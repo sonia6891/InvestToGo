@@ -8,7 +8,8 @@ struct OfficialDistribution: Codable, Hashable {
 }
 /// Official distributions from the ex-rights and ex-dividend notices in the exchanges' open data, TWSE 上市股票除權除息
 /// 預告表 and TPEx 上櫃股票除權除息預告表: upcoming ex-dividend days and cash amounts, without the payment day. Each
-/// refresh adds to what is known, so the record builds up; the bundled official-dividends.json carries the earlier record.
+/// refresh adds to what is known, so the record builds up from the day in sources["since"]; figures over the past year
+/// (frequency, trailing amount) wait until the record covers it. Bundled as official-dividends.json.
 struct OfficialDividends: Codable {
     var sources: [String: String] = [:]
     var events: [String: [OfficialDistribution]] = [:]
@@ -23,8 +24,13 @@ struct OfficialDividends: Codable {
     func isNewer(than other: OfficialDividends) -> Bool { (sources["twse"] ?? "") > (other.sources["twse"] ?? "") || ((sources["twse"] ?? "") == (other.sources["twse"] ?? "") && (sources["tpex"] ?? "") > (other.sources["tpex"] ?? "")) }
     func list(_ symbol: String) -> [OfficialDistribution] { events[symbol] ?? [] }
     func frequency(_ symbol: String) -> String? { freq[symbol] }
-    /// Sum of announced amounts per unit with an ex-dividend date in the past year.
+    /// The day the record starts; nil for a record kept from before, which held data read from the TWSE website.
+    var since: String? { sources["since"] }
+    /// Whether the record covers the past year, so counts and sums over it are whole.
+    var coversYear: Bool { (since ?? "9999") <= DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()) }
+    /// Sum of announced amounts per unit with an ex-dividend date in the past year; nil until the record covers it.
     func trailingAmount(_ symbol: String) -> Double? {
+        guard coversYear else { return nil }
         let from = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()), today = DataChecks.day()
         let items = list(symbol).filter { $0.ex > from && $0.ex <= today && ($0.amount ?? 0) > 0 }
         return items.isEmpty ? nil : items.reduce(0) { $0 + ($1.amount ?? 0) }
@@ -75,14 +81,14 @@ struct OfficialDividends: Codable {
         return events
     }
     /// Adds announcements to the known ones: a known ex-dividend day keeps its payment day, and its amount until the
-    /// notice sets one. With `frequency` the label is worked out again from the past year.
+    /// notice sets one. With `frequency`, once the record covers the past year, the label is worked out again from it.
     func merging(_ fresh: [String: [OfficialDistribution]], frequency: Bool) -> OfficialDividends {
         var next = self
         for (symbol, items) in fresh {
             var byDay = Dictionary(list(symbol).map { ($0.ex, $0) }, uniquingKeysWith: { first, _ in first })
             for item in items { byDay[item.ex] = OfficialDistribution(ex: item.ex, pay: byDay[item.ex]?.pay ?? "", amount: item.amount ?? byDay[item.ex]?.amount) }
             next.events[symbol] = byDay.values.sorted { $0.ex > $1.ex }
-            if frequency, let label = Self.frequency(of: next.events[symbol] ?? []) { next.freq[symbol] = label }
+            if frequency, coversYear, let label = Self.frequency(of: next.events[symbol] ?? []) { next.freq[symbol] = label }
         }
         return next
     }
@@ -90,6 +96,8 @@ struct OfficialDividends: Codable {
     /// record (bundled from TWSE) to tell the frequency from.
     static func fetch(merging old: OfficialDividends, markets: [String: String]) async throws -> OfficialDividends {
         var next = old
+        // A record without its start day holds data read from the TWSE website: start over from the notices.
+        if next.since == nil { next = OfficialDividends(sources: ["since": DataChecks.day()]) }
         var errors: [String] = []
         for (market, url, label) in [("TWSE", twseURL, "上市"), ("TPEx", tpexURL, "上櫃")] {
             do {

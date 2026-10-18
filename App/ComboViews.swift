@@ -125,7 +125,7 @@ extension PortfolioStore {
         let starts = comboStarts(c), total = starts.stock + starts.etf
         return total > 0 ? (starts.stock / total * 100).rounded() / 100 : 0.4
     }
-    /// The holdings' last-year cash dividends as a yield, else 2% for stocks and 4% for ETFs.
+    /// The holdings' last-year cash dividends as a yield once the records cover that year, else 2% for stocks and 4% for ETFs.
     func comboDefaultYields(_ c: ComboSettings) -> (stock: Double, etf: Double) {
         let lines = comboLines(c)
         func weighted(_ items: [ComboLine], perShare: (String) -> Double) -> Double? {
@@ -137,9 +137,8 @@ extension PortfolioStore {
             }
             return weight > 0 ? total / weight : nil
         }
-        let start = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date())
         let stock = weighted(lines.filter(\.isStock)) { StockSnapshot.bundled?.trailingCash($0) ?? 0 }
-        let etf = weighted(lines.filter { !$0.isStock }) { symbol in official.list(symbol).filter { $0.ex > start && $0.ex <= DataChecks.day() }.reduce(0) { $0 + ($1.amount ?? 0) } }
+        let etf = weighted(lines.filter { !$0.isStock }) { official.trailingAmount($0) ?? 0 }
         return (((stock ?? 2) * 100).rounded() / 100, ((etf ?? 4) * 100).rounded() / 100)
     }
     /// Copies the current holdings into the simulated mix, so it can be edited without touching real holdings.

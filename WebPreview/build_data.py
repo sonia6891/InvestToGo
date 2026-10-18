@@ -4,8 +4,10 @@ Run from the repository root:  python -I WebPreview/build_data.py
 
 Distributions come from the exchanges' open data (政府資料開放授權條款): TWSE 上市股票除權除息預告表 (TWT48U_ALL) for
 listed ETFs and TPEx 上櫃股票除權除息預告表 for OTC ETFs. Both list upcoming ex-dividend dates and cash amounts only, with
-no payment date, so each build adds them to the previous snapshot: a known ex-dividend date keeps its payment date,
-and its amount until the notice sets one. Dates more than about two years back are dropped.
+no payment date, so each build adds them to the previous snapshot; a known ex-dividend date keeps its amount until the
+notice sets one. sources["since"] is the day this record started: a snapshot without it still holds distributions
+read from the TWSE website, which is not open data, so the record starts over. Frequencies need a full year in the
+record (不配息 two), and dates more than about two years back are dropped.
 If a source cannot be reached, the previous snapshot of that source is kept.
 """
 import json
@@ -60,8 +62,11 @@ def amount(text):
 
 today = date.today()
 old = previous.get("dividends") or {}
+since = (old.get("sources") or {}).get("since")
+if not since:
+    old, since = {}, today.isoformat()
 events = {sym: {item[0]: list(item) for item in items} for sym, items in (old.get("events") or {}).items() if sym in market}
-sources = {}
+sources = {"since": since}
 
 NOTICES = [
     # (source, market, URL, code field, ex-date field, kind field)
@@ -78,7 +83,7 @@ for key, wanted, url, code_field, day_field, kind_field in NOTICES:
             if market.get(sym) == wanted and ex and "息" in str(row.get(kind_field, "")):
                 known = events.setdefault(sym, {}).get(ex)
                 value = amount(row.get("CashDividend"))
-                events[sym][ex] = [ex, known[1] if known else "", value if value is not None else (known[2] if known else None)]
+                events[sym][ex] = [ex, "", value if value is not None else (known[2] if known else None)]
         sources[key] = today.isoformat()
     except Exception as error:  # keep the previous snapshot of this source
         print(f"{wanted} distributions not refreshed:", error)
@@ -93,10 +98,11 @@ for sym in list(events):
 
 
 def frequency(sym):
-    """Distribution frequency from the number of ex-dividend dates in the past year (listed ETFs only)."""
-    if market.get(sym) != "TWSE" or "twse" not in sources:
-        return None
+    """Distribution frequency from the number of ex-dividend dates in the past year (listed ETFs only), once the
+    record covers that year."""
     year_ago = (today - timedelta(days=365)).isoformat()
+    if market.get(sym) != "TWSE" or "twse" not in sources or since > year_ago:
+        return None
     n = sum(1 for ex, _, _ in events.get(sym, []) if year_ago < ex <= today.isoformat())
     if n >= 9:
         return "月配"
@@ -109,7 +115,8 @@ def frequency(sym):
     if n == 1:
         return "年配"
     listed = listing.get(sym) or ""
-    if not events.get(sym) and listed and listed <= (today - timedelta(days=730)).isoformat():
+    two_years_ago = (today - timedelta(days=730)).isoformat()
+    if not events.get(sym) and since <= two_years_ago and listed and listed <= two_years_ago:
         return "不配息"
     return None
 

@@ -13,6 +13,8 @@ ships this snapshot and shows its date. Live prices still come from the viewer's
   upcoming ex-dates (TWT48U_ALL, TPEx prepost) and past ex-dates (about two years), merged with the previous
   snapshot: TPEx publishes its results table (tpex_exright_daily); TWSE's results table is not open data, so its
   past ex-dates come from the notice on the day, with the cash dividend of a pure ex-dividend as the value.
+"since" holds the day the TAIEX and ex-date histories started from open data alone. Snapshots without it also held
+figures from the TWSE website (FMTQIK, TWT49U), which is not open data, so those histories start over.
 If a source cannot be reached, that part of the previous snapshot is kept.
 """
 import json
@@ -27,6 +29,7 @@ native_target = root / "App/Resources/stock-data.json"
 catalog = json.loads((root / "App/Resources/catalog.json").read_text(encoding="utf-8"))
 etf_ids = {f["id"] for f in catalog["funds"]}
 previous = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
+since = dict(previous.get("since") or {})
 today = date.today()
 
 
@@ -133,6 +136,9 @@ def merged(old, new):
 
 
 taiex = index.get("taiex") or {"name": "加權指數", "hist": []}
+if "taiex" not in since:  # the latest close came from MI_INDEX; only the history goes
+    taiex["hist"], since["taiex"] = [], today.isoformat()
+    index["taiex"] = taiex
 try:
     # 發行量加權股價指數歷史資料 covers the current month only; earlier months come from the previous snapshot.
     new = []
@@ -217,6 +223,8 @@ except Exception as error:
     print("dividend policy not refreshed:", error)
 
 ex_hist = previous.get("exHist") or {}
+if "exHist" not in since:
+    ex_hist, since["exHist"] = {}, today.isoformat()
 try:
     happened = []  # (code, ex-date, 權值＋息值 or None, 息 / 權 / 權息)
     for x in get_json("https://openapi.twse.com.tw/v1/exchangeReport/TWT48U_ALL"):
@@ -255,7 +263,7 @@ except Exception as error:
 
 out = {
     "fetchedDay": today.isoformat(), "closeDate": close_date, "industries": industries, "stocks": stocks, "close": close,
-    "index": index, "revenue": revenue, "eps": eps, "divPolicy": policy, "exHist": ex_hist, "exNext": ex_next,
+    "index": index, "revenue": revenue, "eps": eps, "divPolicy": policy, "exHist": ex_hist, "exNext": ex_next, "since": since,
 }
 text = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
 target.write_text(text, encoding="utf-8")

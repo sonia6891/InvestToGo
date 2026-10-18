@@ -239,7 +239,9 @@ struct StockDetailView: View {
         let price: Double = quote?.price ?? 0
         let yield: Double = cash > 0 && price > 0 ? cash / price * 100 : 0
         let history = snapshot?.exHistory[symbol] ?? [], upcoming = snapshot?.exUpcoming[symbol] ?? [], policies = snapshot?.policies[symbol] ?? []
-        let tpex = store.stock(symbol)?.market == "TPEx"
+        // The history builds up from the exchanges' open data from `since`; no yield until it covers a year.
+        let since = snapshot?.exHistorySince.map { $0.replacingOccurrences(of: "-", with: "/") }
+        let covered = snapshot?.exHistoryCoversYear ?? false
         return VStack(alignment: .leading, spacing: 16) {
             Card(padding: 14) {
                 HStack {
@@ -247,7 +249,7 @@ struct StockDetailView: View {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) { Text("現金殖利率").font(.caption).foregroundStyle(Palette.muted); Text(yield > 0 ? "\(decimal(yield))%" : "—").font(.title3.bold()).monospacedDigit().foregroundStyle(Palette.ink) }
                 }
-                Text(yield > 0 ? "依現價計算；除權息同時進行的不計入。" : (tpex ? "上櫃公司目前只收錄近期除權息預告。" : "近一年沒有純除息紀錄。")).font(.caption).foregroundStyle(Palette.muted).padding(.top, 6)
+                Text(yield > 0 ? "依現價計算；除權息同時進行的不計入。" : (covered ? "近一年沒有純除息紀錄。" : "除權息紀錄自 \(since ?? "今日") 起累積，滿一年後才計算殖利率。")).font(.caption).foregroundStyle(Palette.muted).padding(.top, 6)
             }
             if !policies.isEmpty {
                 Card(padding: 14) {
@@ -276,13 +278,14 @@ struct StockDetailView: View {
             }
             Card(padding: 12) {
                 if history.isEmpty {
-                    Text(tpex ? "上櫃公司的除權息歷史尚未收錄。" : "近兩年沒有除權息紀錄。").font(.subheadline).foregroundStyle(Palette.muted)
+                    Text(since.map { "除權息紀錄自 \($0) 起累積，目前還沒有紀錄。" } ?? "近兩年沒有除權息紀錄。").font(.subheadline).foregroundStyle(Palette.muted)
                 } else {
                     HStack { Text("除權息日"); Spacer(); Text("類型").frame(width: 60); Text("權值＋息值").frame(width: 90, alignment: .trailing) }.font(.caption.bold()).foregroundStyle(Palette.muted)
                     ForEach(history.prefix(12)) { item in
                         Divider().padding(.vertical, 6)
                         HStack { Text(item.date.replacingOccurrences(of: "-", with: "/")).monospacedDigit(); Spacer(); Text(item.kind).frame(width: 60); Text(item.value.map { "\(decimal($0)) 元" } ?? "—").bold().monospacedDigit().frame(width: 90, alignment: .trailing) }.font(.subheadline).foregroundStyle(Palette.ink)
                     }
+                    Text("紀錄自 \(since ?? "—") 起累積；上市配股的權值不在交易所開放資料中，顯示「—」。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
                 }
             }
             NavigationLink(value: AppRoute.dividendForm(id: nil, symbol: symbol, officialEx: nil)) { PrimaryButtonLabel(title: "記錄這檔配息") }.buttonStyle(.plain)

@@ -41,6 +41,8 @@ final class StockSnapshot {
     let policies: [String: [Policy]]
     let exHistory: [String: [ExRight]]
     let exUpcoming: [String: [ExRight]]
+    /// The day the ex-date history started from the exchanges' open data alone.
+    let exHistorySince: String?
     private let closes: [String: [Double?]]
 
     static let bundled: StockSnapshot? = {
@@ -105,6 +107,7 @@ final class StockSnapshot {
         }
         exHistory = exRights("exHist")
         exUpcoming = exRights("exNext")
+        exHistorySince = (root["since"] as? [String: Any])?["exHist"] as? String
     }
 
     /// The exchange's last close as a quote, dated with the trading day.
@@ -128,8 +131,11 @@ final class StockSnapshot {
         }
         return ranked.sorted { $0.1 > $1.1 }.prefix(count).map(\.0)
     }
-    /// Cash paid in pure ex-dividend events during the past year (per share).
-    func trailingCash(_ symbol: String) -> Double {
+    /// Whether the ex-date history covers the past year, so sums over it are whole.
+    var exHistoryCoversYear: Bool { (exHistorySince ?? "9999") <= DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()) }
+    /// Cash paid in pure ex-dividend events during the past year (per share); nil until the history covers it.
+    func trailingCash(_ symbol: String) -> Double? {
+        guard exHistoryCoversYear else { return nil }
         let start = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date())
         return (exHistory[symbol] ?? []).filter { $0.date > start && $0.kind == "息" }.reduce(0) { $0 + ($1.value ?? 0) }
     }

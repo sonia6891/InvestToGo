@@ -316,6 +316,7 @@ struct DividendFormView: View {
                         Spacer(minLength: 4)
                         Button("帶入") { apply(event) }.font(.caption.bold())
                     }.padding(10).background(Palette.green.opacity(0.1), in: RoundedRectangle(cornerRadius: 12)).padding(.top, 8)
+                    if event.pay.isEmpty { Text("公告沒有發放日：帶入後請依投信公告填寫發放日期。").font(.caption).foregroundStyle(Palette.muted) }
                 }
                 VStack(spacing: 2) {
                     FieldRow(title: "符合資格股數") { UnitField(placeholder: "股數", text: $shares, unit: "股", identifier: "dividend-shares") }
@@ -368,9 +369,8 @@ struct DividendFormView: View {
     private func apply(_ event: OfficialDistribution) {
         if let amount = event.amount { perShare = String(amount) }
         hasExDate = true; exDate = DataChecks.date(event.ex) ?? exDate
-        let payText = event.pay.isEmpty ? event.ex : event.pay
-        date = DataChecks.date(payText) ?? date
-        source = payText > DataChecks.day() ? .announcement : .broker
+        // Without a payment day (the open data has none) the date stays for the viewer, and it is an announcement.
+        if let pay = DataChecks.date(event.pay) { date = pay; source = event.pay > DataChecks.day() ? .announcement : .broker } else { source = .announcement }
         if shares.isEmpty { fillShares() }
     }
     private func save() {

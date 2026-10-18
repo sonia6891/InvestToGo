@@ -179,7 +179,7 @@ struct DiscoverView: View {
                     quickRow(.management, options: ["主動型", "被動型"], all: true)
                     quickRow(.theme, options: ["市值型", "高股息", "產業主題"])
                     quickRow(.industry, options: ["科技", "金融", "傳產", "跨產業"])
-                    quickRow(.frequency, options: ["月配", "季配"], more: true)
+                    if !store.official.freq.isEmpty { quickRow(.frequency, options: ["月配", "季配"], more: true) }
                 }
             }
             HStack {
@@ -300,7 +300,7 @@ struct FilterSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    ForEach(FilterGroup.allCases, id: \.self) { group in
+                    ForEach(FilterGroup.allCases.filter { $0 != .frequency || !store.official.freq.isEmpty }, id: \.self) { group in
                         VStack(alignment: .leading, spacing: 10) {
                             Label(group.title, systemImage: group.icon).font(.headline).foregroundStyle(Palette.ink)
                             FlowChips {
@@ -310,7 +310,7 @@ struct FilterSheet: View {
                         }.padding(.vertical, 12)
                         Divider()
                     }
-                    Text("交易市場、資產類別依官方名單的基金類型；產業與商品結構依名稱歸類；配息頻率依近一年除息次數推算，上櫃 ETF 尚無歷史資料。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 12)
+                    Text("交易市場、資產類別依官方名單的基金類型；產業與商品結構依名稱歸類；配息頻率依近一年除息次數推算，需累積滿一年的官方公告（上櫃 ETF 不提供），在那之前不列入篩選。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 12)
                 }
                 .padding(20)
             }
@@ -622,14 +622,14 @@ struct FundDividends: View {
         VStack(alignment: .leading, spacing: 14) {
             Card {
                 HStack {
-                    VStack(alignment: .leading, spacing: 4) { Text("官方配息頻率").font(.caption).foregroundStyle(Palette.muted); Text(store.official.frequency(fund.id) ?? "未收錄").font(.title2.bold()).foregroundStyle(Palette.ink) }
+                    VStack(alignment: .leading, spacing: 4) { Text("官方配息頻率").font(.caption).foregroundStyle(Palette.muted); Text(store.official.frequency(fund.id) ?? (store.official.coversYear ? "未收錄" : "累積中")).font(.title2.bold()).foregroundStyle(Palette.ink) }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) { Text("你記錄的已入帳").font(.caption).foregroundStyle(Palette.muted); Text(shown(money(items.filter { $0.status == .paid }.reduce(0) { $0 + $1.amount }), hidden: hidden)).font(.title3.bold()).monospacedDigit().foregroundStyle(Palette.ink) }
                 }
             }
             Card(padding: 12) {
                 if official.isEmpty {
-                    Text(fund.market == "TPEx" ? "上櫃 ETF 目前只有近期除權息預告，暫無這檔的公告。" : "近兩年沒有這檔的收益分配紀錄。").font(.subheadline).foregroundStyle(Palette.muted).padding(4)
+                    Text(store.official.coversYear ? "近一年沒有這檔的除息公告。" : "目前沒有這檔的除息公告；官方公告自 \((store.official.since ?? "").replacingOccurrences(of: "-", with: "/")) 起累積。").font(.subheadline).foregroundStyle(Palette.muted).padding(4)
                 } else {
                     VStack(spacing: 8) {
                         HStack { Text("除息日").frame(maxWidth: .infinity, alignment: .leading); Text("發放日").frame(maxWidth: .infinity, alignment: .leading); Text("每單位").frame(width: 80, alignment: .trailing) }.font(.caption2.bold()).foregroundStyle(Palette.muted)
@@ -640,6 +640,7 @@ struct FundDividends: View {
                                 Text(event.amount.map { "\(decimal($0)) 元" } ?? "待公布").font(.caption.bold()).monospacedDigit().frame(width: 80, alignment: .trailing)
                             }.foregroundStyle(Palette.ink)
                         }
+                        Text("交易所開放資料只有除息日與金額，沒有發放日，請以投信公告為準。").font(.caption).foregroundStyle(Palette.muted).frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
@@ -691,7 +692,7 @@ struct BasisView: View {
                     facet("point.3.connected.trianglepath.dotted", Palette.purple, "分散性", topTen.map { "前十大 \(decimal($0))%" } ?? "需成分資料")
                     facet("waveform.path.ecg", Palette.teal, "波動度", stats?.volatility.map { "年化 \(decimal($0 * 100))%" } ?? "需歷史資料")
                     facet("chart.line.downtrend.xyaxis", Palette.red, "最大回檔", stats.map { "\(decimal($0.drawdown * 100))%" } ?? "需歷史資料")
-                    facet("dollarsign", Palette.orange, "配息歷史", store.official.frequency(symbol).map { "\($0)・近一年 \(recent) 次" } ?? "未收錄")
+                    facet("dollarsign", Palette.orange, "配息歷史", store.official.frequency(symbol).map { "\($0)・近一年 \(recent) 次" } ?? (store.official.coversYear ? "未收錄" : "累積中"))
                 }.padding(.top, 12)
             }
             Card {

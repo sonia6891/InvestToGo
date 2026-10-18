@@ -113,6 +113,14 @@ final class PortfolioTests: XCTestCase {
         XCTAssertGreaterThan(quote.price, 0); XCTAssertEqual(quote.currency, "TWD"); XCTAssertTrue(quote.isValid)
         XCTAssertNotNil(snapshot.indices["taiex"]?.close)
         XCTAssertNotNil(snapshot.indices["tpex"]?.close)
+        XCTAssertNotNil(snapshot.exHistorySince, "The bundled ex-date history says where it starts")
+        // No trailing cash until the ex-date history covers a year.
+        let day = DataChecks.day(Calendar.current.date(byAdding: .month, value: -2, to: Date())!)
+        func made(since: String) throws -> StockSnapshot {
+            try XCTUnwrap(StockSnapshot(Data(#"{"stocks":[],"industries":[],"exHist":{"2330":[["\#(day)",5.0,"息"],["\#(day)",1.0,"權"]]},"since":{"exHist":"\#(since)"}}"#.utf8)))
+        }
+        XCTAssertNil(try made(since: DataChecks.day()).trailingCash("2330"))
+        XCTAssertEqual(try made(since: "2024-01-01").trailingCash("2330"), 5)
     }
     @MainActor func testStockHoldingIsValuedAndComboPersists() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -222,6 +230,21 @@ final class PortfolioTests: XCTestCase {
         XCTAssertEqual(merged.list("00878"), [OfficialDistribution(ex: "2026-10-19", pay: "2026-11-14", amount: 0.4)])
         XCTAssertEqual(merged.list("00679B"), [OfficialDistribution(ex: "2026-10-16", pay: "", amount: 0.36)])
         XCTAssertEqual(merged.freq, ["00878": "季配"], "Frequencies change only when asked")
+        // Past-year figures wait until the record covers the year.
+        let quarters = (1...4).map { DataChecks.day(Calendar.current.date(byAdding: .month, value: -3 * $0 + 1, to: Date())!) }
+        var started = OfficialDividends(sources: ["since": DataChecks.day()])
+        started.events["0056"] = quarters.map { OfficialDistribution(ex: $0, pay: "", amount: 1) }
+        XCTAssertFalse(started.coversYear); XCTAssertNil(started.trailingAmount("0056"))
+        XCTAssertNil(started.merging(["0056": []], frequency: true).frequency("0056"), "No frequency from part of a year")
+        var whole = started
+        whole.sources["since"] = DataChecks.day(Calendar.current.date(byAdding: .day, value: -366, to: Date())!)
+        XCTAssertTrue(whole.coversYear); XCTAssertEqual(whole.trailingAmount("0056"), 4)
+        XCTAssertEqual(whole.merging(["0056": []], frequency: true).frequency("0056"), "季配")
+        XCTAssertNil(OfficialDividends().since, "A record kept from before has no start day")
+        // The bundled record comes from the open data alone: it says where it starts and has no payment days.
+        let bundled = OfficialDividends.bundled()
+        XCTAssertNotNil(bundled.since)
+        XCTAssertTrue(bundled.events.values.joined().allSatisfy { $0.pay.isEmpty })
     }
     func testLiveProtocolMessages() throws {
         XCTAssertEqual(LiveProtocol.parse(#"{"event":"authenticated","data":{"message":"Authenticated successfully"}}"#), .authenticated)
