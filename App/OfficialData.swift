@@ -67,9 +67,7 @@ struct OfficialDividends: Codable {
     /// ExRrightsExDividend. Both write dates in ROC years ("1151022").
     static func decode(_ bytes: Data, market: String, markets: [String: String]) throws -> [String: [OfficialDistribution]] {
         let keys = market == "TPEx" ? ("SecuritiesCompanyCode", "ExRrightsExDividendDate", "ExRrightsExDividend") : ("Code", "Date", "Exdividend")
-        var data = bytes
-        if data.starts(with: [0xEF, 0xBB, 0xBF]) { data = data.dropFirst(3) }
-        guard let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]], rows.first.map({ $0[keys.0] != nil && $0[keys.1] != nil }) ?? true
+        guard let rows = PublicHTTP.jsonRows(bytes), rows.first.map({ $0[keys.0] != nil && $0[keys.1] != nil }) ?? true
         else { throw AppDataError(market == "TPEx" ? "上櫃配息資料格式不符。" : "上市配息資料格式不符。") }
         var events: [String: [OfficialDistribution]] = [:]
         for row in rows {
@@ -81,14 +79,17 @@ struct OfficialDividends: Codable {
         return events
     }
     /// Adds announcements to the known ones: a known ex-dividend day keeps its payment day, and its amount until the
-    /// notice sets one. With `frequency`, once the record covers the past year, the label is worked out again from it.
+    /// notice sets one. With `frequency`, once the record covers the past year, every ETF's label is worked out again
+    /// from the whole record (an ETF with no new announcement still gets one, and a changed rhythm is relabelled).
     func merging(_ fresh: [String: [OfficialDistribution]], frequency: Bool) -> OfficialDividends {
         var next = self
         for (symbol, items) in fresh {
             var byDay = Dictionary(list(symbol).map { ($0.ex, $0) }, uniquingKeysWith: { first, _ in first })
             for item in items { byDay[item.ex] = OfficialDistribution(ex: item.ex, pay: byDay[item.ex]?.pay ?? "", amount: item.amount ?? byDay[item.ex]?.amount) }
             next.events[symbol] = byDay.values.sorted { $0.ex > $1.ex }
-            if frequency, coversYear, let label = Self.frequency(of: next.events[symbol] ?? []) { next.freq[symbol] = label }
+        }
+        if frequency, coversYear {
+            for (symbol, items) in next.events { next.freq[symbol] = Self.frequency(of: items) }
         }
         return next
     }

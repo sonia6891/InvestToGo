@@ -119,7 +119,7 @@ final class StockSnapshot {
         let previous = change.map { price - $0 }
         let percent: Double? = (previous ?? 0) > 0 ? (change ?? 0) / previous! * 100 : nil
         let fetched = DataChecks.date(day).map { $0.addingTimeInterval(13.5 * 3600) } ?? Date.distantPast
-        var quote = Quote(symbol: symbol, price: price, changePercent: percent, date: day, fetchedAt: fetched, currency: "TWD", change: change, open: row[2], high: row[3], low: row[4], volume: row[5].map { ($0 / 1000).rounded() })
+        var quote = Quote(symbol: symbol, price: price, changePercent: percent, date: day, fetchedAt: fetched, currency: "TWD", change: change, open: row[2], high: row[3], low: row[4], volume: row[5].map { ($0 / 1000).rounded() }, source: OpenData.source)
         if !quote.isValid { quote.open = nil; quote.high = nil; quote.low = nil; quote.volume = nil }
         return quote.isValid ? quote : nil
     }

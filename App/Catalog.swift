@@ -74,6 +74,12 @@ enum PublicHTTP {
         guard bytes.count <= 10_000_000 else { throw AppDataError("資料超過大小上限，保留原資料。") }
         return bytes
     }
+    /// The exchanges' open data as rows: a JSON array of objects, sometimes behind a UTF-8 byte order mark.
+    static func jsonRows(_ bytes: Data) -> [[String: Any]]? {
+        var data = bytes
+        if data.starts(with: [0xEF, 0xBB, 0xBF]) { data = data.dropFirst(3) }
+        return (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]]
+    }
     private final class NoRedirect: NSObject, URLSessionTaskDelegate {
         func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
     }
@@ -134,9 +140,7 @@ enum CatalogAPI {
         try value.validate(); return value
     }
     private static func rows(_ bytes: Data) throws -> [[String: Any]] {
-        var data = bytes
-        if data.starts(with: [0xEF, 0xBB, 0xBF]) { data = data.dropFirst(3) }
-        guard let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]], !rows.isEmpty else { throw AppDataError("上市或上櫃資料不完整，保留原名單。") }
+        guard let rows = PublicHTTP.jsonRows(bytes), !rows.isEmpty else { throw AppDataError("上市或上櫃資料不完整，保留原名單。") }
         return rows
     }
     private static func text(_ value: Any?) -> String? {

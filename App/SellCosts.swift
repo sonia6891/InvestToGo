@@ -24,14 +24,20 @@ enum SellCosts {
     static func brokerKey(_ broker: String) -> String {
         broker.replacingOccurrences(of: "（融資）", with: "").replacingOccurrences(of: "(融資)", with: "").trimmingCharacters(in: .whitespaces)
     }
-    /// The rates the viewer set, by broker; the key "" holds a default for every other broker.
+    /// The rates the viewer set, by broker; the key "" holds a default for every other broker. Decoded once per
+    /// defaults store and kept, since marketValue(of:) asks for a rate on every holding of every render.
     static func rates(in defaults: UserDefaults = .standard) -> [String: FeeRate] {
-        guard let bytes = defaults.data(forKey: ratesKey), let stored = try? JSONDecoder().decode([String: FeeRate].self, from: bytes) else { return [:] }
+        if defaults === UserDefaults.standard, let known = cached { return known }
+        let stored = defaults.data(forKey: ratesKey).flatMap { try? JSONDecoder().decode([String: FeeRate].self, from: $0) } ?? [:]
+        if defaults === UserDefaults.standard { cached = stored }
         return stored
     }
     static func save(_ rates: [String: FeeRate], in defaults: UserDefaults = .standard) {
         if let bytes = try? JSONEncoder().encode(rates) { defaults.set(bytes, forKey: ratesKey) }
+        if defaults === UserDefaults.standard { cached = rates }
     }
+    /// The app's own store, decoded once; test suites are read each time.
+    private static var cached: [String: FeeRate]?
     /// The viewer's own rate for the broker, else its common online rate, else the viewer's default, else the list price.
     static func rate(for broker: String, in defaults: UserDefaults = .standard) -> FeeRate {
         let set = rates(in: defaults), key = brokerKey(broker)

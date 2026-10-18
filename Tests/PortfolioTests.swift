@@ -196,6 +196,8 @@ final class PortfolioTests: XCTestCase {
         XCTAssertEqual(day.day, "2026-10-16")
         var lagging = day; lagging.indices["taiex"]?.date = "2026-10-15"
         XCTAssertEqual(lagging.settledDay, "2026-10-15"); XCTAssertEqual(day.settledDay, "2026-10-16")
+        var oneIndex = day; oneIndex.indices["taiex"] = nil
+        XCTAssertEqual(oneIndex.settledDay, "2026-10-16", "An index that did not decode does not make the closes look behind")
     }
     func testOpenDataDistributions() throws {
         // Shapes of October 2026: TWSE 上市股票除權除息預告表 (息/權, amount empty until set, stocks and ETNs too) and
@@ -240,6 +242,9 @@ final class PortfolioTests: XCTestCase {
         whole.sources["since"] = DataChecks.day(Calendar.current.date(byAdding: .day, value: -366, to: Date())!)
         XCTAssertTrue(whole.coversYear); XCTAssertEqual(whole.trailingAmount("0056"), 4)
         XCTAssertEqual(whole.merging(["0056": []], frequency: true).frequency("0056"), "季配")
+        XCTAssertEqual(whole.merging(["00919": []], frequency: true).frequency("0056"), "季配", "Every ETF in the record is labelled, not only those in the notice")
+        var quiet = whole; quiet.freq["0056"] = "月配"
+        XCTAssertEqual(quiet.merging([:], frequency: true).frequency("0056"), "季配", "A label from before is corrected from the record")
         XCTAssertNil(OfficialDividends().since, "A record kept from before has no start day")
         // The bundled record comes from the open data alone: it says where it starts and has no payment days.
         let bundled = OfficialDividends.bundled()

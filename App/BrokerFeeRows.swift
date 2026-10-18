@@ -29,7 +29,8 @@ struct BrokerFeeRows: View {
             }
         }
         .onAppear { rate = SellCosts.rate(for: broker) }
-        .onChange(of: broker) { _, value in rate = SellCosts.rate(for: value) }
+        // Typing on (國泰證 → 國泰證券) or fixing a typo keeps what the viewer typed in the fee; a different broker's rate replaces it.
+        .onChange(of: broker) { old, value in if SellCosts.rate(for: old) != SellCosts.rate(for: value) { rate = SellCosts.rate(for: value) } }
     }
     private var hasBroker: Bool { !SellCosts.brokerKey(broker).isEmpty }
     private var nameField: some View {

@@ -12,8 +12,9 @@ enum OpenData {
         var fetchedAt: Date
         /// The latest trading day in the data (TWSE and TPEx may be a day apart while one has not published yet).
         var day: String { (Array(quotes.values) + Array(indices.values)).map(\.date).max() ?? "" }
-        /// The older of the two exchanges' latest days, by their indices: TWSE's open data can lag TPEx's by a day or more.
-        var settledDay: String { min(indices["taiex"]?.date ?? "", indices["tpex"]?.date ?? "") }
+        /// The older of the two exchanges' latest days, by their indices: TWSE's open data can lag TPEx's by a day or
+        /// more. An index that did not decode does not count, or the closes would look behind forever.
+        var settledDay: String { ["taiex", "tpex"].compactMap { indices[$0]?.date }.min() ?? day }
     }
     private static let twseQuotes = URL(string: "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL")!
     private static let twseIndices = URL(string: "https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX")!
@@ -39,9 +40,7 @@ enum OpenData {
         return try? decode(bytes)
     }
     private static func rows(_ bytes: Data) throws -> [[String: Any]] {
-        var data = bytes
-        if data.starts(with: [0xEF, 0xBB, 0xBF]) { data = data.dropFirst(3) }
-        guard let rows = (try? JSONSerialization.jsonObject(with: data)) as? [[String: Any]] else { throw StoreError.invalidQuote }
+        guard let rows = PublicHTTP.jsonRows(bytes) else { throw StoreError.invalidQuote }
         return rows
     }
     private static func number(_ value: Any?) -> Double? {

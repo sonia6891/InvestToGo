@@ -289,6 +289,8 @@ struct DividendFormView: View {
     @State private var legacy = false
     @State private var error: String?
     @State private var loaded = false
+    /// 帶入 of an announcement without a payment day (the open data has none): the date is the viewer's to set.
+    @State private var needsPayDate = false
     private let officialEx: String?
     /// Recorded from one holding: its shares, not every holding of the code.
     private let holdingID: UUID?
@@ -342,6 +344,7 @@ struct DividendFormView: View {
             Text("紀錄類型決定狀態：證券帳務＝已入帳、投信公告＝已公告、自行預估＝預估。公告與預估不計入已入帳股息。").font(.caption).foregroundStyle(Palette.muted)
         }
         .navigationTitle(id == nil ? "新增配息紀錄" : "編輯配息紀錄").navigationBarTitleDisplayMode(.inline)
+        .onChange(of: date) { _, _ in needsPayDate = false }
         .onAppear(perform: load)
     }
     private var preview: String? {
@@ -370,12 +373,13 @@ struct DividendFormView: View {
         if let amount = event.amount { perShare = String(amount) }
         hasExDate = true; exDate = DataChecks.date(event.ex) ?? exDate
         // Without a payment day (the open data has none) the date stays for the viewer, and it is an announcement.
-        if let pay = DataChecks.date(event.pay) { date = pay; source = event.pay > DataChecks.day() ? .announcement : .broker } else { source = .announcement }
+        if let pay = DataChecks.date(event.pay) { date = pay; source = event.pay > DataChecks.day() ? .announcement : .broker } else { source = .announcement; needsPayDate = true }
         if shares.isEmpty { fillShares() }
     }
     private func save() {
         error = nil
         guard DataChecks.code(code) else { error = "請輸入正確的 ETF 代號。"; return }
+        guard !needsPayDate else { error = "公告沒有發放日，請依投信公告選擇發放日期再儲存。"; return }
         let ded = Double(deduction.replacingOccurrences(of: ",", with: "")) ?? 0
         var item = store.data.dividends.first { $0.id == id } ?? Dividend(symbol: code, date: date, amount: 0, status: source.status)
         item.symbol = code; item.date = date; item.status = source.status; item.source = source.rawValue

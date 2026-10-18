@@ -131,8 +131,8 @@ struct Quote: Codable {
     var source: String? = nil
     /// True while the price is a trial match (before the open or in the closing call) rather than a trade; never saved.
     var trial: Bool? = nil
-    /// A trading day's close (the open data, or the bundled snapshot stamped 13:30 that day) rather than a live price.
-    var isDailyClose: Bool { source == OpenData.source || DataChecks.date(date).map { $0.addingTimeInterval(13.5 * 3600) == fetchedAt } ?? false }
+    /// A trading day's close (the open data, or the bundled snapshot) rather than a live price.
+    var isDailyClose: Bool { source == OpenData.source }
     var isTWD: Bool { currency == "TWD" || (currency == nil && Fund.starters.contains { $0.id == symbol }) }
     var isValid: Bool {
         price.isFinite && price > 0 && [change, changePercent].allSatisfy { $0?.isFinite ?? true }
@@ -446,6 +446,7 @@ enum StoreError: LocalizedError {
                 let wanted = Set(targets)
                 guard wanted.contains(where: { closes[$0] != nil }) else { throw AppDataError("目前沒有這些代號的收盤資料，保留上次報價。") }
                 fetched = closes.filter { wanted.contains($0.key) && $0.value.fetchedAt > (data.quotes[$0.key]?.fetchedAt ?? .distantPast) }
+                guard !fetched.isEmpty else { message = "收盤資料已是最新（\((daily?.day ?? "").replacingOccurrences(of: "-", with: "/"))）。"; return }
             } else {
                 // In a list, prices streamed in the last minute are already current. PublicHTTP spaces the requests so
                 // they stay within the plan together with live polling; what arrived before an error is still kept.
