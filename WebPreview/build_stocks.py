@@ -12,7 +12,9 @@ ships this snapshot and shows its date. Live prices still come from the viewer's
 - Monthly revenue (t187ap05), latest quarterly EPS (t187ap06 *_ci), latest dividend decision (TWSE t187ap45_L),
   upcoming ex-dates (TWT48U_ALL, TPEx prepost) and past ex-dates (about two years), merged with the previous
   snapshot: TPEx publishes its results table (tpex_exright_daily); TWSE's results table is not open data, so its
-  past ex-dates come from the notice on the day, with the cash dividend of a pure ex-dividend as the value.
+  past ex-dates come from the notice, with the cash dividend of a pure ex-dividend as the value. The notices keep
+  only a few past days and builds can be far apart, so notices still ahead are kept in "exPending" and become
+  history once their day has passed.
 "since" holds the day the TAIEX and ex-date histories started from open data alone. Snapshots without it also held
 figures from the TWSE website (FMTQIK, TWT49U), which is not open data, so those histories start over.
 If a source cannot be reached, that part of the previous snapshot is kept.
@@ -62,11 +64,6 @@ def number(text):
         return float(str(text).replace(",", "").strip())
     except (TypeError, ValueError):
         return None
-
-
-def keep(key, error):
-    print(f"{key} not refreshed:", error)
-    return previous.get(key)
 
 
 # Industry codes shared by both exchanges; names in the revenue datasets take precedence when present.
@@ -222,22 +219,52 @@ try:
 except Exception as error:
     print("dividend policy not refreshed:", error)
 
+# ---- ex-rights and ex-dividend dates: (code, day, 權值＋息值 or None, 息 / 權 / 權息) ----
+tracked = stock_ids | etf_ids
+day_text = today.isoformat()
 ex_hist = previous.get("exHist") or {}
+pending = [tuple(p) for p in (previous.get("exPending") or []) if len(p) == 4 and p[0] in tracked]
 if "exHist" not in since:
-    ex_hist, since["exHist"] = {}, today.isoformat()
+    ex_hist, pending, since["exHist"] = {}, [], today.isoformat()
+
+
+def notice_value(kind, cash):
+    """The notice gives the cash only; the 權值 of a stock dividend depends on the price before the ex-date."""
+    return cash if kind == "息" else None
+
+
+notices = None
 try:
-    happened = []  # (code, ex-date, 權值＋息值 or None, 息 / 權 / 權息)
+    notices = []
     for x in get_json("https://openapi.twse.com.tw/v1/exchangeReport/TWT48U_ALL"):
         kind = str(x.get("Exdividend") or "").strip()
-        # The 權值 of a stock dividend depends on the price before the ex-date, which the notice does not give.
-        happened.append((x["Code"].strip(), roc_day(x["Date"]), number(x.get("CashDividend")) if kind == "息" else None, kind))
+        notices.append((x["Code"].strip(), roc_day(x["Date"]), notice_value(kind, number(x.get("CashDividend"))), kind))
+    for x in get_json("https://www.tpex.org.tw/openapi/v1/tpex_exright_prepost"):
+        kind = str(x.get("ExRrightsExDividend") or "").strip().replace("除", "")
+        notices.append((str(x.get("SecuritiesCompanyCode", "")).strip(), roc_day(x.get("ExRrightsExDividendDate")), notice_value(kind, number(x.get("CashDividend"))), kind))
+    notices = [n for n in notices if n[0] in tracked and n[1] and n[3]]
+except Exception as error:
+    notices = None
+    print("ex-dividend notices not refreshed:", error)
+
+results = []
+try:
     for x in get_json("https://www.tpex.org.tw/openapi/v1/tpex_exright_daily"):
-        happened.append((x["SecuritiesCompanyCode"].strip(), roc_day(x["Date"]), number(x.get("StockDividendPlusCashDividend")),
-                         str(x.get("ExRightsDiviend") or "").strip().replace("除", "")))
+        results.append((x["SecuritiesCompanyCode"].strip(), roc_day(x["Date"]), number(x.get("StockDividendPlusCashDividend")),
+                        str(x.get("ExRightsDiviend") or "").strip().replace("除", "")))
+    results = [r for r in results if r[0] in tracked and r[1] and r[3]]
+except Exception as error:
+    print("TPEx ex-dividend results not refreshed:", error)
+
+if notices is not None or results:
     fresh = {code: {e[0]: e for e in items} for code, items in ex_hist.items()}
-    for code, d, v, kind in happened:
-        if (code in stock_ids or code in etf_ids) and d and d <= today.isoformat() and kind and (v is not None or kind != "息"):
-            fresh.setdefault(code, {})[d] = [d, v, kind]
+    # Later sources win: today's notice over an earlier one, the results table over both. A value already known
+    # stays when the newer source has none (the notice gives no 權值 the results table gave the day before).
+    for code, d, v, kind in pending + (notices or []) + results:
+        known = fresh.setdefault(code, {}).get(d)
+        value = v if v is not None else (known[1] if known else None)
+        if d <= day_text and (value is not None or kind != "息"):
+            fresh[code][d] = [d, value, kind]
     oldest = (today - timedelta(days=730)).isoformat()
     kept = {}
     for code, by_day in fresh.items():
@@ -245,25 +272,20 @@ try:
         if items:
             kept[code] = items
     ex_hist = kept
-except Exception as error:
-    print("ex-dividend history not refreshed:", error)
-
-ex_next = {}
-try:
-    for x in get_json("https://openapi.twse.com.tw/v1/exchangeReport/TWT48U_ALL"):
-        code, d = x["Code"].strip(), roc_day(x["Date"])
-        if code in stock_ids and d >= today.isoformat():
-            ex_next.setdefault(code, []).append([d, number(x.get("CashDividend")), (x.get("Exdividend") or "").strip()])
-    for x in get_json("https://www.tpex.org.tw/openapi/v1/tpex_exright_prepost"):
-        code, d = str(x.get("SecuritiesCompanyCode", "")).strip(), roc_day(x.get("ExRrightsExDividendDate"))
-        if code in stock_ids and d >= today.isoformat():
-            ex_next.setdefault(code, []).append([d, number(x.get("CashDividend")), str(x.get("ExRrightsExDividend", "")).strip()])
-except Exception as error:
-    ex_next = keep("exNext", error) or {}
+if notices is not None:
+    pending = [n for n in notices if n[1] > day_text]
+    ex_next = {}
+    for code, d, v, kind in notices:
+        if code in stock_ids and d >= day_text:
+            ex_next.setdefault(code, []).append([d, v, kind])
+else:
+    pending = [p for p in pending if p[1] > day_text]
+    ex_next = previous.get("exNext") or {}
 
 out = {
     "fetchedDay": today.isoformat(), "closeDate": close_date, "industries": industries, "stocks": stocks, "close": close,
-    "index": index, "revenue": revenue, "eps": eps, "divPolicy": policy, "exHist": ex_hist, "exNext": ex_next, "since": since,
+    "index": index, "revenue": revenue, "eps": eps, "divPolicy": policy, "exHist": ex_hist, "exNext": ex_next,
+    "exPending": [list(p) for p in pending], "since": since,
 }
 text = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
 target.write_text(text, encoding="utf-8")
