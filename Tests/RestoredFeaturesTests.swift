@@ -89,6 +89,12 @@ final class RestoredFeaturesTests: XCTestCase {
         XCTAssertEqual(stats.annualized!,pow(1.1,365.25/366)-1,accuracy:0.000001)
         XCTAssertNil(stats.volatility)
     }
+    func testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays() {
+        let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-02",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-03",source:"test")
+        XCTAssertThrowsError(try h.validate())
+        XCTAssertNil(DataChecks.date("2025-02-30")); XCTAssertNil(DataChecks.date("2025-1-05"))
+        XCTAssertEqual(DataChecks.date("2025-01-05").map { DataChecks.day($0) }, "2025-01-05")
+    }
     func testHistoryRejectsUnadjustedDataAndDuplicateDates() {
         XCTAssertThrowsError(try Fugle.decodeHistory(Data(#"{"symbol":"0050","timeframe":"D","data":[]}"#.utf8),symbol:"0050"))
         let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-01",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-02",source:"test")

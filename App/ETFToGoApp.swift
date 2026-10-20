@@ -131,17 +131,18 @@ struct DiscoverView: View {
     @FocusState private var searchFocused: Bool
     var funds: [Fund] { store.funds.filter { (query.isEmpty || $0.id.localizedCaseInsensitiveContains(query) || $0.name.localizedCaseInsensitiveContains(query)) && (filter == "全部" || $0.strategy.rawValue == filter) && (!favoritesOnly || store.data.favorites.contains($0.id)) } }
     var body: some View {
+        let visible = funds
         Page {
             Text("找到適合你的累積方式").font(.subheadline).foregroundStyle(.secondary)
             HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField("搜尋代碼或名稱", text: $query).autocorrectionDisabled().textInputAutocapitalization(.never).focused($searchFocused).submitLabel(.search).onSubmit { searchFocused = false }.accessibilityIdentifier("fund-search"); if !query.isEmpty { Button { query = "" } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel("清除搜尋") } }.padding(15).background(.white, in: RoundedRectangle(cornerRadius: 16))
             ScrollView(.horizontal, showsIndicators: false) { HStack(spacing: 8) { ForEach(["全部"] + Strategy.allCases.filter { $0 != .unclassified }.map(\.rawValue), id: \.self) { value in Button { filter = value } label: { Text(value).font(.subheadline.weight(.semibold)).padding(.horizontal, 17).padding(.vertical, 11).background(filter == value ? Palette.blue : .white, in: Capsule()).foregroundStyle(filter == value ? .white : Palette.ink) } } } }
             if filter != "全部", let s = Strategy(rawValue: filter) { Text("\(s.subtitle)・策略標籤不代表保本或保證獲利。").font(.caption).foregroundStyle(.secondary) }
-            HStack { Text("ETF 清單").font(.title3.bold()); Text("\(funds.count)").font(.caption.bold()).padding(6).background(.white, in: Circle()); Spacer(); Button { favoritesOnly.toggle() } label: { Label("收藏", systemImage: favoritesOnly ? "star.fill" : "star") }.font(.subheadline) }
+            HStack { Text("ETF 清單").font(.title3.bold()); Text("\(visible.count)").font(.caption.bold()).padding(6).background(.white, in: Circle()); Spacer(); Button { favoritesOnly.toggle() } label: { Label("收藏", systemImage: favoritesOnly ? "star.fill" : "star") }.font(.subheadline) }
             Card {
-                if funds.isEmpty { ContentUnavailableView.search(text: query) }
-                ForEach(funds) { fund in
+                if visible.isEmpty { ContentUnavailableView.search(text: query) }
+                ForEach(visible) { fund in
                     NavigationLink(value: fund) { FundRow(fund: fund) }
-                    if fund.id != funds.last?.id { Divider() }
+                    if fund.id != visible.last?.id { Divider() }
                 }
             }
             Text(store.isDemo ? "示範清單；正式模式使用上市與上櫃名單。" : "上市 \(store.funds.filter { $0.market == "TWSE" }.count) · 上櫃 \(store.funds.filter { $0.market == "TPEx" }.count) 個代碼。外幣級別分開計數，代碼數不等於獨立基金數。" ).font(.caption).foregroundStyle(.secondary)

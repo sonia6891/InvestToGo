@@ -7,12 +7,13 @@ struct AppDataError: LocalizedError {
 }
 enum DataChecks {
     static func code(_ value: String) -> Bool { value.range(of: "^[0-9]{4,6}[A-Z]?$", options: .regularExpression) != nil }
-    static func day(_ date: Date = Date()) -> String {
-        let formatter = DateFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.timeZone = TimeZone(identifier: "Asia/Taipei"); formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
-    }
-    static func date(_ text: String) -> Date? {
+    // Reused because validation and charts parse thousands of dates; DateFormatter is thread-safe on iOS 7+.
+    private static let formatter: DateFormatter = {
         let formatter = DateFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.timeZone = TimeZone(identifier: "Asia/Taipei"); formatter.dateFormat = "yyyy-MM-dd"; formatter.isLenient = false
+        return formatter
+    }()
+    static func day(_ date: Date = Date()) -> String { formatter.string(from: date) }
+    static func date(_ text: String) -> Date? {
         guard let value = formatter.date(from: text), formatter.string(from: value) == text else { return nil }
         return value
     }
@@ -37,13 +38,13 @@ enum PublicHTTP {
             guard url.host == "api.fugle.tw" else { throw AppDataError("金鑰只能傳給富果。") }
             request.setValue(key, forHTTPHeaderField: "X-API-KEY")
         }
-        let session = URLSession(configuration: .ephemeral, delegate: NoRedirect(), delegateQueue: nil)
-        defer { session.finishTasksAndInvalidate() }
         let (bytes, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { throw StoreError.http((response as? HTTPURLResponse)?.statusCode ?? 0) }
         guard bytes.count <= 10_000_000 else { throw AppDataError("資料超過大小上限，保留原資料。") }
         return bytes
     }
+    // One session reuses TLS connections across chunked history and quote requests.
+    private static let session = URLSession(configuration: .ephemeral, delegate: NoRedirect(), delegateQueue: nil)
     private final class NoRedirect: NSObject, URLSessionTaskDelegate {
         func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
     }
