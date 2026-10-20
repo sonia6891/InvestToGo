@@ -245,22 +245,30 @@ enum StoreError: LocalizedError {
         guard !refreshing else { return }
         refreshing = true; defer { refreshing = false }
         message = nil
+        var fetched: [String: Quote] = [:]
         do {
             let key = try SecureKey.read()
             guard !key.isEmpty else { throw StoreError.missingKey }
             let targets = Array(Set(symbols ?? data.holdings.map(\.symbol))).sorted()
             guard !targets.isEmpty else { message = "請先新增持有，或到單檔 ETF 頁面更新報價。"; return }
-            var fetched: [String: Quote] = [:]
             for symbol in targets {
                 let quote = try await Fugle.quote(symbol: symbol, key: key)
                 fetched[symbol] = quote
                 if symbol != targets.last { try await Task.sleep(nanoseconds: 2_100_000_000) }
             }
-            // The user may have edited holdings while the requests were running.
-            var next = data
-            next.quotes.merge(fetched) { _, refreshed in refreshed }
-            try commit(next)
-        } catch { message = error.localizedDescription }
+            try saveQuotes(fetched)
+        } catch {
+            // Keep quotes that were verified before the failure instead of discarding the whole batch.
+            let saved = (try? saveQuotes(fetched)) != nil && !fetched.isEmpty
+            message = error.localizedDescription + (saved ? "（已更新 \(fetched.count) 檔，其餘保留上次報價。）" : "")
+        }
+    }
+    private func saveQuotes(_ fetched: [String: Quote]) throws {
+        guard !fetched.isEmpty else { return }
+        // The user may have edited holdings while the requests were running.
+        var next = data
+        next.quotes.merge(fetched) { _, refreshed in refreshed }
+        try commit(next)
     }
 }
 enum SecureKey {

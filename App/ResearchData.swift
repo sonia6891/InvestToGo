@@ -67,10 +67,11 @@ struct PriceHistory: Codable {
     var fetchedDay: String
     var source: String
     func validate() throws {
+        let today = DataChecks.day()
         guard DataChecks.code(symbol), adjusted, points.count >= 2, points.count <= 10000, DataChecks.date(fetchedDay) != nil,
               Set(points.map(\.date)).count == points.count,
-              points.allSatisfy({ DataChecks.date($0.date) != nil && $0.date <= DataChecks.day() && $0.close.isFinite && $0.close > 0 }),
-              points.map(\.date) == points.map(\.date).sorted() else { throw AppDataError("歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。") }
+              points.allSatisfy({ DataChecks.date($0.date) != nil && $0.date <= today && $0.close.isFinite && $0.close > 0 }),
+              zip(points, points.dropFirst()).allSatisfy({ $0.date < $1.date }) else { throw AppDataError("歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。") }
     }
 }
 struct PerformanceStats {
