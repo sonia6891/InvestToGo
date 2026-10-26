@@ -57,7 +57,7 @@ final class ETFToGoUITests: XCTestCase {
         app.buttons["home-add-holding"].tap()
         app.textFields["holding-symbol"].tap(); app.textFields["holding-symbol"].typeText("0050")
         let name = app.textFields["holding-name"]
-        if (name.value as? String) == "ETF 名稱" { name.tap(); name.typeText("Test ETF") }
+        if (name.value as? String) == "名稱" { name.tap(); name.typeText("Test ETF") }
         app.textFields["holding-shares"].tap(); app.textFields["holding-shares"].typeText("1000")
         app.textFields["holding-cost"].tap(); app.textFields["holding-cost"].typeText("50")
         app.textFields["holding-broker"].tap(); app.textFields["holding-broker"].typeText("Test Broker")
@@ -66,5 +66,12 @@ final class ETFToGoUITests: XCTestCase {
         app.terminate(); app.launchArguments = ["--ui-testing", "--tab", "2"]; app.launch()
         XCTAssertTrue(app.staticTexts["Test Broker"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["0050"].exists)
+    }
+    func testScenarioProjectionFromHoldings() {
+        let app = XCUIApplication(); app.launchArguments = ["--demo", "--tab", "2"]; app.launch()
+        let link = app.buttons["holding-scenarios"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10)); link.tap()
+        XCTAssertTrue(app.staticTexts["試算起始金額"].waitForExistence(timeout: 5))
+        capture(app, "scenario-top"); app.swipeUp(); capture(app, "scenario-results")
     }
 }

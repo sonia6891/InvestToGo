@@ -17,12 +17,12 @@ struct BrokerView: View {
             Text("可匯入券商匯出的 CSV，再選擇對應欄位。這是檔案匯入，尚未連接券商帳戶自動同步。").font(.subheadline)
             TextField("券商名稱", text: $broker).accessibilityIdentifier("broker-import-name")
             TextField("帳戶暱稱（例如主要帳戶）", text: $account).accessibilityIdentifier("broker-import-account")
-            Text("同券商同暱稱會更新同一組庫存；請勿輸入完整帳號或密碼。成本請先換算為台幣。").font(.caption).foregroundStyle(.secondary)
+            Text("ETF 與個股可放在同一份 CSV。同券商同暱稱會更新同一組庫存，並保留你改過的策略分類；請勿輸入完整帳號或密碼。成本請先換算為台幣。").font(.caption).foregroundStyle(.secondary)
             Button("選擇庫存 CSV") { importing = true }.disabled(store.isDemo)
         }
         if let table {
             Section("對應欄位 · \(table.rows.count) 筆") {
-                column("ETF 代碼", selection: $mapping.symbol, table: table)
+                column("代碼（ETF 或個股）", selection: $mapping.symbol, table: table)
                 column("名稱（選填）", selection: $mapping.name, table: table)
                 column("持有數量", selection: $mapping.shares, table: table)
                 column("成本", selection: $mapping.cost, table: table)
@@ -35,7 +35,8 @@ struct BrokerView: View {
         if let preview {
             Section("確認匯入內容") {
                 LabeledContent("券商", value: preview.broker); LabeledContent("筆數", value: "\(preview.holdings.count)"); LabeledContent("總成本（台幣）", value: money(preview.totalCost))
-                ForEach(preview.holdings.prefix(20)) { h in VStack(alignment: .leading) { Text("\(h.symbol) \(h.name)"); Text("\(decimal(h.shares)) 股 · 總成本 \(money(h.cost))").font(.caption).foregroundStyle(.secondary) } }
+                if !preview.stocks.isEmpty { Text("其中 \(preview.stocks.count) 筆不在 ETF 名單，會以個股匯入，新部位的策略為待分類。若其實是新上市 ETF，請先到「找 ETF」更新名單。").font(.caption) }
+                ForEach(preview.holdings.prefix(20)) { h in VStack(alignment: .leading) { Text("\(h.symbol) \(h.name)\(preview.stocks.contains(h.symbol) ? " · 個股" : "")"); Text("\(decimal(h.shares)) 股 · 總成本 \(money(h.cost))").font(.caption).foregroundStyle(.secondary) } }
                 Toggle("替換此帳戶先前匯入的庫存", isOn: $replace)
                 Text(replace ? "會移除這個帳戶先前匯入、但本次檔案已沒有的部位。其他帳戶與手動紀錄保留。" : "只新增或更新本檔部位；檔案未列出的舊部位保留。").font(.caption)
                 Button("確認匯入 \(preview.holdings.count) 筆") { confirmation = true }.disabled(store.isDemo)

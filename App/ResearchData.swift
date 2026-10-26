@@ -40,13 +40,20 @@ struct OverlapRow: Identifiable {
     var id: String { symbol }
 }
 enum ResearchMath {
-    static func exposures(_ portfolio: Portfolio) -> [ExposureRow] {
+    static let direct = "直接持有"
+    /// With `etfs`, holdings outside the ETF catalogue count as directly held stocks and merge into the same row.
+    static func exposures(_ portfolio: Portfolio, etfs: Set<String>? = nil) -> [ExposureRow] {
         var result: [String: ExposureRow] = [:]
         for h in portfolio.holdings {
-            guard let quote = portfolio.quotes[h.symbol], quote.isTWD, let snapshot = portfolio.components?[h.symbol] else { continue }
-            for c in snapshot.components {
-                var row = result[c.symbol] ?? ExposureRow(symbol: c.symbol, name: c.name ?? c.symbol, value: 0, funds: [])
-                row.value += h.shares * quote.price * c.weight / 100; row.funds.insert(h.symbol); result[c.symbol] = row
+            guard let quote = portfolio.quotes[h.symbol], quote.isTWD else { continue }
+            if let snapshot = portfolio.components?[h.symbol] {
+                for c in snapshot.components {
+                    var row = result[c.symbol] ?? ExposureRow(symbol: c.symbol, name: c.name ?? c.symbol, value: 0, funds: [])
+                    row.value += h.shares * quote.price * c.weight / 100; row.funds.insert(h.symbol); result[c.symbol] = row
+                }
+            } else if let etfs, !etfs.contains(h.symbol) {
+                var row = result[h.symbol] ?? ExposureRow(symbol: h.symbol, name: h.name, value: 0, funds: [])
+                row.value += h.shares * quote.price; row.funds.insert(direct); result[h.symbol] = row
             }
         }
         return result.values.sorted { $0.value == $1.value ? $0.symbol < $1.symbol : $0.value > $1.value }

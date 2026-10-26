@@ -9,7 +9,8 @@ struct HoldingsView: View {
         Page {
             HStack(alignment: .firstTextBaseline) { Text("\(store.data.holdings.count) 筆持有").foregroundStyle(.secondary); Spacer(); Text("投入 $\(money(store.data.cost))").font(.subheadline.bold()).foregroundStyle(Palette.ink) }
             Button { add = true } label: { Label("新增一筆持有", systemImage: "plus.circle.fill").frame(maxWidth: .infinity).padding(.vertical, 13) }.buttonStyle(.borderedProminent).buttonBorderShape(.roundedRectangle(radius: 16)).accessibilityIdentifier("add-holding")
-            if brokers.isEmpty { Card { ContentUnavailableView("把你的 ETF 放進口袋", systemImage: "wallet.bifold", description: Text("選擇 ETF，填入股數與成本，之後就能持續追蹤。")) } }
+            if brokers.isEmpty { Card { ContentUnavailableView("把你的 ETF 和個股放進口袋", systemImage: "wallet.bifold", description: Text("選擇 ETF 或輸入個股代碼，填入股數與成本，之後就能持續追蹤。")) } }
+            else { NavigationLink { ScenarioView() } label: { Label("用目前持有試算三種情境", systemImage: "chart.line.uptrend.xyaxis").frame(maxWidth: .infinity).padding(.vertical, 11) }.buttonStyle(.bordered).buttonBorderShape(.roundedRectangle(radius: 16)).accessibilityIdentifier("holding-scenarios") }
             ForEach(brokers, id: \.self) { broker in
                 let items = store.data.holdings.filter { $0.broker == broker }
                 HStack { Label(broker, systemImage: "building.columns").font(.headline); Spacer(); Text("\(items.count) 筆").font(.caption).foregroundStyle(.secondary) }
@@ -17,7 +18,7 @@ struct HoldingsView: View {
                     Button { editing = holding } label: {
                         Card {
                             HStack { Text(holding.name).font(.headline); Spacer(); Image(systemName: "ellipsis").foregroundStyle(.secondary) }
-                            HStack { Text(holding.symbol).font(.caption).foregroundStyle(.secondary); Spacer(); StrategyPill(strategy: holding.strategy) }.padding(.bottom, 8)
+                            HStack { Text(holding.symbol).font(.caption).foregroundStyle(.secondary); Text(store.isETF(holding.symbol) ? "ETF" : "個股").font(.caption2.weight(.medium)).padding(.horizontal, 7).padding(.vertical, 3).foregroundStyle(Palette.ink.opacity(0.7)).background(Palette.ink.opacity(0.06), in: Capsule()); Spacer(); StrategyPill(strategy: holding.strategy) }.padding(.bottom, 8)
                             HStack(alignment: .top) {
                                 metric("持有股數", decimal(holding.shares)); Spacer(); metric("每股成本", decimal(holding.unitCost)); Spacer(); metric("目前市值", store.data.quotes[holding.symbol].flatMap { $0.isTWD ? money($0.price * holding.shares) : nil } ?? "尚無報價")
                             }
@@ -52,11 +53,11 @@ struct HoldingEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section { Text("1  選擇 ETF").font(.headline).foregroundStyle(Palette.blue)
-                    if existing == nil { Picker("快速選擇", selection: $selectedFund) { Text("手動輸入").tag(""); ForEach(store.funds) { Text("\($0.id) \($0.name)").tag($0.id) } }.onChange(of: selectedFund) { _, value in if let item = store.funds.first(where: { $0.id == value }) { symbol = item.id; name = item.name; strategy = item.strategy } } }
-                    TextField("ETF 代碼", text: $symbol).textInputAutocapitalization(.characters).autocorrectionDisabled().accessibilityIdentifier("holding-symbol")
-                    TextField("ETF 名稱", text: $name).accessibilityIdentifier("holding-name")
-                }
+                Section { Text("1  選擇 ETF 或輸入個股").font(.headline).foregroundStyle(Palette.blue)
+                    if existing == nil { Picker("快速選擇 ETF", selection: $selectedFund) { Text("手動輸入").tag(""); ForEach(store.funds) { Text("\($0.id) \($0.name)").tag($0.id) } }.onChange(of: selectedFund) { _, value in if let item = store.funds.first(where: { $0.id == value }) { symbol = item.id; name = item.name; strategy = item.strategy } } }
+                    TextField("代碼（ETF 或個股）", text: $symbol).textInputAutocapitalization(.characters).autocorrectionDisabled().accessibilityIdentifier("holding-symbol")
+                    TextField("名稱", text: $name).accessibilityIdentifier("holding-name")
+                } footer: { Text("個股請直接輸入代碼與名稱，例如 2330 台積電。") }
                 Section { Text("2  填入持有資料").font(.headline).foregroundStyle(Palette.blue)
                     TextField("持有股數（股）", text: $shares).keyboardType(.decimalPad).accessibilityIdentifier("holding-shares")
                     TextField("每股買入成本（元）", text: $cost).keyboardType(.decimalPad).accessibilityIdentifier("holding-cost")
@@ -73,6 +74,7 @@ struct HoldingEditor: View {
         }
     }
     func save() {
+        guard DataChecks.code(symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()) else { error = "代碼須為 4～6 位數字，可加一個英文字母，例如 2330、00631L。"; return }
         let h = Holding(id: existing?.id ?? UUID(), symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), name: name.trimmingCharacters(in: .whitespacesAndNewlines), shares: Double(shares.replacingOccurrences(of: ",", with: "")) ?? 0, unitCost: Double(cost.replacingOccurrences(of: ",", with: "")) ?? 0, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: strategy, sourceAccount: existing?.sourceAccount)
         do { try store.save(h); dismiss() } catch { self.error = error.localizedDescription }
     }
@@ -99,7 +101,7 @@ struct DividendsView: View {
                 Card {
                     HStack(alignment: .top, spacing: 14) {
                         VStack(spacing: 3) { Text(String(Calendar.current.component(.day, from: item.date))).font(.title2.bold()).lineLimit(1); Text(item.date.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "zh_Hant_TW")))).font(.caption2) }.foregroundStyle(Palette.blue).frame(width: 48).padding(.vertical, 10).background(Palette.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-                        VStack(alignment: .leading, spacing: 8) { Text(store.funds.first(where: { $0.id == item.symbol })?.name ?? item.symbol).font(.headline); Text("\(item.symbol) · \(item.status.rawValue)").font(.caption).foregroundStyle(.secondary); Text("$\(money(item.amount))").font(.title3.bold()).foregroundStyle(item.status == .paid ? Palette.green : Palette.ink) }
+                        VStack(alignment: .leading, spacing: 8) { Text(store.funds.first(where: { $0.id == item.symbol })?.name ?? store.data.holdings.first(where: { $0.symbol == item.symbol })?.name ?? item.symbol).font(.headline); Text("\(item.symbol) · \(item.status.rawValue)").font(.caption).foregroundStyle(.secondary); Text("$\(money(item.amount))").font(.title3.bold()).foregroundStyle(item.status == .paid ? Palette.green : Palette.ink) }
                         Spacer(); Image(systemName: item.status == .paid ? "checkmark.circle.fill" : "clock").foregroundStyle(item.status == .paid ? Palette.green : Palette.blue)
                     }
                 }.contextMenu { Button("刪除紀錄", role: .destructive) { deleting = item } }
@@ -118,7 +120,7 @@ struct DividendEditor: View {
     @State private var status = DividendStatus.paid
     @State private var error: String?
     var body: some View { NavigationStack { Form {
-        Section("配息資料") { TextField("ETF 代碼", text: $symbol).textInputAutocapitalization(.characters); TextField("總金額（元）", text: $amount).keyboardType(.decimalPad); DatePicker("入帳／預計日期", selection: $date, displayedComponents: .date); Picker("狀態", selection: $status) { ForEach(DividendStatus.allCases, id: \.self) { Text($0.rawValue).tag($0) } } }
+        Section("配息資料") { TextField("代碼（ETF 或個股）", text: $symbol).textInputAutocapitalization(.characters); TextField("總金額（元）", text: $amount).keyboardType(.decimalPad); DatePicker("入帳／預計日期", selection: $date, displayedComponents: .date); Picker("狀態", selection: $status) { ForEach(DividendStatus.allCases, id: \.self) { Text($0.rawValue).tag($0) } } }
         Section { Text("請輸入這次收到的總金額，不是每股配息。公告與預估不會計入已入帳股息。").font(.footnote).foregroundStyle(.secondary) }
         if let error { Text(error).foregroundStyle(.red) }
     }.navigationTitle("記錄配息").navigationBarTitleDisplayMode(.inline).toolbar { ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }; ToolbarItem(placement: .confirmationAction) { Button("儲存") { guard !symbol.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let value = Double(amount), value.isFinite, value > 0 else { error = "請輸入代碼與大於 0 的配息總額。"; return }; do { try store.record(Dividend(symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), date: date, amount: value, status: status)); dismiss() } catch { self.error = error.localizedDescription } } } } } }

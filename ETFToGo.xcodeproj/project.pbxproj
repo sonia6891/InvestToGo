@@ -10,6 +10,7 @@
 		07875818890007E983D5143F /* BrokerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87259F36DC852AF8135E965 /* BrokerView.swift */; };
 		10F7E36B158DB7E63CA101B4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FE47A3C3D19B0FABF00359 /* Models.swift */; };
 		149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA91E706AB643380F621F219 /* ResearchViews.swift */; };
+		EE549E7AA8B3307A97369761 /* ScenarioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDBE53B93B17643070CB8674 /* ScenarioView.swift */; };
 		1AAA72262CE7C3A24ED720B5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */; };
 		2293242942C405A47B28DE85 /* PortfolioViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EA07CE1D5B62DDB5D7827A /* PortfolioViews.swift */; };
 		29962F132B27E812DF5B6966 /* ResearchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236619A27ADADAE44D858CC7 /* ResearchData.swift */; };
@@ -17,6 +18,7 @@
 		35DE84119451BDCC8D81B257 /* ETFToGoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F400A19431AB664DA7DD /* ETFToGoUITests.swift */; };
 		396CD6BE05F3201DE0CCD0CA /* annual-fees.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C5F2A770E30067FE3AE96E9 /* annual-fees.json */; };
 		40976523A1C62C614DF126B7 /* RestoredFeaturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */; };
+		987302EA6F2ADDE16BAEC6F5 /* StockScenarioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D907AF79BC6FB4E982CE0485 /* StockScenarioTests.swift */; };
 		52A39EB754258C874176C931 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */; };
 		643F72EA9C36FF060E0C5B54 /* ETFToGoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072093705488342334C91245 /* ETFToGoApp.swift */; };
 		6DF2E960A94EA23671BE19A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 264E61A5B7FE5D64083F2B65 /* Assets.xcassets */; };
@@ -54,6 +56,7 @@
 		31EA07CE1D5B62DDB5D7827A /* PortfolioViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViews.swift; sourceTree = "<group>"; };
 		3B6A1B483C6A1272C477FB0E /* PortfolioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioTests.swift; sourceTree = "<group>"; };
 		3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoredFeaturesTests.swift; sourceTree = "<group>"; };
+		D907AF79BC6FB4E982CE0485 /* StockScenarioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockScenarioTests.swift; sourceTree = "<group>"; };
 		4AAF6C96139C535AD4A19E50 /* LegacyImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImport.swift; sourceTree = "<group>"; };
 		4C5F2A770E30067FE3AE96E9 /* annual-fees.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "annual-fees.json"; sourceTree = "<group>"; };
 		4DB86CEF4552F0B7E34DD701 /* ETFToGoTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ETFToGoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,6 +68,7 @@
 		A87259F36DC852AF8135E965 /* BrokerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerView.swift; sourceTree = "<group>"; };
 		B437D243F9BD0B9301D39E7E /* catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = catalog.json; sourceTree = "<group>"; };
 		CA91E706AB643380F621F219 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
+		EDBE53B93B17643070CB8674 /* ScenarioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioView.swift; sourceTree = "<group>"; };
 		CF2030D8EDBE2B88BB042831 /* BrokerImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerImport.swift; sourceTree = "<group>"; };
 		D293146BB8B94669BF6CFA5E /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
 		F5FE47A3C3D19B0FABF00359 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 			children = (
 				3B6A1B483C6A1272C477FB0E /* PortfolioTests.swift */,
 				3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */,
+				D907AF79BC6FB4E982CE0485 /* StockScenarioTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 				74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */,
 				236619A27ADADAE44D858CC7 /* ResearchData.swift */,
 				CA91E706AB643380F621F219 /* ResearchViews.swift */,
+				EDBE53B93B17643070CB8674 /* ScenarioView.swift */,
 				D293146BB8B94669BF6CFA5E /* ToolsView.swift */,
 				326FCE6E7900546067FA3A20 /* Resources */,
 			);
@@ -276,6 +282,7 @@
 				2293242942C405A47B28DE85 /* PortfolioViews.swift in Sources */,
 				29962F132B27E812DF5B6966 /* ResearchData.swift in Sources */,
 				149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */,
+				EE549E7AA8B3307A97369761 /* ScenarioView.swift in Sources */,
 				6EE9393DFDC3396CE5DEA967 /* ToolsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -286,6 +293,7 @@
 			files = (
 				F8D81FB1E2FD4A8601EB90F2 /* PortfolioTests.swift in Sources */,
 				40976523A1C62C614DF126B7 /* RestoredFeaturesTests.swift in Sources */,
+				987302EA6F2ADDE16BAEC6F5 /* StockScenarioTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

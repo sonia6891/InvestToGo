@@ -28,10 +28,11 @@ struct ComponentsView: View {
 }
 struct ExposureView: View {
     @EnvironmentObject var store: PortfolioStore
-    private var rows: [ExposureRow] { ResearchMath.exposures(store.data) }
-    private var covered: [Holding] { store.data.holdings.filter { store.data.quotes[$0.symbol]?.isTWD == true && store.data.components?[$0.symbol] != nil } }
+    private var etfs: Set<String>? { store.funds.isEmpty ? nil : Set(store.funds.map(\.id)) }
+    private var rows: [ExposureRow] { ResearchMath.exposures(store.data, etfs: etfs) }
+    private var covered: [Holding] { store.data.holdings.filter { h in store.data.quotes[h.symbol]?.isTWD == true && (store.data.components?[h.symbol] != nil || etfs?.contains(h.symbol) == false) } }
     var body: some View { Page {
-        Card { Text("ETF 背後的持股").font(.title2.bold()); Text("納入 \(covered.count)／\(store.data.holdings.count) 筆持有").padding(.top, 10); Text("依台幣報價 × 股數 × 揭露權重加總。不同 ETF 可能使用不同公告日期；不含缺少資料、未確認幣別或外幣報價的部位。").font(.caption).foregroundStyle(.secondary).padding(.top, 10) }
+        Card { Text("ETF 背後的持股").font(.title2.bold()); Text("納入 \(covered.count)／\(store.data.holdings.count) 筆持有").padding(.top, 10); Text("依台幣報價 × 股數 × 揭露權重加總，直接持有的個股併入同一檔股票。不同 ETF 可能使用不同公告日期；不含缺少資料、未確認幣別或外幣報價的部位。").font(.caption).foregroundStyle(.secondary).padding(.top, 10) }
         if rows.isEmpty { ContentUnavailableView("資料還不完整", systemImage: "chart.pie", description: Text("先在 ETF 詳情更新成分股與報價。")) }
         ForEach(rows) { row in Card { HStack { Text(row.name).font(.headline); Spacer(); Text("$\(money(row.value))").font(.headline).foregroundStyle(Palette.blue) }; Text("\(row.symbol) · 來自 \(row.funds.sorted().joined(separator: "、"))").font(.caption).foregroundStyle(.secondary).padding(.top, 10) } }
     }.navigationTitle("持股穿透").navigationBarTitleDisplayMode(.inline) }

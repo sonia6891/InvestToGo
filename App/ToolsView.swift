@@ -10,11 +10,13 @@ struct ToolsView: View {
                 HStack(spacing: 18) { Image(systemName: "chart.pie.fill").font(.system(size: 35)).foregroundStyle(.white.opacity(0.9)); VStack(alignment: .leading, spacing: 7) { Text("持有配置").font(.title2.bold()); Text("看看資金放在哪裡").font(.subheadline).foregroundStyle(.white.opacity(0.8)) }; Spacer(); Image(systemName: "arrow.up.right") }.padding(24).foregroundStyle(.white).background(Palette.blue, in: RoundedRectangle(cornerRadius: 24))
             }
             Card {
-                NavigationLink { ExposureView() } label: { toolRow("持股穿透", "合併 ETF 背後的股票曝險", icon: "square.stack.3d.up") }
+                NavigationLink { ExposureView() } label: { toolRow("持股穿透", "合併 ETF 成分與直接持有的個股", icon: "square.stack.3d.up") }
             }
             SectionHeading(title: "規劃與比較")
             Card {
                 NavigationLink { ComparisonView() } label: { toolRow("ETF 比較", "並排查看策略與已取得的報價", icon: "rectangle.split.2x1") }
+                Divider().padding(.vertical, 7)
+                NavigationLink { ScenarioView() } label: { toolRow("三種情境試算", "用目前持有推算 3～50 年", icon: "chart.line.uptrend.xyaxis") }
                 Divider().padding(.vertical, 7)
                 NavigationLink { CalculatorView() } label: { toolRow("複利試算", "每月多存一點，未來有什麼不同", icon: "function") }
                 Divider().padding(.vertical, 7)
@@ -38,7 +40,7 @@ struct AllocationView: View {
     @EnvironmentObject var store: PortfolioStore
     var body: some View { Page {
         Card { Text("投入成本").foregroundStyle(.secondary); Text("$\(money(store.data.cost))").font(.largeTitle.bold()).padding(.top, 6) }
-        SectionHeading(title: "依 ETF 分配")
+        SectionHeading(title: "依代碼分配")
         let symbols = Array(Set(store.data.holdings.map(\.symbol))).sorted()
         ForEach(symbols, id: \.self) { symbol in
             let holdings = store.data.holdings.filter { $0.symbol == symbol }
@@ -46,7 +48,7 @@ struct AllocationView: View {
             Card { HStack { Text(holdings.first?.name ?? symbol).font(.headline); Spacer(); Text("\(decimal(amount / max(store.data.cost, 1) * 100))%").font(.headline).foregroundStyle(Palette.blue) }; ProgressView(value: amount, total: max(store.data.cost, 1)).padding(.vertical, 12); Text("\(symbol) · 成本 $\(money(amount))").font(.caption).foregroundStyle(.secondary) }
         }
         if symbols.isEmpty { ContentUnavailableView("還沒有持有紀錄", systemImage: "chart.pie") }
-        Text("這裡顯示投入成本的 ETF 配置；股票曝險請前往持股穿透，兩檔共同成分可在 ETF 比較查看。").font(.caption).foregroundStyle(.secondary)
+        Text("這裡顯示 ETF 與個股的投入成本配置；股票曝險請前往持股穿透，兩檔 ETF 共同成分可在 ETF 比較查看。").font(.caption).foregroundStyle(.secondary)
     }.navigationTitle("持有配置").navigationBarTitleDisplayMode(.inline) }
 }
 struct ComparisonView: View {

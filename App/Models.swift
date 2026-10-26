@@ -76,6 +76,7 @@ struct Portfolio: Codable {
     var components: [String: ComponentSnapshot]? = nil
     var histories: [String: PriceHistory]? = nil
     var fees: [String: FeeRecord]? = nil
+    var scenarioPlan: ScenarioPlan? = nil
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
     var marketValue: Double? {
         guard !holdings.isEmpty, holdings.allSatisfy({ quotes[$0.symbol]?.isTWD == true }) else { return nil }
@@ -92,6 +93,7 @@ struct Portfolio: Codable {
               value.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.price.isFinite && $0.value.price > 0 })
         else { throw StoreError.unsupportedBackup }
         try value.legacyPlan?.validate()
+        if let plan = value.scenarioPlan { guard (try? plan.validate()) != nil else { throw StoreError.unsupportedBackup } }
         for d in (value.legacyDividends ?? [:]).values { try d.validate() }
         for (code, snapshot) in value.components ?? [:] { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
         for (code, history) in value.histories ?? [:] { guard code == history.symbol else { throw StoreError.unsupportedBackup }; try history.validate() }
@@ -143,6 +145,8 @@ enum StoreError: LocalizedError {
     @Published var catalogMessage: String?
     @Published var catalogRefreshing = false
     var funds: [Fund] { isDemo ? Fund.starters : (catalog?.funds ?? []) }
+    // Codes outside the ETF catalogue are treated as individual stocks.
+    func isETF(_ symbol: String) -> Bool { funds.contains { $0.id == symbol } }
     let isDemo: Bool
     private let url: URL
     init(url: URL? = nil, demo: Bool = false, reset: Bool = false) {
@@ -203,6 +207,7 @@ enum StoreError: LocalizedError {
         next.favorites.formUnion(incoming.favorites)
         next.comparison = incoming.comparison ?? next.comparison
         next.legacyPlan = incoming.legacyPlan ?? next.legacyPlan
+        next.scenarioPlan = incoming.scenarioPlan ?? next.scenarioPlan
         next.legacyPrices = (next.legacyPrices ?? [:]).merging(incoming.legacyPrices ?? [:]) { _, new in new }
         next.legacyDividends = (next.legacyDividends ?? [:]).merging(incoming.legacyDividends ?? [:]) { _, new in new }
         next.components = (next.components ?? [:]).merging(incoming.components ?? [:]) { _, new in new }
