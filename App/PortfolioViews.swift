@@ -50,6 +50,8 @@ struct HoldingEditor: View {
     @State private var strategy = Strategy.unclassified
     @State private var error: String?
     @State private var deletePrompt = false
+    // Broker inventory pages show a total cost that already reflects each account's fee discount.
+    @AppStorage("holding-cost-is-total") private var totalCost = true
     var body: some View {
         NavigationStack {
             Form {
@@ -60,24 +62,29 @@ struct HoldingEditor: View {
                 } footer: { Text("個股請直接輸入代碼與名稱，例如 2330 台積電。") }
                 Section { Text("2  填入持有資料").font(.headline).foregroundStyle(Palette.blue)
                     TextField("持有股數（股）", text: $shares).keyboardType(.decimalPad).accessibilityIdentifier("holding-shares")
-                    TextField("每股買入成本（元）", text: $cost).keyboardType(.decimalPad).accessibilityIdentifier("holding-cost")
+                    Picker("成本填法", selection: $totalCost) { Text("券商顯示的總成本").tag(true); Text("每股成本").tag(false) }.pickerStyle(.segmented)
+                        .onChange(of: totalCost) { _, total in if let s = number(shares), s > 0, let c = number(cost) { cost = plain(total ? s * c : c / s) } }
+                    TextField(totalCost ? "總成本（照券商庫存頁，元）" : "每股買入成本（元）", text: $cost).keyboardType(.decimalPad).accessibilityIdentifier("holding-cost")
                     TextField("券商名稱", text: $broker).accessibilityIdentifier("holding-broker")
                     Picker("策略分類", selection: $strategy) { ForEach(Strategy.allCases) { Text($0.rawValue).tag($0) } }
-                } footer: { Text("輸入 1,000 股代表 1 張。策略可以日後調整，不影響持有數量。") }
-                if let s = Double(shares), let c = Double(cost), s > 0, c > 0 { Section { LabeledContent("這筆投入成本", value: "$\(money(s * c))") } }
+                } footer: { Text("輸入 1,000 股代表 1 張。總成本請直接照抄券商 App「庫存」頁的持有成本，已含你帳戶實際的手續費折扣，不必自己計算。策略可以日後調整。") }
+                if let s = number(shares), let c = number(cost), s > 0, c > 0 { Section { if totalCost { LabeledContent("換算每股成本", value: (c / s).formatted(.number.precision(.fractionLength(0...4)))) } else { LabeledContent("這筆投入成本", value: "$\(money(s * c))") } } }
                 if let error { Section { Text(error).foregroundStyle(.red) } }
                 if existing != nil { Section { Button("刪除這筆持有", role: .destructive) { deletePrompt = true } } }
             }.navigationTitle(existing == nil ? "新增持有" : "編輯持有").navigationBarTitleDisplayMode(.inline)
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("取消") { dismiss() } }; ToolbarItem(placement: .confirmationAction) { Button("儲存") { save() }.fontWeight(.bold).accessibilityIdentifier("save-holding") } }
-                .onAppear { if let h = existing { symbol = h.symbol; name = h.name; shares = String(h.shares); cost = String(h.unitCost); broker = h.broker; strategy = h.strategy } else if let fund { symbol = fund.id; selectedFund = fund.id; name = fund.name; strategy = fund.strategy } }
+                .onAppear { if let h = existing { symbol = h.symbol; name = h.name; shares = plain(h.shares); cost = plain(totalCost ? h.cost : h.unitCost); broker = h.broker; strategy = h.strategy } else if let fund { symbol = fund.id; selectedFund = fund.id; name = fund.name; strategy = fund.strategy } }
                 .confirmationDialog("刪除這筆持有？配息紀錄會保留。", isPresented: $deletePrompt, titleVisibility: .visible) { Button("確認刪除", role: .destructive) { do { if let existing { try store.remove(existing) }; dismiss() } catch { self.error = error.localizedDescription } } }
         }
     }
     func save() {
         guard DataChecks.code(symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()) else { error = "代碼須為 4～6 位數字，可加一個英文字母，例如 2330、00631L。"; return }
-        let h = Holding(id: existing?.id ?? UUID(), symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), name: name.trimmingCharacters(in: .whitespacesAndNewlines), shares: Double(shares.replacingOccurrences(of: ",", with: "")) ?? 0, unitCost: Double(cost.replacingOccurrences(of: ",", with: "")) ?? 0, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: strategy, sourceAccount: existing?.sourceAccount)
+        let s = number(shares) ?? 0, c = number(cost) ?? 0
+        let h = Holding(id: existing?.id ?? UUID(), symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), name: name.trimmingCharacters(in: .whitespacesAndNewlines), shares: s, unitCost: totalCost ? (s > 0 ? c / s : 0) : c, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: strategy, sourceAccount: existing?.sourceAccount)
         do { try store.save(h); dismiss() } catch { self.error = error.localizedDescription }
     }
+    private func number(_ text: String) -> Double? { Double(text.replacingOccurrences(of: ",", with: "").trimmingCharacters(in: .whitespaces)) }
+    private func plain(_ value: Double) -> String { value.formatted(.number.grouping(.never).precision(.fractionLength(0...6)).locale(Locale(identifier: "en_US_POSIX"))) }
 }
 struct DividendsView: View {
     @EnvironmentObject var store: PortfolioStore

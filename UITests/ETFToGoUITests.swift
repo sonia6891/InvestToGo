@@ -59,7 +59,7 @@ final class ETFToGoUITests: XCTestCase {
         let name = app.textFields["holding-name"]
         if (name.value as? String) == "名稱" { name.tap(); name.typeText("Test ETF") }
         app.textFields["holding-shares"].tap(); app.textFields["holding-shares"].typeText("1000")
-        app.textFields["holding-cost"].tap(); app.textFields["holding-cost"].typeText("50")
+        app.textFields["holding-cost"].tap(); app.textFields["holding-cost"].typeText("50000")
         app.textFields["holding-broker"].tap(); app.textFields["holding-broker"].typeText("Test Broker")
         app.buttons["save-holding"].tap()
         XCTAssertTrue(app.buttons["home-add-holding"].waitForExistence(timeout: 5))
