@@ -125,6 +125,21 @@ final class RestoredFeaturesTests: XCTestCase {
         XCTAssertEqual(stats.annualized!,pow(1.1,365.25/366)-1,accuracy:0.000001)
         XCTAssertNil(stats.volatility)
     }
+    func testExposureMergesDirectlyHeldStocks() throws {
+        var data = Portfolio.sample; data.components = ["0050": snapshot("0050", [("2330",60),("2454",10)])]
+        data.holdings.append(Holding(symbol: "2330", name: "台積電", shares: 100, unitCost: 900, broker: "富邦證券", strategy: .unclassified))
+        data.quotes["2330"] = Quote(symbol: "2330", price: 1000, changePercent: nil, date: DataChecks.day(), fetchedAt: Date(), currency: "TWD")
+        let row = try XCTUnwrap(ResearchMath.exposures(data, stocks: ["2330"]).first { $0.symbol == "2330" })
+        XCTAssertEqual(row.value, 2000 * 55 * 0.6 + 100 * 1000, accuracy: 0.001)
+        XCTAssertEqual(row.funds, ["0050", ResearchMath.direct])
+        XCTAssertFalse(ResearchMath.exposures(data).contains { $0.funds.contains(ResearchMath.direct) }, "Codes not named as stocks are not assumed to be stocks")
+    }
+    func testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays() {
+        let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-02",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-03",source:"test")
+        XCTAssertThrowsError(try h.validate())
+        XCTAssertNil(DataChecks.date("2025-02-30")); XCTAssertNil(DataChecks.date("2025-1-05"))
+        XCTAssertEqual(DataChecks.date("2025-01-05").map { DataChecks.day($0) }, "2025-01-05")
+    }
     func testHistoryRejectsUnadjustedDataAndDuplicateDates() {
         XCTAssertThrowsError(try Fugle.decodeHistory(Data(#"{"symbol":"0050","timeframe":"D","data":[]}"#.utf8),symbol:"0050"))
         let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-01",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-02",source:"test")

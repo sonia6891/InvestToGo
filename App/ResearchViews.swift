@@ -40,15 +40,20 @@ struct ComponentsContent: View {
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in do { let bytes = try DataChecks.readFile(result.get(), limit: 1_000_000); try store.saveComponents(ComponentSnapshot.imported(bytes, symbol: symbol)) } catch { self.error = error.localizedDescription } }
     }
 }
+extension PortfolioStore {
+    /// Look-through exposure with directly held stocks merged in, priced the same way as the holdings' market value.
+    var exposures: [ExposureRow] { ResearchMath.exposures(data, stocks: Set(data.holdings.map(\.symbol).filter { self.isStock($0) }), quote: { self.quote($0) }) }
+}
 struct ExposureView: View {
     @EnvironmentObject var store: PortfolioStore
     @State private var tab = 0
     @State private var busy = false
     @State private var error: String?
-    private var rows: [ExposureRow] { ResearchMath.exposures(store.data) }
-    private var covered: [Holding] { store.data.holdings.filter { store.data.quotes[$0.symbol]?.isTWD == true && store.data.components?[$0.symbol] != nil } }
+    private var rows: [ExposureRow] { store.exposures }
+    private var covered: [Holding] { store.data.holdings.filter { store.quote($0.symbol)?.isTWD == true && (store.data.components?[$0.symbol] != nil || store.isStock($0.symbol)) } }
     var body: some View {
-        let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil }
+        // Directly held stocks have no ETF components to fetch.
+        let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil && !store.isStock($0) }
         Page {
             SegmentBar(items: ["持股集中度", "重疊成分"], selection: $tab, pill: true, filled: true)
             if tab == 0 { concentration } else { overlaps }
@@ -90,7 +95,7 @@ struct ExposureView: View {
                         Text("\(decimal(row.value / base * 100))%").font(.caption.bold()).monospacedDigit().frame(width: 52, alignment: .trailing)
                     }.foregroundStyle(Palette.ink).padding(.vertical, 6)
                 }
-                Text("比重＝透過 ETF 間接持有的金額 ÷ 你的台幣持有市值；納入 \(covered.count)／\(store.data.holdings.count) 筆持有。不同 ETF 可能使用不同公告日期。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
+                Text("比重＝透過 ETF 間接持有加上直接持有的金額 ÷ 你的台幣持有市值；納入 \(covered.count)／\(store.data.holdings.count) 筆持有。不同 ETF 可能使用不同公告日期。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
             }
         }
     }

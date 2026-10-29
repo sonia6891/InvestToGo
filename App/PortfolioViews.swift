@@ -302,7 +302,7 @@ struct AllocationSection: View {
                     let rows = makeSlices(store.data.holdings, key: { industryKey($0) }, value: value)
                     if rows.isEmpty { Text("還沒有持有紀錄。").foregroundStyle(Palette.muted) } else { DonutChart(slices: rows, center: (useValue ? "總市值" : "總成本", shown(wanText(total), hidden: hidden)), showAmounts: true, hidden: hidden) }
                 default:
-                    let rows = ResearchMath.exposures(store.data)
+                    let rows = store.exposures
                     if rows.isEmpty { Text("需要持有 ETF 的成分股資料。到 ETF 詳情 › 持股 更新成分股後，這裡會合併計算。").font(.subheadline).foregroundStyle(Palette.muted) }
                     else { BarList(slices: rows.prefix(8).enumerated().map { Slice(label: $0.element.name, amount: $0.element.value, color: Palette.series[$0.offset % Palette.series.count]) }) }
                     NavigationLink(value: AppRoute.exposure) { HStack(spacing: 2) { Text("查看持股透視"); Image(systemName: "chevron.right") }.font(.caption.bold()) }.padding(.top, 8)
