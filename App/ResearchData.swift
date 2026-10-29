@@ -40,13 +40,22 @@ struct OverlapRow: Identifiable {
     var id: String { symbol }
 }
 enum ResearchMath {
-    static func exposures(_ portfolio: Portfolio) -> [ExposureRow] {
+    static let direct = "直接持有"
+    /// Holdings listed in `stocks` count as directly held and merge into the same row as that stock held through ETFs.
+    /// `quote` defaults to the portfolio's own saved quotes.
+    static func exposures(_ portfolio: Portfolio, stocks: Set<String> = [], quote: ((String) -> Quote?)? = nil) -> [ExposureRow] {
+        let price: (String) -> Quote? = quote ?? { portfolio.quotes[$0] }
         var result: [String: ExposureRow] = [:]
         for h in portfolio.holdings {
-            guard let quote = portfolio.quotes[h.symbol], quote.isTWD, let snapshot = portfolio.components?[h.symbol] else { continue }
-            for c in snapshot.components {
-                var row = result[c.symbol] ?? ExposureRow(symbol: c.symbol, name: c.name ?? c.symbol, value: 0, funds: [])
-                row.value += h.shares * quote.price * c.weight / 100; row.funds.insert(h.symbol); result[c.symbol] = row
+            guard let quote = price(h.symbol), quote.isTWD else { continue }
+            if let snapshot = portfolio.components?[h.symbol] {
+                for c in snapshot.components {
+                    var row = result[c.symbol] ?? ExposureRow(symbol: c.symbol, name: c.name ?? c.symbol, value: 0, funds: [])
+                    row.value += h.shares * quote.price * c.weight / 100; row.funds.insert(h.symbol); result[c.symbol] = row
+                }
+            } else if stocks.contains(h.symbol) {
+                var row = result[h.symbol] ?? ExposureRow(symbol: h.symbol, name: h.name, value: 0, funds: [])
+                row.value += h.shares * quote.price; row.funds.insert(direct); result[h.symbol] = row
             }
         }
         return result.values.sorted { $0.value == $1.value ? $0.symbol < $1.symbol : $0.value > $1.value }
@@ -59,18 +68,19 @@ enum ResearchMath {
         }.sorted { min($0.left, $0.right) > min($1.left, $1.right) }
     }
 }
-struct PricePoint: Codable, Identifiable { var date: String; var close: Double; var id: String { date } }
-struct PriceHistory: Codable {
+struct PricePoint: Codable, Identifiable, Equatable { var date: String; var close: Double; var id: String { date } }
+struct PriceHistory: Codable, Equatable {
     var symbol: String
     var adjusted: Bool
     var points: [PricePoint]
     var fetchedDay: String
     var source: String
     func validate() throws {
+        let today = DataChecks.day()
         guard DataChecks.code(symbol), adjusted, points.count >= 2, points.count <= 10000, DataChecks.date(fetchedDay) != nil,
               Set(points.map(\.date)).count == points.count,
-              points.allSatisfy({ DataChecks.date($0.date) != nil && $0.date <= DataChecks.day() && $0.close.isFinite && $0.close > 0 }),
-              points.map(\.date) == points.map(\.date).sorted() else { throw AppDataError("歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。") }
+              points.allSatisfy({ DataChecks.date($0.date) != nil && $0.date <= today && $0.close.isFinite && $0.close > 0 }),
+              zip(points, points.dropFirst()).allSatisfy({ $0.date < $1.date }) else { throw AppDataError("歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。") }
     }
 }
 struct PerformanceStats {
@@ -107,8 +117,11 @@ struct FeeRecord: Codable {
     var note: String
     func validate() throws {
         guard DataChecks.code(symbol), DataChecks.date(effectiveDate) != nil, effectiveDate <= DataChecks.day(),
-              !management.isEmpty, management.count <= 2000, !custody.isEmpty, custody.count <= 2000, note.count <= 2000,
-              let url = URL(string: sourceURL), url.scheme == "https", url.host != nil, url.user == nil, url.password == nil else { throw AppDataError("請填寫費率級距、有效日期及 HTTPS 資料來源。") }
+              !management.isEmpty, management.count <= 2000, !custody.isEmpty, custody.count <= 2000, note.count <= 2000 else { throw AppDataError("請填寫費率級距及有效日期。") }
+        // A reference address is optional (older records have one); when present it must be a plain https link.
+        if !sourceURL.isEmpty {
+            guard let url = URL(string: sourceURL), url.scheme == "https", url.host != nil, url.user == nil, url.password == nil else { throw AppDataError("參考網址須為 https 開頭。") }
+        }
         if let rate = annualExpensePercent {
             guard rate.isFinite, (0...100).contains(rate), let year = expenseYear, (1990...Calendar.current.component(.year, from: Date())).contains(year) else { throw AppDataError("總費用率須附統計年度，且數值應為 0～100%。") }
         } else if expenseYear != nil { throw AppDataError("費用年度與總費用率須一起填寫。") }

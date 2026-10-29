@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8C3E2A9F4B1D6E7A0F5C3B41 /* OfficialData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3E2A9F4B1D6E7A0F5C3B40 /* OfficialData.swift */; };
+		E39E805FA17DCEE06FBC91A1 /* ComboViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39E805FA17DCEE06FBC91A0 /* ComboViews.swift */; };
+		D28D7F4E906CBDCF5EAB8091 /* MarketViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28D7F4E906CBDCF5EAB8090 /* MarketViews.swift */; };
+		C17C6E3D8F5BACBE4D9A7F81 /* StockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17C6E3D8F5BACBE4D9A7F80 /* StockData.swift */; };
+		9D4F3B0A5C2E7F8B1A6D4C51 /* HomeScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4F3B0A5C2E7F8B1A6D4C50 /* HomeScreens.swift */; };
+		AE5A4C1B6D3F8A9C2B7E5D61 /* DividendScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5A4C1B6D3F8A9C2B7E5D60 /* DividendScreens.swift */; };
+		BF6B5D2C7E4A9BAD3C8F6E71 /* official-dividends.json in Resources */ = {isa = PBXBuildFile; fileRef = BF6B5D2C7E4A9BAD3C8F6E70 /* official-dividends.json */; };
+		F4AF9160B28EDFF170CDA2B1 /* stock-data.json in Resources */ = {isa = PBXBuildFile; fileRef = F4AF9160B28EDFF170CDA2B0 /* stock-data.json */; };
+		5A1C0E7B2D9F4A6E8B3C1D21 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1C0E7B2D9F4A6E8B3C1D20 /* Theme.swift */; };
+		7B2D1F8C3E0A5B7F9C4D2E31 /* DiscoverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2D1F8C3E0A5B7F9C4D2E30 /* DiscoverViews.swift */; };
 		07875818890007E983D5143F /* BrokerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87259F36DC852AF8135E965 /* BrokerView.swift */; };
 		10F7E36B158DB7E63CA101B4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FE47A3C3D19B0FABF00359 /* Models.swift */; };
 		149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA91E706AB643380F621F219 /* ResearchViews.swift */; };
@@ -46,6 +56,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8C3E2A9F4B1D6E7A0F5C3B40 /* OfficialData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficialData.swift; sourceTree = "<group>"; };
+		E39E805FA17DCEE06FBC91A0 /* ComboViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboViews.swift; sourceTree = "<group>"; };
+		D28D7F4E906CBDCF5EAB8090 /* MarketViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketViews.swift; sourceTree = "<group>"; };
+		C17C6E3D8F5BACBE4D9A7F80 /* StockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockData.swift; sourceTree = "<group>"; };
+		9D4F3B0A5C2E7F8B1A6D4C50 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
+		AE5A4C1B6D3F8A9C2B7E5D60 /* DividendScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendScreens.swift; sourceTree = "<group>"; };
+		BF6B5D2C7E4A9BAD3C8F6E70 /* official-dividends.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "official-dividends.json"; sourceTree = "<group>"; };
+		F4AF9160B28EDFF170CDA2B0 /* stock-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "stock-data.json"; sourceTree = "<group>"; };
+		5A1C0E7B2D9F4A6E8B3C1D20 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		7B2D1F8C3E0A5B7F9C4D2E30 /* DiscoverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViews.swift; sourceTree = "<group>"; };
 		072093705488342334C91245 /* ETFToGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETFToGoApp.swift; sourceTree = "<group>"; };
 		0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		236619A27ADADAE44D858CC7 /* ResearchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchData.swift; sourceTree = "<group>"; };
@@ -86,6 +106,8 @@
 			children = (
 				4C5F2A770E30067FE3AE96E9 /* annual-fees.json */,
 				B437D243F9BD0B9301D39E7E /* catalog.json */,
+				BF6B5D2C7E4A9BAD3C8F6E70 /* official-dividends.json */,
+				F4AF9160B28EDFF170CDA2B0 /* stock-data.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -125,6 +147,7 @@
 				CF2030D8EDBE2B88BB042831 /* BrokerImport.swift */,
 				A87259F36DC852AF8135E965 /* BrokerView.swift */,
 				0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */,
+				7B2D1F8C3E0A5B7F9C4D2E30 /* DiscoverViews.swift */,
 				072093705488342334C91245 /* ETFToGoApp.swift */,
 				4AAF6C96139C535AD4A19E50 /* LegacyImport.swift */,
 				F5FE47A3C3D19B0FABF00359 /* Models.swift */,
@@ -133,6 +156,13 @@
 				74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */,
 				236619A27ADADAE44D858CC7 /* ResearchData.swift */,
 				CA91E706AB643380F621F219 /* ResearchViews.swift */,
+				5A1C0E7B2D9F4A6E8B3C1D20 /* Theme.swift */,
+				8C3E2A9F4B1D6E7A0F5C3B40 /* OfficialData.swift */,
+				E39E805FA17DCEE06FBC91A0 /* ComboViews.swift */,
+				D28D7F4E906CBDCF5EAB8090 /* MarketViews.swift */,
+				C17C6E3D8F5BACBE4D9A7F80 /* StockData.swift */,
+				9D4F3B0A5C2E7F8B1A6D4C50 /* HomeScreens.swift */,
+				AE5A4C1B6D3F8A9C2B7E5D60 /* DividendScreens.swift */,
 				D293146BB8B94669BF6CFA5E /* ToolsView.swift */,
 				326FCE6E7900546067FA3A20 /* Resources */,
 			);
@@ -247,6 +277,8 @@
 				1AAA72262CE7C3A24ED720B5 /* PrivacyInfo.xcprivacy in Resources */,
 				396CD6BE05F3201DE0CCD0CA /* annual-fees.json in Resources */,
 				35D9F2388BE10124F42EB4F5 /* catalog.json in Resources */,
+				BF6B5D2C7E4A9BAD3C8F6E71 /* official-dividends.json in Resources */,
+				F4AF9160B28EDFF170CDA2B1 /* stock-data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +301,7 @@
 				F27E7984B1E62699D593C989 /* BrokerImport.swift in Sources */,
 				07875818890007E983D5143F /* BrokerView.swift in Sources */,
 				52A39EB754258C874176C931 /* Catalog.swift in Sources */,
+				7B2D1F8C3E0A5B7F9C4D2E31 /* DiscoverViews.swift in Sources */,
 				643F72EA9C36FF060E0C5B54 /* ETFToGoApp.swift in Sources */,
 				D8EA314C066A59ADEBDCEC05 /* LegacyImport.swift in Sources */,
 				10F7E36B158DB7E63CA101B4 /* Models.swift in Sources */,
@@ -276,6 +309,13 @@
 				2293242942C405A47B28DE85 /* PortfolioViews.swift in Sources */,
 				29962F132B27E812DF5B6966 /* ResearchData.swift in Sources */,
 				149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */,
+				5A1C0E7B2D9F4A6E8B3C1D21 /* Theme.swift in Sources */,
+				8C3E2A9F4B1D6E7A0F5C3B41 /* OfficialData.swift in Sources */,
+				E39E805FA17DCEE06FBC91A1 /* ComboViews.swift in Sources */,
+				D28D7F4E906CBDCF5EAB8091 /* MarketViews.swift in Sources */,
+				C17C6E3D8F5BACBE4D9A7F81 /* StockData.swift in Sources */,
+				9D4F3B0A5C2E7F8B1A6D4C51 /* HomeScreens.swift in Sources */,
+				AE5A4C1B6D3F8A9C2B7E5D61 /* DividendScreens.swift in Sources */,
 				6EE9393DFDC3396CE5DEA967 /* ToolsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -472,7 +512,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "ETF 袋著走";
+				INFOPLIST_KEY_CFBundleDisplayName = "投資袋著走";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -492,7 +532,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "ETF 袋著走";
+				INFOPLIST_KEY_CFBundleDisplayName = "投資袋著走";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

@@ -21,7 +21,7 @@ final class RestoredFeaturesTests: XCTestCase {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: dir) }
         let store = PortfolioStore(url: dir.appendingPathComponent("portfolio.json"))
-        try store.save(Portfolio.demo.holdings[1])
+        try store.save(Portfolio.sample.holdings[1])
         try store.importBackup(Data(legacy.utf8)); try store.importBackup(Data(legacy.utf8))
         XCTAssertEqual(store.data.holdings.count, 2); XCTAssertEqual(store.data.dividends.count, 1)
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: dir.appendingPathComponent("Recovery").path).count, 2)
@@ -48,16 +48,52 @@ final class RestoredFeaturesTests: XCTestCase {
     }
     func testCatalogRejectsMissingMarketAndDuplicates() {
         let rows = Data(#"[{"基金代號":"0050","基金簡稱":"元大台灣50","出表日期":"1151014","上市日期":"0920630"}]"#.utf8)
-        let active = Data(#"{"status":"success","data":[{"stockNo":"0050","stockName":"元大台灣50","listingDate":"2003.06.30"}]}"#.utf8)
-        XCTAssertThrowsError(try CatalogAPI.decode(listed:rows,otc:Data(#"{"status":"success","data":[]}"#.utf8),active:active))
-        XCTAssertThrowsError(try CatalogAPI.decode(listed:rows,otc:active,active:active))
+        let twse = Data(#"[{"Date":"1151015","Code":"0050","Name":"元大台灣50"}]"#.utf8)
+        let otc = Data(#"[{"Date":"1151016","SecuritiesCompanyCode":"00679B","CompanyName":"元大美債20年"}]"#.utf8)
+        let stocksOnly = Data(#"[{"Date":"1151016","SecuritiesCompanyCode":"6488","CompanyName":"環球晶"}]"#.utf8)
+        XCTAssertNoThrow(try CatalogAPI.decode(listed: rows, twse: twse, otc: otc, today: "2026-10-15"))
+        XCTAssertThrowsError(try CatalogAPI.decode(listed: rows, twse: twse, otc: Data("[]".utf8)), "An empty OTC list is refused")
+        XCTAssertThrowsError(try CatalogAPI.decode(listed: rows, twse: twse, otc: stocksOnly), "An OTC list without ETFs is refused")
+        XCTAssertThrowsError(try CatalogAPI.decode(listed: rows, twse: twse, otc: Data(#"[{"SecuritiesCompanyCode":"0050","CompanyName":"元大台灣50"}]"#.utf8)), "A code in both markets is refused")
+        XCTAssertThrowsError(try CatalogAPI.decode(listed: rows, twse: Data(#"[{"Date":"1151015","Symbol":"0050","Title":"元大台灣50"}]"#.utf8), otc: otc), "Renamed fields are refused")
+        let twice = Data(#"[{"基金代號":"0050","出表日期":"1151014"},{"基金代號":"0050","出表日期":"1151014"}]"#.utf8)
+        XCTAssertThrowsError(try CatalogAPI.decode(listed: twice, twse: twse, otc: otc), "A fund listed twice is refused")
     }
-    func testCatalogExcludesHistoricalAndFutureListings() throws {
-        let rows = Data(#"[{"基金代號":"0054","出表日期":"1151014"}]"#.utf8)
-        let active = Data(#"{"status":"success","data":[{"stockNo":"0050","stockName":"元大台灣50","listingDate":"2003.06.30"},{"stockNo":"00415A","stockName":"尚未掛牌","listingDate":"2026.10.20"}]}"#.utf8)
-        let otc = Data(#"{"status":"success","data":[{"stockNo":"00679B","stockName":"元大美債20年","listingDate":"20170117"}]}"#.utf8)
-        let result = try CatalogAPI.decode(listed:rows,otc:otc,active:active,today:"2026-10-15")
-        XCTAssertEqual(result.funds.map(\.id),["0050","00679B"])
+    func testCatalogFromOpenData() throws {
+        // Shapes of October 2026: TWSE 基金基本資料彙總表 (ROC dates, some HTML entities, funds that left the market stay
+        // in it), 上市個股日成交資訊 (with a byte order mark) and TPEx 上櫃股票收盤行情 (stocks, ETFs and ETNs together).
+        let listed = Data(#"""
+        [{"出表日期":"1151015","基金代號":"0050","基金簡稱":"元大台灣50","基金類型":"國內成分證券指數股票型基金","基金中文名稱":"元大台灣卓越50證券投資信託基金","上市日期":"0920630"},
+         {"出表日期":"1151015","基金代號":"00646","基金簡稱":"元大S&amp;P500","基金類型":"國外成分證券指數股票型基金","基金中文名稱":"元大標普500證券投資信託基&#63754;","上市日期":"1041216"},
+         {"出表日期":"1151014","基金代號":"0054","基金簡稱":"元大台商50","基金類型":"國內成分證券指數股票型基金","基金中文名稱":"元大台商收成證券投資信託基金","上市日期":"0960814"}]
+        """#.utf8)
+        let twse = Data([0xEF, 0xBB, 0xBF]) + Data(#"""
+        [{"Date":"1151015","Code":"0050","Name":"元大台灣50","ClosingPrice":"108.90"},
+         {"Date":"1151015","Code":"00646","Name":"元大S&P500","ClosingPrice":"70.00"},
+         {"Date":"1151015","Code":"00415A","Name":"主動新掛牌","ClosingPrice":"10.00"},
+         {"Date":"1151015","Code":"2330","Name":"台積電","ClosingPrice":"1450.00"}]
+        """#.utf8)
+        let otc = Data(#"""
+        [{"Date":"1151016","SecuritiesCompanyCode":"00679B","CompanyName":"元大美債20年","Close":"25.74"},
+         {"Date":"1151016","SecuritiesCompanyCode":"009999","CompanyName":"新上櫃債","Close":"10.00"},
+         {"Date":"1151016","SecuritiesCompanyCode":"6488","CompanyName":"環球晶","Close":"430.50"},
+         {"Date":"1151016","SecuritiesCompanyCode":"020001","CompanyName":"富邦特選蘋果N","Close":"20.00"}]
+        """#.utf8)
+        let previous = CatalogSnapshot(funds: [Fund(id: "00679B", name: "元大美債20年", strategy: .unclassified, market: "TPEx", fullName: "元大美國政府20年期(以上)債券證券投資信託基金", fundType: "指數股票型", listingDate: "2017-01-17")],
+                                       listedDate: "2026-10-01", fetchedDay: "2026-10-01", sources: [])
+        let result = try CatalogAPI.decode(listed: listed, twse: twse, otc: otc, previous: previous, today: "2026-10-16")
+        XCTAssertEqual(result.funds.map(\.id), ["00415A", "0050", "00646", "00679B", "009999"], "0054 left the market; stocks and ETNs are not ETFs")
+        let tw50 = try XCTUnwrap(result.funds.first { $0.id == "0050" })
+        XCTAssertEqual(tw50.market, "TWSE"); XCTAssertEqual(tw50.listingDate, "2003-06-30"); XCTAssertEqual(tw50.strategy, .saving)
+        XCTAssertEqual(tw50.fullName, "元大台灣卓越50證券投資信託基金"); XCTAssertEqual(tw50.fundType, "國內成分證券指數股票型基金")
+        let sp = try XCTUnwrap(result.funds.first { $0.id == "00646" })
+        XCTAssertEqual(sp.name, "元大S&P500"); XCTAssertEqual(sp.fullName, "元大標普500證券投資信託基\u{F90A}"); XCTAssertEqual(sp.listingDate, "2015-12-16")
+        XCTAssertNil(result.funds.first { $0.id == "00415A" }?.listingDate, "Not in the fund list yet")
+        let bond = try XCTUnwrap(result.funds.first { $0.id == "00679B" })
+        XCTAssertEqual(bond.market, "TPEx"); XCTAssertEqual(bond.listingDate, "2017-01-17"); XCTAssertEqual(bond.fullName, "元大美國政府20年期(以上)債券證券投資信託基金")
+        XCTAssertEqual(result.funds.first { $0.id == "009999" }?.market, "TPEx"); XCTAssertNil(result.funds.first { $0.id == "009999" }?.listingDate)
+        XCTAssertEqual(result.listedDate, "2026-10-15"); XCTAssertEqual(result.fetchedDay, "2026-10-16")
+        XCTAssertEqual(result.sources, [CatalogAPI.listedURL, CatalogAPI.twseURL, CatalogAPI.otcURL])
     }
     func snapshot(_ symbol: String, _ values: [(String, Double)]) -> ComponentSnapshot {
         ComponentSnapshot(symbol: symbol, date: "2026-10-01", components: values.map { FundComponent(symbol: $0.0, name: $0.0, weight: $0.1) }, source: "test")
@@ -67,7 +103,7 @@ final class RestoredFeaturesTests: XCTestCase {
         let b = snapshot("00878", [("2330",20),("2317",5)])
         let rows = ResearchMath.overlap(a,b)
         XCTAssertEqual(rows.count, 1); XCTAssertEqual(rows.reduce(0) { $0 + min($1.left,$1.right) }, 20)
-        var data = Portfolio.demo; data.components = ["0050":a,"00878":b]
+        var data = Portfolio.sample; data.components = ["0050":a,"00878":b]
         let exposure = ResearchMath.exposures(data)
         XCTAssertEqual(exposure.first?.value, 91200)
         data.quotes.removeValue(forKey: "00878")
@@ -89,6 +125,45 @@ final class RestoredFeaturesTests: XCTestCase {
         XCTAssertEqual(stats.annualized!,pow(1.1,365.25/366)-1,accuracy:0.000001)
         XCTAssertNil(stats.volatility)
     }
+    func testExposureMergesDirectlyHeldStocks() throws {
+        var data = Portfolio.sample; data.components = ["0050": snapshot("0050", [("2330",60),("2454",10)])]
+        data.holdings.append(Holding(symbol: "2330", name: "台積電", shares: 100, unitCost: 900, broker: "富邦證券", strategy: .unclassified))
+        data.quotes["2330"] = Quote(symbol: "2330", price: 1000, changePercent: nil, date: DataChecks.day(), fetchedAt: Date(), currency: "TWD")
+        let row = try XCTUnwrap(ResearchMath.exposures(data, stocks: ["2330"]).first { $0.symbol == "2330" })
+        XCTAssertEqual(row.value, 2000 * 55 * 0.6 + 100 * 1000, accuracy: 0.001)
+        XCTAssertEqual(row.funds, ["0050", ResearchMath.direct])
+        XCTAssertFalse(ResearchMath.exposures(data).contains { $0.funds.contains(ResearchMath.direct) }, "Codes not named as stocks are not assumed to be stocks")
+    }
+    func testCSVTrailingCellsShortRowsAndBadRowsAreSkippedNotFatal() throws {
+        let table = try CSVTable.parse(Data("代碼,名稱,股數,總成本,\n0050,元大台灣50,1000,50000,\n00878,國泰永續高股息,abc,20000\n00919,群益台灣精選高息,1,000,22000\n合計,,,72000\n備註\n".utf8))
+        XCTAssertEqual(table.headers, ["代碼","名稱","股數","總成本"], "A trailing empty title cell is dropped")
+        XCTAssertTrue(table.rows.allSatisfy { $0.count >= 4 }, "Short rows are padded")
+        let p = try BrokerPreview.make(table: table, mapping: BrokerMapping(guessing: table), broker: "測試券商", account: "主要", funds: Fund.starters)
+        XCTAssertEqual(p.holdings.map(\.symbol), ["0050"])
+        XCTAssertEqual(p.skipped.count, 4)
+        XCTAssertTrue(p.skipped[0].contains("00878") && p.skipped[0].contains("數量"))
+        XCTAssertTrue(p.skipped[1].contains("00919") && p.skipped[1].contains("逗號"))
+        XCTAssertEqual(p.skippedCodes, ["00878", "00919"])
+        XCTAssertThrowsError(try BrokerPreview.make(table: CSVTable.parse(Data("代碼,股數,總成本\n合計,1,1".utf8)), mapping: BrokerMapping(symbol: 0, name: -1, shares: 1, cost: 2), broker: "測試券商", account: "主要", funds: Fund.starters)) {
+            XCTAssertTrue($0.localizedDescription.contains("沒有可匯入"))
+        }
+    }
+    @MainActor func testReplacingAnAccountKeepsHoldingsWhoseRowsWereSkipped() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("data.json"))
+        let mapping = BrokerMapping(symbol: 0, name: -1, shares: 1, cost: 2)
+        try store.importBroker(BrokerPreview.make(table: CSVTable.parse(Data("code,shares,cost\n0050,1000,50000\n00878,2000,40000\n0056,1000,30000".utf8)), mapping: mapping, broker: "A", account: "主", funds: Fund.starters), replaceAccount: false)
+        let next = try BrokerPreview.make(table: CSVTable.parse(Data("code,shares,cost\n0050,1000,50000\n00878,-,40000".utf8)), mapping: mapping, broker: "A", account: "主", funds: Fund.starters)
+        try store.importBroker(next, replaceAccount: true)
+        XCTAssertEqual(Set(store.data.holdings.map(\.symbol)), ["0050", "00878"], "0056 left the file and is removed; 00878's row was unreadable, so it stays")
+    }
+    func testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays() {
+        let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-02",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-03",source:"test")
+        XCTAssertThrowsError(try h.validate())
+        XCTAssertNil(DataChecks.date("2025-02-30")); XCTAssertNil(DataChecks.date("2025-1-05"))
+        XCTAssertEqual(DataChecks.date("2025-01-05").map { DataChecks.day($0) }, "2025-01-05")
+    }
     func testHistoryRejectsUnadjustedDataAndDuplicateDates() {
         XCTAssertThrowsError(try Fugle.decodeHistory(Data(#"{"symbol":"0050","timeframe":"D","data":[]}"#.utf8),symbol:"0050"))
         let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-01",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-02",source:"test")
@@ -104,7 +179,7 @@ final class RestoredFeaturesTests: XCTestCase {
     @MainActor func testBrokerReimportReplacesOnlySelectedAccount() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at:dir) }
-        let store = PortfolioStore(url:dir.appendingPathComponent("p.json")); try store.save(Portfolio.demo.holdings[2])
+        let store = PortfolioStore(url:dir.appendingPathComponent("p.json")); try store.save(Portfolio.sample.holdings[2])
         let table = try CSVTable.parse(Data("code,shares,cost\n0050,2,100000\n00878,1,20000".utf8))
         let mapping = BrokerMapping(symbol:0,name:-1,shares:1,cost:2,lots:true)
         let a = try BrokerPreview.make(table:table,mapping:mapping,broker:"A",account:"主",funds:Fund.starters)
@@ -118,6 +193,7 @@ final class RestoredFeaturesTests: XCTestCase {
         var fee = FeeRecord(symbol:"0050",effectiveDate:"2026-01-01",management:"級距費率",custody:"級距費率",annualExpensePercent:0.2,expenseYear:nil,sourceURL:"https://example.com",note:"")
         XCTAssertThrowsError(try fee.validate()); fee.expenseYear=2025; XCTAssertNoThrow(try fee.validate())
         fee.sourceURL="javascript:alert(1)"; XCTAssertThrowsError(try fee.validate())
+        fee.sourceURL=""; XCTAssertNoThrow(try fee.validate(), "The reference address is optional")
     }
     func testSchemaOneStillDecodesWithoutNewFields() throws {
         let bytes = Data(#"{"schema":1,"holdings":[],"dividends":[],"favorites":[],"quotes":{}}"#.utf8)
@@ -164,7 +240,7 @@ final class RestoredFeaturesTests: XCTestCase {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at:dir) }
         let store = PortfolioStore(url:dir.appendingPathComponent("p.json"))
-        var incoming = Portfolio.demo
+        var incoming = Portfolio.sample
         try store.importBackup(JSONEncoder().encode(incoming))
         XCTAssertEqual(store.data.quotes["0050"]?.price,55)
         incoming.quotes["0050"]?.price=1

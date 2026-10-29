@@ -21,7 +21,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview
         TARGETED_DEVICE_FAMILY: '1'
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: ETF 袋著走
+        INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
