@@ -134,6 +134,30 @@ final class RestoredFeaturesTests: XCTestCase {
         XCTAssertEqual(row.funds, ["0050", ResearchMath.direct])
         XCTAssertFalse(ResearchMath.exposures(data).contains { $0.funds.contains(ResearchMath.direct) }, "Codes not named as stocks are not assumed to be stocks")
     }
+    func testCSVTrailingCellsShortRowsAndBadRowsAreSkippedNotFatal() throws {
+        let table = try CSVTable.parse(Data("代碼,名稱,股數,總成本,\n0050,元大台灣50,1000,50000,\n00878,國泰永續高股息,abc,20000\n00919,群益台灣精選高息,1,000,22000\n合計,,,72000\n備註\n".utf8))
+        XCTAssertEqual(table.headers, ["代碼","名稱","股數","總成本"], "A trailing empty title cell is dropped")
+        XCTAssertTrue(table.rows.allSatisfy { $0.count >= 4 }, "Short rows are padded")
+        let p = try BrokerPreview.make(table: table, mapping: BrokerMapping(guessing: table), broker: "測試券商", account: "主要", funds: Fund.starters)
+        XCTAssertEqual(p.holdings.map(\.symbol), ["0050"])
+        XCTAssertEqual(p.skipped.count, 4)
+        XCTAssertTrue(p.skipped[0].contains("00878") && p.skipped[0].contains("數量"))
+        XCTAssertTrue(p.skipped[1].contains("00919") && p.skipped[1].contains("逗號"))
+        XCTAssertEqual(p.skippedCodes, ["00878", "00919"])
+        XCTAssertThrowsError(try BrokerPreview.make(table: CSVTable.parse(Data("代碼,股數,總成本\n合計,1,1".utf8)), mapping: BrokerMapping(symbol: 0, name: -1, shares: 1, cost: 2), broker: "測試券商", account: "主要", funds: Fund.starters)) {
+            XCTAssertTrue($0.localizedDescription.contains("沒有可匯入"))
+        }
+    }
+    @MainActor func testReplacingAnAccountKeepsHoldingsWhoseRowsWereSkipped() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("data.json"))
+        let mapping = BrokerMapping(symbol: 0, name: -1, shares: 1, cost: 2)
+        try store.importBroker(BrokerPreview.make(table: CSVTable.parse(Data("code,shares,cost\n0050,1000,50000\n00878,2000,40000\n0056,1000,30000".utf8)), mapping: mapping, broker: "A", account: "主", funds: Fund.starters), replaceAccount: false)
+        let next = try BrokerPreview.make(table: CSVTable.parse(Data("code,shares,cost\n0050,1000,50000\n00878,-,40000".utf8)), mapping: mapping, broker: "A", account: "主", funds: Fund.starters)
+        try store.importBroker(next, replaceAccount: true)
+        XCTAssertEqual(Set(store.data.holdings.map(\.symbol)), ["0050", "00878"], "0056 left the file and is removed; 00878's row was unreadable, so it stays")
+    }
     func testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays() {
         let h = PriceHistory(symbol:"0050",adjusted:true,points:[PricePoint(date:"2025-01-02",close:100),PricePoint(date:"2025-01-01",close:101)],fetchedDay:"2025-01-03",source:"test")
         XCTAssertThrowsError(try h.validate())

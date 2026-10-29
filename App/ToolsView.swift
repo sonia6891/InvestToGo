@@ -383,7 +383,7 @@ struct BackupView: View {
     var body: some View {
         Page {
             Card {
-                SectionHeading(title: "資料備份與還原", subtitle: "匯出或匯入持有、配息、交易、收藏與已取得報價；不含行情金鑰")
+                SectionHeading(title: "資料備份與還原", subtitle: "匯出或匯入持有、配息、交易、收藏與已取得報價；不含行情金鑰與可重新取得的歷史走勢")
                 HStack(spacing: 10) {
                     actionTile("匯出備份 (JSON)", "包含自選、持股、設定", icon: "arrow.down.to.line", color: Palette.green) { do { exportURL = try store.export(); message = "已建立備份檔，可用下方按鈕儲存或分享。" } catch { message = error.localizedDescription } }
                     actionTile("匯入資料 (JSON)", "選擇備份檔案恢復資料", icon: "arrow.up.to.line", color: Palette.blue) { importing = true }

@@ -174,8 +174,10 @@ struct Portfolio: Codable {
         guard !holdings.isEmpty, holdings.allSatisfy({ quotes[$0.symbol]?.isTWD == true }) else { return nil }
         return holdings.reduce(0) { $0 + $1.shares * quotes[$1.symbol]!.price }
     }
-    static func decodeBackup(_ data: Data) throws -> Portfolio {
-        guard data.count <= 5_000_000 else { throw StoreError.unsupportedBackup }
+    /// `limit` is raised only for the device's own records file, which earlier versions let grow past a backup's
+    /// size with price histories; the first save then moves those out.
+    static func decodeBackup(_ data: Data, limit: Int = 5_000_000) throws -> Portfolio {
+        guard data.count <= limit else { throw StoreError.unsupportedBackup }
         let value = try JSONDecoder().decode(Portfolio.self, from: data)
         guard value.schema == 1, value.holdings.count <= 10000, value.dividends.count <= 50000, value.favorites.count <= 2000 else { throw StoreError.unsupportedBackup }
         for holding in value.holdings { try holding.validate() }
@@ -247,21 +249,39 @@ enum StoreError: LocalizedError {
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
            cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
-        if reset { try? FileManager.default.removeItem(at: self.url) }
+        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL) }
         if FileManager.default.fileExists(atPath: self.url.path) {
-            do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url)) }
+            do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url), limit: 100_000_000) }
             catch { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。"; readFailure = true }
+        }
+        historiesSaved = (data.histories ?? [:]).isEmpty
+        // Earlier versions kept histories in the records file; the next save moves them out. A history that does not
+        // validate is dropped, since it can be fetched again.
+        if let bytes = try? Data(contentsOf: historiesURL), let cached = try? JSONDecoder().decode([String: PriceHistory].self, from: bytes) {
+            let valid = cached.filter { $0.key == $0.value.symbol && (try? $0.value.validate()) != nil }
+            if !valid.isEmpty { data.histories = (data.histories ?? [:]).merging(valid) { _, cached in cached } }
         }
     }
     private var readFailure = false
+    /// Price histories are large and can be fetched again, so they are saved apart from the records: a save of the
+    /// records stays small and fast, and many histories never push the records past the backup size limit.
+    private var historiesURL: URL { url.appendingPathExtension("histories") }
     func commit(_ next: Portfolio) throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
-        let encoded = try JSONEncoder().encode(next)
+        var records = next; records.histories = nil
+        let encoded = try JSONEncoder().encode(records)
+        guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
         _ = try Portfolio.decodeBackup(encoded)
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if next.histories != data.histories || !historiesSaved {
+            try JSONEncoder().encode(next.histories ?? [:]).write(to: historiesURL, options: [.atomic, .completeFileProtection])
+            historiesSaved = true
+        }
         try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
     }
+    /// False while the records file still holds histories from an earlier version, so the next save moves them out.
+    private var historiesSaved = false
     func save(_ holding: Holding) throws {
         try holding.validate()
         var next = data
@@ -371,7 +391,9 @@ enum StoreError: LocalizedError {
     func export() throws -> URL {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("ETFToGo-backup-\(UUID().uuidString.prefix(8)).json")
         // Preserve recoverable bytes when decoding failed; never export an empty replacement.
-        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(data)
+        // Price histories are left out: they can be fetched again and would make the backup too large to import.
+        var records = data; records.histories = nil
+        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
         try bytes.write(to: file, options: .atomic)
         return file
     }

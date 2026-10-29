@@ -63,8 +63,13 @@ struct BrokerView: View {
                 }
                 ForEach(preview.warnings(price: { price($0) }), id: \.self) { Text($0).font(.caption).foregroundStyle(Palette.red) }
                 if let costHint { Text(costHint).font(.caption.bold()).foregroundStyle(Palette.red) }
+                if !preview.skipped.isEmpty {
+                    Text("略過 \(preview.skipped.count) 列，不會匯入：").font(.caption.bold()).foregroundStyle(Palette.red)
+                    ForEach(preview.skipped.prefix(20), id: \.self) { Text($0).font(.caption) }
+                    if preview.skipped.count > 20 { Text("另有 \(preview.skipped.count - 20) 列略過。").font(.caption) }
+                }
                 Toggle("替換此帳戶先前匯入的庫存", isOn: $replace)
-                Text(replace ? "會移除這個帳戶先前匯入、但本次檔案已沒有的部位。其他帳戶與手動紀錄保留。" : "只新增或更新本檔部位；檔案未列出的舊部位保留。").font(.caption)
+                Text((replace ? "會移除這個帳戶先前匯入、但本次檔案已沒有的部位。其他帳戶與手動紀錄保留。" : "只新增或更新本檔部位；檔案未列出的舊部位保留。") + (replace && !preview.skippedCodes.isEmpty ? "略過列上的代號保留上次匯入的庫存。" : "")).font(.caption)
                 Button("確認匯入 \(preview.holdings.count) 筆") { confirmation = true }
             }
         }

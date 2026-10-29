@@ -68,8 +68,8 @@ enum ResearchMath {
         }.sorted { min($0.left, $0.right) > min($1.left, $1.right) }
     }
 }
-struct PricePoint: Codable, Identifiable { var date: String; var close: Double; var id: String { date } }
-struct PriceHistory: Codable {
+struct PricePoint: Codable, Identifiable, Equatable { var date: String; var close: Double; var id: String { date } }
+struct PriceHistory: Codable, Equatable {
     var symbol: String
     var adjusted: Bool
     var points: [PricePoint]

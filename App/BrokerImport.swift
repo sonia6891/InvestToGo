@@ -34,7 +34,15 @@ struct CSVTable {
         row.append(cell.trimmingCharacters(in: .whitespacesAndNewlines)); if row.contains(where: { !$0.isEmpty }) { rows.append(row) }
         guard rows.count >= 2, rows.count <= 10001 else { throw AppDataError("需要標題列與持有資料，最多 10,000 筆。") }
         var headers = rows.removeFirst(); headers[0] = headers[0].replacingOccurrences(of: "\u{feff}", with: "")
-        guard headers.count <= 100, rows.allSatisfy({ $0.count == headers.count }) else { throw AppDataError("CSV 每列欄位數不一致。") }
+        // Spreadsheets often end lines with empty cells, and total or note rows are shorter than the title row.
+        while headers.count > 1, headers.last?.isEmpty == true { headers.removeLast() }
+        guard headers.count <= 100 else { throw AppDataError("CSV 欄位超過 100 欄。") }
+        rows = rows.map { row in
+            var row = row
+            while row.count > headers.count, row.last?.isEmpty == true { row.removeLast() }
+            return row + Array(repeating: "", count: max(headers.count - row.count, 0))
+        }
+        // A row still wider than the titles (such as an unquoted 1,000) is kept as is and skipped with a reason when previewed.
         return Self(headers: headers, rows: rows)
     }
     /// The column titled with one of `names`, trying the names in order (so 總成本 wins over a plain 成本).
@@ -64,18 +72,23 @@ struct BrokerPreview {
     var holdings: [Holding]
     var sourceAccount: String
     var broker: String
+    /// CSV rows not imported, each with its reason; shown before importing.
+    var skipped: [String] = []
+    /// Codes on skipped rows. Replacing the account keeps their earlier holdings rather than removing them.
+    var skippedCodes: Set<String> = []
     var totalCost: Double { holdings.reduce(0) { $0 + $1.cost } }
     /// One position to import; `place` names it in error messages.
-    private struct Entry { var place: String; var code: String; var name: String; var quantity: Double?; var cost: Double?; var margin = false }
+    private struct Entry { var place: String; var code: String; var name: String; var quantity: Double?; var cost: Double?; var margin = false; var problem: String? = nil }
     /// ETFs take the fund list's name and strategy; stocks are named from the stock list and left unclassified, as in the 新增持有 form.
     static func make(table: CSVTable, mapping: BrokerMapping, broker: String, account: String, funds: [Fund], stock: (String) -> StockInfo? = { StockSnapshot.bundled?.byID[$0] }) throws -> Self {
         guard [mapping.symbol, mapping.shares, mapping.cost].allSatisfy({ table.headers.indices.contains($0) }),
               Set([mapping.symbol, mapping.shares, mapping.cost]).count == 3 else { throw AppDataError("請指定不同的代號、數量與成本欄。") }
         let entries = table.rows.enumerated().map { offset, row in
             Entry(place: "第 \(offset + 2) 列", code: row[mapping.symbol].uppercased(), name: table.headers.indices.contains(mapping.name) ? row[mapping.name] : "",
-                  quantity: number(row[mapping.shares]), cost: number(row[mapping.cost]))
+                  quantity: number(row[mapping.shares]), cost: number(row[mapping.cost]),
+                  problem: row.count > table.headers.count ? "欄位比標題列多，可能有未加引號的逗號" : nil)
         }
-        return try build(entries, lots: mapping.lots, totalCost: mapping.totalCost, broker: broker, account: account, funds: funds, stock: stock)
+        return try build(entries, lots: mapping.lots, totalCost: mapping.totalCost, broker: broker, account: account, funds: funds, stock: stock, skipInvalid: true)
     }
     /// The lots the user checked after reading screenshots. Each lot's total is its cost, or its price per share
     /// times its shares; lots of one code and kind (現股 or 融資) become one holding with the shares and totals
@@ -123,31 +136,45 @@ struct BrokerPreview {
         if lots || value.hasSuffix("股") { value.removeLast() }
         return number(value).map { lots ? $0 * 1000 : $0 }
     }
-    private static func build(_ entries: [Entry], lots: Bool, totalCost: Bool, broker: String, account: String, funds: [Fund], stock: (String) -> StockInfo?) throws -> Self {
+    /// With `skipInvalid` (CSV), a row with a bad code, quantity or cost, or a code in neither list, is skipped and
+    /// listed instead of stopping the whole file; the screenshot list asks the user to fix each lot instead.
+    private static func build(_ entries: [Entry], lots: Bool, totalCost: Bool, broker: String, account: String, funds: [Fund], stock: (String) -> StockInfo?, skipInvalid: Bool = false) throws -> Self {
         let name = broker.trimmingCharacters(in: .whitespacesAndNewlines); let alias = account.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty, name.count <= 80, !alias.isEmpty, alias.count <= 80 else { throw AppDataError("請填券商名稱與帳戶暱稱（各 80 字以內）。") }
         let source = StableID.make("broker-account", name + "\u{0}" + alias).uuidString
-        var holdings: [Holding] = []; var seen = Set<String>()
+        var holdings: [Holding] = []; var seen = Set<String>(); var skipped: [String] = []; var skippedCodes = Set<String>()
         for entry in entries {
             let code = entry.code
-            guard DataChecks.code(code), let qty = entry.quantity, let cost = entry.cost, qty.isFinite, qty > 0, cost.isFinite, cost >= 0 else { throw AppDataError("\(entry.place)有無效代號、數量或成本，整份未匯入。") }
+            func skip(_ reason: String) throws {
+                guard skipInvalid else { throw AppDataError("\(entry.place) \(code)：\(reason)，整份未匯入。") }
+                skipped.append("\(entry.place)\(code.isEmpty ? "" : " " + code)：\(reason)")
+                if DataChecks.code(code) { skippedCodes.insert(code) }
+            }
+            if let problem = entry.problem { try skip(problem); continue }
+            guard DataChecks.code(code) else { try skip("不是股票或 ETF 代號"); continue }
+            guard let qty = entry.quantity, let cost = entry.cost, qty.isFinite, qty > 0, cost.isFinite, cost >= 0 else { try skip("數量或成本不是有效數字"); continue }
             guard seen.insert(entry.margin ? code + "\u{0}融資" : code).inserted else { throw AppDataError("\(code) 有多列，請先將同帳戶同一檔合併為一筆庫存。") }
             if lots && (code.hasSuffix("C") || code.hasSuffix("K")) { throw AppDataError("\(code) 為外幣級別，交易單位可能不是 1,000 股；請將數量改為實際股數再匯入。") }
             let shares = qty * (lots ? 1000 : 1)
             let fund = funds.first { $0.id == code }
-            guard let listed = fund?.name ?? stock(code)?.name else { throw AppDataError("\(entry.place) \(code) 不在目前股票或 ETF 名單；請先更新名單，或移除該列。") }
+            guard let listed = fund?.name ?? stock(code)?.name else {
+                guard skipInvalid else { throw AppDataError("\(entry.place) \(code) 不在目前股票或 ETF 名單；請先更新名單，或移除該列。") }
+                try skip("不在目前股票或 ETF 名單"); continue
+            }
             // 融資 is a holding of its own beside 現股, so the two never replace each other on a later import.
             let holding = Holding(id: StableID.make("broker-position", source + "\u{0}" + code + (entry.margin ? "\u{0}融資" : "")), symbol: code, name: entry.name.isEmpty ? listed : entry.name,
                                   shares: shares, unitCost: totalCost ? cost / shares : cost, broker: entry.margin ? name + "（融資）" : name, strategy: fund?.strategy ?? .unclassified, sourceAccount: source)
             try holding.validate(); holdings.append(holding)
         }
-        return Self(holdings: holdings, sourceAccount: source, broker: name)
+        guard !holdings.isEmpty else { throw AppDataError("沒有可匯入的列。" + (skipped.first.map { "例如\($0)。" } ?? "")) }
+        return Self(holdings: holdings, sourceAccount: source, broker: name, skipped: skipped, skippedCodes: skippedCodes)
     }
 }
 extension PortfolioStore {
     func importBroker(_ preview: BrokerPreview, replaceAccount: Bool) throws {
         var next = data
-        if replaceAccount { next.holdings.removeAll { $0.sourceAccount == preview.sourceAccount } }
+        // A position whose row was skipped stays as last imported rather than disappearing.
+        if replaceAccount { next.holdings.removeAll { $0.sourceAccount == preview.sourceAccount && !preview.skippedCodes.contains($0.symbol) } }
         for holding in preview.holdings {
             if let i = next.holdings.firstIndex(where: { $0.id == holding.id }) { next.holdings[i] = holding } else { next.holdings.append(holding) }
             next.log(.brokerImport, holding)

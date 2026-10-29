@@ -38,6 +38,28 @@ final class PortfolioTests: XCTestCase {
         XCTAssertEqual(reopened.data.holdings.count, count)
         XCTAssertTrue(reopened.data.holdings.contains { $0.id == holding.id })
     }
+    @MainActor func testPriceHistoriesLiveApartFromRecords() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let url = directory.appendingPathComponent("data.json")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let start = try XCTUnwrap(DataChecks.date("2010-01-04"))
+        let points = (0..<4000).map { PricePoint(date: DataChecks.day(start.addingTimeInterval(Double($0) * 86400)), close: 100 + Double($0 % 50)) }
+        var legacy = Portfolio.sample
+        legacy.histories = Dictionary(uniqueKeysWithValues: (0..<50).map { i in (String(1000 + i), PriceHistory(symbol: String(1000 + i), adjusted: true, points: points, fetchedDay: "2026-01-02", source: "test")) })
+        let legacyBytes = try JSONEncoder().encode(legacy)
+        XCTAssertGreaterThan(legacyBytes.count, 5_000_000, "An earlier records file holding many histories is past the backup limit")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try legacyBytes.write(to: url)
+        let store = PortfolioStore(url: url)
+        XCTAssertNil(store.message, "The oversized earlier file still opens")
+        XCTAssertEqual(store.data.histories?.count, 50)
+        try store.save(Portfolio.sample.holdings[0])
+        XCTAssertLessThan(try Data(contentsOf: url).count, 100_000, "Saving moves the histories out of the records file")
+        let reopened = PortfolioStore(url: url)
+        XCTAssertEqual(reopened.data.histories?.count, 50)
+        XCTAssertEqual(reopened.data.histories?["1000"], legacy.histories?["1000"])
+        XCTAssertNil(try Portfolio.decodeBackup(Data(contentsOf: reopened.export())).histories, "Backups leave out histories, which can be fetched again")
+    }
     @MainActor func testTradeLogRecordsHoldingChanges() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let url = directory.appendingPathComponent("data.json")
@@ -382,9 +404,9 @@ final class PortfolioTests: XCTestCase {
         XCTAssertEqual(preview.holdings[1].name, "元大台灣50"); XCTAssertEqual(preview.holdings[1].strategy, .saving)
         XCTAssertEqual(preview.totalCost, 680000)
         let unlisted = try CSVTable.parse(Data("股票代號,現股庫存,付出成本\n2330,1000,580000\n1234,1000,10000".utf8))
-        XCTAssertThrowsError(try BrokerPreview.make(table: unlisted, mapping: BrokerMapping(guessing: unlisted), broker: "國泰證券", account: "主要", funds: Fund.starters, stock: { stocks[$0] })) { error in
-            XCTAssertTrue(error.localizedDescription.contains("1234"), "A code in neither list is still refused")
-        }
+        let partial = try BrokerPreview.make(table: unlisted, mapping: BrokerMapping(guessing: unlisted), broker: "國泰證券", account: "主要", funds: Fund.starters, stock: { stocks[$0] })
+        XCTAssertEqual(partial.holdings.map(\.symbol), ["2330"], "A code in neither list is not imported")
+        XCTAssertTrue(partial.skipped.contains { $0.contains("1234") }, "and is listed as skipped")
         let bundled = try BrokerPreview.make(table: table, mapping: mapping, broker: "國泰證券", account: "主要", funds: Fund.starters)
         XCTAssertEqual(bundled.holdings[0].name, StockSnapshot.bundled?.byID["2330"]?.name, "By default stocks come from the bundled list")
     }
