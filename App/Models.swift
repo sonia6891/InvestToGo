@@ -433,8 +433,9 @@ enum StoreError: LocalizedError {
             try Data(contentsOf: url).write(to: directory.appendingPathComponent("before-import-\(UUID().uuidString).json"), options: [.atomic, .completeFileProtection])
         }
     }
-    func refreshCatalog() async {
-        guard !catalogRefreshing else { return }
+    /// `automatic` (at launch) skips the three requests when today's list is already on the device; the 立即更新 buttons always fetch.
+    func refreshCatalog(automatic: Bool = false) async {
+        guard !catalogRefreshing, !(automatic && catalog?.fetchedDay == DataChecks.day()) else { return }
         catalogRefreshing = true; defer { catalogRefreshing = false }
         do {
             let next = try await CatalogAPI.fetch(previous: catalog)

@@ -36,7 +36,7 @@ struct RootView: View {
         }
         .environment(\.tabBarMinimize) { value in if minimized != value { minimized = value } }
         .onChange(of: tab) { _, _ in minimized = false }
-        .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog() } }
+        .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
         .task(id: phase) {
