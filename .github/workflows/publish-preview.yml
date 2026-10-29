@@ -6,6 +6,11 @@ on:
         description: Completed native-ui run in this repository
         required: true
         type: string
+      run_attempt:
+        description: Attempt whose evidence should be preserved
+        required: true
+        type: string
+        default: '1'
 permissions:
   actions: read
   contents: write
@@ -15,28 +20,42 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: ETFToGo-native-ui-evidence
-          run-id: ${{ inputs.run_id }}
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/native-evidence
+      - name: Download evidence from the selected run and attempt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id }}
+          RUN_ATTEMPT: ${{ inputs.run_attempt }}
+        run: |
+          set -euo pipefail
+          [[ "$RUN_ID" =~ ^[0-9]+$ && "$RUN_ATTEMPT" =~ ^[1-9][0-9]*$ ]]
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts?per_page=100" --jq '.artifacts[] | select(.expired == false) | .name' > "$RUNNER_TEMP/artifact-names.txt"
+          EVIDENCE="ETFToGo-native-ui-evidence-$RUN_ID-$RUN_ATTEMPT"
+          if grep -Fxq "$EVIDENCE" "$RUNNER_TEMP/artifact-names.txt"; then
+            gh run download "$RUN_ID" -n "$EVIDENCE" -D "$RUNNER_TEMP/native-evidence"
+            gh run download "$RUN_ID" -n "ETFToGo-screens-$RUN_ID-$RUN_ATTEMPT" -D "$RUNNER_TEMP/native-evidence/build/screens"
+          else
+            # Older workflows stored screenshots within the evidence artifact.
+            [[ "$RUN_ATTEMPT" == 1 ]]
+            gh run download "$RUN_ID" -n ETFToGo-native-ui-evidence -D "$RUNNER_TEMP/native-evidence"
+          fi
       - name: Save screenshots and project to a separate private branch
         env:
           RUN_ID: ${{ inputs.run_id }}
+          RUN_ATTEMPT: ${{ inputs.run_attempt }}
         run: |
           set -euo pipefail
           [[ "$RUN_ID" =~ ^[0-9]+$ ]]
-          git switch --orphan "ui-evidence-$RUN_ID"
+          git switch --orphan "ui-evidence-$RUN_ID-attempt-$RUN_ATTEMPT"
           mkdir -p Screens Evidence
           cp "$RUNNER_TEMP/native-evidence/build/screens/"*.png Screens/
           cp -R "$RUNNER_TEMP/native-evidence/ETFToGo.xcodeproj" Evidence/
           cp "$RUNNER_TEMP/native-evidence/App/Assets.xcassets/AppIcon.appiconset/AppIcon.png" Evidence/
           cp "$RUNNER_TEMP/native-evidence/build/compile.log" Evidence/
-          cp "$RUNNER_TEMP/native-evidence/build/tests.log" Evidence/
-          printf 'Native simulator screenshots from workflow run %s. Demo data. No TestFlight release.\n' "$RUN_ID" > Evidence/README.txt
+          cp "$RUNNER_TEMP/native-evidence/build/"*.log Evidence/
+          if [[ -f "$RUNNER_TEMP/native-evidence/build/provenance.txt" ]]; then cp "$RUNNER_TEMP/native-evidence/build/provenance.txt" Evidence/; fi
+          printf 'Native simulator screenshots from workflow run %s, attempt %s. Demo data. No TestFlight release. Test results must be checked in the source run.\n' "$RUN_ID" "$RUN_ATTEMPT" > Evidence/README.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add Screens Evidence
           git commit -m "Preserve native UI evidence from run $RUN_ID"
-          git push origin "ui-evidence-$RUN_ID"
+          git push origin "ui-evidence-$RUN_ID-attempt-$RUN_ATTEMPT"
