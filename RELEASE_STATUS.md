@@ -8,9 +8,9 @@
 - [TestFlight run 39161906093](https://github.com/sonia6891/InvestToGo/actions/runs/39161906093) 使用同一來源：以 App Store Connect API 金鑰簽署封存、上傳成功，並等到這個建置完成處理後交給內部測試群組。
 - 使用者是否已更新並開啟這個版本，尚待回報；不把上傳成功當成實機驗證。
 
-## 2026-10-29 分支整併（`claude/optimization-updates-refinement-ccqlsj`，**未編譯、未測試**）
+## 2026-10-29 分支整併與修正（`claude/optimization-updates-refinement-ccqlsj`），已編譯並通過測試，尚未上傳
 
-此環境沒有 Swift／Xcode，只做過 tree-sitter 語法剖析（30 個 Swift 檔 0 錯誤）。須重跑 native-ui 才算驗證。
+[native-ui run 40807353695](https://github.com/sonia6891/InvestToGo/actions/runs/40807353695) 使用來源 `64da217572b37d14791304b6ac08d27081c405db`：Xcode 編譯成功，**57 項單元測試與 6 項 UI 測試全部通過**，五個分頁截圖已產生。尚未簽署上傳 TestFlight，也尚未在使用者 iPhone 上驗證。
 
 - 移植 `claude/perf-optimizations`（原本基於舊 main）：日期格式器改為共用，不再於每次存檔驗證歷史價格時逐筆重建；網路請求共用同一個不轉址的連線；歷史日期排序檢查改為逐筆比較。報價批次中途失敗時保留已取得報價，改版已有，不重複移植。
 - 從 `claude/stocks-and-scenarios`（同樣基於舊 main）只移植改版缺少的部分：持股透視把直接持有的個股併入同一檔股票的曝險，價格與持有市值同樣來源；個股不再出現在「取得成分股」清單。個股持有、情境試算與以總成本輸入，改版已有，其餘不移植。
