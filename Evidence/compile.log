@@ -1,0 +1,1131 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0, OS:26.4.1, name:iPhone 17 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0, OS:26.4.1, name:iPhone 17 Pro }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (3 targets)
+    Target 'ETFToGoUITests' in project 'ETFToGo'
+        ➜ Explicit dependency on target 'ETFToGo' in project 'ETFToGo'
+    Target 'ETFToGoTests' in project 'ETFToGo'
+        ➜ Explicit dependency on target 'ETFToGo' in project 'ETFToGo'
+    Target 'ETFToGo' in project 'ETFToGo' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+Build description signature: 200dd290657f85a84e4c5153b1aa8b31
+Build description path: /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/XCBuildData/200dd290657f85a84e4c5153b1aa8b31.xcbuilddata
+ClangStatCache /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo-e5d9904722e3fbe0b67534d3011e84e1-VFS-iphonesimulator/all-product-headers.yaml
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo-e5d9904722e3fbe0b67534d3011e84e1-VFS-iphonesimulator/all-product-headers.yaml
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+    cd /Users/runner/work/InvestToGo/InvestToGo/ETFToGo.xcodeproj
+    builtin-create-build-directory /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/empty-ETFToGoUITests.plist (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/empty-ETFToGoUITests.plist
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ProductTypeInfoPlistAdditions.plist (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ProductTypeInfoPlistAdditions.plist
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_const_extract_protocols.json (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftConstValuesFileList (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.LinkFileList (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.LinkFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-OutputFileMap.json (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyStaticMetadataFileList (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyMetadataFileList (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-project-headers.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-project-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-own-target-headers.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-generated-files.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-generated-files.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-target-headers.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-non-framework-target-headers.hmap (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/empty-ETFToGoTests.plist (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/empty-ETFToGoTests.plist
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_const_extract_protocols.json (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftConstValuesFileList (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.LinkFileList (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.LinkFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-OutputFileMap.json (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyStaticMetadataFileList (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyMetadataFileList (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-project-headers.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-project-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-own-target-headers.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-generated-files.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-generated-files.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-target-headers.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-non-framework-target-headers.hmap (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/empty-ETFToGo.plist (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/empty-ETFToGo.plist
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_const_extract_protocols.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftConstValuesFileList (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.LinkFileList (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.LinkFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-OutputFileMap.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyStaticMetadataFileList (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyMetadataFileList (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-project-headers.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-project-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-own-target-headers.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-generated-files.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-generated-files.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-target-headers.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-non-framework-target-headers.hmap (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibPath-normal-arm64.txt (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibPath-normal-arm64.txt
+
+WriteAuxiliaryFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibInstallName-normal-arm64.txt (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    write-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibInstallName-normal-arm64.txt
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+Ld /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/__preview.dylib normal (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0-simulator -dynamiclib -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -install_name @rpath/ETFToGo.debug.dylib -Xlinker -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_dependency_info.dat -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/__preview.dylib
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/unthinned (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/unthinned
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned
+
+GenerateAssetSymbols /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/actool /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets --compile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_dependencies --output-partial-info-plist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --development-region zh-Hant --target-device iphone --minimum-deployment-target 18.0 --platform iphonesimulator --bundle-identifier tw.sonia.etftogo.uireview --generate-swift-asset-symbol-extensions NO --generate-swift-asset-symbols /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.swift --generate-objc-asset-symbols /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.h --generate-asset-symbol-index /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/* com.apple.actool.compilation-results */
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols-Index.plist
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.h
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.swift
+
+
+CpResource /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/stock-data.json /Users/runner/work/InvestToGo/InvestToGo/App/Resources/stock-data.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/InvestToGo/InvestToGo/App/Resources/stock-data.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+CpResource /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/official-dividends.json /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/official-dividends.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/official-dividends.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+CpResource /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/catalog.json /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/catalog.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/catalog.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+CpResource /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/annual-fees.json /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/annual-fees.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Resources/annual-fees.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+CpResource /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PrivacyInfo.xcprivacy /Users/runner/work/InvestToGo/InvestToGo/App/PrivacyInfo.xcprivacy (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/runner/work/InvestToGo/InvestToGo/App/PrivacyInfo.xcprivacy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/libXCTestBundleInject.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestBundleInject.dylib (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestBundleInject.dylib /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCUnit.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCUIAutomation.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCTestSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCTestCore.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCTest.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/XCTAutomationSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks/Testing.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks
+
+CompileAssetCatalogVariant thinned /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/actool /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets --compile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --compress-pngs --enable-on-demand-resources YES --filter-for-thinning-device-configuration iPhone18,1 --filter-for-device-os-version 26.4.1 --development-region zh-Hant --target-device iphone --minimum-deployment-target 18.0 --platform iphonesimulator
+/* com.apple.actool.compilation-results */
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist_thinned
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned/AppIcon60x60@2x.png
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned/AppIcon76x76@2x~ipad.png
+/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned/Assets.car
+
+
+SwiftDriver ETFToGo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-SwiftDriver -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGo -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ptrcheck-1XMEXOFQ8I3GTYN481Q2QED74.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SwiftShims-D0M8YGVBM5JTYN0B99V371EAY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ptrauth-F5KURKYAUTWAJFVO748ELSEO2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_stdarg-9DX604XHIZPS4P84NV9OA6DDJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_SwiftConcurrencyShims-DZ099GNM99K16903XD6S30V8C.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_stddef-164I1YX9NPWZD8ZAW7T74IZ56.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_float-1NX2CJSM2WWG9P8NPXDGZDGU7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/DeveloperToolsSupport-7OJ6ZDWPLK9O02ZQM6HHPFUJ8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_AvailabilityInternal-CEJBS73J9H0ARWJPWEGIU5W14.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/GroupActivities-6XE83IA448VRAI9Z3FUXFXSWQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_stdbool-1R0NZ43L5UM1CBYBWI47QNIYF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_DarwinFoundation1-9T7NZPRWP65J3XOUCH38M0T56.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_limits-3HM6UCLCGQF1Y60DZ7P31Y2UZ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_DarwinFoundation2-CA22F5CU1LY1SY3KSI896VNAF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ExtensionFoundation-4P3YCU86THW2WO5SB5O7POW81.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_tgmath-GSROA4BS3JC3ERZ11JHULSDF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/sys_types-87QW2C39QE2TV4GNUTU8NSLKX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_stdint-18E2KTHP5N36M59KOFJTXOH5W.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_DarwinFoundation3-65QKD7XK9TWG8JW4RMD6OQT3E.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_stdatomic-7N63D8Y3ZI2HFOB08MAHLPLM4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_intrinsics-4GDAXQ2EE73E94TA2ONRJVHAX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_Builtin_inttypes-BDTAB2YHS3IFIP4SH1KI33D5X.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Darwin-BY7YIR2CGOLQK0TSPT3CUY5N2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/simd-AJK878AUWA0EZSBG0R9BO6O38.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ObjectiveC-7EKCH5TXHCAT6QHWZAJFEKQ04.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/MachO-1JZS4Q8CSV9M3GX9HIVAC9MX0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/os_object-10ME69ORSH48N04YH304W15QA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Spatial-CQUATO90CO9H0BSEJFKKU5HVO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/os_workgroup-6YGFEP55RUSDEIWG80JCSWI3X.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Dispatch-E0KSTNZF985RG1YV248K9W3WX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/XPC-1BE20UZ8THEV7UTVMQR6UKLKG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreFoundation-BHZS6UJMB3VHXHR6ECSGPYJ5J.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/dnssd-VPVUU4NSUZYX33Y33KLXJR9T.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/os-6JJIEAJGJQWJES3AV1TCJ4O61.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Security-53M99F1CQGYF2BSIIQLGLCZB2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CFNetwork-7MQDC5V9TKG71ROXMOBN74PGM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreGraphics-9JCAAY5LX9Q5EZTWG90X344UR.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreServices-4W1RJ1PH72OC6E2422KZPQAIO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Foundation-71W9H23QNOFY72WVO8O1OP2KO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreAudioTypes-6AQRX7QXQSMD594SUOBLV40CE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreText-DFTCDQYW57A0HQ5HI40TWNJ3Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreAudio-5GTMXONOORFLRHTADEFI9YBXM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ImageIO-CA19E2W62YVAAETNT218UGN0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreHaptics-12ZB8H644RJY7KVUVRO9VPVBE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreData-6WT36DFKYA6BBIIS3IIFYWA7Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/LocalAuthentication-BYJ8OB78EHZINBHXB0QQ8ASAA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/OpenGLES-77M53TA6VYEQ9CXGGO47SAGJH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/UniformTypeIdentifiers-88VX9QGA632LGBF25RCZLQIIW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreTransferable-ADN80FL5OXPCSRDF7OLMN9DGI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Symbols-CGFVZ908OTLD7Q7G0XR7X6WEC.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ModelIO-7HYHGDE8IMO5EHPIFRZCGMPNT.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/UIUtilities-EZ046BO455VYBOZRJVD1LT0TV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Network-2H3HPJAJOATE6DEINDFPDICPW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/DataDetection-AV3YAMG95V36MXI6KPYMYWUTL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreMIDI-32SFBZKTYLIB8HMU0K5VQO56M.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/FileProvider-BJ5CDVXD2S83Z2ES7LJF5LUTV.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/AVRouting-1ALM8967XW6S22140PSFV6I9X.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/AudioToolbox-BKR2VOOB7QSYHGIIE1RHSJIVM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/UserNotifications-6FI8YWJXHQNG0ICYBX506F08C.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/OSLog-DE71J18I6UQJSMGJ856AZKZ5U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Accessibility-82CO5RVHYT9F5OYLWZ6MKGP00.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/IOSurface-4GKMI2RPJI4AGF3TDFFVJALY0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/_LocationEssentials-90JQNL8AVQWX213P67MOM3NM8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Metal-EDLU50G2IKIQFO7HIL15FI1XY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreLocation-AXWPA5ZFS5ZPPQXA40AZ1BNX0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreMotion-9TM1XCMKYJUMUN0PWRGT5B0H.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CloudKit-77VIBXST9V43OD4RZD7EP17WJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreVideo-4RS0S8U2VDAR1OAH6952VIPAS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/QuartzCore-8X9Q5HEGRTQUKUQ0CGW5NA8JC.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Accelerate-E2JNRCNWEMAG2B053FL9725RI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreML-46GG9RMTLJDDEGZKXAU5H8R1J.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SwiftUICore-DL7IL7H5SIERZ30HL1CP3W2G8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreMedia-1VRHF47EW5LVV0QNSF7KB2N8Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/CoreImage-CG9KRYJNNB8E65W6OM1QV8KPI.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Vision-9OHO68Q0HU9ZL6DANB1ISK5A0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/UIKit-4TZCPX539QYCXGFBNHR2MBMR8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/AVFAudio-DJQTFSBJ9ER6WLDEJNUDPSUJD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/MediaToolbox-ANC30C83WJ5JAC8UMDRL7WPXG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/AVFoundation-1MCSF5WUGB43D6YQU5WOU5RIH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Photos-4U05T1OVQNR47G5DGBQ2LXGYA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/MultipeerConnectivity-3SY5MIRATPLTPH8B34O5KZARC.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SafariServices-40MFYFY37YBF6FGIGZJ7PZ7SS.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/AuthenticationServices-5WUFGOUBX8ZIDUQ6N150CC1WQ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/GameController-3D64Z0A4HWYUK0WQ51BHCLAH7.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SwiftUI-8M64HWVFQRPOQEDUHQJIWBJ4Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/PhotosUI-M5KF2RCKTCG37OLI0Y4P336B.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/GLKit-BLWON1H6FDXBE49E6QZOFQ4FX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SceneKit-4Y2V2OQ8BMIE5UWWYIEEMNGL9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/SpriteKit-5UQ0I59G41WZFMTWX6LND0OVX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/ARKit-22UVAJRRY4U67B1TQZ39RDR1U.pcm
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ETFToGo (in target 'ETFToGo' from project 'ETFToGo')
+
+EmitSwiftModule normal arm64 (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+/Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift:17:101: warning: main actor-isolated static property 'skinKey' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "") ?? Skins.default
+                                                                                                    ^
+/Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift:14:16: note: static property declared here
+    static let skinKey = "pocket.skin", soundKey = "pocket.sound"
+               ^
+
+SwiftCompile normal arm64 Compiling\ PocketHero.swift,\ PocketShape.swift,\ PortfolioViews.swift,\ Research.swift,\ ResearchData.swift,\ ResearchViews.swift,\ SHA256.swift,\ ScreenshotImport.swift,\ SellCosts.swift,\ SkinStore.swift,\ Skins.swift,\ StableID.swift,\ StockData.swift,\ TaiwanMarket.swift,\ Theme.swift,\ ToolsView.swift,\ TrendRole.swift,\ GeneratedAssetSymbols.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/PocketHero.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/PocketShape.swift /Users/runner/work/InvestToGo/InvestToGo/App/PortfolioViews.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Research.swift /Users/runner/work/InvestToGo/InvestToGo/App/ResearchData.swift /Users/runner/work/InvestToGo/InvestToGo/App/ResearchViews.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/SHA256.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/ScreenshotImport.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Analytics/SellCosts.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/Skins.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/StableID.swift /Users/runner/work/InvestToGo/InvestToGo/App/StockData.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/TaiwanMarket.swift /Users/runner/work/InvestToGo/InvestToGo/App/Theme.swift /Users/runner/work/InvestToGo/InvestToGo/App/ToolsView.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/TrendRole.swift /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/PocketHero.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/PocketShape.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/PortfolioViews.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Research.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/ResearchData.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/ResearchViews.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/SHA256.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/ScreenshotImport.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Analytics/SellCosts.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+/Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift:17:101: warning: main actor-isolated static property 'skinKey' can not be referenced from a nonisolated context; this is an error in the Swift 6 language mode
+    nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "") ?? Skins.default
+                                                                                                    ^
+/Users/runner/work/InvestToGo/InvestToGo/App/Design/SkinStore.swift:14:16: note: static property declared here
+    static let skinKey = "pocket.skin", soundKey = "pocket.sound"
+               ^
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/Skins.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/StableID.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/StockData.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/TaiwanMarket.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Theme.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/ToolsView.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/TrendRole.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 Compiling\ Formatters.swift,\ Fugle.swift,\ GameControls.swift,\ GameTabBar.swift,\ HomeDashboard.swift,\ HomeScreens.swift,\ LegacyImport.swift,\ LiveFeed.swift,\ LiveQuoteLink.swift,\ MarketViews.swift,\ Models.swift,\ OfficialData.swift,\ OfficialDataCore.swift,\ OpenData.swift,\ OpenDataCore.swift,\ PlanView.swift,\ Planning.swift,\ Platform.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/Formatters.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/Fugle.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/GameControls.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/GameTabBar.swift /Users/runner/work/InvestToGo/InvestToGo/App/HomeDashboard.swift /Users/runner/work/InvestToGo/InvestToGo/App/HomeScreens.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/LegacyImport.swift /Users/runner/work/InvestToGo/InvestToGo/App/LiveFeed.swift /Users/runner/work/InvestToGo/InvestToGo/App/LiveQuoteLink.swift /Users/runner/work/InvestToGo/InvestToGo/App/MarketViews.swift /Users/runner/work/InvestToGo/InvestToGo/App/Models.swift /Users/runner/work/InvestToGo/InvestToGo/App/OfficialData.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/OfficialDataCore.swift /Users/runner/work/InvestToGo/InvestToGo/App/OpenData.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/OpenDataCore.swift /Users/runner/work/InvestToGo/InvestToGo/App/PlanView.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Planning.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/Platform.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/Formatters.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/Fugle.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/GameControls.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/GameTabBar.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/HomeDashboard.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+/Users/runner/work/InvestToGo/InvestToGo/App/HomeDashboard.swift:205:13: warning: initialization of immutable value 'hasStock' was never used; consider replacing with assignment to '_' or removing it
+        let hasStock = store.data.favorites.contains { store.isStock($0) }
+        ~~~~^~~~~~~~
+        _
+/Users/runner/work/InvestToGo/InvestToGo/App/HomeDashboard.swift:206:13: warning: initialization of immutable value 'hasETF' was never used; consider replacing with assignment to '_' or removing it
+        let hasETF = store.data.favorites.contains { !store.isStock($0) }
+        ~~~~^~~~~~
+        _
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/HomeScreens.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/LegacyImport.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/LiveFeed.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/LiveQuoteLink.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/MarketViews.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Models.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/OfficialData.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/OfficialDataCore.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/OpenData.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/OpenDataCore.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/PlanView.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Planning.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/Platform.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ETFToGo (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftDriver\ Compilation\ Requirements ETFToGo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGo -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Compiling Formatters.swift, Fugle.swift, GameControls.swift, GameTabBar.swift, HomeDashboard.swift, HomeScreens.swift, LegacyImport.swift, LiveFeed.swift, LiveQuoteLink.swift, MarketViews.swift, Models.swift, OfficialData.swift, OfficialDataCore.swift, OpenData.swift, OpenDataCore.swift, PlanView.swift, Planning.swift, Platform.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftCompile normal arm64 Compiling\ AnnualFees.swift,\ BlockGlyphs.swift,\ BrokerFeeRows.swift,\ BrokerImport.swift,\ BrokerImportCore.swift,\ BrokerView.swift,\ BurstView.swift,\ Catalog.swift,\ CatalogCore.swift,\ Combo.swift,\ ComboViews.swift,\ CoreBundle.swift,\ CoreModels.swift,\ DataChecks.swift,\ DesignShowcase.swift,\ DiscoverViews.swift,\ DividendScreens.swift,\ ETFToGoApp.swift,\ Feedback.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/AnnualFees.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/BlockGlyphs.swift /Users/runner/work/InvestToGo/InvestToGo/App/BrokerFeeRows.swift /Users/runner/work/InvestToGo/InvestToGo/App/BrokerImport.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/BrokerImportCore.swift /Users/runner/work/InvestToGo/InvestToGo/App/BrokerView.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/BurstView.swift /Users/runner/work/InvestToGo/InvestToGo/App/Catalog.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/CatalogCore.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Combo.swift /Users/runner/work/InvestToGo/InvestToGo/App/ComboViews.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/CoreBundle.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/CoreModels.swift /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/DataChecks.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/DesignShowcase.swift /Users/runner/work/InvestToGo/InvestToGo/App/DiscoverViews.swift /Users/runner/work/InvestToGo/InvestToGo/App/DividendScreens.swift /Users/runner/work/InvestToGo/InvestToGo/App/ETFToGoApp.swift /Users/runner/work/InvestToGo/InvestToGo/App/Design/Feedback.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/AnnualFees.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Design/BlockGlyphs.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/BrokerFeeRows.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/BrokerImport.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Import/BrokerImportCore.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/BrokerView.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/BurstView.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Catalog.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Sources/CatalogCore.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/Combo.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/ComboViews.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+/Users/runner/work/InvestToGo/InvestToGo/App/ComboViews.swift:79:13: warning: immutable value 'stocks' was never used; consider replacing with '_' or removing it
+        let stocks = lines.filter(\.isStock), etfs = lines.filter { !$0.isStock }
+            ^~~~~~
+            _
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/CoreBundle.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Models/CoreModels.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/PocketCore/Sources/PocketCore/Support/DataChecks.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/DesignShowcase.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/DiscoverViews.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/DividendScreens.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/ETFToGoApp.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/App/Design/Feedback.swift (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftMergeGeneratedHeaders /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/ETFToGo-Swift.h /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-Swift.h (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-Swift.h -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/ETFToGo-Swift.h
+
+SwiftDriverJobDiscovery normal arm64 Compiling PocketHero.swift, PocketShape.swift, PortfolioViews.swift, Research.swift, ResearchData.swift, ResearchViews.swift, SHA256.swift, ScreenshotImport.swift, SellCosts.swift, SkinStore.swift, Skins.swift, StableID.swift, StockData.swift, TaiwanMarket.swift, Theme.swift, ToolsView.swift, TrendRole.swift, GeneratedAssetSymbols.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftdoc (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.abi.json (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftsourceinfo (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+SwiftDriver ETFToGoUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-SwiftDriver -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoUITests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCUIAutomation-7RM31SL3Z0XFW4X5ERFTD4KB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCTest-AF2NNXLUA2FXV5WJWUB7L9XF4.pcm
+
+SwiftDriver ETFToGoTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-SwiftDriver -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoTests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyCompileModuleFromInterface arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCUIAutomation-1XQPRWRW8AJX9.swiftmodule
+
+SwiftExplicitDependencyCompileModuleFromInterface arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules/XCTest-1SSUVJIPBQOOO.swiftmodule
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ETFToGoUITests (in target 'ETFToGoUITests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/UITests/ETFToGoUITests.swift (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ETFToGoTests (in target 'ETFToGoTests' from project 'ETFToGo')
+
+EmitSwiftModule normal arm64 (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ETFToGoUITests (in target 'ETFToGoUITests' from project 'ETFToGo')
+
+SwiftDriver\ Compilation\ Requirements ETFToGoUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoUITests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ETFToGoTests (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftDriver\ Compilation\ Requirements ETFToGoTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoTests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftMergeGeneratedHeaders /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources/ETFToGoUITests-Swift.h /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-Swift.h (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-Swift.h -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources/ETFToGoUITests-Swift.h
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftdoc (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.abi.json (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftsourceinfo (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+SwiftMergeGeneratedHeaders /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources/ETFToGoTests-Swift.h /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-Swift.h (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-Swift.h -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources/ETFToGoTests-Swift.h
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.swiftmodule
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftdoc (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftdoc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.swiftdoc
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.abi.json (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.abi.json /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/arm64-apple-ios-simulator.abi.json
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftsourceinfo (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftsourceinfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoTests.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo
+
+SwiftCompile normal arm64 Compiling\ ETFToGoUITests.swift /Users/runner/work/InvestToGo/InvestToGo/UITests/ETFToGoUITests.swift (in target 'ETFToGoUITests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/UITests/ETFToGoUITests.swift (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 Compiling\ RestoredFeaturesTests.swift /Users/runner/work/InvestToGo/InvestToGo/Tests/RestoredFeaturesTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/Tests/RestoredFeaturesTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling ETFToGoUITests.swift (in target 'ETFToGoUITests' from project 'ETFToGo')
+
+SwiftDriver\ Compilation ETFToGoUITests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoUITests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList -DDEBUG -module-alias Testing\=_Testing_Unavailable -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -parse-as-library -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Compiling RestoredFeaturesTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 Compiling\ PortfolioTests.swift /Users/runner/work/InvestToGo/InvestToGo/Tests/PortfolioTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/Tests/PortfolioTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftCompile normal arm64 Compiling\ Fixtures.swift /Users/runner/work/InvestToGo/InvestToGo/Tests/Fixtures.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftCompile normal arm64 /Users/runner/work/InvestToGo/InvestToGo/Tests/Fixtures.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    
+
+SwiftDriverJobDiscovery normal arm64 Compiling PortfolioTests.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling Fixtures.swift (in target 'ETFToGoTests' from project 'ETFToGo')
+
+SwiftDriver\ Compilation ETFToGoTests normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGoTests -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList -DDEBUG -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Isystem /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -F /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+SwiftDriverJobDiscovery normal arm64 Compiling AnnualFees.swift, BlockGlyphs.swift, BrokerFeeRows.swift, BrokerImport.swift, BrokerImportCore.swift, BrokerView.swift, BurstView.swift, Catalog.swift, CatalogCore.swift, Combo.swift, ComboViews.swift, CoreBundle.swift, CoreModels.swift, DataChecks.swift, DesignShowcase.swift, DiscoverViews.swift, DividendScreens.swift, ETFToGoApp.swift, Feedback.swift (in target 'ETFToGo' from project 'ETFToGo')
+
+SwiftDriver\ Compilation ETFToGo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-Swift-Compilation -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ETFToGo -Onone @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList -DDEBUG -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -target arm64-apple-ios18.0-simulator -g -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/SDKStatCaches.noindex/iphonesimulator26.5-23F81a-688ef53f1462e2c8f657fdc38a81448ff45c64a1807a658693f2a61704f17a36.sdkstatcache -output-file-map /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-generated-files.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-own-target-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-project-headers.hmap -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-Swift.h -working-directory /Users/runner/work/InvestToGo/InvestToGo -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib normal (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0-simulator -dynamiclib -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -filelist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.LinkFileList -install_name @rpath/ETFToGo.debug.dylib -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.swiftmodule @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo-linker-args.resp -Xlinker -alias -Xlinker _main -Xlinker ___debug_main_executable_dylib_entry_point -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib
+
+ConstructStubExecutorLinkFileList /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-ExecutorLinkFileList-normal-arm64.txt (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    construct-stub-executor-link-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor_no_swift_entry_point.a /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libPreviewsJITStubExecutor.a --output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-ExecutorLinkFileList-normal-arm64.txt
+note: Using stub executor library with Swift entry point. (in target 'ETFToGo' from project 'ETFToGo')
+
+Ld /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo normal (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0-simulator -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -Xlinker -rpath -Xlinker @executable_path -Xlinker -rpath -Xlinker @executable_path/Frameworks -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -e ___debug_blank_executor_main -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_dylib -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibPath-normal-arm64.txt -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __debug_instlnm -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-DebugDylibInstallName-normal-arm64.txt -Xlinker -filelist -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo-ExecutorLinkFileList-normal-arm64.txt /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo
+
+LinkAssetCatalog /Users/runner/work/InvestToGo/InvestToGo/App/Assets.xcassets (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-linkAssetCatalog --thinned /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app --plist-output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist
+note: Emplaced /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/AppIcon60x60@2x.png (in target 'ETFToGo' from project 'ETFToGo')
+note: Emplaced /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/AppIcon76x76@2x~ipad.png (in target 'ETFToGo' from project 'ETFToGo')
+note: Emplaced /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Assets.car (in target 'ETFToGo' from project 'ETFToGo')
+
+ProcessInfoPlistFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/empty-ETFToGo.plist (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-infoPlistUtility /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/empty-ETFToGo.plist -producttype com.apple.product-type.application -genpkginfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/assetcatalog_generated_info.plist -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist
+
+ExtractAppIntentsMetadata (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --module-name ETFToGo --sdk-root /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 18.0 --bundle-identifier tw.sonia.etftogo.uireview --output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app --target-triple arm64-apple-ios18.0-simulator --binary-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo --dependency-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo_dependency_info.dat --stringsdata-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftFileList --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/Objects-normal/arm64/ETFToGo.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-11 19:23:26.788 appintentsmetadataprocessor[3134:16002] Starting appintentsmetadataprocessor export
+2026-11-11 19:23:26.797 appintentsmetadataprocessor[3134:16002] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/SystemExtensions --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Extensions --platform iphonesimulator --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --toolchain /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+AppIntentsSSUTraining (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist --temp-dir-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ssu --bundle-id tw.sonia.etftogo.uireview --product-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app --extracted-metadata-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Metadata.appintents --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGo.build/ETFToGo.DependencyMetadataFileList --source-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist --archive-ssu-assets
+2026-11-11 19:23:26.856 appintentsnltrainingprocessor[3135:16007] Parsing options for appintentsnltrainingprocessor
+2026-11-11 19:23:26.856 appintentsnltrainingprocessor[3135:16007] Starting AppIntents SSU YAML Generation
+2026-11-11 19:23:26.861 appintentsnltrainingprocessor[3135:16007] No AppShortcuts found - Skipping.
+
+ProcessInfoPlistFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Info.plist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/empty-ETFToGoTests.plist (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-infoPlistUtility /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/empty-ETFToGoTests.plist -producttype com.apple.product-type.bundle.unit-test -expandbuildsettings -format binary -platform iphonesimulator -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Info.plist
+
+Ld /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/ETFToGoTests normal (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0-simulator -bundle -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -L/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -filelist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -bundle_loader /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo -Xlinker -object_path_lto -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.swiftmodule @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/ETFToGo.debug.dylib -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/ETFToGoTests
+
+ExtractAppIntentsMetadata (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --module-name ETFToGoTests --sdk-root /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 18.0 --bundle-identifier tw.sonia.ETFToGoTests --output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest --target-triple arm64-apple-ios18.0-simulator --binary-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/ETFToGoTests --dependency-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests_dependency_info.dat --stringsdata-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftFileList --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/Objects-normal/arm64/ETFToGoTests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-11 19:23:27.480 appintentsmetadataprocessor[3139:16020] Starting appintentsmetadataprocessor export
+2026-11-11 19:23:27.482 appintentsmetadataprocessor[3139:16020] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/ETFToGoTests --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Frameworks --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/PlugIns --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/SystemExtensions --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Extensions --platform iphonesimulator --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --toolchain /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+AppIntentsSSUTraining (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Info.plist --temp-dir-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ssu --bundle-id tw.sonia.ETFToGoTests --product-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest --extracted-metadata-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Metadata.appintents --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoTests.build/ETFToGoTests.DependencyMetadataFileList --source-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest/Info.plist --archive-ssu-assets
+2026-11-11 19:23:27.505 appintentsnltrainingprocessor[3140:16023] Parsing options for appintentsnltrainingprocessor
+2026-11-11 19:23:27.506 appintentsnltrainingprocessor[3140:16023] Starting AppIntents SSU YAML Generation
+2026-11-11 19:23:27.506 appintentsnltrainingprocessor[3140:16023] No AppShortcuts found - Skipping.
+
+RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest
+
+Touch /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest (in target 'ETFToGoTests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /usr/bin/touch -c /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoTests.xctest
+
+RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+Validate /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-validationUtility /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app (in target 'ETFToGo' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /usr/bin/touch -c /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+
+ProcessInfoPlistFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Info.plist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/empty-ETFToGoUITests.plist (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-infoPlistUtility /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/empty-ETFToGoUITests.plist -producttype com.apple.product-type.bundle.ui-testing -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ProductTypeInfoPlistAdditions.plist -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Info.plist
+
+Ld /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/ETFToGoUITests normal (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0-simulator -bundle -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk -O0 -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -L/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -L/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/EagerLinkingTBDs/Debug-iphonesimulator -F/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator -iframework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks -iframework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk/Developer/Library/Frameworks -filelist /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.LinkFileList -Xlinker -rpath -Xlinker /usr/lib/swift -Xlinker -rpath -Xlinker @loader_path/Frameworks -Xlinker -rpath -Xlinker @executable_path/Frameworks -Xlinker -dead_strip -Xlinker -object_path_lto -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_lto.o -rdynamic -Xlinker -no_deduplicate -Xlinker -objc_abi_version -Xlinker 2 -Xlinker -dependency_info -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.swiftmodule @/Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests-linker-args.resp -Xlinker -needed_framework -Xlinker XCTest -framework XCTest -Xlinker -needed-lXCTestSwiftSupport -lXCTestSwiftSupport -o /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/ETFToGoUITests
+
+ExtractAppIntentsMetadata (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --module-name ETFToGoUITests --sdk-root /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 18.0 --bundle-identifier tw.sonia.ETFToGoUITests --output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest --target-triple arm64-apple-ios18.0-simulator --binary-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/ETFToGoUITests --dependency-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests_dependency_info.dat --stringsdata-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftFileList --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/Objects-normal/arm64/ETFToGoUITests.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-11-11 19:23:27.846 appintentsmetadataprocessor[3145:16034] Starting appintentsmetadataprocessor export
+2026-11-11 19:23:27.848 appintentsmetadataprocessor[3145:16034] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+CopySwiftLibs /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/ETFToGoUITests --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Frameworks --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/PlugIns --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/SystemExtensions --scan-folder /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Extensions --platform iphonesimulator --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.IUXtCd/Metal.xctoolchain --toolchain /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Frameworks --strip-bitcode --scan-executable /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib --strip-bitcode-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os
+Ignoring --strip-bitcode because --sign was not passed
+
+AppIntentsSSUTraining (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Info.plist --temp-dir-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ssu --bundle-id tw.sonia.ETFToGoUITests --product-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest --extracted-metadata-path /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Metadata.appintents --metadata-file-list /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Intermediates.noindex/ETFToGo.build/Debug-iphonesimulator/ETFToGoUITests.build/ETFToGoUITests.DependencyMetadataFileList --source-file /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Info.plist --archive-ssu-assets
+2026-11-11 19:23:27.870 appintentsnltrainingprocessor[3146:16035] Parsing options for appintentsnltrainingprocessor
+2026-11-11 19:23:27.870 appintentsnltrainingprocessor[3146:16035] Starting AppIntents SSU YAML Generation
+2026-11-11 19:23:27.870 appintentsnltrainingprocessor[3146:16035] No AppShortcuts found - Skipping.
+
+MkDir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /bin/mkdir -p /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app
+
+CopyPlistFile /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Info.plist /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/Info.plist (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copyPlist --validate --convert xml1 --macro-expansion WRAPPEDPRODUCTNAME ETFToGoUITests-Runner --macro-expansion WRAPPEDPRODUCTBUNDLEIDENTIFIER tw.sonia.ETFToGoUITests.xctrunner --macro-expansion TESTPRODUCTNAME ETFToGoUITests --macro-expansion TESTPRODUCTBUNDLEIDENTIFIER tw.sonia.ETFToGoUITests --copy-value UIDeviceFamily /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest/Info.plist --outdir /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app -- /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/Info.plist
+
+CopyAndPreserveArchs /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/ETFToGoUITests-Runner (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/XCTRunner -output /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/ETFToGoUITests-Runner -extract arm64
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PkgInfo /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/PkgInfo (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Xcode/Agents/XCTRunner.app/PkgInfo /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/libXCTestSwiftSupport.dylib /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib/libXCTestSwiftSupport.dylib /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCUnit.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCUnit.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCUIAutomation.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCUIAutomation.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCTestSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestSupport.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCTestCore.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTestCore.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCTest.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/XCTest.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/XCTAutomationSupport.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/PrivateFrameworks/XCTAutomationSupport.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+Copy /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks/Testing.framework /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -exclude Headers -exclude PrivateHeaders -exclude Modules -exclude \*.tbd -resolve-src-symlinks /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks/Testing.framework /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/Frameworks
+
+RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    builtin-RegisterExecutionPolicyException /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest
+
+Touch /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest (in target 'ETFToGoUITests' from project 'ETFToGo')
+    cd /Users/runner/work/InvestToGo/InvestToGo
+    /usr/bin/touch -c /Users/runner/work/InvestToGo/InvestToGo/build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGoUITests-Runner.app/PlugIns/ETFToGoUITests.xctest
+
+** TEST BUILD SUCCEEDED **
+

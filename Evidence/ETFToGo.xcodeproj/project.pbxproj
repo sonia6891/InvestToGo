@@ -1,0 +1,838 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07875818890007E983D5143F /* BrokerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87259F36DC852AF8135E965 /* BrokerView.swift */; };
+		10D64C031CBCC5A2CD4F9C5B /* OpenDataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9481B6D5274035BE3A4ECE /* OpenDataCore.swift */; };
+		10F7E36B158DB7E63CA101B4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5FE47A3C3D19B0FABF00359 /* Models.swift */; };
+		1178D8628B84EBFDAF76B456 /* Skins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3964554FE11358F290CF0AEA /* Skins.swift */; };
+		13B16236B6823A4A49091F96 /* MarketViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40F437EBEEE42B00613F5C82 /* MarketViews.swift */; };
+		149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA91E706AB643380F621F219 /* ResearchViews.swift */; };
+		1AAA72262CE7C3A24ED720B5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */; };
+		1D57AAEFAB9F6C9B29C5944F /* AnnualFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1568BC2D59B2837729C0B90 /* AnnualFees.swift */; };
+		2293242942C405A47B28DE85 /* PortfolioViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EA07CE1D5B62DDB5D7827A /* PortfolioViews.swift */; };
+		26595C46B029FFB3DD500619 /* TrendRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4891B36B2E3852B006E8021 /* TrendRole.swift */; };
+		29962F132B27E812DF5B6966 /* ResearchData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236619A27ADADAE44D858CC7 /* ResearchData.swift */; };
+		33DB66C94F9FB8F4D489EFDB /* Fugle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D692D354044D502C722498 /* Fugle.swift */; };
+		35DE84119451BDCC8D81B257 /* ETFToGoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5843F400A19431AB664DA7DD /* ETFToGoUITests.swift */; };
+		38B02D0E2B814591344C8342 /* Combo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509750D7F27D16946C13737B /* Combo.swift */; };
+		3B5246C22EA20DD200943EFE /* BrokerImportCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E38038CBEA5E65846A56576 /* BrokerImportCore.swift */; };
+		40976523A1C62C614DF126B7 /* RestoredFeaturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */; };
+		4F2088B0D576147E097EB39A /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242C743FEDEC5802669A25B7 /* Feedback.swift */; };
+		527810A966D226454795B53D /* TaiwanMarket.swift in Sources */ = {isa = PBXBuildFile; fileRef = C79338E328C87922298615E2 /* TaiwanMarket.swift */; };
+		52A39EB754258C874176C931 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */; };
+		56102D6EB9B22E81C0A340A2 /* ComboViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83CFF03250B2239307A9ACF4 /* ComboViews.swift */; };
+		58E5AA809AA8ED8D0F7D9A53 /* CoreBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AE64F335033333D60FFDF2 /* CoreBundle.swift */; };
+		5BE6020C123E9FDBF49A08A9 /* LiveFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94C6CDD6AED570AB5C16F685 /* LiveFeed.swift */; };
+		5BFD72AC6AF3B4F5C5DEF5CA /* DesignShowcase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055BEB9F141DAD7484A30BAD /* DesignShowcase.swift */; };
+		60B666C3FD3D4467778DED83 /* DataChecks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8972C537DEF2028DD67D83 /* DataChecks.swift */; };
+		61E0488E1AFFDF36BAE5FF98 /* HomeScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = B355CA6F8878DB3C14DE1673 /* HomeScreens.swift */; };
+		63EB5969215ACC50E2BDF50B /* CoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB9F4FAE59DD5F3C99C0B4F /* CoreModels.swift */; };
+		643F72EA9C36FF060E0C5B54 /* ETFToGoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072093705488342334C91245 /* ETFToGoApp.swift */; };
+		675CFA584E02F1C0903237EE /* Research.swift in Sources */ = {isa = PBXBuildFile; fileRef = 977E489AC4A805096D877312 /* Research.swift */; };
+		6DF2E960A94EA23671BE19A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 264E61A5B7FE5D64083F2B65 /* Assets.xcassets */; };
+		6EE9393DFDC3396CE5DEA967 /* ToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D293146BB8B94669BF6CFA5E /* ToolsView.swift */; };
+		701E231062FF682A002AAC7E /* catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 89EF4A2E73962CC907C371F7 /* catalog.json */; };
+		72D687C97D29A07DDEEFC827 /* OfficialDataCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFCB4361266A196F5C361B5E /* OfficialDataCore.swift */; };
+		76FD74F7A31C7775FA9C6ADD /* SellCosts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9336D3CE629AC58602A0BE92 /* SellCosts.swift */; };
+		7D42D15C05B605D3978B3050 /* Planning.swift in Sources */ = {isa = PBXBuildFile; fileRef = E76319E02606B32AA868B143 /* Planning.swift */; };
+		84FC6AF56C75E6E039C02F05 /* stock-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 2892CF63468A51EBC1F42577 /* stock-data.json */; };
+		8B02CA05E3342219CC66A119 /* annual-fees.json in Resources */ = {isa = PBXBuildFile; fileRef = AECF33633198714BFE1E6424 /* annual-fees.json */; };
+		8C19D14BFAE8011E799F055D /* official-dividends.json in Resources */ = {isa = PBXBuildFile; fileRef = 02FE4AA8D76EE276B6D316B2 /* official-dividends.json */; };
+		8F42682809EE933B4AFA71EF /* GameTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B11F31E8C68152833F3B99 /* GameTabBar.swift */; };
+		95B5BBB3FFEA60DA46172517 /* HomeDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3002E375D58174FCC0EC9C9 /* HomeDashboard.swift */; };
+		987AC3AA5B433F2803F4FDBD /* PocketHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9AC829F099457B3EED82CDE /* PocketHero.swift */; };
+		9DCB380ACDB010B373C48659 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = B06EDAEBBC84A534F205001F /* Platform.swift */; };
+		9F4CF4ACB494FB0119A6989E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFA83F544954CA7C726F809 /* Theme.swift */; };
+		A314742B4F7019D10322ECE0 /* Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4497E2227E5D6EA7DE349731 /* Fixtures.swift */; };
+		A89267F553877B25697A9825 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6742B9A0FF1D739FB63511B8 /* PlanView.swift */; };
+		A966D713D0FCBBC5165E01F8 /* BurstView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E338003A90B5477D04733E6 /* BurstView.swift */; };
+		A9960D82061A4B82F89B5001 /* StockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8333359A446EBAA1814E25 /* StockData.swift */; };
+		AE4E161F3FC77D3B8BF02F37 /* LegacyImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96CCFA611EC8AA91458EAB60 /* LegacyImport.swift */; };
+		B4C2F578C9716169672CF6D6 /* ScreenshotImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0718E1CD312301C0F97DBE /* ScreenshotImport.swift */; };
+		B70AB328A9E690AC3238DAE8 /* BlockGlyphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 534F292D1A8B62BB9D2FD570 /* BlockGlyphs.swift */; };
+		BB403CCE679C43C1C6CBDAD0 /* CatalogCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00AD75B207F778D13F118F26 /* CatalogCore.swift */; };
+		BE6809DF4B7619C4552CF65A /* DividendScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76337FFA00AA4AE368055FA5 /* DividendScreens.swift */; };
+		C7A155D6C03EFFE3F2247275 /* DiscoverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8E1F1572B99D3F664AC8A6 /* DiscoverViews.swift */; };
+		C7EE9F270676742ADE78F259 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1460E6BF359AD7729AEC9A /* Formatters.swift */; };
+		CB62CA265B6A028A1ADC890C /* OfficialData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 614475C26D39777AE6D227B8 /* OfficialData.swift */; };
+		CF159DA70A4BA0361FB78843 /* BrokerFeeRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 955EE84E4AA916DDD244EE47 /* BrokerFeeRows.swift */; };
+		E185D8A2AD66FCC3CF433AB6 /* OpenData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C49476E3A52CF393EB5A6E33 /* OpenData.swift */; };
+		E317500EBCE631119DFDEC56 /* PocketShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD7709BDBC53B551CADDF6 /* PocketShape.swift */; };
+		F27E7984B1E62699D593C989 /* BrokerImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2030D8EDBE2B88BB042831 /* BrokerImport.swift */; };
+		F5A4650BEEA6BB68E4B6AECF /* SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E812B4841254DEDC6C15B7C /* SHA256.swift */; };
+		F7AE175473A26CBAF8B3382E /* StableID.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1BC3EAE89B6910894476EED /* StableID.swift */; };
+		F8149BC6B01C38E590BACAB6 /* GameControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB746A00D6DF9172A227B0AC /* GameControls.swift */; };
+		F8A6F7C0B963F9223D8099FD /* LiveQuoteLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CBB01B12DC37C5AF64F0F4 /* LiveQuoteLink.swift */; };
+		F8D81FB1E2FD4A8601EB90F2 /* PortfolioTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B6A1B483C6A1272C477FB0E /* PortfolioTests.swift */; };
+		FD4461A47EE2DC1F70EAC153 /* SkinStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B9FC1BA8FA53685E3C76097 /* SkinStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		13850996FF30C66C07B884A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3684EFB5E3369897D5B43798 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 86A53960CC5878DB44E6891C;
+			remoteInfo = ETFToGo;
+		};
+		14D9DA336A918A5921D46692 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3684EFB5E3369897D5B43798 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 86A53960CC5878DB44E6891C;
+			remoteInfo = ETFToGo;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		00AD75B207F778D13F118F26 /* CatalogCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogCore.swift; sourceTree = "<group>"; };
+		02FE4AA8D76EE276B6D316B2 /* official-dividends.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "official-dividends.json"; sourceTree = "<group>"; };
+		055BEB9F141DAD7484A30BAD /* DesignShowcase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignShowcase.swift; sourceTree = "<group>"; };
+		072093705488342334C91245 /* ETFToGoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETFToGoApp.swift; sourceTree = "<group>"; };
+		0D8E1F1572B99D3F664AC8A6 /* DiscoverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViews.swift; sourceTree = "<group>"; };
+		0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
+		15CBB01B12DC37C5AF64F0F4 /* LiveQuoteLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveQuoteLink.swift; sourceTree = "<group>"; };
+		236619A27ADADAE44D858CC7 /* ResearchData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchData.swift; sourceTree = "<group>"; };
+		242C743FEDEC5802669A25B7 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		264E61A5B7FE5D64083F2B65 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2892CF63468A51EBC1F42577 /* stock-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "stock-data.json"; sourceTree = "<group>"; };
+		2AFA83F544954CA7C726F809 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		31EA07CE1D5B62DDB5D7827A /* PortfolioViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViews.swift; sourceTree = "<group>"; };
+		33D692D354044D502C722498 /* Fugle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fugle.swift; sourceTree = "<group>"; };
+		3964554FE11358F290CF0AEA /* Skins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skins.swift; sourceTree = "<group>"; };
+		3B6A1B483C6A1272C477FB0E /* PortfolioTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioTests.swift; sourceTree = "<group>"; };
+		3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestoredFeaturesTests.swift; sourceTree = "<group>"; };
+		40F437EBEEE42B00613F5C82 /* MarketViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketViews.swift; sourceTree = "<group>"; };
+		4497E2227E5D6EA7DE349731 /* Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fixtures.swift; sourceTree = "<group>"; };
+		46B11F31E8C68152833F3B99 /* GameTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameTabBar.swift; sourceTree = "<group>"; };
+		4DB86CEF4552F0B7E34DD701 /* ETFToGoTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ETFToGoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4FB1A178D28C7B85C6916E25 /* ETFToGo.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ETFToGo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		509750D7F27D16946C13737B /* Combo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Combo.swift; sourceTree = "<group>"; };
+		534F292D1A8B62BB9D2FD570 /* BlockGlyphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockGlyphs.swift; sourceTree = "<group>"; };
+		5843F400A19431AB664DA7DD /* ETFToGoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ETFToGoUITests.swift; sourceTree = "<group>"; };
+		5ADD7709BDBC53B551CADDF6 /* PocketShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketShape.swift; sourceTree = "<group>"; };
+		5E812B4841254DEDC6C15B7C /* SHA256.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SHA256.swift; sourceTree = "<group>"; };
+		614475C26D39777AE6D227B8 /* OfficialData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficialData.swift; sourceTree = "<group>"; };
+		6742B9A0FF1D739FB63511B8 /* PlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
+		6E38038CBEA5E65846A56576 /* BrokerImportCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerImportCore.swift; sourceTree = "<group>"; };
+		74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		76337FFA00AA4AE368055FA5 /* DividendScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividendScreens.swift; sourceTree = "<group>"; };
+		7A9481B6D5274035BE3A4ECE /* OpenDataCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenDataCore.swift; sourceTree = "<group>"; };
+		7E338003A90B5477D04733E6 /* BurstView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BurstView.swift; sourceTree = "<group>"; };
+		7F7E9EEA92DA1F054BBA3D12 /* ETFToGoUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ETFToGoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F8333359A446EBAA1814E25 /* StockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StockData.swift; sourceTree = "<group>"; };
+		83CFF03250B2239307A9ACF4 /* ComboViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComboViews.swift; sourceTree = "<group>"; };
+		89EF4A2E73962CC907C371F7 /* catalog.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = catalog.json; sourceTree = "<group>"; };
+		8B8972C537DEF2028DD67D83 /* DataChecks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataChecks.swift; sourceTree = "<group>"; };
+		9336D3CE629AC58602A0BE92 /* SellCosts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SellCosts.swift; sourceTree = "<group>"; };
+		94C6CDD6AED570AB5C16F685 /* LiveFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveFeed.swift; sourceTree = "<group>"; };
+		955EE84E4AA916DDD244EE47 /* BrokerFeeRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerFeeRows.swift; sourceTree = "<group>"; };
+		96CCFA611EC8AA91458EAB60 /* LegacyImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyImport.swift; sourceTree = "<group>"; };
+		977E489AC4A805096D877312 /* Research.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Research.swift; sourceTree = "<group>"; };
+		9B9FC1BA8FA53685E3C76097 /* SkinStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinStore.swift; sourceTree = "<group>"; };
+		A87259F36DC852AF8135E965 /* BrokerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerView.swift; sourceTree = "<group>"; };
+		AECF33633198714BFE1E6424 /* annual-fees.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "annual-fees.json"; sourceTree = "<group>"; };
+		B06EDAEBBC84A534F205001F /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
+		B355CA6F8878DB3C14DE1673 /* HomeScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreens.swift; sourceTree = "<group>"; };
+		BFCB4361266A196F5C361B5E /* OfficialDataCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfficialDataCore.swift; sourceTree = "<group>"; };
+		C49476E3A52CF393EB5A6E33 /* OpenData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenData.swift; sourceTree = "<group>"; };
+		C79338E328C87922298615E2 /* TaiwanMarket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaiwanMarket.swift; sourceTree = "<group>"; };
+		CA91E706AB643380F621F219 /* ResearchViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResearchViews.swift; sourceTree = "<group>"; };
+		CB746A00D6DF9172A227B0AC /* GameControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameControls.swift; sourceTree = "<group>"; };
+		CF2030D8EDBE2B88BB042831 /* BrokerImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerImport.swift; sourceTree = "<group>"; };
+		D1BC3EAE89B6910894476EED /* StableID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StableID.swift; sourceTree = "<group>"; };
+		D293146BB8B94669BF6CFA5E /* ToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsView.swift; sourceTree = "<group>"; };
+		D5AE64F335033333D60FFDF2 /* CoreBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreBundle.swift; sourceTree = "<group>"; };
+		E3002E375D58174FCC0EC9C9 /* HomeDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDashboard.swift; sourceTree = "<group>"; };
+		E76319E02606B32AA868B143 /* Planning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planning.swift; sourceTree = "<group>"; };
+		EAB9F4FAE59DD5F3C99C0B4F /* CoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreModels.swift; sourceTree = "<group>"; };
+		F1568BC2D59B2837729C0B90 /* AnnualFees.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnualFees.swift; sourceTree = "<group>"; };
+		F4891B36B2E3852B006E8021 /* TrendRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendRole.swift; sourceTree = "<group>"; };
+		F5FE47A3C3D19B0FABF00359 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		F9AC829F099457B3EED82CDE /* PocketHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PocketHero.swift; sourceTree = "<group>"; };
+		FD1460E6BF359AD7729AEC9A /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		FF0718E1CD312301C0F97DBE /* ScreenshotImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotImport.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		14644B06E5633F55F5AAAFAF /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				7E338003A90B5477D04733E6 /* BurstView.swift */,
+				055BEB9F141DAD7484A30BAD /* DesignShowcase.swift */,
+				242C743FEDEC5802669A25B7 /* Feedback.swift */,
+				CB746A00D6DF9172A227B0AC /* GameControls.swift */,
+				46B11F31E8C68152833F3B99 /* GameTabBar.swift */,
+				F9AC829F099457B3EED82CDE /* PocketHero.swift */,
+				9B9FC1BA8FA53685E3C76097 /* SkinStore.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		191E7985E7021BD24929D733 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AECF33633198714BFE1E6424 /* annual-fees.json */,
+				89EF4A2E73962CC907C371F7 /* catalog.json */,
+				02FE4AA8D76EE276B6D316B2 /* official-dividends.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		26B3FA78AE4408D607E5C659 = {
+			isa = PBXGroup;
+			children = (
+				FCAB97D994B54E9FAC21BE8D /* App */,
+				BAC96EB4AFA949DBAA891808 /* PocketCore */,
+				48E6AB249185E3565A106BC6 /* Tests */,
+				7A4ADDB0EBD8F890A6C6190C /* UITests */,
+				81D37D0BC4377944816D8499 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		326FCE6E7900546067FA3A20 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				2892CF63468A51EBC1F42577 /* stock-data.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		48CA12E6C891AC093DBCB661 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				D5AE64F335033333D60FFDF2 /* CoreBundle.swift */,
+				8B8972C537DEF2028DD67D83 /* DataChecks.swift */,
+				FD1460E6BF359AD7729AEC9A /* Formatters.swift */,
+				B06EDAEBBC84A534F205001F /* Platform.swift */,
+				5E812B4841254DEDC6C15B7C /* SHA256.swift */,
+				D1BC3EAE89B6910894476EED /* StableID.swift */,
+				C79338E328C87922298615E2 /* TaiwanMarket.swift */,
+				F4891B36B2E3852B006E8021 /* TrendRole.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		48E6AB249185E3565A106BC6 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				4497E2227E5D6EA7DE349731 /* Fixtures.swift */,
+				3B6A1B483C6A1272C477FB0E /* PortfolioTests.swift */,
+				3DBF15CEEA446757E64F509A /* RestoredFeaturesTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		7A47DED0E898FAE470FEB78F /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				9336D3CE629AC58602A0BE92 /* SellCosts.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		7A4ADDB0EBD8F890A6C6190C /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				5843F400A19431AB664DA7DD /* ETFToGoUITests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		81D37D0BC4377944816D8499 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4FB1A178D28C7B85C6916E25 /* ETFToGo.app */,
+				4DB86CEF4552F0B7E34DD701 /* ETFToGoTests.xctest */,
+				7F7E9EEA92DA1F054BBA3D12 /* ETFToGoUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		904ACACA1A67F0C2EA638214 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				509750D7F27D16946C13737B /* Combo.swift */,
+				EAB9F4FAE59DD5F3C99C0B4F /* CoreModels.swift */,
+				E76319E02606B32AA868B143 /* Planning.swift */,
+				977E489AC4A805096D877312 /* Research.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		BAC96EB4AFA949DBAA891808 /* PocketCore */ = {
+			isa = PBXGroup;
+			children = (
+				7A47DED0E898FAE470FEB78F /* Analytics */,
+				C8C1AA99FBDD63479FA1FDA3 /* Design */,
+				C9802F53C3C2FFDE04814E5E /* Import */,
+				904ACACA1A67F0C2EA638214 /* Models */,
+				191E7985E7021BD24929D733 /* Resources */,
+				C255567A23994B57A8BB5484 /* Sources */,
+				48CA12E6C891AC093DBCB661 /* Support */,
+			);
+			name = PocketCore;
+			path = PocketCore/Sources/PocketCore;
+			sourceTree = "<group>";
+		};
+		C255567A23994B57A8BB5484 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				F1568BC2D59B2837729C0B90 /* AnnualFees.swift */,
+				00AD75B207F778D13F118F26 /* CatalogCore.swift */,
+				33D692D354044D502C722498 /* Fugle.swift */,
+				BFCB4361266A196F5C361B5E /* OfficialDataCore.swift */,
+				7A9481B6D5274035BE3A4ECE /* OpenDataCore.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		C8C1AA99FBDD63479FA1FDA3 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				534F292D1A8B62BB9D2FD570 /* BlockGlyphs.swift */,
+				5ADD7709BDBC53B551CADDF6 /* PocketShape.swift */,
+				3964554FE11358F290CF0AEA /* Skins.swift */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		C9802F53C3C2FFDE04814E5E /* Import */ = {
+			isa = PBXGroup;
+			children = (
+				6E38038CBEA5E65846A56576 /* BrokerImportCore.swift */,
+				96CCFA611EC8AA91458EAB60 /* LegacyImport.swift */,
+				FF0718E1CD312301C0F97DBE /* ScreenshotImport.swift */,
+			);
+			path = Import;
+			sourceTree = "<group>";
+		};
+		FCAB97D994B54E9FAC21BE8D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				264E61A5B7FE5D64083F2B65 /* Assets.xcassets */,
+				955EE84E4AA916DDD244EE47 /* BrokerFeeRows.swift */,
+				CF2030D8EDBE2B88BB042831 /* BrokerImport.swift */,
+				A87259F36DC852AF8135E965 /* BrokerView.swift */,
+				0DDD6383D83BF9DFC36FFC44 /* Catalog.swift */,
+				83CFF03250B2239307A9ACF4 /* ComboViews.swift */,
+				0D8E1F1572B99D3F664AC8A6 /* DiscoverViews.swift */,
+				76337FFA00AA4AE368055FA5 /* DividendScreens.swift */,
+				072093705488342334C91245 /* ETFToGoApp.swift */,
+				E3002E375D58174FCC0EC9C9 /* HomeDashboard.swift */,
+				B355CA6F8878DB3C14DE1673 /* HomeScreens.swift */,
+				94C6CDD6AED570AB5C16F685 /* LiveFeed.swift */,
+				15CBB01B12DC37C5AF64F0F4 /* LiveQuoteLink.swift */,
+				40F437EBEEE42B00613F5C82 /* MarketViews.swift */,
+				F5FE47A3C3D19B0FABF00359 /* Models.swift */,
+				614475C26D39777AE6D227B8 /* OfficialData.swift */,
+				C49476E3A52CF393EB5A6E33 /* OpenData.swift */,
+				6742B9A0FF1D739FB63511B8 /* PlanView.swift */,
+				31EA07CE1D5B62DDB5D7827A /* PortfolioViews.swift */,
+				74D27FC0D6D38787C4BE5FB6 /* PrivacyInfo.xcprivacy */,
+				236619A27ADADAE44D858CC7 /* ResearchData.swift */,
+				CA91E706AB643380F621F219 /* ResearchViews.swift */,
+				7F8333359A446EBAA1814E25 /* StockData.swift */,
+				2AFA83F544954CA7C726F809 /* Theme.swift */,
+				D293146BB8B94669BF6CFA5E /* ToolsView.swift */,
+				14644B06E5633F55F5AAAFAF /* Design */,
+				326FCE6E7900546067FA3A20 /* Resources */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2F8F41E09A39969252AF0902 /* ETFToGoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3593227288D296520CAB40F2 /* Build configuration list for PBXNativeTarget "ETFToGoTests" */;
+			buildPhases = (
+				A39F6C197FDFB4D678AFC39B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CD7A7FD2B52B329249979FE1 /* PBXTargetDependency */,
+			);
+			name = ETFToGoTests;
+			packageProductDependencies = (
+			);
+			productName = ETFToGoTests;
+			productReference = 4DB86CEF4552F0B7E34DD701 /* ETFToGoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		86A53960CC5878DB44E6891C /* ETFToGo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 06228B0929AAE7535214950B /* Build configuration list for PBXNativeTarget "ETFToGo" */;
+			buildPhases = (
+				9579F79E4B728FB2A9AA03E2 /* Sources */,
+				E0E6479ACFA6F4DD4E329801 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ETFToGo;
+			packageProductDependencies = (
+			);
+			productName = ETFToGo;
+			productReference = 4FB1A178D28C7B85C6916E25 /* ETFToGo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DF365F5256A6D665CA95BCA6 /* ETFToGoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4ECBFD2BEB3B7D05FB58A8D /* Build configuration list for PBXNativeTarget "ETFToGoUITests" */;
+			buildPhases = (
+				5EC87491CB5458C6D0D61C06 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16A24F44B4BE47BE3825AD15 /* PBXTargetDependency */,
+			);
+			name = ETFToGoUITests;
+			packageProductDependencies = (
+			);
+			productName = ETFToGoUITests;
+			productReference = 7F7E9EEA92DA1F054BBA3D12 /* ETFToGoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3684EFB5E3369897D5B43798 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					2F8F41E09A39969252AF0902 = {
+						ProvisioningStyle = Automatic;
+					};
+					86A53960CC5878DB44E6891C = {
+						ProvisioningStyle = Automatic;
+					};
+					DF365F5256A6D665CA95BCA6 = {
+						ProvisioningStyle = Automatic;
+						TestTargetID = 86A53960CC5878DB44E6891C;
+					};
+				};
+			};
+			buildConfigurationList = D448417D9AFE6C6E85EB7E24 /* Build configuration list for PBXProject "ETFToGo" */;
+			developmentRegion = "zh-Hant";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				"zh-Hant",
+			);
+			mainGroup = 26B3FA78AE4408D607E5C659;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 81D37D0BC4377944816D8499 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				86A53960CC5878DB44E6891C /* ETFToGo */,
+				2F8F41E09A39969252AF0902 /* ETFToGoTests */,
+				DF365F5256A6D665CA95BCA6 /* ETFToGoUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E0E6479ACFA6F4DD4E329801 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DF2E960A94EA23671BE19A6 /* Assets.xcassets in Resources */,
+				1AAA72262CE7C3A24ED720B5 /* PrivacyInfo.xcprivacy in Resources */,
+				8B02CA05E3342219CC66A119 /* annual-fees.json in Resources */,
+				701E231062FF682A002AAC7E /* catalog.json in Resources */,
+				8C19D14BFAE8011E799F055D /* official-dividends.json in Resources */,
+				84FC6AF56C75E6E039C02F05 /* stock-data.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5EC87491CB5458C6D0D61C06 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				35DE84119451BDCC8D81B257 /* ETFToGoUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9579F79E4B728FB2A9AA03E2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D57AAEFAB9F6C9B29C5944F /* AnnualFees.swift in Sources */,
+				B70AB328A9E690AC3238DAE8 /* BlockGlyphs.swift in Sources */,
+				CF159DA70A4BA0361FB78843 /* BrokerFeeRows.swift in Sources */,
+				F27E7984B1E62699D593C989 /* BrokerImport.swift in Sources */,
+				3B5246C22EA20DD200943EFE /* BrokerImportCore.swift in Sources */,
+				07875818890007E983D5143F /* BrokerView.swift in Sources */,
+				A966D713D0FCBBC5165E01F8 /* BurstView.swift in Sources */,
+				52A39EB754258C874176C931 /* Catalog.swift in Sources */,
+				BB403CCE679C43C1C6CBDAD0 /* CatalogCore.swift in Sources */,
+				38B02D0E2B814591344C8342 /* Combo.swift in Sources */,
+				56102D6EB9B22E81C0A340A2 /* ComboViews.swift in Sources */,
+				58E5AA809AA8ED8D0F7D9A53 /* CoreBundle.swift in Sources */,
+				63EB5969215ACC50E2BDF50B /* CoreModels.swift in Sources */,
+				60B666C3FD3D4467778DED83 /* DataChecks.swift in Sources */,
+				5BFD72AC6AF3B4F5C5DEF5CA /* DesignShowcase.swift in Sources */,
+				C7A155D6C03EFFE3F2247275 /* DiscoverViews.swift in Sources */,
+				BE6809DF4B7619C4552CF65A /* DividendScreens.swift in Sources */,
+				643F72EA9C36FF060E0C5B54 /* ETFToGoApp.swift in Sources */,
+				4F2088B0D576147E097EB39A /* Feedback.swift in Sources */,
+				C7EE9F270676742ADE78F259 /* Formatters.swift in Sources */,
+				33DB66C94F9FB8F4D489EFDB /* Fugle.swift in Sources */,
+				F8149BC6B01C38E590BACAB6 /* GameControls.swift in Sources */,
+				8F42682809EE933B4AFA71EF /* GameTabBar.swift in Sources */,
+				95B5BBB3FFEA60DA46172517 /* HomeDashboard.swift in Sources */,
+				61E0488E1AFFDF36BAE5FF98 /* HomeScreens.swift in Sources */,
+				AE4E161F3FC77D3B8BF02F37 /* LegacyImport.swift in Sources */,
+				5BE6020C123E9FDBF49A08A9 /* LiveFeed.swift in Sources */,
+				F8A6F7C0B963F9223D8099FD /* LiveQuoteLink.swift in Sources */,
+				13B16236B6823A4A49091F96 /* MarketViews.swift in Sources */,
+				10F7E36B158DB7E63CA101B4 /* Models.swift in Sources */,
+				CB62CA265B6A028A1ADC890C /* OfficialData.swift in Sources */,
+				72D687C97D29A07DDEEFC827 /* OfficialDataCore.swift in Sources */,
+				E185D8A2AD66FCC3CF433AB6 /* OpenData.swift in Sources */,
+				10D64C031CBCC5A2CD4F9C5B /* OpenDataCore.swift in Sources */,
+				A89267F553877B25697A9825 /* PlanView.swift in Sources */,
+				7D42D15C05B605D3978B3050 /* Planning.swift in Sources */,
+				9DCB380ACDB010B373C48659 /* Platform.swift in Sources */,
+				987AC3AA5B433F2803F4FDBD /* PocketHero.swift in Sources */,
+				E317500EBCE631119DFDEC56 /* PocketShape.swift in Sources */,
+				2293242942C405A47B28DE85 /* PortfolioViews.swift in Sources */,
+				675CFA584E02F1C0903237EE /* Research.swift in Sources */,
+				29962F132B27E812DF5B6966 /* ResearchData.swift in Sources */,
+				149FEC2B487F219A5B8A3B4D /* ResearchViews.swift in Sources */,
+				F5A4650BEEA6BB68E4B6AECF /* SHA256.swift in Sources */,
+				B4C2F578C9716169672CF6D6 /* ScreenshotImport.swift in Sources */,
+				76FD74F7A31C7775FA9C6ADD /* SellCosts.swift in Sources */,
+				FD4461A47EE2DC1F70EAC153 /* SkinStore.swift in Sources */,
+				1178D8628B84EBFDAF76B456 /* Skins.swift in Sources */,
+				F7AE175473A26CBAF8B3382E /* StableID.swift in Sources */,
+				A9960D82061A4B82F89B5001 /* StockData.swift in Sources */,
+				527810A966D226454795B53D /* TaiwanMarket.swift in Sources */,
+				9F4CF4ACB494FB0119A6989E /* Theme.swift in Sources */,
+				6EE9393DFDC3396CE5DEA967 /* ToolsView.swift in Sources */,
+				26595C46B029FFB3DD500619 /* TrendRole.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A39F6C197FDFB4D678AFC39B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A314742B4F7019D10322ECE0 /* Fixtures.swift in Sources */,
+				F8D81FB1E2FD4A8601EB90F2 /* PortfolioTests.swift in Sources */,
+				40976523A1C62C614DF126B7 /* RestoredFeaturesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		16A24F44B4BE47BE3825AD15 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 86A53960CC5878DB44E6891C /* ETFToGo */;
+			targetProxy = 13850996FF30C66C07B884A3 /* PBXContainerItemProxy */;
+		};
+		CD7A7FD2B52B329249979FE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 86A53960CC5878DB44E6891C /* ETFToGo */;
+			targetProxy = 14D9DA336A918A5921D46692 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1E1783F7C2EC7764BA1B33E4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.ETFToGoUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = ETFToGo;
+			};
+			name = Release;
+		};
+		3BC0B7BBBB87749FF408DE8B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.3.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		474C7F7B44E3004CA06DE2BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 0.3.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		4E077B199E857AB68C8977BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.ETFToGoUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = ETFToGo;
+			};
+			name = Debug;
+		};
+		749A589B20EA2A33D15650F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "投資袋著走";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.etftogo.uireview;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		8E24C2C476AF9D731F942C72 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "投資袋著走";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.etftogo.uireview;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		981EC831793F5F3A81AF8315 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.ETFToGoTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ETFToGo.app/ETFToGo";
+			};
+			name = Release;
+		};
+		FF531CDDE14F735265318E3E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = tw.sonia.ETFToGoTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ETFToGo.app/ETFToGo";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		06228B0929AAE7535214950B /* Build configuration list for PBXNativeTarget "ETFToGo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8E24C2C476AF9D731F942C72 /* Debug */,
+				749A589B20EA2A33D15650F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3593227288D296520CAB40F2 /* Build configuration list for PBXNativeTarget "ETFToGoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF531CDDE14F735265318E3E /* Debug */,
+				981EC831793F5F3A81AF8315 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D448417D9AFE6C6E85EB7E24 /* Build configuration list for PBXProject "ETFToGo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				474C7F7B44E3004CA06DE2BA /* Debug */,
+				3BC0B7BBBB87749FF408DE8B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F4ECBFD2BEB3B7D05FB58A8D /* Build configuration list for PBXNativeTarget "ETFToGoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E077B199E857AB68C8977BD /* Debug */,
+				1E1783F7C2EC7764BA1B33E4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3684EFB5E3369897D5B43798 /* Project object */;
+}
