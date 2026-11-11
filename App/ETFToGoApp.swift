@@ -1,4 +1,5 @@
 import SwiftUI
+import PocketCore
 
 @main struct ETFToGoApp: App {
     @StateObject private var store: PortfolioStore

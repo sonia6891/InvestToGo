@@ -1,6 +1,7 @@
 import SwiftUI
 import Charts
 import UniformTypeIdentifiers
+import PocketCore
 
 struct ComponentsView: View {
     @EnvironmentObject var store: PortfolioStore
@@ -23,7 +24,7 @@ struct ComponentsView: View {
             LazyVStack(spacing: 10) { ForEach(snapshot.components.sorted { $0.weight > $1.weight }) { c in Card { HStack { VStack(alignment: .leading) { Text(c.name ?? c.symbol).font(.headline); Text(c.symbol).font(.caption).foregroundStyle(.secondary) }; Spacer(); Text("\(decimal(c.weight))%").font(.headline).foregroundStyle(Palette.blue) } } } }
         } else { ContentUnavailableView("尚無成分資料", systemImage: "square.grid.2x2", description: Text("沒有資料不代表沒有重疊持股。")) }
     }.navigationTitle("成分股與權重").navigationBarTitleDisplayMode(.inline)
-        .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in do { let bytes = try DataChecks.readFile(result.get(), limit: 1_000_000); try store.saveComponents(ComponentSnapshot.imported(bytes, symbol: symbol)) } catch { self.error = error.localizedDescription } }
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in do { let bytes = try FileAccess.read(result.get(), limit: 1_000_000); try store.saveComponents(ComponentSnapshot.imported(bytes, symbol: symbol)) } catch { self.error = error.localizedDescription } }
     }
 }
 struct ExposureView: View {

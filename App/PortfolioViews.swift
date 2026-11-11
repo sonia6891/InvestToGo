@@ -1,4 +1,5 @@
 import SwiftUI
+import PocketCore
 
 struct HoldingsView: View {
     @EnvironmentObject var store: PortfolioStore

@@ -24,7 +24,7 @@
 
 ## 建置與儲存
 
-Xcode 26.6 / iOS 17 以上。執行 `xcodegen generate` 產生 ETFToGo.xcodeproj；原生 App，不含 WebView。測試預覽 Bundle ID `tw.sonia.etftogo.uireview`；正式封存覆蓋為 `com.sonia.etftogo`，延續既有 TestFlight App。
+Xcode 26.6 / iOS 18 以上。不依賴畫面的邏輯（資料模型、備份、CSV 匯入、研究計算、官方收盤價與除權息預告解析）放在 Swift Package `PocketCore/`，可在 Mac 或 Linux 以 `swift test --package-path PocketCore` 測試；兩個平台共用的測試資料放 `SharedFixtures/`。執行 `xcodegen generate` 產生 ETFToGo.xcodeproj；原生 App，不含 WebView。測試預覽 Bundle ID `tw.sonia.etftogo.uireview`；正式封存覆蓋為 `com.sonia.etftogo`，延續既有 TestFlight App。
 
 GitHub native-ui workflow 執行編譯、單元及操作測試，保留結果與截圖。正式簽署沿用既有私人簽署環境的獨立 ETF 分支，秘密不寫入本工程。App Store Connect App ID 6822974128。
 

@@ -1,34 +1,6 @@
 import SwiftUI
+import PocketCore
 
-struct PlanYear: Identifiable {
-    let year: Int
-    let invested: Double
-    let cash: Double
-    let contributed: Double
-    var id: Int { year }
-    var total: Double { invested + cash }
-}
-enum PlanMath {
-    static func project(_ plan: LegacyPlan) throws -> [PlanYear] {
-        try plan.validate()
-        let monthlyRate = exp(log1p(plan.totalReturn) / 12) - 1
-        var invested = plan.principal, cash = 0.0, contributed = plan.principal
-        var rows = [PlanYear(year: 0, invested: invested, cash: cash, contributed: contributed)]
-        for month in 1...(plan.years * 12) {
-            invested *= 1 + monthlyRate
-            if month % (12 / plan.frequency) == 0 {
-                let gross = invested * plan.distributionRate / Double(plan.frequency)
-                let net = gross * (1 - plan.deductionRate)
-                invested -= gross
-                invested += net * plan.reinvest
-                cash += net * (1 - plan.reinvest)
-            }
-            invested += plan.monthly; contributed += plan.monthly
-            if month % 12 == 0 { rows.append(PlanYear(year: month / 12, invested: invested, cash: cash, contributed: contributed)) }
-        }
-        return rows
-    }
-}
 struct PlanView: View {
     @EnvironmentObject var store: PortfolioStore
     @State private var plan = LegacyPlan(principal: 100000, monthly: 5000, years: 10, totalReturn: 0.06, distributionRate: 0.04, frequency: 4, reinvest: 1, deductionRate: 0)

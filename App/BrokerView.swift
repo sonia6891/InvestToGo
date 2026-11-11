@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import PocketCore
 
 struct BrokerView: View {
     @EnvironmentObject var store: PortfolioStore
@@ -52,7 +53,7 @@ struct BrokerView: View {
         .fileImporter(isPresented: $importing, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
             preview = nil; table = nil; message = nil
             do {
-                let value = try CSVTable.parse(DataChecks.readFile(result.get())); table = value
+                let value = try CSVTable.parse(FileAccess.read(result.get())); table = value
                 mapping = BrokerMapping(symbol: value.guess(["代碼", "股票代號", "證券代號", "商品代碼", "symbol", "code"]), name: value.guess(["名稱", "股票名稱", "證券名稱", "name"]), shares: value.guess(["股數", "庫存股數", "庫存數量", "數量", "shares", "quantity"]), cost: value.guess(["總成本", "投資成本", "成本", "cost"]))
             } catch { message = error.localizedDescription }
         }
