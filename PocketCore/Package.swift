@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.iOS(.v18), .macOS(.v14)],
     products: [.library(name: "PocketCore", targets: ["PocketCore"])],
     targets: [
-        .target(name: "PocketCore"),
+        .target(name: "PocketCore", resources: [.process("Resources")]),
         .testTarget(name: "PocketCoreTests", dependencies: ["PocketCore"])
     ],
     swiftLanguageModes: [.v5]
