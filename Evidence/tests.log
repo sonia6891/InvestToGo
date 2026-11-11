@@ -1,0 +1,733 @@
+Command line invocation:
+    /Applications/Xcode_26.6.app/Contents/Developer/usr/bin/xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+Writing result bundle at path:
+	/Users/runner/work/InvestToGo/InvestToGo/build/Tests.xcresult
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, arch:arm64, id:2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0, OS:26.4.1, name:iPhone 17 Pro }
+{ platform:iOS Simulator, arch:x86_64, id:2CC7A2C1-E1A7-4633-911A-DB60BDEB97F0, OS:26.4.1, name:iPhone 17 Pro }
+IOSurfaceClientSetSurfaceNotify failed e00002c7
+Test Suite 'All tests' started at 2026-11-11 18:38:40.575.
+Test Suite 'ETFToGoTests.xctest' started at 2026-11-11 18:38:40.577.
+Test Suite 'PortfolioTests' started at 2026-11-11 18:38:40.577.
+Test Case '-[ETFToGoTests.PortfolioTests testBackupRejectsInvalidData]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testBackupRejectsInvalidData]' passed (0.019 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testBrokerCSVSkipsStockRows]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testBrokerCSVSkipsStockRows]' passed (0.015 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testBundledStocksAndCloses]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testBundledStocksAndCloses]' passed (0.004 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testBuyAndSellAdjustHolding]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testBuyAndSellAdjustHolding]' passed (0.035 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testComboProjectionMatchesTemplate]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testComboProjectionMatchesTemplate]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testDividendSharesFollowTheHolding]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testDividendSharesFollowTheHolding]' passed (0.022 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testFeeRatesPerBroker]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testFeeRatesPerBroker]' passed (0.018 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testFugleTrialMatchQuote]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testFugleTrialMatchQuote]' passed (0.008 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testLiveMergeKeepsMissingFields]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testLiveMergeKeepsMissingFields]' passed (0.054 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testLiveProtocolMessages]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testLiveProtocolMessages]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testLiveQuotesWinWhenFresherAndAreKept]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testLiveQuotesWinWhenFresherAndAreKept]' passed (0.026 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testMalformedFileIsNotOverwritten]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testMalformedFileIsNotOverwritten]' passed (0.013 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testNoMarketValueWithoutCompleteQuotes]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testNoMarketValueWithoutCompleteQuotes]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testOfficialDistributionHelpers]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testOfficialDistributionHelpers]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testOpenDataDistributions]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testOpenDataDistributions]' passed (0.006 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testOpenDataQuotes]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testOpenDataQuotes]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testPersistenceAndImportIdempotence]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testPersistenceAndImportIdempotence]' passed (0.054 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testPriceHistoriesLiveApartFromRecords]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testPriceHistoriesLiveApartFromRecords]' passed (20.404 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testProjectionZeroReturnAndMonthlyTiming]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testProjectionZeroReturnAndMonthlyTiming]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testQuoteValidation]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testQuoteValidation]' passed (0.004 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testRealTradeBehindTrialMatch]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testRealTradeBehindTrialMatch]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testRequestPaceKeepsWithinLimit]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testRequestPaceKeepsWithinLimit]' passed (0.275 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotBoxesAndTwoReadings]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotBoxesAndTwoReadings]' passed (0.005 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotCostPerShareOrTotal]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotCostPerShareOrTotal]' passed (0.006 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLinesGiveCodeSharesAndCost]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLinesGiveCodeSharesAndCost]' passed (0.013 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLotsKeptAndOverlapsOnce]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLotsKeptAndOverlapsOnce]' passed (0.007 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLotsMergeByCodeAndKind]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotLotsMergeByCodeAndKind]' passed (0.019 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotNamesWithoutCodes]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotNamesWithoutCodes]' passed (0.005 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotReimportFixesEarlierCosts]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testScreenshotReimportFixesEarlierCosts]' passed (0.016 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testSellCostsMatchTheBroker]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testSellCostsMatchTheBroker]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testStockHoldingStaysReadableAndComboIsETFOnly]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testStockHoldingStaysReadableAndComboIsETFOnly]' passed (0.034 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testTaiwanTradingHours]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testTaiwanTradingHours]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.PortfolioTests testTradeLogRecordsHoldingChanges]' started.
+Test Case '-[ETFToGoTests.PortfolioTests testTradeLogRecordsHoldingChanges]' passed (0.030 seconds).
+Test Suite 'PortfolioTests' passed at 2026-11-11 18:39:01.752.
+	 Executed 33 tests, with 0 failures (0 unexpected) in 21.111 (21.175) seconds
+Test Suite 'RestoredFeaturesTests' started at 2026-11-11 18:39:01.753.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testAnnualFeeSnapshotUsesReportedTotalsAndCorrectYear]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testAnnualFeeSnapshotUsesReportedTotalsAndCorrectYear]' passed (0.040 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBackupRestoresQuotesWithoutOverwritingExistingQuotes]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBackupRestoresQuotesWithoutOverwritingExistingQuotes]' passed (0.047 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBrokerReimportReplacesOnlySelectedAccount]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBrokerReimportReplacesOnlySelectedAccount]' passed (0.050 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBundledCatalogCoversBothMarketsAndNoDuplicateCodes]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testBundledCatalogCoversBothMarketsAndNoDuplicateCodes]' passed (0.005 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCatalogFromOpenData]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCatalogFromOpenData]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCatalogRejectsMissingMarketAndDuplicates]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCatalogRejectsMissingMarketAndDuplicates]' passed (0.007 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testComponentsRejectFutureDatesInvalidWeightsAndUnknownSymbol]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testComponentsRejectFutureDatesInvalidWeightsAndUnknownSymbol]' passed (0.006 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVAcceptsBOMBeforeQuotedHeader]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVAcceptsBOMBeforeQuotedHeader]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVQuotedCommasNewlinesAndTrailingLine]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVQuotedCommasNewlinesAndTrailingLine]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVTrailingCellsShortRowsAndBadRowsAreSkippedNotFatal]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVTrailingCellsShortRowsAndBadRowsAreSkippedNotFatal]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVUTF16AndBig5Encoding]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testCSVUTF16AndBig5Encoding]' passed (0.006 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testExposureMergesDirectlyHeldStocks]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testExposureMergesDirectlyHeldStocks]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testFeeRecordRequiresYearAndSource]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testFeeRecordRequiresYearAndSource]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testHistoryRejectsOutOfOrderDatesAndInvalidCalendarDays]' passed (0.003 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testHistoryRejectsUnadjustedDataAndDuplicateDates]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testHistoryRejectsUnadjustedDataAndDuplicateDates]' passed (0.009 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testLegacyRejectsNegativeCostsAndMissingActualPayment]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testLegacyRejectsNegativeCostsAndMissingActualPayment]' passed (0.011 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testOverlapAndExposureUseWeightsAndExcludeMissingQuotes]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testOverlapAndExposureUseWeightsAndExcludeMissingQuotes]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPlannedDividendAndOlderNativeEnvelope]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPlannedDividendAndOlderNativeEnvelope]' passed (0.005 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPlanReinvestmentDoesNotCountDividendsTwice]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPlanReinvestmentDoesNotCountDividendsTwice]' passed (0.004 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPricePerformanceUsesDrawdownsAndRealTimeInterval]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPricePerformanceUsesDrawdownsAndRealTimeInterval]' passed (0.001 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPWARepeatedImportKeepsCurrentDataAndStableIDs]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testPWARepeatedImportKeepsCurrentDataAndStableIDs]' passed (0.018 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testRealPWAShapeMigratesCostActualDividendAndMetadata]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testRealPWAShapeMigratesCostActualDividendAndMetadata]' passed (0.002 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testReplacingAnAccountKeepsHoldingsWhoseRowsWereSkipped]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testReplacingAnAccountKeepsHoldingsWhoseRowsWereSkipped]' passed (0.053 seconds).
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testSchemaOneStillDecodesWithoutNewFields]' started.
+Test Case '-[ETFToGoTests.RestoredFeaturesTests testSchemaOneStillDecodesWithoutNewFields]' passed (0.001 seconds).
+Test Suite 'RestoredFeaturesTests' passed at 2026-11-11 18:39:02.222.
+	 Executed 24 tests, with 0 failures (0 unexpected) in 0.283 (0.469) seconds
+Test Suite 'ETFToGoTests.xctest' passed at 2026-11-11 18:39:02.223.
+	 Executed 57 tests, with 0 failures (0 unexpected) in 21.394 (21.646) seconds
+Test Suite 'All tests' passed at 2026-11-11 18:39:02.224.
+	 Executed 57 tests, with 0 failures (0 unexpected) in 21.394 (21.649) seconds
+2026-11-11 18:39:07.256203+0000 ETFToGoUITests-Runner[24138:70183] [Default] Running tests...
+2026-11-11 18:39:07.331718+0000 ETFToGoUITests-Runner[24138:70211] [General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-11-11 18:39:09.365687+0000 ETFToGoUITests-Runner[24138:70219] [General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+objc[24138]: Class UIAccessibilityLoaderWebShared is implemented in both /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebCore.axbundle/WebCore (0x107574310) and /Library/Developer/CoreSimulator/Volumes/iOS_23E254a/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.4.simruntime/Contents/Resources/RuntimeRoot/System/Library/AccessibilityBundles/WebKit.axbundle/WebKit (0x106df8398). This may cause spurious casting failures and mysterious crashes. One of the duplicates must be removed or renamed.
+    t =      nans Interface orientation changed to Portrait
+Test Suite 'All tests' started at 2026-11-11 18:39:16.945.
+Test Suite 'ETFToGoUITests.xctest' started at 2026-11-11 18:39:16.947.
+Test Suite 'ETFToGoUITests' started at 2026-11-11 18:39:16.948.
+Test Case '-[ETFToGoUITests.ETFToGoUITests testAllTabsAndSearch]' started.
+    t =     0.00s Start Test at 2026-11-11 18:39:16.949
+    t =     1.58s Set Up
+    t =     1.59s Open tw.sonia.etftogo.uireview
+    t =     1.59s     Launch tw.sonia.etftogo.uireview
+2026-11-11 18:39:20.104 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:39:20.105 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     4.76s         Setting up automation session
+    t =     7.82s         Wait for tw.sonia.etftogo.uireview to idle
+    t =    12.38s Waiting 10.0s for "portfolio-value" StaticText to exist
+    t =    13.41s     Checking `Expect predicate `existsNoRetry == 1` for object "portfolio-value" StaticText`
+    t =    13.41s         Checking existence of `"portfolio-value" StaticText`
+    t =    14.04s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    14.66s Added attachment named 'screen-0'
+    t =    14.67s Tap "tab-探索" Button
+    t =    14.67s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.68s     Find the "tab-探索" Button
+    t =    14.85s     Check for interrupting elements affecting "tab-探索" Button
+    t =    15.00s     Synthesize event
+    t =    15.49s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    17.95s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    19.12s Added attachment named 'screen-1'
+    t =    19.13s Waiting 5.0s for "fund-search" TextField to exist
+    t =    20.19s     Checking `Expect predicate `existsNoRetry == 1` for object "fund-search" TextField`
+    t =    20.19s         Checking existence of `"fund-search" TextField`
+    t =    20.43s Tap "fund-search" TextField
+    t =    20.43s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    20.43s     Find the "fund-search" TextField
+    t =    20.63s     Check for interrupting elements affecting "fund-search" TextField
+    t =    20.79s     Synthesize event
+    t =    21.13s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    25.35s Type '0050
+' into "fund-search" TextField
+    t =    25.35s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    25.44s     Find the "fund-search" TextField
+    t =    26.59s     Check for interrupting elements affecting "fund-search" TextField
+    t =    26.77s     Synthesize event
+    t =    27.08s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    27.56s Checking existence of `"元大台灣50" StaticText`
+    t =    28.30s Checking existence of `"國泰永續高股息" StaticText`
+    t =    28.56s Tap "tab-持有" Button
+    t =    28.57s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    28.58s     Find the "tab-持有" Button
+    t =    28.77s     Check for interrupting elements affecting "tab-持有" Button
+    t =    28.90s     Synthesize event
+    t =    29.23s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    30.66s Waiting 5.0s for "add-holding" Button to exist
+    t =    31.72s     Checking `Expect predicate `existsNoRetry == 1` for object "add-holding" Button`
+    t =    31.72s         Checking existence of `"add-holding" Button`
+    t =    32.07s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    32.51s Added attachment named 'screen-2'
+    t =    32.52s Tap "tab-配息" Button
+    t =    32.52s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    32.53s     Find the "tab-配息" Button
+    t =    32.77s     Check for interrupting elements affecting "tab-配息" Button
+    t =    32.88s     Synthesize event
+    t =    33.23s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    35.12s Waiting 5.0s for "新增配息紀錄" Button to exist
+    t =    36.12s     Checking `Expect predicate `existsNoRetry == 1` for object "新增配息紀錄" Button`
+    t =    36.12s         Checking existence of `"新增配息紀錄" Button`
+    t =    37.29s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    38.12s Added attachment named 'screen-3'
+    t =    38.12s Tap "tab-工具" Button
+    t =    38.12s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    38.13s     Find the "tab-工具" Button
+    t =    38.94s     Check for interrupting elements affecting "tab-工具" Button
+    t =    39.36s     Synthesize event
+    t =    39.71s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    44.81s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    46.21s Added attachment named 'screen-4'
+    t =    46.21s Waiting 5.0s for "tool-backup" Button to exist
+    t =    47.27s     Checking `Expect predicate `existsNoRetry == 1` for object "tool-backup" Button`
+    t =    47.28s         Checking existence of `"tool-backup" Button`
+    t =    47.87s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testAllTabsAndSearch]' passed (48.623 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testAnnualFeesAndHistoryNavigation]' started.
+    t =     0.00s Start Test at 2026-11-11 18:40:05.574
+    t =     0.09s Set Up
+    t =     0.11s Open tw.sonia.etftogo.uireview
+    t =     0.11s     Launch tw.sonia.etftogo.uireview
+    t =     0.11s         Terminate tw.sonia.etftogo.uireview:24554
+2026-11-11 18:40:08.933 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:40:08.934 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     5.66s         Setting up automation session
+    t =     8.48s         Wait for tw.sonia.etftogo.uireview to idle
+    t =    11.95s Waiting 10.0s for "fund-search" TextField to exist
+    t =    12.98s     Checking `Expect predicate `existsNoRetry == 1` for object "fund-search" TextField`
+    t =    12.98s         Checking existence of `"fund-search" TextField`
+    t =    13.49s Tap "fund-search" TextField
+    t =    13.49s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    13.55s     Find the "fund-search" TextField
+    t =    13.96s     Check for interrupting elements affecting "fund-search" TextField
+    t =    14.12s     Synthesize event
+    t =    14.55s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    15.82s Type '0050
+' into "fund-search" TextField
+    t =    15.82s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.11s     Find the "fund-search" TextField
+    t =    16.67s     Check for interrupting elements affecting "fund-search" TextField
+    t =    17.20s     Synthesize event
+    t =    17.52s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.33s Tap "元大台灣50" StaticText
+    t =    18.34s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.36s     Find the "元大台灣50" StaticText
+    t =    19.06s     Check for interrupting elements affecting "元大台灣50" StaticText
+    t =    19.71s     Synthesize event
+    t =    20.26s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    21.24s Waiting 5.0s for "資訊" Button to exist
+    t =    22.28s     Checking `Expect predicate `existsNoRetry == 1` for object "資訊" Button`
+    t =    22.28s         Checking existence of `"資訊" Button`
+    t =    22.50s Tap "資訊" Button
+    t =    22.50s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.73s     Find the "資訊" Button
+    t =    22.92s     Check for interrupting elements affecting "資訊" Button
+    t =    23.08s     Synthesize event
+    t =    23.41s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    23.55s Waiting 5.0s for "annual-fee-heading" StaticText to exist
+    t =    24.61s     Checking `Expect predicate `existsNoRetry == 1` for object "annual-fee-heading" StaticText`
+    t =    24.62s         Checking existence of `"annual-fee-heading" StaticText`
+    t =    24.79s Waiting 5.0s for "annual-fee-total" Any to exist
+    t =    25.85s     Checking `Expect predicate `existsNoRetry == 1` for object "annual-fee-total" Any`
+    t =    25.85s         Checking existence of `"annual-fee-total" Any`
+    t =    26.34s Find the "annual-fee-total" Any
+    t =    26.87s Find the "annual-fee-total" Other
+    t =    27.37s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    28.23s Added attachment named 'annual-fees-0050'
+    t =    28.23s Tap "走勢" Button
+    t =    28.23s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    28.24s     Find the "走勢" Button
+    t =    28.42s     Check for interrupting elements affecting "走勢" Button
+    t =    28.66s     Synthesize event
+    t =    29.03s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    29.26s Waiting 5.0s for "更新歷史績效" Button to exist
+    t =    30.31s     Checking `Expect predicate `existsNoRetry == 1` for object "更新歷史績效" Button`
+    t =    30.32s         Checking existence of `"更新歷史績效" Button`
+    t =    30.50s Checking existence of `"尚無歷史資料" StaticText`
+    t =    30.62s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    31.17s Added attachment named 'history-empty-state'
+    t =    31.18s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testAnnualFeesAndHistoryNavigation]' passed (31.464 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testDesignShowcase]' started.
+    t =     0.00s Start Test at 2026-11-11 18:40:37.039
+    t =     0.07s Set Up
+    t =     0.07s Open tw.sonia.etftogo.uireview
+    t =     0.07s     Launch tw.sonia.etftogo.uireview
+    t =     0.07s         Terminate tw.sonia.etftogo.uireview:25256
+2026-11-11 18:40:38.166 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:40:38.166 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.83s         Setting up automation session
+    t =     4.38s         Wait for tw.sonia.etftogo.uireview to idle
+    t =     7.03s Waiting 10.0s for "tool-design" Button to exist
+    t =     8.05s     Checking `Expect predicate `existsNoRetry == 1` for object "tool-design" Button`
+    t =     8.05s         Checking existence of `"tool-design" Button`
+    t =     8.22s Tap "tool-design" Button
+    t =     8.22s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     8.22s     Find the "tool-design" Button
+    t =     8.32s     Check for interrupting elements affecting "tool-design" Button
+    t =     8.39s     Synthesize event
+    t =     8.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.12s Waiting 10.0s for "showcase-record" Button to exist
+    t =    15.21s     Checking `Expect predicate `existsNoRetry == 1` for object "showcase-record" Button`
+    t =    15.21s         Checking existence of `"showcase-record" Button`
+    t =    18.80s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    19.38s Added attachment named 'design-home-blackgold'
+    t =    19.38s Tap "showcase-record" Button
+    t =    19.38s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    19.40s     Find the "showcase-record" Button
+    t =    19.59s     Check for interrupting elements affecting "showcase-record" Button
+    t =    19.69s     Synthesize event
+    t =    20.03s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.21s Tap "showcase-record" Button
+    t =    22.22s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.41s     Find the "showcase-record" Button
+    t =    22.65s     Check for interrupting elements affecting "showcase-record" Button
+    t =    22.85s     Synthesize event
+    t =    23.23s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    26.27s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    26.67s Added attachment named 'design-home-after-record'
+    t =    26.68s Find the "showcase-amount" StaticText
+    t =    26.86s Find the "showcase-record" Button
+    t =    27.00s Tap "skin-picker" Button
+    t =    27.01s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    27.01s     Find the "skin-picker" Button
+    t =    27.12s     Check for interrupting elements affecting "skin-picker" Button
+    t =    27.23s     Synthesize event
+    t =    27.58s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    29.64s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    30.05s Added attachment named 'design-home-ember'
+    t =    30.06s Tap "skin-picker" Button
+    t =    30.06s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    30.07s     Find the "skin-picker" Button
+    t =    30.18s     Check for interrupting elements affecting "skin-picker" Button
+    t =    30.33s     Synthesize event
+    t =    30.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    32.76s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    33.50s Added attachment named 'design-home-ice'
+    t =    33.50s Tap "skin-picker" Button
+    t =    33.51s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    33.51s     Find the "skin-picker" Button
+    t =    33.86s     Check for interrupting elements affecting "skin-picker" Button
+    t =    34.40s     Synthesize event
+    t =    34.78s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    34.81s Tap "showcase-tab-fees" Button
+    t =    34.82s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    34.87s     Find the "showcase-tab-fees" Button
+    t =    35.42s     Check for interrupting elements affecting "showcase-tab-fees" Button
+    t =    35.66s     Synthesize event
+    t =    36.01s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    36.03s Waiting 5.0s for "fee-row-1" Button to exist
+    t =    37.05s     Checking `Expect predicate `existsNoRetry == 1` for object "fee-row-1" Button`
+    t =    37.05s         Checking existence of `"fee-row-1" Button`
+    t =    37.51s Tap "fee-row-1" Button
+    t =    37.51s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    37.52s     Find the "fee-row-1" Button
+    t =    37.83s     Check for interrupting elements affecting "fee-row-1" Button
+    t =    37.99s     Synthesize event
+    t =    38.35s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    40.38s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    40.93s Added attachment named 'design-fees'
+    t =    40.93s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testDesignShowcase]' passed (41.351 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testDiscoverIsETFOnlyAndComboRuns]' started.
+    t =     0.00s Start Test at 2026-11-11 18:41:18.391
+    t =     0.08s Set Up
+    t =     0.08s Open tw.sonia.etftogo.uireview
+    t =     0.08s     Launch tw.sonia.etftogo.uireview
+    t =     0.08s         Terminate tw.sonia.etftogo.uireview:25949
+2026-11-11 18:41:19.492 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:41:19.492 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.40s         Setting up automation session
+    t =     5.10s         Wait for tw.sonia.etftogo.uireview to idle
+    t =     9.42s Waiting 10.0s for "fund-search" TextField to exist
+    t =    10.45s     Checking `Expect predicate `existsNoRetry == 1` for object "fund-search" TextField`
+    t =    10.45s         Checking existence of `"fund-search" TextField`
+    t =    11.20s Checking existence of `"個股" Button`
+    t =    11.52s Tap "fund-search" TextField
+    t =    11.52s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    11.52s     Find the "fund-search" TextField
+    t =    11.72s     Check for interrupting elements affecting "fund-search" TextField
+    t =    11.88s     Synthesize event
+    t =    12.21s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    13.45s Type '2317
+' into "fund-search" TextField
+    t =    13.45s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    13.79s     Find the "fund-search" TextField
+    t =    14.58s     Check for interrupting elements affecting "fund-search" TextField
+    t =    14.83s     Synthesize event
+    t =    15.14s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    15.78s Waiting 3.0s for "鴻海" StaticText to exist
+    t =    16.80s     Checking `Expect predicate `existsNoRetry == 1` for object "鴻海" StaticText`
+    t =    16.81s         Checking existence of `"鴻海" StaticText`
+    t =    16.97s         Capturing element debug description
+    t =    17.78s     Checking `Expect predicate `existsNoRetry == 1` for object "鴻海" StaticText`
+    t =    17.78s         Checking existence of `"鴻海" StaticText`
+    t =    17.88s         Capturing element debug description
+    t =    18.78s     Checking `Expect predicate `existsNoRetry == 1` for object "鴻海" StaticText`
+    t =    18.78s         Checking existence of `"鴻海" StaticText`
+    t =    18.89s         Capturing element debug description
+    t =    18.90s     Checking existence of `"鴻海" StaticText`
+    t =    18.95s Collecting debug information to assist test failure triage
+    t =    18.95s     Requesting snapshot of accessibility hierarchy for app with pid 27106
+    t =    19.13s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    19.55s Added attachment named 'etf-only-search'
+    t =    19.56s Tap "tab-工具" Button
+    t =    19.56s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    19.56s     Find the "tab-工具" Button
+    t =    19.65s     Check for interrupting elements affecting "tab-工具" Button
+    t =    19.74s     Synthesize event
+    t =    20.05s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    21.48s Waiting 5.0s for "tool-combo" Button to exist
+    t =    22.50s     Checking `Expect predicate `existsNoRetry == 1` for object "tool-combo" Button`
+    t =    22.50s         Checking existence of `"tool-combo" Button`
+    t =    22.65s Tap "tool-combo" Button
+    t =    22.65s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.66s     Find the "tool-combo" Button
+    t =    22.74s     Check for interrupting elements affecting "tool-combo" Button
+    t =    22.79s     Synthesize event
+    t =    23.10s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    23.59s Waiting 5.0s for "combo-settings" Button to exist
+    t =    24.62s     Checking `Expect predicate `existsNoRetry == 1` for object "combo-settings" Button`
+    t =    24.63s         Checking existence of `"combo-settings" Button`
+    t =    24.86s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    25.41s Added attachment named 'combo'
+    t =    25.42s Tap "combo-settings" Button
+    t =    25.42s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    25.42s     Find the "combo-settings" Button
+    t =    25.54s     Check for interrupting elements affecting "combo-settings" Button
+    t =    25.62s     Synthesize event
+    t =    25.93s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    26.48s Waiting 5.0s for "combo-run" Button to exist
+    t =    27.51s     Checking `Expect predicate `existsNoRetry == 1` for object "combo-run" Button`
+    t =    27.52s         Checking existence of `"combo-run" Button`
+    t =    27.87s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    28.81s Added attachment named 'combo-settings'
+    t =    28.81s Tap "combo-run" Button
+    t =    28.81s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    28.81s     Find the "combo-run" Button
+    t =    28.92s     Check for interrupting elements affecting "combo-run" Button
+    t =    29.04s     Synthesize event
+    t =    29.06s         Scroll element to visible
+    t =    29.07s         Find the "combo-run" Button
+    t =    29.41s         Computed hit point {202.08333587646484, 702.83334350585938} after scrolling to visible
+    t =    29.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    30.59s Waiting 5.0s for "試算結果" NavigationBar to exist
+    t =    31.65s     Checking `Expect predicate `existsNoRetry == 1` for object "試算結果" NavigationBar`
+    t =    31.65s         Checking existence of `"試算結果" NavigationBar`
+    t =    31.82s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    32.24s Added attachment named 'combo-result'
+    t =    32.24s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testDiscoverIsETFOnlyAndComboRuns]' passed (32.532 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testHoldingSurvivesRelaunch]' started.
+    t =     0.00s Start Test at 2026-11-11 18:41:50.923
+    t =     0.06s Set Up
+    t =     0.06s Open tw.sonia.etftogo.uireview
+    t =     0.06s     Launch tw.sonia.etftogo.uireview
+    t =     0.06s         Terminate tw.sonia.etftogo.uireview:27106
+2026-11-11 18:41:52.024 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:41:52.024 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.22s         Setting up automation session
+    t =     4.20s         Wait for tw.sonia.etftogo.uireview to idle
+    t =     7.63s Tap "home-add-holding" Button
+    t =     7.63s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     7.64s     Find the "home-add-holding" Button
+    t =     8.28s     Check for interrupting elements affecting "home-add-holding" Button
+    t =     8.40s     Synthesize event
+    t =     8.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     9.17s Tap "holding-symbol" TextField
+    t =     9.17s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     9.72s     Find the "holding-symbol" TextField
+    t =     9.98s     Check for interrupting elements affecting "holding-symbol" TextField
+    t =    10.13s     Synthesize event
+    t =    10.47s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    11.29s Type '0050' into "holding-symbol" TextField
+    t =    11.29s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    11.61s     Find the "holding-symbol" TextField
+    t =    11.89s     Check for interrupting elements affecting "holding-symbol" TextField
+    t =    12.04s     Synthesize event
+    t =    12.32s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    12.34s Find the "holding-name" TextField
+    t =    12.55s Tap "holding-shares" TextField
+    t =    12.55s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    12.55s     Find the "holding-shares" TextField
+    t =    12.67s     Check for interrupting elements affecting "holding-shares" TextField
+    t =    12.79s     Synthesize event
+    t =    13.11s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.48s Type '1000' into "holding-shares" TextField
+    t =    14.48s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.59s     Find the "holding-shares" TextField
+    t =    14.78s     Check for interrupting elements affecting "holding-shares" TextField
+    t =    14.92s     Synthesize event
+    t =    15.20s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    15.21s Tap "holding-cost" TextField
+    t =    15.21s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    15.22s     Find the "holding-cost" TextField
+    t =    15.37s     Check for interrupting elements affecting "holding-cost" TextField
+    t =    15.50s     Synthesize event
+    t =    15.87s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.12s Type '50' into "holding-cost" TextField
+    t =    16.12s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.18s     Find the "holding-cost" TextField
+    t =    16.32s     Check for interrupting elements affecting "holding-cost" TextField
+    t =    16.46s     Synthesize event
+    t =    16.71s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.72s Tap "holding-broker" TextField
+    t =    16.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.74s     Find the "holding-broker" TextField
+    t =    16.99s     Check for interrupting elements affecting "holding-broker" TextField
+    t =    17.20s     Synthesize event
+    t =    17.53s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.01s Type 'Test Broker' into "holding-broker" TextField
+    t =    18.01s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.41s     Find the "holding-broker" TextField
+    t =    18.63s     Check for interrupting elements affecting "holding-broker" TextField
+    t =    18.76s     Synthesize event
+    t =    19.15s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    19.16s Tap "save-holding" Button
+    t =    19.16s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    19.26s     Find the "save-holding" Button
+    t =    19.64s     Check for interrupting elements affecting "save-holding" Button
+    t =    19.82s     Synthesize event
+    t =    19.88s         Scroll element to visible
+    t =    19.90s         Find the "save-holding" Button
+    t =    20.38s         Computed hit point {296.5, 354.5} after scrolling to visible
+    t =    20.71s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    23.18s Checking `Expect predicate `exists == 0` for object "save-holding" Button`
+    t =    23.19s     Checking existence of `"save-holding" Button`
+    t =    23.38s Waiting 5.0s for "portfolio-value" StaticText to exist
+    t =    24.43s     Checking `Expect predicate `existsNoRetry == 1` for object "portfolio-value" StaticText`
+    t =    24.43s         Checking existence of `"portfolio-value" StaticText`
+    t =    24.60s Find the "portfolio-value" StaticText
+    t =    24.73s Terminate tw.sonia.etftogo.uireview:28250
+    t =    25.73s Open tw.sonia.etftogo.uireview
+    t =    25.74s     Launch tw.sonia.etftogo.uireview
+2026-11-11 18:42:16.683 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:42:16.683 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =    26.78s         Setting up automation session
+    t =    29.36s         Wait for tw.sonia.etftogo.uireview to idle
+    t =    32.69s Waiting 10.0s for "0050" StaticText to exist
+    t =    33.72s     Checking `Expect predicate `existsNoRetry == 1` for object "0050" StaticText`
+    t =    33.72s         Checking existence of `"0050" StaticText`
+    t =    33.90s Tap "holdings-trades" Button
+    t =    33.90s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    33.90s     Find the "holdings-trades" Button
+    t =    33.99s     Check for interrupting elements affecting "holdings-trades" Button
+    t =    34.05s     Synthesize event
+    t =    34.37s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    34.51s Waiting 5.0s for "買進" StaticText to exist
+    t =    35.57s     Checking `Expect predicate `existsNoRetry == 1` for object "買進" StaticText`
+    t =    35.57s         Checking existence of `"買進" StaticText`
+    t =    35.67s Tap Button (Element at index 0)
+    t =    35.67s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    35.68s     Find the Button (Element at index 0)
+    t =    35.75s     Check for interrupting elements affecting "BackButton" Button
+    t =    35.82s     Synthesize event
+    t =    36.14s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    36.58s Waiting 5.0s for "holdings-allocation" Button to exist
+    t =    37.60s     Checking `Expect predicate `existsNoRetry == 1` for object "holdings-allocation" Button`
+    t =    37.60s         Checking existence of `"holdings-allocation" Button`
+    t =    37.67s Tap "holdings-allocation" Button
+    t =    37.67s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    37.67s     Find the "holdings-allocation" Button
+    t =    37.76s     Check for interrupting elements affecting "holdings-allocation" Button
+    t =    37.83s     Synthesize event
+    t =    38.19s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    39.28s Waiting 5.0s for "券商帳戶" StaticText to exist
+    t =    40.30s     Checking `Expect predicate `existsNoRetry == 1` for object "券商帳戶" StaticText`
+    t =    40.30s         Checking existence of `"券商帳戶" StaticText`
+    t =    40.37s Checking existence of `"Test Broker" StaticText`
+    t =    40.43s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testHoldingSurvivesRelaunch]' passed (40.703 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testHomeSearchWatchlistAndCombo]' started.
+    t =     0.00s Start Test at 2026-11-11 18:42:31.627
+    t =     0.04s Set Up
+    t =     0.04s Open tw.sonia.etftogo.uireview
+    t =     0.04s     Launch tw.sonia.etftogo.uireview
+    t =     0.04s         Terminate tw.sonia.etftogo.uireview:28902
+2026-11-11 18:42:32.691 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:42:32.691 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     2.13s         Setting up automation session
+    t =     4.03s         Wait for tw.sonia.etftogo.uireview to idle
+    t =     7.12s Waiting 10.0s for "home-search" Button to exist
+    t =     8.14s     Checking `Expect predicate `existsNoRetry == 1` for object "home-search" Button`
+    t =     8.15s         Checking existence of `"home-search" Button`
+    t =     8.44s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =     8.97s Added attachment named 'home-empty'
+    t =     8.97s Tap "home-search" Button
+    t =     8.97s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     8.98s     Find the "home-search" Button
+    t =     9.16s     Check for interrupting elements affecting "home-search" Button
+    t =     9.24s     Synthesize event
+    t =     9.57s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    11.60s Waiting 5.0s for "fund-search" TextField to exist
+    t =    12.66s     Checking `Expect predicate `existsNoRetry == 1` for object "fund-search" TextField`
+    t =    12.66s         Checking existence of `"fund-search" TextField`
+    t =    13.33s Waiting 5.0s for "完成搜尋" Button to exist
+    t =    14.40s     Checking `Expect predicate `existsNoRetry == 1` for object "完成搜尋" Button`
+    t =    14.40s         Checking existence of `"完成搜尋" Button`
+    t =    14.57s Tap "完成搜尋" Button
+    t =    14.57s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.58s     Find the "完成搜尋" Button
+    t =    14.74s     Check for interrupting elements affecting "完成搜尋" Button
+    t =    14.92s     Synthesize event
+    t =    15.25s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.04s Tap "tab-首頁" Button
+    t =    16.04s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    16.05s     Find the "tab-首頁" Button
+    t =    16.21s     Check for interrupting elements affecting "tab-首頁" Button
+    t =    16.35s     Synthesize event
+    t =    16.67s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    17.77s Waiting 5.0s for "home-add-favorite" Button to exist
+    t =    18.81s     Checking `Expect predicate `existsNoRetry == 1` for object "home-add-favorite" Button`
+    t =    18.81s         Checking existence of `"home-add-favorite" Button`
+    t =    18.94s Swipe up Target Application 'tw.sonia.etftogo.uireview'
+    t =    18.94s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.94s     Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    19.01s     Check for interrupting elements affecting "投資袋著走" Application
+    t =    19.07s     Synthesize event
+    t =    19.50s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    20.04s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    20.80s Added attachment named 'home-lower'
+    t =    20.81s Tap "試算 10 年" Button
+    t =    20.81s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    20.81s     Find the "試算 10 年" Button
+    t =    20.91s     Check for interrupting elements affecting "試算 10 年" Button
+    t =    20.97s     Synthesize event
+    t =    21.28s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    21.51s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    21.99s Added attachment named 'home-combo-10y'
+    t =    22.00s Tap "home-combo" Button
+    t =    22.00s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.00s     Find the "home-combo" Button
+    t =    22.13s     Check for interrupting elements affecting "home-combo" Button
+    t =    22.20s     Synthesize event
+    t =    22.52s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.90s Waiting 5.0s for "combo-settings" Button to exist
+    t =    23.94s     Checking `Expect predicate `existsNoRetry == 1` for object "combo-settings" Button`
+    t =    23.95s         Checking existence of `"combo-settings" Button`
+    t =    24.11s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testHomeSearchWatchlistAndCombo]' passed (24.411 seconds).
+Test Case '-[ETFToGoUITests.ETFToGoUITests testOTCCatalogAndRestoredResearchNavigation]' started.
+    t =     0.00s Start Test at 2026-11-11 18:42:56.038
+    t =     0.03s Set Up
+    t =     0.03s Open tw.sonia.etftogo.uireview
+    t =     0.03s     Launch tw.sonia.etftogo.uireview
+    t =     0.03s         Terminate tw.sonia.etftogo.uireview:29209
+2026-11-11 18:42:57.097 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: The operation couldn’t be completed. (DebuggerLLDB.DebuggerVersionStore.StoreError error 0.)
+2026-11-11 18:42:57.097 xcodebuild[21456:63224] [MT] IDELaunchParametersSnapshot: no debugger version
+    t =     1.89s         Setting up automation session
+    t =     3.81s         Wait for tw.sonia.etftogo.uireview to idle
+    t =     6.81s Waiting 10.0s for "fund-search" TextField to exist
+    t =     7.87s     Checking `Expect predicate `existsNoRetry == 1` for object "fund-search" TextField`
+    t =     7.87s         Checking existence of `"fund-search" TextField`
+    t =     8.22s Tap "fund-search" TextField
+    t =     8.22s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     8.22s     Find the "fund-search" TextField
+    t =     8.40s     Check for interrupting elements affecting "fund-search" TextField
+    t =     8.51s     Synthesize event
+    t =     8.82s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     9.46s Type '00679B
+' into "fund-search" TextField
+    t =     9.46s     Wait for tw.sonia.etftogo.uireview to idle
+    t =     9.81s     Find the "fund-search" TextField
+    t =    10.09s     Check for interrupting elements affecting "fund-search" TextField
+    t =    10.32s     Synthesize event
+    t =    10.66s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    10.94s Waiting 5.0s for "元大美債20年" StaticText to exist
+    t =    12.00s     Checking `Expect predicate `existsNoRetry == 1` for object "元大美債20年" StaticText`
+    t =    12.01s         Checking existence of `"元大美債20年" StaticText`
+    t =    12.15s Tap "元大美債20年" StaticText
+    t =    12.15s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    12.16s     Find the "元大美債20年" StaticText
+    t =    12.28s     Check for interrupting elements affecting "元大美債20年" StaticText
+    t =    12.40s     Synthesize event
+    t =    12.72s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    13.37s Waiting 5.0s for "持股" Button to exist
+    t =    14.45s     Checking `Expect predicate `existsNoRetry == 1` for object "持股" Button`
+    t =    14.45s         Checking existence of `"持股" Button`
+    t =    14.79s Tap "持股" Button
+    t =    14.79s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    14.80s     Find the "持股" Button
+    t =    15.03s     Check for interrupting elements affecting "持股" Button
+    t =    15.20s     Synthesize event
+    t =    15.54s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    15.55s Waiting 5.0s for "更新成分股" Button to exist
+    t =    16.60s     Checking `Expect predicate `existsNoRetry == 1` for object "更新成分股" Button`
+    t =    16.60s         Checking existence of `"更新成分股" Button`
+    t =    16.76s Checking existence of `"尚無成分資料" StaticText`
+    t =    16.86s Find the Target Application 'tw.sonia.etftogo.uireview'
+    t =    17.19s Added attachment named 'restored-components'
+    t =    17.19s Tap "tab-工具" Button
+    t =    17.19s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    17.19s     Find the "tab-工具" Button
+    t =    17.32s     Check for interrupting elements affecting "tab-工具" Button
+    t =    17.44s     Synthesize event
+    t =    17.75s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    18.98s Waiting 5.0s for "tool-broker" Button to exist
+    t =    20.00s     Checking `Expect predicate `existsNoRetry == 1` for object "tool-broker" Button`
+    t =    20.00s         Checking existence of `"tool-broker" Button`
+    t =    20.13s Tap "tool-broker" Button
+    t =    20.13s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    20.13s     Find the "tool-broker" Button
+    t =    20.21s     Check for interrupting elements affecting "tool-broker" Button
+    t =    20.27s     Synthesize event
+    t =    20.59s     Wait for tw.sonia.etftogo.uireview to idle
+    t =    22.01s Waiting 5.0s for "broker-import-name" TextField to exist
+    t =    23.05s     Checking `Expect predicate `existsNoRetry == 1` for object "broker-import-name" TextField`
+    t =    23.05s         Checking existence of `"broker-import-name" TextField`
+    t =    23.24s Checking existence of `"選擇庫存 CSV" Button`
+    t =    23.36s Tear Down
+Test Case '-[ETFToGoUITests.ETFToGoUITests testOTCCatalogAndRestoredResearchNavigation]' passed (23.639 seconds).
+Test Suite 'ETFToGoUITests' passed at 2026-11-11 18:43:19.677.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 242.723 (242.730) seconds
+Test Suite 'ETFToGoUITests.xctest' passed at 2026-11-11 18:43:19.678.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 242.723 (242.731) seconds
+Test Suite 'All tests' passed at 2026-11-11 18:43:19.679.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 242.723 (242.734) seconds
+2026-11-11 18:44:03.322 xcodebuild[21456:63224] [MT] IDETestOperationsObserverDebug: 344.442 elapsed -- Testing started completed.
+2026-11-11 18:44:03.322 xcodebuild[21456:63224] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-11-11 18:44:03.322 xcodebuild[21456:63224] [MT] IDETestOperationsObserverDebug: 344.442 sec, +344.442 sec -- end
+
+Test session results, code coverage, and logs:
+	/Users/runner/work/InvestToGo/InvestToGo/build/Tests.xcresult
+
+** TEST EXECUTE SUCCEEDED **
+
+Testing started
