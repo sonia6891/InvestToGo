@@ -32,7 +32,7 @@ struct RootView: View {
         }
         .tint(Palette.blue)
         .overlay(alignment: .bottom) {
-            FloatingTabBar(selection: $tab, minimized: minimized, reselect: { resets[$0] += 1 }, expand: { minimized = false }).ignoresSafeArea(.keyboard)
+            GameTabBar(selection: $tab, reselect: { resets[$0] += 1 }).ignoresSafeArea(.keyboard)
         }
         .environment(\.tabBarMinimize) { value in if minimized != value { minimized = value } }
         .onChange(of: tab) { _, _ in minimized = false }

@@ -4,7 +4,7 @@ import SwiftUI
 /// look and feel can be checked on a phone before every page is rebuilt.
 struct DesignShowcase: View {
     var close: () -> Void = {}
-    @StateObject private var skins = SkinStore()
+    @ObservedObject private var skins = SkinStore.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var screen = 0
     @State private var streak = 12

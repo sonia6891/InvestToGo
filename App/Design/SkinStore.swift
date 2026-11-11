@@ -9,6 +9,8 @@ extension Color {
 
 /// The chosen skin and the sound setting, kept on the device.
 @MainActor final class SkinStore: ObservableObject {
+    /// One store for the whole app, so a skin chosen anywhere restyles the tab bar and every screen at once.
+    static let shared = SkinStore()
     static let skinKey = "pocket.skin", soundKey = "pocket.sound"
     @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey) } }
     @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
