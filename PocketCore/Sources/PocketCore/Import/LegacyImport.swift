@@ -1,11 +1,25 @@
 import Foundation
 
-public enum BackupImport {
-    public struct OldDividend: Codable {
-        public let id: String; public let code: String; public let name: String; public let paymentDate: String; public let exDate: String?
-        public let eligibleShares: Double; public let perShare: Double; public let deductions: Double; public let status: String; public let actualReceived: Double?; public let sourceUrl: String?
-        public var amount: Double { status == "received" ? (actualReceived ?? 0) : eligibleShares * perShare - deductions }
-        public func validate() throws {
+struct LegacyPlan: Codable {
+    var principal: Double
+    var monthly: Double
+    var years: Int
+    var totalReturn: Double
+    var distributionRate: Double
+    var frequency: Int
+    var reinvest: Double
+    var deductionRate: Double
+    func validate() throws {
+        guard principal.isFinite, (0...1e12).contains(principal), monthly.isFinite, (0...1e9).contains(monthly), (1...50).contains(years), totalReturn.isFinite, (-0.9...0.5).contains(totalReturn), distributionRate.isFinite, (0...0.3).contains(distributionRate), [1,2,4,12].contains(frequency), reinvest.isFinite, (0...1).contains(reinvest), deductionRate.isFinite, (0...0.2).contains(deductionRate) else { throw StoreError.unsupportedBackup }
+    }
+}
+enum BackupImport {
+    struct OldHolding: Decodable { let id: String; let code: String; let name: String; let shares: Double; let cost: Double; let price: Double?; let priceDate: String? }
+    struct OldDividend: Codable {
+        let id: String; let code: String; let name: String; let paymentDate: String; let exDate: String?
+        let eligibleShares: Double; let perShare: Double; let deductions: Double; let status: String; let actualReceived: Double?; let sourceUrl: String?
+        var amount: Double { status == "received" ? (actualReceived ?? 0) : eligibleShares * perShare - deductions }
+        func validate() throws {
             guard eligibleShares.isFinite, eligibleShares > 0, eligibleShares <= 1e10, eligibleShares.rounded() == eligibleShares,
                   perShare.isFinite, (0...1e5).contains(perShare), deductions.isFinite, (0...(eligibleShares * perShare)).contains(deductions),
                   status != "received" || actualReceived != nil, actualReceived.map({ $0.isFinite && (0...1e15).contains($0) }) ?? true,
@@ -14,10 +28,9 @@ public enum BackupImport {
             if let sourceUrl, !sourceUrl.isEmpty { guard sourceUrl.count <= 2048, let u = URL(string: sourceUrl), ["http", "https"].contains(u.scheme), u.host != nil, u.user == nil, u.password == nil else { throw StoreError.unsupportedBackup } }
         }
     }
-    public struct OldHolding: Decodable { let id: String; let code: String; let name: String; let shares: Double; let cost: Double; let price: Double?; let priceDate: String? }
-    public struct Planning: Decodable { let version: Int; let holdings: [OldHolding]; let dividends: [OldDividend]; let plan: LegacyPlan? }
-    public struct Envelope: Decodable { let app: String; let version: Int; let planning: Planning; let favorites: [String]; let comparison: [String]; let components: [String: ComponentSnapshot]? }
-    public static func decode(_ bytes: Data) throws -> Portfolio {
+    struct Planning: Decodable { let version: Int; let holdings: [OldHolding]; let dividends: [OldDividend]; let plan: LegacyPlan? }
+    struct Envelope: Decodable { let app: String; let version: Int; let planning: Planning; let favorites: [String]; let comparison: [String]; let components: [String: ComponentSnapshot]? }
+    static func decode(_ bytes: Data) throws -> Portfolio {
         guard bytes.count <= 5_000_000, let root = try JSONSerialization.jsonObject(with: bytes) as? [String: Any] else { throw StoreError.unsupportedBackup }
         if root["schema"] != nil { return try Portfolio.decodeBackup(bytes) }
         let decoder = JSONDecoder(); let planning: Planning
@@ -52,3 +65,4 @@ public enum BackupImport {
         _ = try Portfolio.decodeBackup(JSONEncoder().encode(result)); return result
     }
 }
+struct LegacyPrice: Codable { var symbol: String; var price: Double; var date: String }

@@ -7,7 +7,16 @@ concurrency:
   group: native-ui
   cancel-in-progress: false
 jobs:
+  core:
+    # PocketCore's shared logic is tested on Linux first, so a failing change never takes Mac minutes.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test PocketCore
+        run: swift test --package-path PocketCore
   simulator:
+    needs: core
     runs-on: macos-26
     timeout-minutes: 30
     steps:

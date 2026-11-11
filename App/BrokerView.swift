@@ -44,7 +44,7 @@ struct BrokerView: View {
                 Text(mapping.totalCost ? "總成本會除以股數，轉成每股成本。" : "成本欄會直接當成每股台幣成本。").font(.caption)
                 Button("驗證並預覽") {
                     do {
-                        let made = try BrokerPreview.make(table: table, mapping: mapping, broker: broker, account: account, funds: store.funds, stock: { store.stock($0) })
+                        let made = try BrokerPreview.make(table: table, mapping: mapping, broker: broker, account: account, funds: store.funds)
                         preview = made; costHint = otherCostColumn(made, table); message = nil
                     } catch { preview = nil; message = error.localizedDescription }
                 }
@@ -141,7 +141,7 @@ struct BrokerView: View {
         }
         Section {
             Button("新增一筆") { drafts.append(ScreenshotImport.Draft()) }
-            Button("驗證並預覽") { do { preview = try BrokerPreview.make(drafts: drafts, broker: broker, account: account, funds: store.funds, stock: { store.stock($0) }); costHint = nil; message = nil } catch { preview = nil; message = error.localizedDescription } }
+            Button("驗證並預覽") { do { preview = try BrokerPreview.make(drafts: drafts, broker: broker, account: account, funds: store.funds); costHint = nil; message = nil } catch { preview = nil; message = error.localizedDescription } }
         }
     }
     /// 融券 lots: listed so the user sees why they are not imported.
@@ -183,7 +183,7 @@ struct BrokerView: View {
         let now = made.warnings(price: { price($0) }).count
         guard now > 0 else { return nil }
         var other = mapping; other.totalCost.toggle()
-        guard let alternative = try? BrokerPreview.make(table: table, mapping: other, broker: broker, account: account, funds: store.funds, stock: { store.stock($0) }),
+        guard let alternative = try? BrokerPreview.make(table: table, mapping: other, broker: broker, account: account, funds: store.funds),
               alternative.warnings(price: { price($0) }).count < now else { return nil }
         return mapping.totalCost ? "成本欄看起來是每股價格：請關閉「成本欄是總成本」再預覽。" : "成本欄看起來是總成本：請打開「成本欄是總成本」再預覽。"
     }
