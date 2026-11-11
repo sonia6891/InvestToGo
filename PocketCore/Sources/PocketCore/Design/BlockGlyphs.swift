@@ -20,7 +20,8 @@ struct GlyphBlock: Equatable {
 /// alternately gold on segments a/c/g and b/d/f per digit; "." "%" and "−"/"-" have their own shapes. Other characters
 /// (letters, spaces, thousands separators) are skipped.
 enum BlockGlyphs {
-    static let width = 1.1, height = 2.0, stroke = 0.4, depth = 0.62, radius = 0.16, gap = 0.32
+    // Chunky sculpted strokes (the reference numerals are thick blocks, not thin LCD bars).
+    static let width = 1.3, height = 2.0, stroke = 0.62, depth = 0.9, radius = 0.09, gap = 0.18
     static let ringRadius = 0.34
 
     private static let segments: [Character: (x: Double, y: Double, horizontal: Bool)] = [

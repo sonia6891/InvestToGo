@@ -39,6 +39,7 @@ struct DesignShowcase: View {
             }.padding(.top, 10)
 
             ZStack {
+                PosterShards(center: UnitPoint(x: 0.5, y: 0.5), colors: skin.burst.map { Color(rgb: $0) })
                 BurstView(trigger: bursts, center: UnitPoint(x: 0.5, y: 0.32), colors: skin.burst.map { Color(rgb: $0) })
                 PocketHero(value: screen == 0 ? "\(streak)" : fees[feeIndex].1, showsPocket: screen == 0, skin: skin, drops: drops,
                            label: screen == 0 ? "連續領息 \(streak) 個月" : "\(fees[feeIndex].0) \(fees[feeIndex].1)") {
@@ -70,25 +71,34 @@ struct DesignShowcase: View {
     }
 
     private func homeCaption(_ skin: Skin) -> some View {
-        VStack(spacing: 8) {
-            Text("十一月").font(.system(size: 12, weight: .black)).tracking(2).foregroundStyle(Color(rgb: skin.accent == skin.foreground ? skin.background : skin.background))
-                .padding(.horizontal, 10).padding(.vertical, 3).background(Color(rgb: skin.accent), in: RoundedRectangle(cornerRadius: 3))
-            (Text("這個月口袋 ").font(.system(size: 28, weight: .black)) + Text("+$\(amount.formatted())").font(.system(size: 38, weight: .black).width(.condensed)).foregroundColor(Color(rgb: skin.accent)))
-                .foregroundStyle(Color(rgb: skin.foreground))
-                .accessibilityIdentifier("showcase-amount")
+        VStack(spacing: 6) {
+            Text("PKT×\(String(format: "%03d", streak))").font(.system(size: 11, design: .monospaced)).tracking(1).foregroundStyle(Color(rgb: skin.muted))
+            Text("+$\(amount.formatted())").font(.system(size: 60, weight: .black).width(.condensed)).foregroundStyle(Color(rgb: skin.foreground))
+                .minimumScaleFactor(0.6).lineLimit(1)
+                .accessibilityIdentifier("showcase-amount").accessibilityLabel("這個月口袋 +$\(amount.formatted())")
+            Text("本月入袋").font(.system(size: 11, weight: .bold)).tracking(2).foregroundStyle(Color(rgb: skin.foreground))
+                .padding(.horizontal, 8).padding(.vertical, 2).overlay(RoundedRectangle(cornerRadius: 3).stroke(Color(rgb: skin.foreground), lineWidth: 1))
+            Text("連續領息 \(streak) 個月・今年 \(paidThisMonth ? 11 : 10)／12 個月已入袋").font(.system(size: 12)).foregroundStyle(Color(rgb: skin.muted)).padding(.top, 2)
             Button("記錄配息") { drops += 1 }
-                .buttonStyle(HexButtonStyle(skin: skin)).padding(.top, 6)
+                .buttonStyle(HexButtonStyle(skin: skin)).padding(.top, 8)
                 .accessibilityIdentifier("showcase-record")
-            HStack(spacing: 2) {
-                ForEach(1...12, id: \.self) { month in
-                    let paid = month <= 10 || (month == 11 && paidThisMonth)
-                    VStack(spacing: 5) {
-                        Circle().fill(paid ? Color(rgb: skin.accent) : .clear).overlay(Circle().stroke(Color(rgb: paid ? skin.accent : skin.line), lineWidth: 1.5)).frame(width: 18, height: 18)
-                        Text("\(month)").font(.system(size: 10, design: .monospaced)).foregroundStyle(Color(rgb: month == 11 ? skin.foreground : skin.muted))
-                    }.frame(maxWidth: .infinity)
-                    .accessibilityElement().accessibilityLabel("\(month) 月\(paid ? "已領息" : "尚未領息")")
+            HStack(spacing: 18) {
+                ForEach(Skins.all) { item in
+                    Button { skins.skin = item; Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
+                        ZStack(alignment: .topLeading) {
+                            RoundedRectangle(cornerRadius: 12).fill(Color(rgb: item.metal.color))
+                                .overlay(RoundedRectangle(cornerRadius: 12).inset(by: 9).fill(Color(rgb: item.matte)))
+                                .frame(width: 52, height: 52)
+                                .shadow(color: .black.opacity(0.35), radius: 6, y: 4)
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(rgb: skin.foreground), lineWidth: item.id == skin.id ? 2.5 : 0))
+                            if item.id != skin.id {
+                                Text("新").font(.system(size: 9, weight: .black)).foregroundStyle(Color(rgb: 0x17130E))
+                                    .padding(.horizontal, 4).padding(.vertical, 1).background(Color(rgb: 0xF2B632), in: RoundedRectangle(cornerRadius: 3)).offset(x: -6, y: -6)
+                            }
+                        }
+                    }.buttonStyle(.plain).accessibilityLabel("皮膚 \(item.name) \(item.rarity)")
                 }
-            }.padding(.top, 14)
+            }.padding(.top, 12)
         }
     }
 
