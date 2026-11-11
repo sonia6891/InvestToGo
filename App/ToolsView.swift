@@ -14,7 +14,7 @@ struct ToolsView: View {
                 Artwork(name: "misc-bulb", size: 56)
             }.padding(.top, 6)
             section("試算", icon: "function", color: Palette.blue) {
-                wide("個股＋ETF 組合試算", "3、5、10 年資產預估", art: "tool-compound", route: .combo).accessibilityIdentifier("tool-combo").padding(.bottom, 10)
+                wide("ETF 組合試算", "3、5、10 年資產預估", art: "tool-compound", route: .combo).accessibilityIdentifier("tool-combo").padding(.bottom, 10)
                 HStack(spacing: 10) {
                     tile("股息複利", "複利試算", art: "cat-saving", route: .plan, tint: Palette.pink)
                     tile("領息目標", "達成規劃", art: "tool-goal", route: .goal)

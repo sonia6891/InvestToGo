@@ -124,9 +124,7 @@ struct DiscoverView: View {
     var body: some View {
         let items = funds
         Page {
-            SegmentBar(items: ["ETF", "個股"], selection: $mode, pill: true, filled: true)
             searchField
-            if mode == 0 { stockMatches }
             if mode == 1 {
                 StockDiscoverContent(query: $query)
             } else {
@@ -145,7 +143,7 @@ struct DiscoverView: View {
     private func applyRequest() {
         guard let request = store.discoverRequest else { return }
         store.discoverRequest = nil
-        mode = request.stocks == true ? 1 : 0
+        mode = 0
         if request.search {
             // A search from the home page starts clean, so an earlier ETF filter cannot hide its results.
             filter = FundFilter(); query = ""

@@ -16,7 +16,7 @@ struct HomeView: View {
     var resetDiscover: () -> Void = {}
     /// 總覽, 個股 or ETF: which part of the portfolio the asset card and the market card show.
     @State private var scope = 0
-    @State private var watchKind = 0
+    @State private var watchKind = 1  // ETF only
     @State private var overview = false
     @AppStorage("hideAmounts") private var hidden = false
     @AppStorage("readNotices") private var readNotices = ""
@@ -26,7 +26,6 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 14) {
                 header
                 searchBar
-                ScopeTabs(items: ["總覽", "個股", "ETF"], selection: $scope)
                 assetCard
                 marketCard
                 watchCard
@@ -205,7 +204,6 @@ struct HomeView: View {
         guard scope == 0 else { return }
         let hasStock = store.data.favorites.contains { store.isStock($0) }
         let hasETF = store.data.favorites.contains { !store.isStock($0) }
-        if hasETF && !hasStock { watchKind = 1 } else if hasStock && !hasETF { watchKind = 0 }
     }
     private var watchCard: some View {
         let favorites = store.data.favorites.filter { store.isStock($0) == (watchKind == 0) }.sorted()
@@ -220,7 +218,6 @@ struct HomeView: View {
                 NavigationLink(value: AppRoute.watchlist) { HStack(spacing: 3) { Text("管理"); Image(systemName: "chevron.right") }.font(.subheadline.bold()) }
                     .accessibilityIdentifier("home-watchlist")
             }
-            SegmentBar(items: ["股票", "ETF"], selection: $watchKind, pill: true, filled: true)
             if shownSymbols.isEmpty {
                 HStack(spacing: 14) {
                     Image(systemName: "star.fill").font(.system(size: 38))
@@ -432,7 +429,7 @@ struct ComboTeaser: View {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("組合試算").font(.subheadline.bold()).foregroundStyle(Palette.ink).lineLimit(1)
-                        Text("個股 + ETF").font(.caption).foregroundStyle(Palette.muted).lineLimit(1)
+                        Text("ETF").font(.caption).foregroundStyle(Palette.muted).lineLimit(1)
                     }
                     Spacer(minLength: 0)
                     ComboArt()

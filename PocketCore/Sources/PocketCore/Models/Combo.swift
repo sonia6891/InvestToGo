@@ -22,7 +22,7 @@ struct ComboSettings: Codable, Equatable {
     var source = 0
     var simulated: [ComboItem] = []
     var excluded: [String] = []
-    var includeStocks = true
+    var includeStocks = false  // ETF only: the stock share is never used
     var includeETFs = true
     var snapshotAt: Date? = nil
     var monthly: Double = 10000
@@ -45,7 +45,7 @@ struct ComboSettings: Codable, Equatable {
         source = try c.decodeIfPresent(Int.self, forKey: .source) ?? base.source
         simulated = try c.decodeIfPresent([ComboItem].self, forKey: .simulated) ?? []
         excluded = try c.decodeIfPresent([String].self, forKey: .excluded) ?? []
-        includeStocks = try c.decodeIfPresent(Bool.self, forKey: .includeStocks) ?? true
+        includeStocks = false
         includeETFs = try c.decodeIfPresent(Bool.self, forKey: .includeETFs) ?? true
         snapshotAt = try c.decodeIfPresent(Date.self, forKey: .snapshotAt)
         monthly = try c.decodeIfPresent(Double.self, forKey: .monthly) ?? base.monthly

@@ -42,7 +42,7 @@ struct ComponentsContent: View {
 }
 extension PortfolioStore {
     /// Look-through exposure with directly held stocks merged in, priced the same way as the holdings' market value.
-    var exposures: [ExposureRow] { ResearchMath.exposures(data, stocks: Set(data.holdings.map(\.symbol).filter { self.isStock($0) }), quote: { self.quote($0) }) }
+    var exposures: [ExposureRow] { ResearchMath.exposures(data, stocks: [], quote: { self.quote($0) }) }
 }
 struct ExposureView: View {
     @EnvironmentObject var store: PortfolioStore

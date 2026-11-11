@@ -123,7 +123,7 @@ final class PortfolioTests: XCTestCase {
         var flat = settings; flat.stockReturn = 0; flat.etfReturn = 0
         XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: flat, stockShare: 0.4, years: 10, scenario: .base).end, 1500000, accuracy: 0.01)
         var cash = settings; cash.reinvest = false; cash.stockYield = 2; cash.etfYield = 4
-        XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: cash, stockShare: 0.4, years: 5, scenario: .base).end, 1050621.51, accuracy: 1)
+        XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: cash, stockShare: 0.4, years: 5, scenario: .base).end, 1049649.13, accuracy: 1)  // ETF only: all money earns the ETF yield
         XCTAssertEqual(ComboScenario.conservative.rate(5), -2); XCTAssertEqual(ComboScenario.optimistic.rate(5), 8)
     }
     func testBundledStocksAndCloses() throws {
@@ -391,24 +391,15 @@ final class PortfolioTests: XCTestCase {
         XCTAssertNotEqual(store.quote("0056")?.price, 40, "An hour-old trial-match price is over")
         XCTAssertNil(reopened.data.quotes["9999"], "Only holdings and the watchlist are saved")
     }
-    func testBrokerCSVImportsStocksAlongsideETFs() throws {
+    func testBrokerCSVSkipsStockRows() throws {
         let table = try CSVTable.parse(Data("股票代號,商品名稱,現股庫存,付出成本\n2330,,1000,\"580,000\"\n0050,元大台灣50,2000,\"100,000\"\n".utf8))
         let mapping = BrokerMapping(guessing: table)
         XCTAssertEqual([mapping.symbol, mapping.name, mapping.shares, mapping.cost], [0, 1, 2, 3], "國泰證券's column titles are recognised")
-        let stocks = ["2330": StockInfo(id: "2330", name: "台積電", market: "TWSE", industry: "半導體業", fullName: "台灣積體電路製造股份有限公司", listingDate: "1994-09-05")]
-        let preview = try BrokerPreview.make(table: table, mapping: mapping, broker: "國泰證券", account: "主要", funds: Fund.starters, stock: { stocks[$0] })
-        XCTAssertEqual(preview.holdings.map(\.symbol), ["2330", "0050"])
-        XCTAssertEqual(preview.holdings[0].name, "台積電", "A stock is named from the stock list")
-        XCTAssertEqual(preview.holdings[0].strategy, .unclassified)
-        XCTAssertEqual(preview.holdings[0].unitCost, 580)
-        XCTAssertEqual(preview.holdings[1].name, "元大台灣50"); XCTAssertEqual(preview.holdings[1].strategy, .saving)
-        XCTAssertEqual(preview.totalCost, 680000)
-        let unlisted = try CSVTable.parse(Data("股票代號,現股庫存,付出成本\n2330,1000,580000\n1234,1000,10000".utf8))
-        let partial = try BrokerPreview.make(table: unlisted, mapping: BrokerMapping(guessing: unlisted), broker: "國泰證券", account: "主要", funds: Fund.starters, stock: { stocks[$0] })
-        XCTAssertEqual(partial.holdings.map(\.symbol), ["2330"], "A code in neither list is not imported")
-        XCTAssertTrue(partial.skipped.contains { $0.contains("1234") }, "and is listed as skipped")
-        let bundled = try BrokerPreview.make(table: table, mapping: mapping, broker: "國泰證券", account: "主要", funds: Fund.starters)
-        XCTAssertEqual(bundled.holdings[0].name, StockSnapshot.bundled?.byID["2330"]?.name, "By default stocks come from the bundled list")
+        let preview = try BrokerPreview.make(table: table, mapping: mapping, broker: "國泰證券", account: "主要", funds: Fund.starters)
+        XCTAssertEqual(preview.holdings.map(\.symbol), ["0050"], "ETF only: a stock row is not imported")
+        XCTAssertEqual(preview.holdings[0].name, "元大台灣50"); XCTAssertEqual(preview.holdings[0].strategy, .saving)
+        XCTAssertTrue(preview.skipped.contains { $0.contains("2330") }, "and is listed as skipped")
+        XCTAssertEqual(preview.totalCost, 100000)
     }
     private let listing = ScreenshotImport.Listing([(code: "2330", name: "台積電"), (code: "2308", name: "台達電"), (code: "0050", name: "元大台灣50"), (code: "0056", name: "元大高股息"),
                                                     (code: "00878", name: "國泰永續高股息"), (code: "2884", name: "玉山金"), (code: "9991", name: "測試股"), (code: "9992", name: "測試股")])

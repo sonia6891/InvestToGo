@@ -44,7 +44,7 @@ final class PortedAppTests: XCTestCase {
         var flat = settings; flat.stockReturn = 0; flat.etfReturn = 0
         XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: flat, stockShare: 0.4, years: 10, scenario: .base).end, 1500000, accuracy: 0.01)
         var cash = settings; cash.reinvest = false; cash.stockYield = 2; cash.etfYield = 4
-        XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: cash, stockShare: 0.4, years: 5, scenario: .base).end, 1050621.51, accuracy: 1)
+        XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: cash, stockShare: 0.4, years: 5, scenario: .base).end, 1049649.13, accuracy: 1)  // ETF only: all money earns the ETF yield
         XCTAssertEqual(ComboScenario.conservative.rate(5), -2); XCTAssertEqual(ComboScenario.optimistic.rate(5), 8)
     }
     func testQuoteValidation() throws {

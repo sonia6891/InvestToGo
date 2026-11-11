@@ -34,7 +34,6 @@ struct HoldingsView: View {
                     Label("新增持有", systemImage: "plus").font(.subheadline.bold()).foregroundStyle(.white).padding(.horizontal, 14).padding(.vertical, 8).background(Palette.hero, in: Capsule())
                 }.accessibilityIdentifier("add-holding")
             }.padding(.top, 6)
-            SegmentBar(items: ["全部", "個股", "ETF"], selection: $kind, pill: true, filled: true)
             hero(stockValue: stockValue, etfValue: etfValue)
             if holdings.isEmpty {
                 Card {
@@ -55,7 +54,7 @@ struct HoldingsView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }.buttonStyle(.plain)
                 }
-                NavigationLink(value: AppRoute.combo) { PrimaryButtonLabel(title: "個股 + ETF 組合試算", icon: "function") }.buttonStyle(.plain).accessibilityIdentifier("holdings-combo")
+                NavigationLink(value: AppRoute.combo) { PrimaryButtonLabel(title: "ETF 組合試算", icon: "function") }.buttonStyle(.plain).accessibilityIdentifier("holdings-combo")
                 Label("行情更新不等於券商持股同步", systemImage: "info.circle").font(.caption).foregroundStyle(Palette.muted).frame(maxWidth: .infinity)
                 Card(padding: 12) {
                     NavigationLink(value: AppRoute.trades) { ToolRow(title: "交易紀錄", subtitle: "買進、賣出、調整與匯入", icon: "arrow.left.arrow.right") }.buttonStyle(.plain).accessibilityIdentifier("holdings-trades")
@@ -82,7 +81,6 @@ struct HoldingsView: View {
             }
             Text(shown(total > 0 ? money(total) : "—", hidden: hidden)).font(.system(size: 36, weight: .heavy, design: .rounded)).monospacedDigit().minimumScaleFactor(0.6).lineLimit(1).accessibilityIdentifier("holdings-total")
             HStack(spacing: 10) {
-                splitTile(title: "個股", value: stockValue, total: total, tint: Palette.pink)
                 splitTile(title: "ETF", value: etfValue, total: total, tint: Palette.blue)
             }
         }
@@ -475,7 +473,7 @@ struct HoldingFormView: View {
         .onAppear(perform: load)
         .onChange(of: symbol) { _, value in
             let code = value.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-            if let known = store.funds.first(where: { $0.id == code })?.name ?? store.stock(code)?.name { name = known }
+            if let known = store.funds.first(where: { $0.id == code })?.name { name = known }
         }
         .confirmationDialog("刪除這筆持有？配息紀錄會保留。", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("確認刪除", role: .destructive) { if let existing { do { try store.remove(existing); dismiss() } catch { self.error = error.localizedDescription } } }
@@ -486,16 +484,17 @@ struct HoldingFormView: View {
         if let h = existing {
             symbol = h.symbol; name = h.name; shares = h.shares == h.shares.rounded() ? String(Int(h.shares)) : String(h.shares)
             total = String((h.cost * 100).rounded() / 100); broker = h.broker; date = h.purchaseDate ?? Date()
-        } else if let known = store.funds.first(where: { $0.id == symbol })?.name ?? store.stock(symbol)?.name { name = known }
+        } else if let known = store.funds.first(where: { $0.id == symbol })?.name { name = known }
     }
     private func save() {
         let code = symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         let s = Double(shares.replacingOccurrences(of: ",", with: "")) ?? 0, t = Double(total.replacingOccurrences(of: ",", with: "")) ?? -1
         let fund = store.funds.first { $0.id == code }
-        guard DataChecks.code(code) else { error = "請輸入正確的股票或 ETF 代號，例如 2330、0050。"; return }
+        guard DataChecks.code(code) else { error = "請輸入正確的 ETF 代號，例如 0050、00878。"; return }
+        guard fund != nil else { error = "目前只支援 ETF，請輸入 ETF 名單中的代號。"; return }
         guard s > 0 else { error = "持有股數須大於 0。"; return }
         guard t >= 0 else { error = "請填寫總成本（含手續費）。"; return }
-        let h = Holding(id: existing?.id ?? UUID(), symbol: code, name: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? (fund?.name ?? store.stock(code)?.name ?? "") : name.trimmingCharacters(in: .whitespacesAndNewlines), shares: s, unitCost: t / s, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: existing.map { $0.symbol == code ? $0.strategy : (fund?.strategy ?? .unclassified) } ?? (fund?.strategy ?? .unclassified), sourceAccount: existing?.sourceAccount, purchaseDate: date)
+        let h = Holding(id: existing?.id ?? UUID(), symbol: code, name: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? (fund?.name ?? "") : name.trimmingCharacters(in: .whitespacesAndNewlines), shares: s, unitCost: t / s, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: existing.map { $0.symbol == code ? $0.strategy : (fund?.strategy ?? .unclassified) } ?? (fund?.strategy ?? .unclassified), sourceAccount: existing?.sourceAccount, purchaseDate: date)
         SellCosts.remember(feeRate, for: broker)
         do { try store.save(h); dismiss() } catch { self.error = error.localizedDescription }
     }
@@ -520,7 +519,7 @@ struct TradeFormView: View {
                     HStack { Image(systemName: "magnifyingglass").foregroundStyle(Palette.muted); TextField("例如 00878", text: $symbol).textInputAutocapitalization(.characters).autocorrectionDisabled() }
                         .padding(11).background(Palette.cardSoft, in: RoundedRectangle(cornerRadius: 12))
                     let code = symbol.trimmingCharacters(in: .whitespaces).uppercased()
-                    if let known = store.funds.first(where: { $0.id == code })?.name ?? store.stock(code)?.name { Text(known).font(.caption).foregroundStyle(Palette.muted) }
+                    if let known = store.funds.first(where: { $0.id == code })?.name { Text(known).font(.caption).foregroundStyle(Palette.muted) }
                 }
                 VStack(spacing: 2) {
                     FieldRow(title: "交易日期") { DatePicker("交易日期", selection: $date, displayedComponents: .date).labelsHidden() }

@@ -194,14 +194,13 @@ struct BrokerView: View {
     }
     private func listedName(_ symbol: String) -> String {
         let code = symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        return store.funds.first { $0.id == code }?.name ?? store.stock(code)?.name ?? "（不在股票或 ETF 名單）"
+        return store.funds.first { $0.id == code }?.name ?? "（不在 ETF 名單）"
     }
     /// Reads the chosen screenshots one by one, then lists what was found for the user to check.
     private func read(_ items: [PhotosPickerItem]) async {
         reading = true; preview = nil; table = nil; drafts = []; skipped = []; message = nil
         let etfs = store.funds.map { (code: $0.id, name: $0.name) }
-        let stocks = (store.stockSnapshot?.stocks ?? []).map { (code: $0.id, name: $0.name) }
-        let listing = ScreenshotImport.Listing(etfs + stocks)
+        let listing = ScreenshotImport.Listing(etfs)
         var pages: [[ScreenshotImport.Row]] = [], failed = 0
         for (index, item) in items.enumerated() {
             progress = "正在辨識第 \(index + 1)／\(items.count) 張截圖…"

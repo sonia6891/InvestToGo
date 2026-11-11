@@ -84,7 +84,6 @@ struct ComboView: View {
             if c.source == 0 && store.data.holdings.isEmpty {
                 Card { ContentUnavailableView("還沒有持有", systemImage: "bag", description: Text("先新增持有，或切換到「模擬組合」自己加入股票與 ETF。")) }
             }
-            group(title: "個股", icon: "chart.line.uptrend.xyaxis", tint: Palette.pink, lines: stocks, included: c.includeStocks, total: stocks.reduce(0) { $0 + $1.amount }, isStock: true, colors: stockColors)
             group(title: "ETF", icon: "chart.bar.fill", tint: Palette.blue, lines: etfs, included: c.includeETFs, total: etfs.reduce(0) { $0 + $1.amount }, isStock: false, colors: etfColors)
             HStack {
                 VStack(alignment: .leading, spacing: 2) { Text("試算總資產").font(.headline); Text("(個股＋ETF)").font(.caption).opacity(0.85) }
