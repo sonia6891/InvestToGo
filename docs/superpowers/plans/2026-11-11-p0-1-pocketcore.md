@@ -185,7 +185,7 @@ func testBrokerPreviewConvertsLotsAndUsesStableIDs() throws {
 - Produces:
   - `public struct ExDividendNotice: Codable, Equatable { public var symbol: String; public var name: String; public var exDate: String; public var kind: Kind; public var cashPerShare: Double? }`
   - `public enum Kind: String, Codable { case cash = "息", stock = "權", both = "權息" }`
-  - `public enum OfficialDividends { public static func decodeTWT48U(_ bytes: Data, etfCodes: Set<String>) throws -> [ExDividendNotice] }`
+  - `public enum OfficialDividends { public static func decodeTWT48U(_ bytes: Data, etfCodes: Set<String>) throws -> [ExDividendNotice] }`（`Kind` 巢狀於 `ExDividendNotice` 內）
   - 結果依 `exDate`、`symbol` 排序。
 
 - [ ] **Step 1: 寫失敗測試** — `testDecodeMatchesSharedExpectation`、`testMissingCashDividendIsNil`（`0051` 的 `cashPerShare == nil`）、`testOnlyCatalogueETFsAreKept`（非 ETF 與不在 `etfCodes` 的代碼被排除）、`testUnknownKindThrows`（`Exdividend` 為未知值時丟 `AppDataError("除權息資料欄位改變，未更新。")`）。

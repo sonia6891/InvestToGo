@@ -1,0 +1,7 @@
+{
+ "etfCodes": ["0051", "00690", "00878"],
+ "notices": [
+  {"symbol": "00690", "name": "兆豐藍籌30", "exDate": "2026-11-17", "kind": "息", "cashPerShare": 2.0},
+  {"symbol": "0051", "name": "元大中型100", "exDate": "2026-11-20", "kind": "息", "cashPerShare": null}
+ ]
+}

@@ -1,0 +1,58 @@
+[
+ {
+  "Date": "1151120",
+  "Code": "0051",
+  "Name": "元大中型100",
+  "Exdividend": "息",
+  "StockDividendRatio": "",
+  "SubscriptionRatio": "",
+  "SubscriptionPricePerShare": "",
+  "CashDividend": "",
+  "SharesOffered": "",
+  "SharesEmpOwner": "",
+  "SharesholderOwner": "",
+  "StockHoldingRatio": ""
+ },
+ {
+  "Date": "1151117",
+  "Code": "00690",
+  "Name": "兆豐藍籌30",
+  "Exdividend": "息",
+  "StockDividendRatio": "",
+  "SubscriptionRatio": "",
+  "SubscriptionPricePerShare": "",
+  "CashDividend": "2.000000",
+  "SharesOffered": "",
+  "SharesEmpOwner": "",
+  "SharesholderOwner": "",
+  "StockHoldingRatio": ""
+ },
+ {
+  "Date": "1151120",
+  "Code": "4562",
+  "Name": "穎漢",
+  "Exdividend": "權",
+  "StockDividendRatio": "",
+  "SubscriptionRatio": "0.14906449",
+  "SubscriptionPricePerShare": "尚未公告",
+  "CashDividend": "0",
+  "SharesOffered": "1305000.00",
+  "SharesEmpOwner": "1305000.00",
+  "SharesholderOwner": "10440000.00",
+  "StockHoldingRatio": "119.25159345"
+ },
+ {
+  "Date": "1151119",
+  "Code": "01007T",
+  "Name": "兆豐國泰R2",
+  "Exdividend": "息",
+  "StockDividendRatio": "",
+  "SubscriptionRatio": "",
+  "SubscriptionPricePerShare": "",
+  "CashDividend": "0.215313",
+  "SharesOffered": "",
+  "SharesEmpOwner": "",
+  "SharesholderOwner": "",
+  "StockHoldingRatio": ""
+ }
+]
