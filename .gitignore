@@ -12,3 +12,4 @@ Evidence/*.log
 Screens/
 .superpowers/
 PocketCore/.build/
+PocketCore/.swiftpm/

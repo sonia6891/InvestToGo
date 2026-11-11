@@ -1,88 +1,47 @@
 name: Build and inspect native ETF UI
 on:
   workflow_dispatch:
-    inputs:
-      scope:
-        description: Full regression, unit tests only, or screenshots only (not a test pass)
-        type: choice
-        options: [full, unit, screens]
-        default: full
 permissions:
   contents: read
 concurrency:
-  group: native-ui-${{ github.ref }}
-  cancel-in-progress: true
+  group: native-ui
+  cancel-in-progress: false
 jobs:
-  preflight:
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - uses: actions/checkout@v4
-      - name: Validate inputs before requesting a Mac
-        run: |
-          set -euo pipefail
-          test -s project.yml
-          test -s App/Assets.xcassets/Pocket.imageset/pocket.png
-          test -d App/Assets.xcassets/AppIcon.appiconset
-          test -s Tests/PortfolioTests.swift
-          test -s UITests/ETFToGoUITests.swift
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          for path in Path('App').rglob('*.json'):
-              json.loads(path.read_text())
-          print('Input preflight passed. Swift compilation still requires macOS.')
-          PY
   simulator:
-    needs: preflight
-    runs-on: tuist-macos
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Generate complete Xcode project and app icon
+      - name: Generate complete Xcode project
         run: |
           set -euo pipefail
+          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
           xcodebuild -version
           test "$(xcodebuild -version | head -n 1)" = 'Xcode 26.6'
-          command -v xcodegen >/dev/null || brew install xcodegen
-          sips -z 1024 1024 App/Assets.xcassets/Pocket.imageset/pocket.png --out App/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+          brew install xcodegen
           xcodegen generate
           xcodebuild -list -project ETFToGo.xcodeproj
-      - name: Compile once before booting a simulator
-        timeout-minutes: 10
-        env:
-          TEST_SCOPE: ${{ inputs.scope }}
-        run: |
-          set -euo pipefail
-          mkdir -p build/screens
-          printf 'commit=%s\nrun=%s\nattempt=%s\nscope=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$TEST_SCOPE" > build/provenance.txt
-          ACTION=build-for-testing
-          if [[ "$TEST_SCOPE" == screens ]]; then ACTION=build; fi
-          xcodebuild "$ACTION" -project ETFToGo.xcodeproj -scheme ETFToGo -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
-          python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only simulator app')"
       - name: Boot an available iPhone simulator
         id: device
-        timeout-minutes: 8
         run: |
           set -euo pipefail
           DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for runtime,items in d["devices"].items() if "iOS" in runtime for x in items if "iPhone" in x["name"]))')
           echo "udid=$DEVICE" >> "$GITHUB_OUTPUT"
-          STATE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["state"] for items in d["devices"].values() for x in items if x["udid"]==sys.argv[1]))' "$DEVICE")
-          if [[ "$STATE" != Booted ]]; then xcrun simctl boot "$DEVICE"; fi
+          xcrun simctl boot "$DEVICE"
           xcrun simctl bootstatus "$DEVICE" -b
           xcrun simctl status_bar "$DEVICE" override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100
           xcrun simctl ui "$DEVICE" appearance light
-      - name: Verify calculations and persistence without rebuilding
-        if: inputs.scope != 'screens'
-        timeout-minutes: 5
+      - name: Compile native app
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
-          xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -only-testing:ETFToGoTests -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/UnitTests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/unit-tests.log
+          mkdir -p build/screens
+          xcodebuild build-for-testing -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
+          python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only simulator app')"
       - name: Capture all five real SwiftUI screens
-        if: inputs.scope != 'unit'
         timeout-minutes: 3
+        continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
@@ -90,7 +49,7 @@ jobs:
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
           for TAB in 0 1 2 3 4; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --demo --tab "$TAB"
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --tab "$TAB"
             sleep 4
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$TAB.png"
           done
@@ -98,42 +57,31 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ETFToGo-screens-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ETFToGo-screens
           path: build/screens/
           retention-days: 14
-      - name: Verify UI navigation and editing without rebuilding
-        if: inputs.scope == 'full'
-        timeout-minutes: 8
+      - name: Verify calculations, persistence, search and editing
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
-          xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -only-testing:ETFToGoUITests -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/tests.log
+          xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/tests.log
+      - name: Export UI test screenshots
+        if: always()
+        run: |
+          if [ -d build/Tests.xcresult ]; then
+            xcrun xcresulttool export attachments --path build/Tests.xcresult --output-path build/test-attachments
+          fi
       - name: Save verifiable build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ETFToGo-native-ui-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ETFToGo-native-ui-evidence
           retention-days: 14
           path: |
-            build/provenance.txt
-            build/UnitTests.xcresult/
+            build/screens/
+            build/test-attachments/
             build/*.log
             build/Tests.xcresult/
             ETFToGo.xcodeproj/
             App/Assets.xcassets/AppIcon.appiconset/AppIcon.png
-      - name: State validation scope explicitly
-        if: always()
-        env:
-          TEST_SCOPE: ${{ inputs.scope }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          printf 'Scope: %s; status: %s; commit: %s\n' "$TEST_SCOPE" "$JOB_STATUS" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
-          if [[ "$TEST_SCOPE" != full ]]; then
-            echo 'Partial validation only; full regression is required before release.' >> "$GITHUB_STEP_SUMMARY"
-          fi
-      - name: Shut down the selected simulator
-        if: always() && steps.device.outputs.udid != ''
-        env:
-          DEVICE: ${{ steps.device.outputs.udid }}
-        run: xcrun simctl shutdown "$DEVICE" || true

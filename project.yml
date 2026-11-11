@@ -3,10 +3,7 @@ options:
   bundleIdPrefix: tw.sonia
   developmentLanguage: zh-Hant
   deploymentTarget:
-    iOS: '18.0'
-packages:
-  PocketCore:
-    path: PocketCore
+    iOS: '17.0'
 settings:
   base:
     SWIFT_VERSION: '5.0'
@@ -19,14 +16,12 @@ targets:
     type: application
     platform: iOS
     sources: [App]
-    dependencies:
-      - package: PocketCore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview
         TARGETED_DEVICE_FAMILY: '1'
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: ETF 袋著走
+        INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
@@ -37,7 +32,6 @@ targets:
     sources: [Tests]
     dependencies:
       - target: ETFToGo
-      - package: PocketCore
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
