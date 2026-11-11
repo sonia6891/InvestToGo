@@ -132,7 +132,7 @@ struct PocketHero: View {
             scene.coin.position = [0, 1.55, -0.12]
             pocketGroup.addChild(scene.coin)
             pocketGroup.position.y = 1.75
-            numeral.position.y = -1.75
+            numeral.position.y = -1.9
         } else {
             numeral.position.y = 0
         }
@@ -142,11 +142,12 @@ struct PocketHero: View {
     private func fit() {
         let visibleHeight: Float = 2 * 16 * tan(14 * .pi / 180), visibleWidth = visibleHeight * scene.aspect
         if showsPocket {
-            // Content spans y −2.75 (numeral bottom) to 3.9 (coin top): 6.65 high, centred at 0.575.
-            let s = min(0.92 * visibleHeight / 6.65, 0.85 * visibleWidth / max(2.7, scene.numeralWidth))
-            root.scale = [s, s, s]; root.position.y = -0.575 * s
+            // Content spans y −3.05 (numeral bottom) to 3.9 (coin top): 6.95 high, centred at 0.425. The margin leaves
+            // room for perspective (the front faces are nearer the camera), the idle sway and a drag tilt.
+            let s = min(0.8 * visibleHeight / 6.95, 0.72 * visibleWidth / max(2.7, scene.numeralWidth))
+            root.scale = [s, s, s]; root.position.y = -0.425 * s
         } else {
-            let s = min(0.82 * visibleWidth / scene.numeralWidth, 0.8 * visibleHeight / 2.2)
+            let s = min(0.7 * visibleWidth / scene.numeralWidth, 0.7 * visibleHeight / 2.3)
             root.scale = [s, s, s]; root.position.y = 0
         }
     }

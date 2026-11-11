@@ -30,6 +30,13 @@ final class BlockGlyphsTests: XCTestCase {
             XCTAssertLessThanOrEqual(right - left, r.width + 1e-9, text)
         }
     }
+    func testDigitsStayInsideTheirCellAndKeepOpenCounters() {
+        let blocks = BlockGlyphs.layout("8").blocks
+        let top = blocks.map { $0.y + $0.height / 2 }.max()!, bottom = blocks.map { $0.y - $0.height / 2 }.min()!
+        XCTAssertEqual(top - bottom, BlockGlyphs.height, accuracy: 1e-9, "Vertical strokes must not stick out past the top and bottom bars")
+        XCTAssertGreaterThanOrEqual(W - 2 * BlockGlyphs.stroke, 0.35 * W, "The hole inside 0/8 must stay readable")
+        XCTAssertGreaterThanOrEqual((BlockGlyphs.height - 3 * BlockGlyphs.stroke) / 2, 0.4, "Upper and lower holes of 8 must stay open")
+    }
     func testUnknownCharactersAreSkipped() {
         XCTAssertEqual(BlockGlyphs.layout("A1 2").blocks, BlockGlyphs.layout("12").blocks)
         XCTAssertTrue(BlockGlyphs.layout("").blocks.isEmpty)

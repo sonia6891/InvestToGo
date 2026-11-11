@@ -40,6 +40,8 @@ struct DesignShowcase: View {
 
             ZStack {
                 PosterShards(center: UnitPoint(x: 0.5, y: 0.5), colors: skin.burst.map { Color(rgb: $0) })
+                    // Fade the shards out towards the edges instead of cutting them off at the frame.
+                    .mask(EllipticalGradient(colors: [.black, .black, .clear], center: .center, startRadiusFraction: 0, endRadiusFraction: 0.55))
                 BurstView(trigger: bursts, center: UnitPoint(x: 0.5, y: 0.32), colors: skin.burst.map { Color(rgb: $0) })
                 PocketHero(value: screen == 0 ? "\(streak)" : fees[feeIndex].1, showsPocket: screen == 0, skin: skin, drops: drops,
                            label: screen == 0 ? "連續領息 \(streak) 個月" : "\(fees[feeIndex].0) \(fees[feeIndex].1)") {
