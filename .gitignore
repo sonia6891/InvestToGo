@@ -10,3 +10,5 @@ xcuserdata/
 *.ipa
 Evidence/*.log
 Screens/
+.superpowers/
+PocketCore/.build/
