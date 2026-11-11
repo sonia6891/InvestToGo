@@ -3,6 +3,7 @@ import SwiftUI
 /// 3D 元件展示: the home hero and the fee-detail pattern built from the design system, with demo figures, so the
 /// look and feel can be checked on a phone before every page is rebuilt.
 struct DesignShowcase: View {
+    var close: () -> Void = {}
     @StateObject private var skins = SkinStore()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var screen = 0
@@ -18,6 +19,10 @@ struct DesignShowcase: View {
         let skin = skins.skin
         VStack(spacing: 0) {
             HStack {
+                Button(action: close) {
+                    Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(Color(rgb: skin.foreground))
+                        .frame(width: 36, height: 36).overlay(Circle().stroke(Color(rgb: skin.foreground), lineWidth: 1.5))
+                }.buttonStyle(.plain).accessibilityLabel("關閉").accessibilityIdentifier("showcase-close")
                 VStack(alignment: .leading, spacing: 2) {
                     Text("PKT×\(String(format: "%03d", streak))").font(.system(size: 11, design: .monospaced))
                     Text("連續領息 \(streak) 個月").font(.system(size: 11, weight: .bold, design: .monospaced)).foregroundStyle(Color(rgb: skin.foreground))
@@ -48,8 +53,8 @@ struct DesignShowcase: View {
         .padding(.horizontal, 16)
         .background(Color(rgb: skin.background).ignoresSafeArea())
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.4), value: skin.id)
-        .navigationTitle("3D 元件展示").navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(contrastRatio(skin.foreground, 0x000000) > contrastRatio(skin.foreground, 0xFFFFFF) ? .dark : .light, for: .navigationBar)
+        .statusBarHidden(false)
+        .preferredColorScheme(contrastRatio(skin.foreground, 0x000000) > contrastRatio(skin.foreground, 0xFFFFFF) ? .dark : .light)
     }
 
     private func tab(_ title: String, _ index: Int, id: String, skin: Skin) -> some View {
@@ -68,7 +73,7 @@ struct DesignShowcase: View {
         VStack(spacing: 8) {
             Text("十一月").font(.system(size: 12, weight: .black)).tracking(2).foregroundStyle(Color(rgb: skin.accent == skin.foreground ? skin.background : skin.background))
                 .padding(.horizontal, 10).padding(.vertical, 3).background(Color(rgb: skin.accent), in: RoundedRectangle(cornerRadius: 3))
-            (Text("這個月口袋 ").font(.system(size: 28, weight: .black)) + Text("+$\(amount.formatted())").font(.system(size: 32, weight: .black, design: .rounded)).foregroundColor(Color(rgb: skin.accent)))
+            (Text("這個月口袋 ").font(.system(size: 28, weight: .black)) + Text("+$\(amount.formatted())").font(.system(size: 38, weight: .black).width(.condensed)).foregroundColor(Color(rgb: skin.accent)))
                 .foregroundStyle(Color(rgb: skin.foreground))
                 .accessibilityIdentifier("showcase-amount")
             Button("記錄配息") { drops += 1 }

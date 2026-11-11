@@ -3,7 +3,10 @@ import UniformTypeIdentifiers
 import UserNotifications
 
 struct ToolsView: View {
+    /// The 3D showcase opens full screen, like the new design: no navigation or tab bar around the hero.
+    @State private var showDesign = false
     var body: some View {
+        Group {
         Page {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -14,7 +17,15 @@ struct ToolsView: View {
                 Artwork(name: "misc-bulb", size: 56)
             }.padding(.top, 6)
             section("試算", icon: "function", color: Palette.blue) {
-                wide("3D 元件展示", "新版遊戲風格試玩", art: "div-coins", route: .designShowcase).accessibilityIdentifier("tool-design").padding(.bottom, 10)
+                Button { showDesign = true } label: {
+                    HStack(spacing: 10) {
+                        Artwork(name: "div-coins", size: 44)
+                        VStack(alignment: .leading, spacing: 2) { Text("3D 元件展示").font(.subheadline.bold()).foregroundStyle(Palette.ink); Text("新版遊戲風格試玩").font(.caption2).foregroundStyle(Palette.muted) }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12).frame(maxWidth: .infinity)
+                    .background(Palette.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 18))
+                }.buttonStyle(.plain).accessibilityIdentifier("tool-design").padding(.bottom, 10)
                 wide("ETF 組合試算", "3、5、10 年資產預估", art: "tool-compound", route: .combo).accessibilityIdentifier("tool-combo").padding(.bottom, 10)
                 HStack(spacing: 10) {
                     tile("股息複利", "複利試算", art: "cat-saving", route: .plan, tint: Palette.pink)
@@ -38,6 +49,8 @@ struct ToolsView: View {
             Text("試算都是情境假設，不是預測或保證；比較與透視使用你取得的實際資料。").font(.caption).foregroundStyle(Palette.muted)
         }
         .toolbar(.hidden, for: .navigationBar)
+            }
+        .fullScreenCover(isPresented: $showDesign) { DesignShowcase(close: { showDesign = false }) }
     }
     private func section<Content: View>(_ title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
         Card(padding: 14) {
