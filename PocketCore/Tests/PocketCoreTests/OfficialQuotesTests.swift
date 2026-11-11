@@ -40,6 +40,16 @@ final class OfficialQuotesTests: XCTestCase {
         XCTAssertEqual(OfficialQuotes.merge([q("2026-11-10", 1)], into: [:])["0050"]?.price, 1)
     }
 
+    func testOfficialCloseReplacesSameDayIntradayQuote() {
+        let day = DataChecks.date("2026-11-10")!
+        func q(_ price: Double, fetchedAt: Date) -> Quote { Quote(symbol: "0050", price: price, changePercent: 0.3, date: "2026-11-10", fetchedAt: fetchedAt, currency: "TWD") }
+        let official = Quote(symbol: "0050", price: 99.7, changePercent: nil, date: "2026-11-10", fetchedAt: now, currency: "TWD")
+        let intraday = q(98, fetchedAt: day.addingTimeInterval(11 * 3600))
+        XCTAssertEqual(OfficialQuotes.merge([official], into: ["0050": intraday])["0050"]?.price, 99.7, "A mid-session price must give way to that day's official close")
+        let afterClose = q(99.6, fetchedAt: day.addingTimeInterval(15 * 3600))
+        XCTAssertEqual(OfficialQuotes.merge([official], into: ["0050": afterClose])["0050"]?.price, 99.6, "A quote fetched after the close is kept")
+    }
+
     func testChangedDateFormatThrows() {
         let bytes = Data(#"[{"Date":"2026/11/10","Code":"0050","Name":"元大台灣50","ClosingPrice":"99.70"}]"#.utf8)
         XCTAssertThrowsError(try OfficialQuotes.decodeTWSE(bytes, fetchedAt: now)) { error in
