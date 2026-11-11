@@ -1,0 +1,24 @@
+import SwiftUI
+
+extension Color {
+    /// A colour from 0xRRGGBB, as the skins store them.
+    init(rgb: UInt32) {
+        self.init(red: Double((rgb >> 16) & 0xFF) / 255, green: Double((rgb >> 8) & 0xFF) / 255, blue: Double(rgb & 0xFF) / 255)
+    }
+}
+
+/// The chosen skin and the sound setting, kept on the device.
+@MainActor final class SkinStore: ObservableObject {
+    static let skinKey = "pocket.skin", soundKey = "pocket.sound"
+    @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey) } }
+    @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
+
+    init() {
+        skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "") ?? Skins.default
+        soundOn = (UserDefaults.standard.object(forKey: Self.soundKey) as? Bool) ?? true
+    }
+    func next() {
+        let all = Skins.all
+        skin = all[((all.firstIndex(of: skin) ?? 0) + 1) % all.count]
+    }
+}
