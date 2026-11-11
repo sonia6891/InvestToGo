@@ -8,6 +8,7 @@ enum AppRoute: Hashable {
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
     case watchlist, basis(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
+    case designShowcase
     case stock(String), combo, comboAdding(String), comboSettings, comboResult, trades, allocation
 }
 struct RouteView: View {
@@ -41,6 +42,7 @@ struct RouteView: View {
         case .connection: ConnectionView()
         case .reminders: ReminderCenterView()
         case .stock(let symbol): StockDetailView(symbol: symbol)
+        case .designShowcase: DesignShowcase()
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
         case .comboSettings: ComboSettingsView()

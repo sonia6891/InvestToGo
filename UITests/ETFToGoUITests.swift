@@ -66,6 +66,20 @@ final class ETFToGoUITests: XCTestCase {
         app.buttons["combo-run"].tap()
         XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5)); capture(app, "combo-result")
     }
+    func testDesignShowcase() {
+        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--tab", "4"]; app.launch()
+        XCTAssertTrue(app.buttons["tool-design"].waitForExistence(timeout: 10)); app.buttons["tool-design"].tap()
+        let record = app.buttons["showcase-record"]
+        XCTAssertTrue(record.waitForExistence(timeout: 10)); sleep(2); capture(app, "design-home-blackgold")
+        record.tap(); record.tap()
+        sleep(3); capture(app, "design-home-after-record")
+        XCTAssertTrue(record.isHittable, "Tapping twice does not leave the screen stuck")
+        app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-ember")
+        app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-ice")
+        app.buttons["skin-picker"].tap()
+        app.segmentedControls["showcase-screen"].buttons["費用率細項"].tap()
+        XCTAssertTrue(app.buttons["fee-row-1"].waitForExistence(timeout: 5)); app.buttons["fee-row-1"].tap(); sleep(2); capture(app, "design-fees")
+    }
     func testHomeSearchWatchlistAndCombo() {
         let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset"]; app.launch()
         XCTAssertTrue(app.buttons["home-search"].waitForExistence(timeout: 10)); capture(app, "home-empty")

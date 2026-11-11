@@ -144,7 +144,7 @@ final class PortfolioTests: XCTestCase {
         XCTAssertNil(try made(since: DataChecks.day()).trailingCash("2330"))
         XCTAssertEqual(try made(since: "2024-01-01").trailingCash("2330"), 5)
     }
-    @MainActor func testStockHoldingIsValuedAndComboPersists() throws {
+    @MainActor func testStockHoldingStaysReadableAndComboIsETFOnly() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let url = directory.appendingPathComponent("data.json")
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -159,7 +159,7 @@ final class PortfolioTests: XCTestCase {
         store.saveCombo(combo)
         let reopened = PortfolioStore(url: url)
         XCTAssertEqual(reopened.combo, combo)
-        XCTAssertEqual(reopened.comboStarts(reopened.combo).stock, 50000, accuracy: 0.001)
+        XCTAssertEqual(reopened.comboStarts(reopened.combo).stock, 0, accuracy: 0.001, "ETF only: a stock in the combo is not counted")
         XCTAssertEqual(reopened.comboStarts(reopened.combo).etf, 30000, accuracy: 0.001)
     }
     func testQuoteValidation() throws {
