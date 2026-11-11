@@ -27,8 +27,11 @@ struct DesignShowcase: View {
                     .toggleStyle(.button).tint(Color(rgb: skin.accent)).foregroundStyle(Color(rgb: skin.foreground))
                 SkinPicker(skins: skins)
             }
-            Picker("畫面", selection: $screen) { Text("首頁").tag(0); Text("費用率細項").tag(1) }
-                .pickerStyle(.segmented).padding(.top, 10).accessibilityIdentifier("showcase-screen")
+            HStack(spacing: 8) {
+                tab("首頁", 0, id: "showcase-tab-home", skin: skin)
+                tab("費用率細項", 1, id: "showcase-tab-fees", skin: skin)
+                Spacer()
+            }.padding(.top, 10)
 
             ZStack {
                 BurstView(trigger: bursts, center: UnitPoint(x: 0.5, y: 0.32), colors: skin.burst.map { Color(rgb: $0) })
@@ -47,6 +50,18 @@ struct DesignShowcase: View {
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.4), value: skin.id)
         .navigationTitle("3D 元件展示").navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(contrastRatio(skin.foreground, 0x000000) > contrastRatio(skin.foreground, 0xFFFFFF) ? .dark : .light, for: .navigationBar)
+    }
+
+    private func tab(_ title: String, _ index: Int, id: String, skin: Skin) -> some View {
+        Button { screen = index; Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
+            Text(title).font(.system(size: 13, weight: .bold))
+                .foregroundStyle(Color(rgb: screen == index ? skin.background : skin.muted))
+                .padding(.horizontal, 16).frame(minHeight: 36)
+                .background(Capsule().fill(screen == index ? Color(rgb: skin.foreground) : .clear))
+                .overlay(Capsule().stroke(Color(rgb: screen == index ? skin.foreground : skin.line), lineWidth: 1.5))
+        }
+        .buttonStyle(.plain).accessibilityIdentifier(id)
+        .accessibilityAddTraits(screen == index ? .isSelected : [])
     }
 
     private func homeCaption(_ skin: Skin) -> some View {

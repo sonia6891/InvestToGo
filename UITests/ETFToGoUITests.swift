@@ -71,13 +71,14 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tool-design"].waitForExistence(timeout: 10)); app.buttons["tool-design"].tap()
         let record = app.buttons["showcase-record"]
         XCTAssertTrue(record.waitForExistence(timeout: 10)); sleep(2); capture(app, "design-home-blackgold")
-        record.tap(); record.tap()
+        record.tap(); sleep(2); record.tap()
         sleep(3); capture(app, "design-home-after-record")
+        XCTAssertTrue(app.staticTexts["showcase-amount"].label.contains("1,880"), "Two records add 2 × 320 once each: \(app.staticTexts["showcase-amount"].label)")
         XCTAssertTrue(record.isHittable, "Tapping twice does not leave the screen stuck")
         app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-ember")
         app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-ice")
         app.buttons["skin-picker"].tap()
-        app.segmentedControls["showcase-screen"].buttons["費用率細項"].tap()
+        app.buttons["showcase-tab-fees"].tap()
         XCTAssertTrue(app.buttons["fee-row-1"].waitForExistence(timeout: 5)); app.buttons["fee-row-1"].tap(); sleep(2); capture(app, "design-fees")
     }
     func testHomeSearchWatchlistAndCombo() {

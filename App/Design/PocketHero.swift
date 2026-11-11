@@ -2,8 +2,17 @@ import SwiftUI
 import RealityKit
 import UIKit
 
-/// Per-frame state shared between SwiftUI gestures and the RealityKit update loop.
-@MainActor final class HeroMotion {
+/// Everything the RealityKit scene keeps between SwiftUI updates. A reference type, because writing @State while
+/// SwiftUI is updating the view is ignored: counters kept there re-triggered the coin drop on every update.
+@MainActor final class HeroScene {
+    let root = Entity(), numeral = Entity(), pocketGroup = Entity()
+    var coin = Entity()
+    var builtKey: String?
+    var handledDrops: Int?
+    var numeralWidth: Float = 1
+    var aspect: Float = 0.6
+    var showsPocket = false
+    var reduceMotion = false
     var tilt: CGSize = .zero
     var smoothed: SIMD2<Float> = .zero
     var time: Float = 0
@@ -23,16 +32,13 @@ struct PocketHero: View {
     var onLanded: () -> Void = {}
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var root = Entity()
-    @State private var numeral = Entity()
-    @State private var pocketGroup = Entity()
-    @State private var coin = Entity()
-    @State private var built: (value: String, skin: String, pocket: Bool)?
-    @State private var lastDrops = 0
-    @State private var motion = HeroMotion()
-    @State private var environment: EnvironmentResource?
+    @State private var scene = HeroScene()
+    private var root: Entity { scene.root }
+    private var numeral: Entity { scene.numeral }
+    private var pocketGroup: Entity { scene.pocketGroup }
 
     var body: some View {
+        GeometryReader { geo in
         RealityView { content in
             let camera = PerspectiveCamera()
             camera.camera.fieldOfViewInDegrees = 28
@@ -44,29 +50,34 @@ struct PocketHero: View {
             light.shadow = DirectionalLightComponent.Shadow(maximumDistance: 30, depthBias: 2)
             light.look(at: .zero, from: [-4, 6, 9], relativeTo: nil)
             content.add(light)
+            let fill = DirectionalLight()
+            fill.light.intensity = 1300
+            fill.look(at: .zero, from: [5, 1, 10], relativeTo: nil)
+            content.add(fill)
 
             root.addChild(numeral)
             root.addChild(pocketGroup)
             content.add(root)
             if let environment = try? await Self.studioEnvironment() {
-                root.components.set(ImageBasedLightComponent(source: .single(environment), intensityExponent: 0.4))
+                root.components.set(ImageBasedLightComponent(source: .single(environment), intensityExponent: 1))
                 root.components.set(ImageBasedLightReceiverComponent(imageBasedLight: root))
-                self.environment = environment
             }
             _ = content.subscribe(to: SceneEvents.Update.self) { event in
                 step(Float(event.deltaTime))
             }
         } update: { _ in
+            scene.reduceMotion = reduceMotion
+            scene.aspect = Float(max(geo.size.width, 1) / max(geo.size.height, 1))
             rebuildIfNeeded()
-            if drops != lastDrops {
-                let fresh = drops > lastDrops
-                lastDrops = drops
-                if fresh { dropCoin() }
-            }
+            fit()
+            // The first update only records the count: opening a screen never plays a drop.
+            if let handled = scene.handledDrops, drops > handled { scene.handledDrops = drops; dropCoin() }
+            else if scene.handledDrops == nil { scene.handledDrops = drops }
+        }
         }
         .gesture(DragGesture(minimumDistance: 0)
-            .onChanged { motion.tilt = CGSize(width: $0.translation.width / 160, height: $0.translation.height / 220) }
-            .onEnded { _ in motion.tilt = .zero })
+            .onChanged { scene.tilt = CGSize(width: $0.translation.width / 160, height: $0.translation.height / 220) }
+            .onEnded { _ in scene.tilt = .zero })
         .accessibilityElement()
         .accessibilityLabel(label)
         .accessibilityAddTraits(.updatesFrequently)
@@ -75,9 +86,12 @@ struct PocketHero: View {
     // MARK: Building
 
     private func rebuildIfNeeded() {
-        guard built?.value != value || built?.skin != skin.id || built?.pocket != showsPocket else { return }
-        let firstBuild = built == nil
-        built = (value, skin.id, showsPocket)
+        let key = "\(value)|\(skin.id)|\(showsPocket)"
+        guard scene.builtKey != key else { return }
+        let firstBuild = scene.builtKey == nil
+        let valueChanged = scene.builtKey.map { !$0.hasPrefix(value + "|") } ?? false
+        scene.builtKey = key
+        scene.showsPocket = showsPocket
         let matte = Self.material(skin.matte, metalness: 0, roughness: 0.85)
         let metal = Self.material(skin.metal.color, metalness: skin.metal.metalness, roughness: skin.metal.roughness)
 
@@ -97,10 +111,8 @@ struct PocketHero: View {
             entity.components.set(GroundingShadowComponent(castsShadow: true))
             numeral.addChild(entity)
         }
-        // Fit wide values (e.g. "−0.02%") into the same frame as two digits.
-        let fit = Float(min(1, 3.6 / max(layout.width, 0.1)))
-        numeral.scale = [fit, fit, fit]
-        if !firstBuild && !reduceMotion { pop() }
+        scene.numeralWidth = Float(max(layout.width, 0.1))
+        if !firstBuild && valueChanged && !reduceMotion { pop() }
 
         pocketGroup.children.removeAll()
         pocketGroup.isEnabled = showsPocket
@@ -116,17 +128,26 @@ struct PocketHero: View {
                 s.orientation = simd_quatf(angle: Float(stitch.angle) - .pi / 2, axis: [0, 0, 1])
                 pocketGroup.addChild(s)
             }
-            coin = Self.coin(metal)
-            coin.position = [0, 1.55, -0.12]
-            pocketGroup.addChild(coin)
+            scene.coin = Self.coin(metal)
+            scene.coin.position = [0, 1.55, -0.12]
+            pocketGroup.addChild(scene.coin)
             pocketGroup.position.y = 1.75
             numeral.position.y = -1.75
-            root.scale = [0.82, 0.82, 0.82]
-            root.position.y = -0.45
         } else {
             numeral.position.y = 0
-            root.scale = [1, 1, 1]
-            root.position.y = 0
+        }
+    }
+
+    /// Scales the scene to its frame: the pocket screen fills the height, a lone numeral 82% of the width.
+    private func fit() {
+        let visibleHeight: Float = 2 * 16 * tan(14 * .pi / 180), visibleWidth = visibleHeight * scene.aspect
+        if showsPocket {
+            // Content spans y −2.75 (numeral bottom) to 3.9 (coin top): 6.65 high, centred at 0.575.
+            let s = min(0.92 * visibleHeight / 6.65, 0.85 * visibleWidth / max(2.7, scene.numeralWidth))
+            root.scale = [s, s, s]; root.position.y = -0.575 * s
+        } else {
+            let s = min(0.82 * visibleWidth / scene.numeralWidth, 0.8 * visibleHeight / 2.2)
+            root.scale = [s, s, s]; root.position.y = 0
         }
     }
 
@@ -185,44 +206,45 @@ struct PocketHero: View {
     // MARK: Motion
 
     private func step(_ dt: Float) {
-        motion.time += dt
-        let target = SIMD2<Float>(Float(motion.tilt.width), Float(motion.tilt.height))
-        motion.smoothed += (target - motion.smoothed) * min(1, dt * 6)
-        let sway: Float = reduceMotion ? 0 : sin(motion.time * 0.5) * 0.12
-        root.orientation = simd_quatf(angle: sway + motion.smoothed.x * 0.45, axis: [0, 1, 0]) * simd_quatf(angle: motion.smoothed.y * 0.25, axis: [1, 0, 0])
-        if showsPocket, motion.spinning, !reduceMotion {
-            coin.orientation = simd_quatf(angle: motion.time * 1.5, axis: [0, 1, 0])
-            coin.position.y = 1.55 + sin(motion.time * 2) * 0.08
+        scene.time += dt
+        let target = SIMD2<Float>(Float(scene.tilt.width), Float(scene.tilt.height))
+        scene.smoothed += (target - scene.smoothed) * min(1, dt * 6)
+        let sway: Float = scene.reduceMotion ? 0 : sin(scene.time * 0.5) * 0.12
+        root.orientation = simd_quatf(angle: sway + scene.smoothed.x * 0.45, axis: [0, 1, 0]) * simd_quatf(angle: scene.smoothed.y * 0.25, axis: [1, 0, 0])
+        if scene.showsPocket, scene.spinning, !scene.reduceMotion {
+            scene.coin.orientation = simd_quatf(angle: scene.time * 1.5, axis: [0, 1, 0])
+            scene.coin.position.y = 1.55 + sin(scene.time * 2) * 0.08
         }
-        if motion.shake > 0 {
-            motion.shake = max(0, motion.shake - dt)
-            let a = motion.shake * 0.5
+        if scene.shake > 0 {
+            scene.shake = max(0, scene.shake - dt)
+            let a = scene.shake * 0.5
             root.position.x = Float.random(in: -a...a) * 0.3
         } else { root.position.x = 0 }
     }
 
     private func pop() {
-        numeral.scale *= 1.25
-        let settled = Transform(scale: numeral.scale / 1.25, rotation: numeral.orientation, translation: numeral.position)
+        numeral.scale = [1.25, 1.25, 1.25]
+        let settled = Transform(scale: [1, 1, 1], rotation: numeral.orientation, translation: numeral.position)
         numeral.move(to: settled, relativeTo: numeral.parent, duration: 0.45, timingFunction: .easeOut)
     }
 
     private func dropCoin() {
         guard showsPocket else { onLanded(); return }
-        if reduceMotion { onLanded(); return }
-        motion.spinning = false
-        coin.orientation = simd_quatf(angle: 0, axis: [0, 1, 0])
-        var inside = coin.transform; inside.translation.y = -0.35
-        coin.move(to: inside, relativeTo: pocketGroup, duration: 0.5, timingFunction: .easeIn)
+        // Reduced motion, or a tap while a coin is still falling: count it without another animation.
+        if reduceMotion || !scene.spinning { onLanded(); return }
+        scene.spinning = false
+        scene.coin.orientation = simd_quatf(angle: 0, axis: [0, 1, 0])
+        var inside = scene.coin.transform; inside.translation.y = -0.35
+        scene.coin.move(to: inside, relativeTo: pocketGroup, duration: 0.5, timingFunction: .easeIn)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.38) {
-            motion.shake = 0.38
+            scene.shake = 0.38
             onLanded()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-            coin.position = [0, 6.5, -0.12]
-            var hover = coin.transform; hover.translation.y = 1.55
-            coin.move(to: hover, relativeTo: pocketGroup, duration: 0.7, timingFunction: .easeOut)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.72) { motion.spinning = true }
+            scene.coin.position = [0, 6.5, -0.12]
+            var hover = scene.coin.transform; hover.translation.y = 1.55
+            scene.coin.move(to: hover, relativeTo: pocketGroup, duration: 0.7, timingFunction: .easeOut)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.72) { scene.spinning = true }
         }
     }
 }
