@@ -3,14 +3,16 @@ import Charts
 import UIKit
 
 enum Palette {
-    static let blue = Color(red: 0.12, green: 0.42, blue: 1.0)
-    static let deepBlue = Color(red: 0.07, green: 0.31, blue: 0.88)
-    // Text and surfaces follow the light or dark appearance chosen in Settings.
-    static let ink = Color(light: UIColor(red: 0.06, green: 0.12, blue: 0.24, alpha: 1), dark: UIColor(red: 0.91, green: 0.93, blue: 0.98, alpha: 1))
-    static let muted = Color(light: UIColor(red: 0.42, green: 0.48, blue: 0.60, alpha: 1), dark: UIColor(red: 0.59, green: 0.64, blue: 0.74, alpha: 1))
-    static let background = Color(light: UIColor(red: 0.95, green: 0.97, blue: 1.0, alpha: 1), dark: UIColor(red: 0.055, green: 0.086, blue: 0.157, alpha: 1))
-    static let card = Color(light: .white, dark: UIColor(red: 0.09, green: 0.13, blue: 0.23, alpha: 1))
-    static let cardSoft = Color(light: UIColor(red: 0.953, green: 0.965, blue: 1.0, alpha: 1), dark: UIColor(red: 0.114, green: 0.161, blue: 0.27, alpha: 1))
+    // Text, surfaces, actions and gains/losses follow the chosen skin (SkinStore), so every screen shares its look.
+    private static var skin: Skin { SkinStore.current }
+    static var blue: Color { skin.lightText ? Color(rgb: skin.accent) : Color(rgb: skin.foreground) }
+    static var deepBlue: Color { blue }
+    static var ink: Color { Color(rgb: skin.foreground) }
+    static var muted: Color { Color(rgb: skin.muted) }
+    static var background: Color { Color(rgb: skin.background) }
+    static var card: Color { Color(rgb: skin.surface) }
+    static var cardSoft: Color { Color(rgb: skin.surface2) }
+    static var line: Color { Color(rgb: skin.line) }
     static let teal = Color(red: 0.07, green: 0.70, blue: 0.77)
     static let red = Color(red: 0.90, green: 0.22, blue: 0.27)
     static let green = Color(red: 0.05, green: 0.62, blue: 0.42)
@@ -18,9 +20,9 @@ enum Palette {
     static let pink = Color(red: 0.93, green: 0.33, blue: 0.52)
     static let purple = Color(red: 0.49, green: 0.33, blue: 0.96)
     // Taiwan convention: gains red, losses green (TrendRole).
-    static let up = red
-    static let down = green
-    /// Lighter versions for text on the blue hero gradient.
+    static var up: Color { Color(rgb: skin.up) }
+    static var down: Color { Color(rgb: skin.down) }
+    /// Lighter versions for text on the dark hero panel.
     static let heroUp = Color(red: 1.0, green: 0.82, blue: 0.83)
     static let heroDown = Color(red: 0.77, green: 0.97, blue: 0.83)
     static func trend(_ value: Double) -> Color {
@@ -28,11 +30,12 @@ enum Palette {
     }
     static func strategy(_ value: Strategy) -> Color { switch value { case .saving: return pink; case .income: return green; case .risk: return purple; case .unclassified: return muted } }
     static func status(_ value: DividendStatus) -> Color { switch value { case .paid: return green; case .announced: return blue; case .estimated: return pink } }
-    static let hero = LinearGradient(colors: [Color(red: 0.27, green: 0.58, blue: 1.0), Color(red: 0.08, green: 0.33, blue: 0.93)], startPoint: .topLeading, endPoint: .bottomTrailing)
-    static let page = LinearGradient(colors: [Color(light: UIColor(red: 0.88, green: 0.92, blue: 1.0, alpha: 1), dark: UIColor(red: 0.075, green: 0.13, blue: 0.25, alpha: 1)), background], startPoint: .top, endPoint: .bottom)
+    /// The hero panel: the skin's matte body colour, so white hero text keeps its contrast on every skin.
+    static var hero: LinearGradient { LinearGradient(colors: [Color(rgb: skin.matte2), Color(rgb: skin.matte)], startPoint: .topLeading, endPoint: .bottomTrailing) }
+    static var page: LinearGradient { LinearGradient(colors: [background, background], startPoint: .top, endPoint: .bottom) }
     /// Allocation groups shown in the design's legends.
     static func theme(_ value: String) -> Color { switch value { case "市值型": return blue; case "高股息": return purple; case "產業主題": return teal; case "個股": return pink; default: return orange } }
-    static let series: [Color] = [blue, pink, teal, orange, purple, green, Color(red: 0.54, green: 0.63, blue: 0.77)]
+    static var series: [Color] { [Color(red: 0.12, green: 0.42, blue: 1.0), pink, teal, orange, purple, green, Color(red: 0.54, green: 0.63, blue: 0.77)] }
 }
 extension Color {
     init(light: UIColor, dark: UIColor) { self.init(uiColor: UIColor { $0.userInterfaceStyle == .dark ? dark : light }) }

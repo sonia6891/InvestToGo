@@ -23,9 +23,9 @@ final class PocketShapeTests: XCTestCase {
 
 final class SkinsTests: XCTestCase {
     func testThreeSkinsWithUniqueIDs() {
-        XCTAssertEqual(Skins.all.map(\.name), ["黑金", "橘焰", "冰藍"])
+        XCTAssertEqual(Skins.all.map(\.name), ["橘焰", "黑金", "冰藍"])
         XCTAssertEqual(Set(Skins.all.map(\.id)).count, 3)
-        XCTAssertEqual(Skins.default.id, "blackgold")
+        XCTAssertEqual(Skins.default.id, "ember")
         XCTAssertEqual(Skins.named("ice")?.rarity, "普通"); XCTAssertNil(Skins.named("nope"))
     }
     func testSkinTextContrast() {
@@ -34,5 +34,12 @@ final class SkinsTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(contrastRatio(skin.muted, skin.background), 4.5, "\(skin.name) small labels")
         }
         XCTAssertEqual(contrastRatio(0xFFFFFF, 0x000000), 21, accuracy: 0.01)
+    }
+    func testTrendColoursAndSurfacesReadOnEverySkin() {
+        for skin in Skins.all {
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.up, skin.background), 3, "\(skin.id) up")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.down, skin.background), 3, "\(skin.id) down")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.foreground, skin.surface), 4.5, "\(skin.id) text on cards")
+        }
     }
 }

@@ -12,15 +12,24 @@ extension Color {
     /// One store for the whole app, so a skin chosen anywhere restyles the tab bar and every screen at once.
     static let shared = SkinStore()
     static let skinKey = "pocket.skin", soundKey = "pocket.sound"
-    @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey) } }
+    @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey); Self.current = skin } }
+    /// The skin the ordinary screens' Palette reads; set before any screen draws.
+    nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "") ?? Skins.default
     @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
 
     init() {
         skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "") ?? Skins.default
         soundOn = (UserDefaults.standard.object(forKey: Self.soundKey) as? Bool) ?? true
+        Self.current = skin
     }
+    /// Text on the skin is light (dark skins) or dark (light skins).
+    var colorScheme: ColorScheme { skin.lightText ? .dark : .light }
     func next() {
         let all = Skins.all
         skin = all[((all.firstIndex(of: skin) ?? 0) + 1) % all.count]
     }
+}
+
+extension Skin {
+    var lightText: Bool { contrastRatio(foreground, 0x000000) > contrastRatio(foreground, 0xFFFFFF) }
 }

@@ -3,6 +3,8 @@ import SwiftUI
 @main struct ETFToGoApp: App {
     @StateObject private var store: PortfolioStore
     @AppStorage("appearance") private var appearance = "light"
+    /// The skin decides light or dark text; every screen redraws when it changes.
+    @ObservedObject private var skins = SkinStore.shared
     init() {
         let args = ProcessInfo.processInfo.arguments
         let testURL = args.contains("--ui-testing") ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
@@ -11,7 +13,7 @@ import SwiftUI
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(store)
-                .preferredColorScheme(appearance == "light" ? .light : (appearance == "dark" ? .dark : nil))
+                .preferredColorScheme(skins.colorScheme)
         }
     }
 }
@@ -22,6 +24,7 @@ struct RootView: View {
     /// Re-selecting a tab returns it to its first screen.
     @State private var resets = [0, 0, 0, 0, 0]
     @State private var minimized = false
+    @ObservedObject private var skins = SkinStore.shared
     var body: some View {
         TabView(selection: $tab) {
             stack(0) { HomeView(tab: $tab, resetDiscover: { resets[1] += 1 }) }
@@ -31,6 +34,7 @@ struct RootView: View {
             stack(4) { ToolsView() }
         }
         .tint(Palette.blue)
+        .id(skins.skin.id)
         .overlay(alignment: .bottom) {
             GameTabBar(selection: $tab, reselect: { resets[$0] += 1 }).ignoresSafeArea(.keyboard)
         }
