@@ -20,7 +20,7 @@
 - 工具：工具中心（試算／分析／管理）、股息複利、領息目標、定期定額、三檔比較（一年報酬、內扣費用、波動度、近一年殖利率、配息頻率）、持股透視（持股集中度、重疊成分）、備份與券商資料。
 - 官方配息資料：`App/Resources/official-dividends.json`（由 `WebPreview/build_data.py` 產生），App 可在「資料來源」直接向證交所與櫃買中心更新。
 
-漲跌依設計稿：上漲綠、下跌紅（`Palette.up`／`Palette.down`），與網頁版一致。分類、工具與配息插圖在 `App/Assets.xcassets/Art`。
+漲跌依台灣習慣：上漲紅、下跌綠（`Palette.up`／`Palette.down`，規則在 `PocketCore` 的 `TrendRole`）。網頁測試版尚未跟進。分類、工具與配息插圖在 `App/Assets.xcassets/Art`。
 
 ## 網頁測試版（WebPreview/）
 

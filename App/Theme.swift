@@ -17,13 +17,15 @@ enum Palette {
     static let orange = Color(red: 1.0, green: 0.58, blue: 0.10)
     static let pink = Color(red: 0.93, green: 0.33, blue: 0.52)
     static let purple = Color(red: 0.49, green: 0.33, blue: 0.96)
-    // The approved design shows gains in green and losses in red (same as the web preview).
-    static let up = green
-    static let down = red
+    // Taiwan convention: gains red, losses green (TrendRole).
+    static let up = red
+    static let down = green
     /// Lighter versions for text on the blue hero gradient.
-    static let heroUp = Color(red: 0.77, green: 0.97, blue: 0.83)
-    static let heroDown = Color(red: 1.0, green: 0.82, blue: 0.83)
-    static func trend(_ value: Double) -> Color { value > 0 ? up : (value < 0 ? down : muted) }
+    static let heroUp = Color(red: 1.0, green: 0.82, blue: 0.83)
+    static let heroDown = Color(red: 0.77, green: 0.97, blue: 0.83)
+    static func trend(_ value: Double) -> Color {
+        switch TrendRole(value) { case .up: return up; case .down: return down; case .flat: return muted }
+    }
     static func strategy(_ value: Strategy) -> Color { switch value { case .saving: return pink; case .income: return green; case .risk: return purple; case .unclassified: return muted } }
     static func status(_ value: DividendStatus) -> Color { switch value { case .paid: return green; case .announced: return blue; case .estimated: return pink } }
     static let hero = LinearGradient(colors: [Color(red: 0.27, green: 0.58, blue: 1.0), Color(red: 0.08, green: 0.33, blue: 0.93)], startPoint: .topLeading, endPoint: .bottomTrailing)
