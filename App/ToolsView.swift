@@ -4,7 +4,6 @@ import UserNotifications
 
 struct ToolsView: View {
     /// The 3D showcase opens full screen, like the new design: no navigation or tab bar around the hero.
-    @State private var showDesign = false
     var body: some View {
         Group {
         Page {
@@ -17,7 +16,7 @@ struct ToolsView: View {
                 Artwork(name: "misc-bulb", size: 56)
             }.padding(.top, 6)
             section("試算", icon: "function", color: Palette.blue) {
-                Button { showDesign = true } label: {
+                Button { SkinStore.shared.showcaseOpen = true } label: {
                     HStack(spacing: 10) {
                         Artwork(name: "div-coins", size: 44)
                         VStack(alignment: .leading, spacing: 2) { Text("3D 元件展示").font(.subheadline.bold()).foregroundStyle(Palette.ink); Text("新版遊戲風格試玩").font(.caption2).foregroundStyle(Palette.muted) }
@@ -50,7 +49,6 @@ struct ToolsView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
             }
-        .fullScreenCover(isPresented: $showDesign) { DesignShowcase(close: { showDesign = false }) }
     }
     private func section<Content: View>(_ title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
         Card(padding: 14) {

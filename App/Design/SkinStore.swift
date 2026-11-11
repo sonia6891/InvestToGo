@@ -16,8 +16,13 @@ extension Color {
     /// The skin the ordinary screens' Palette reads; set before any screen draws.
     nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "") ?? Skins.default
     @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
+    /// The 3D showcase is presented from the app root, outside the screens that redraw on a skin change, so trying
+    /// skins does not close it.
+    @Published var showcaseOpen = false
 
     init() {
+        // UI tests start from the default look, whatever an earlier test chose.
+        if ProcessInfo.processInfo.arguments.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
         skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "") ?? Skins.default
         soundOn = (UserDefaults.standard.object(forKey: Self.soundKey) as? Bool) ?? true
         Self.current = skin

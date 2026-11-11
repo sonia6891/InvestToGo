@@ -35,6 +35,7 @@ struct RootView: View {
         }
         .tint(Palette.blue)
         .id(skins.skin.id)
+        .fullScreenCover(isPresented: $skins.showcaseOpen) { DesignShowcase(close: { skins.showcaseOpen = false }) }
         .overlay(alignment: .bottom) {
             GameTabBar(selection: $tab, reselect: { resets[$0] += 1 }).ignoresSafeArea(.keyboard)
         }
