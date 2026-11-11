@@ -47,11 +47,16 @@ jobs:
           [[ "$RUN_ID" =~ ^[0-9]+$ ]]
           git switch --orphan "ui-evidence-$RUN_ID-attempt-$RUN_ATTEMPT"
           mkdir -p Screens Evidence
-          cp "$RUNNER_TEMP/native-evidence/build/screens/"*.png Screens/
+          cp "$RUNNER_TEMP/native-evidence/build/screens/"*.png Screens/ 2>/dev/null || true
           cp -R "$RUNNER_TEMP/native-evidence/ETFToGo.xcodeproj" Evidence/
           cp "$RUNNER_TEMP/native-evidence/App/Assets.xcassets/AppIcon.appiconset/AppIcon.png" Evidence/
-          cp "$RUNNER_TEMP/native-evidence/build/compile.log" Evidence/
-          cp "$RUNNER_TEMP/native-evidence/build/"*.log Evidence/
+          cp "$RUNNER_TEMP/native-evidence/build/"*.log Evidence/ 2>/dev/null || true
+          # UI-test screenshots (for example the 3D design showcase), named by the test's attachment name.
+          if [[ -d "$RUNNER_TEMP/native-evidence/build/test-attachments" ]]; then
+            mkdir -p Screens/ui-tests
+            find "$RUNNER_TEMP/native-evidence/build/test-attachments" -name '*.png' -exec cp {} Screens/ui-tests/ \;
+            cp "$RUNNER_TEMP/native-evidence/build/test-attachments/manifest.json" Screens/ui-tests/ 2>/dev/null || true
+          fi
           if [[ -f "$RUNNER_TEMP/native-evidence/build/provenance.txt" ]]; then cp "$RUNNER_TEMP/native-evidence/build/provenance.txt" Evidence/; fi
           printf 'Native simulator screenshots from workflow run %s, attempt %s. Demo data. No TestFlight release. Test results must be checked in the source run.\n' "$RUN_ID" "$RUN_ATTEMPT" > Evidence/README.txt
           git config user.name 'github-actions[bot]'
