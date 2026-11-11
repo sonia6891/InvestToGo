@@ -28,7 +28,7 @@
 ## Review Focus
 
 1. **沒有成交的列**（證交所 `ClosingPrice` 為空字串、櫃買 `Close` 為 `" ---"`）→ 跳過，絕不產生價格 0 的報價。→ Task 5 測試 `testNoTradeRowsAreSkipped`。
-2. **外幣或特殊級別代碼**（結尾 `K`、`C`、`U`）的收盤價 → `currency` 設為 `"UNKNOWN"`，不得算進台幣市值。→ Task 5 測試 `testForeignClassIsNotTWD`。
+2. **外幣級別代碼**（結尾 `K`、`C`）的收盤價 → `currency` 設為 `"UNKNOWN"`，不得算進台幣市值。→ Task 5 測試 `testForeignClassIsNotTWD`。
 3. **除權息預告沒有寫現金股利**（`CashDividend` 為空）→ `cashPerShare == nil`，不是 0。→ Task 6 測試 `testMissingCashDividendIsNil`。
 4. **官方收盤價比手上的報價舊**（例如富果盤中報價日期較新）→ 不覆寫；日期相同時保留既有。→ Task 5 測試 `testMergeKeepsNewerQuote`。
 5. **舊資料識別碼**：純 Swift SHA-256 對中文與 `\u{0}` 分隔字串的結果要與原實作一致。→ Task 1 測試 `testStableIDMatchesLegacyValues`。
@@ -163,9 +163,9 @@ func testBrokerPreviewConvertsLotsAndUsesStableIDs() throws {
   - `public static func decodeTPEx(_ bytes: Data, fetchedAt: Date) throws -> [Quote]`
   - `public static func merge(_ incoming: [Quote], into existing: [String: Quote]) -> [String: Quote]`
 
-規則：只收 `DataChecks.code` 通過且以 `00` 開頭的代碼；收盤價去空白後須能轉成大於 0 的有限數字，否則跳過；`date` 由民國日期轉為 `yyyy-MM-dd`，轉換失敗整份丟 `AppDataError("官方收盤價日期格式改變，保留原有報價。")`；代碼結尾為 `K`、`C`、`U` 時 `currency = "UNKNOWN"`，其餘 `"TWD"`；`changePercent = nil`。`merge` 只在新報價 `date` 嚴格大於既有報價時取代，沒有既有報價時直接加入。
+規則：只收 `DataChecks.code` 通過且以 `00` 開頭的代碼；收盤價去空白後須能轉成大於 0 的有限數字，否則跳過；`date` 由民國日期轉為 `yyyy-MM-dd`，轉換失敗整份丟 `AppDataError("官方收盤價日期格式改變，保留原有報價。")`；代碼結尾為 `K`、`C` 時 `currency = "UNKNOWN"`（`U` 為以台幣交易的期貨型 ETF，屬 TWD；見 ledger ruling），其餘 `"TWD"`；`changePercent = nil`。`merge` 只在新報價 `date` 嚴格大於既有報價時取代，沒有既有報價時直接加入。
 
-- [ ] **Step 1: 寫失敗測試** — `testDecodeMatchesSharedExpectation`（兩份 fixture 解析結果等於 `expected-quotes.json`）、`testNoTradeRowsAreSkipped`（`00625K`、`00986B` 不在結果中）、`testForeignClassIsNotTWD`（`00635U` 的 `isTWD == false`，`0050` 的 `isTWD == true`）、`testMergeKeepsNewerQuote`（既有 `2026-11-11` 不被 `2026-11-10` 取代；既有 `2026-11-07` 被取代；日期相同保留既有）、`testChangedDateFormatThrows`（`Date` 改成 `"2026/11/10"` 時丟錯）。
+- [ ] **Step 1: 寫失敗測試** — `testDecodeMatchesSharedExpectation`（兩份 fixture 解析結果等於 `expected-quotes.json`）、`testNoTradeRowsAreSkipped`（`00625K`、`00986B` 不在結果中）、`testForeignClassIsNotTWD`（`00636K`、`00687C` 的 `isTWD == false`，`00635U`、`0050` 的 `isTWD == true`）、`testMergeKeepsNewerQuote`（既有 `2026-11-11` 不被 `2026-11-10` 取代；既有 `2026-11-07` 被取代；日期相同保留既有）、`testChangedDateFormatThrows`（`Date` 改成 `"2026/11/10"` 時丟錯）。
 - [ ] **Step 2: 執行確認失敗**
 - [ ] **Step 3: 實作 `OfficialQuotes`**
 - [ ] **Step 4: 執行確認通過**
