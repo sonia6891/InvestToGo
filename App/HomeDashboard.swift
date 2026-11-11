@@ -20,13 +20,12 @@ struct HomeView: View {
     @State private var overview = false
     @AppStorage("hideAmounts") private var hidden = false
     @AppStorage("readNotices") private var readNotices = ""
+    @ObservedObject private var skins = SkinStore.shared
 
     var body: some View {
         Page {
             VStack(alignment: .leading, spacing: 14) {
-                header
-                searchBar
-                assetCard
+                poster
                 marketCard
                 watchCard
                 dividendsAndGoals
@@ -42,6 +41,80 @@ struct HomeView: View {
         .onAppear(perform: pickWatchKind)
         .onChange(of: store.data.favorites) { _, _ in pickWatchKind() }
         .onChange(of: scope) { _, value in if value > 0 { watchKind = value == 1 ? 0 : 1 } else { pickWatchKind() } }
+    }
+
+    /* ---------- poster: the 3D pocket, the total in huge type, two hex actions ---------- */
+    private var poster: some View {
+        let skin = skins.skin, t = totals(0)
+        let unread = AppNotice.all(store).filter { !readNotices.split(separator: ",").map(String.init).contains($0.id) }.count
+        let unrealized = t.value.map { $0 - t.cost }
+        let percent: Double? = unrealized.flatMap { t.cost > 0 ? $0 / t.cost * 100 : nil }
+        let total = t.value.map { "$" + money($0) } ?? "—"
+        return VStack(spacing: 6) {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("PKT×\(String(format: "%03d", t.count))").font(.system(size: 11, design: .monospaced)).tracking(1).foregroundStyle(Palette.muted)
+                    Text("投資袋著走").font(.system(size: 24, weight: .black).width(.condensed)).foregroundStyle(Palette.ink)
+                }
+                .accessibilityElement(children: .combine).accessibilityLabel("投資袋著走")
+                Spacer()
+                NavigationLink(value: AppRoute.notices) {
+                    Image(systemName: "bell.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(Palette.ink).frame(width: 40, height: 40)
+                        .overlay(Circle().stroke(Palette.ink, lineWidth: 2))
+                        .overlay(alignment: .topTrailing) { if unread > 0 { Circle().fill(Palette.up).frame(width: 10, height: 10) } }
+                }.accessibilityLabel(unread > 0 ? "通知中心，\(unread) 則未讀" : "通知中心")
+                NavigationLink(value: AppRoute.settings) {
+                    Image(systemName: "gearshape.fill").font(.system(size: 16, weight: .bold)).foregroundStyle(Palette.ink).frame(width: 40, height: 40)
+                        .overlay(Circle().stroke(Palette.ink, lineWidth: 2))
+                }.accessibilityLabel("設定")
+            }
+            .padding(.top, 4)
+
+            ZStack {
+                PosterShards(center: UnitPoint(x: 0.5, y: 0.5), colors: skin.burst.map { Color(rgb: $0) })
+                    .mask(EllipticalGradient(colors: [.black, .black, .clear], center: .center, startRadiusFraction: 0, endRadiusFraction: 0.55))
+                PocketHero(value: "\(t.count)", showsPocket: true, skin: skin, drops: 0, label: "口袋裡有 \(t.count) 檔 ETF")
+            }
+            .frame(height: 300)
+            .accessibilityElement(children: .contain)
+
+            VStack(spacing: 6) {
+                Text("PKT×TOTAL · TWD").font(.system(size: 11, design: .monospaced)).tracking(1.5).foregroundStyle(Palette.muted)
+                Text(shown(total, hidden: hidden))
+                    .font(.system(size: 58, weight: .black).width(.condensed)).monospacedDigit().foregroundStyle(Palette.ink)
+                    .lineLimit(1).minimumScaleFactor(0.5)
+                    .contentTransition(.numericText(value: t.value ?? 0)).animation(.snappy, value: t.value)
+                    .accessibilityIdentifier("portfolio-value")
+                HStack(spacing: 8) {
+                    Text("我的總資產").font(.system(size: 11, weight: .bold)).tracking(2).foregroundStyle(Palette.ink)
+                        .padding(.horizontal, 8).padding(.vertical, 2).overlay(RoundedRectangle(cornerRadius: 3).stroke(Palette.ink, lineWidth: 1))
+                    Button { hidden.toggle() } label: { Image(systemName: hidden ? "eye.slash" : "eye").font(.system(size: 13, weight: .bold)).foregroundStyle(Palette.ink) }
+                        .buttonStyle(.plain).accessibilityLabel(hidden ? "顯示金額" : "隱藏金額")
+                }
+                if t.count > 0 && t.value == nil {
+                    Text("\(t.missing) 檔還沒有台幣報價，暫時無法估算市值").font(.caption).foregroundStyle(Palette.muted)
+                }
+                HStack(spacing: 6) {
+                    Text("未實現").foregroundStyle(Palette.muted)
+                    Text(unrealized.map { shown(signed($0), hidden: hidden) } ?? "—").foregroundStyle(unrealized.map(Palette.trend) ?? Palette.muted)
+                    if let percent { Text(shown("(\(percentText(percent)))", hidden: hidden)).foregroundStyle(Palette.trend(percent)) }
+                    Text("・累積配息").foregroundStyle(Palette.muted)
+                    Text(t.paid > 0 ? shown(money(t.paid), hidden: hidden) : "—").foregroundStyle(Palette.ink)
+                }
+                .font(.system(size: 13, weight: .bold, design: .monospaced)).lineLimit(1).minimumScaleFactor(0.7)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { overview = true }
+            .accessibilityAction(named: "看資產總覽") { overview = true }
+
+            HStack(spacing: 12) {
+                NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) { Text("新增持有") }
+                    .buttonStyle(HexButtonStyle(skin: skin, horizontal: 22)).accessibilityIdentifier("home-add-holding")
+                Button { openDiscover(stocks: false, search: true) } label: { Text("搜尋 ETF") }
+                    .buttonStyle(HexButtonStyle(skin: skin, horizontal: 22)).accessibilityIdentifier("home-search").accessibilityLabel("搜尋 ETF")
+            }
+            .padding(.top, 10).padding(.bottom, 8)
+        }
     }
 
     /* ---------- header and search ---------- */

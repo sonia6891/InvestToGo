@@ -14,11 +14,13 @@ struct HexShape: Shape {
 
 struct HexButtonStyle: ButtonStyle {
     var skin: Skin
+    /// Side padding; smaller when two buttons share a row.
+    var horizontal: CGFloat = 40
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 18, weight: .black)).tracking(4)
             .foregroundStyle(configuration.isPressed ? Color(rgb: skin.background) : Color(rgb: skin.foreground))
-            .padding(.horizontal, 40).frame(minHeight: 52)
+            .padding(.horizontal, horizontal).frame(minHeight: 52)
             .background(HexShape().fill(configuration.isPressed ? Color(rgb: skin.foreground) : .clear))
             .overlay(HexShape().stroke(Color(rgb: skin.foreground), lineWidth: 2))
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
