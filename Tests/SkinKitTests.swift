@@ -24,6 +24,11 @@ import UIKit
     func testEveryStyleKindHasARendering() {
         XCTAssertEqual(Skins.all.count, 4)
         for skin in Skins.all {
+            // A missing font or image would still "render" (as a fallback), so check the resources themselves.
+            for name in [skin.fonts.big, skin.fonts.title, skin.fonts.body, skin.fonts.mono] {
+                XCTAssertNotNil(UIFont(name: name, size: 17), "\(skin.id) font \(name) is not registered")
+            }
+            XCTAssertNotNil(UIImage(named: skin.art.image(.find)), "\(skin.id) has no find art")
             assertDrawn("tag", SkinTag("連續定期定額"), skin)
             assertDrawn("primary button", SkinButton("加入口袋") {}, skin)
             assertDrawn("secondary button", SkinButton("＋ 加一檔", primary: false) {}, skin)

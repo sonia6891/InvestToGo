@@ -81,6 +81,8 @@ struct SketchBoxShape: InsettableShape {
     var seed: UInt64 = 1
     /// How far (pt) corners and side midpoints may wander.
     var wobble: CGFloat = 2.2
+    /// The pen's run past its start, for strokes. Fills pass false and get a closed outline with no spike.
+    var overshoot = true
     var insetAmount: CGFloat = 0
     func path(in rect: CGRect) -> Path {
         let r = rect.insetBy(dx: insetAmount + wobble / 2, dy: insetAmount + wobble / 2)
@@ -96,6 +98,7 @@ struct SketchBoxShape: InsettableShape {
             let mid = CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
             p.addQuadCurve(to: b, control: jitter(mid))
         }
+        guard overshoot else { p.closeSubpath(); return p }
         // The pen runs a little past where it started.
         let start = corners[0], next = corners[1]
         let length = max(1, hypot(next.x - start.x, next.y - start.y))

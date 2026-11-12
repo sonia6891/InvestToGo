@@ -36,6 +36,14 @@ struct SkinKitPreview: View {
                     Text("\(skin.code) · \(skin.name)").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
                     Text("元件總表").skinFont(.title(30)).skinForeground(\.ink)
                 }
+                // The hero zone: the stage with the skin's decoration around it. Decoration lives only here, never
+                // under text or controls.
+                ZStack {
+                    SkinDecor(page: .lobby)
+                    SkinStage(size: 240) { SkinImage(.find).frame(width: 170, height: 170) }
+                }
+                .frame(height: 320)
+                .padding(.horizontal, -20)
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text("12").skinFont(.big(48))
                     Text("個月").skinFont(.title(24))
@@ -65,8 +73,6 @@ struct SkinKitPreview: View {
                         }
                     }
                 }
-                SkinStage(size: 240) { SkinImage(.find).frame(width: 170, height: 170) }
-                    .frame(maxWidth: .infinity)
                 HStack {
                     ForEach([SkinArtName.pocketIcon, .dividends, .tools, .achievements], id: \.self) { name in
                         VStack(spacing: 6) { SkinImage(name).frame(width: 64, height: 64); SkinTag(name.rawValue) }
@@ -77,13 +83,7 @@ struct SkinKitPreview: View {
             .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 40)
         }
         .accessibilityIdentifier("skinkit-root")
-        .background {
-            ZStack {
-                skin.color(\.page)
-                SkinDecor(page: .lobby)
-            }
-            .ignoresSafeArea()
-        }
+        .background(skin.color(\.page).ignoresSafeArea())
         .navigationTitle("元件總表").navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("關閉") { dismiss() } } }
     }
