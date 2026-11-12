@@ -228,13 +228,13 @@ struct SkinSearchField: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
-                .accessibilityIdentifier(identifier ?? "")
         }
         .frame(minHeight: 44)
     }
 
     @ViewBuilder private var input: some View {
         let field = TextField("", text: $text, prompt: Text(prompt).foregroundStyle(skin.color(\.dim)))
+            .modifier(OptionalIdentifier(identifier: identifier))
         if let focus { field.focused(focus) } else { field }
     }
 
@@ -257,6 +257,14 @@ struct SkinSearchField: View {
                 .background(SketchBoxShape(seed: 21, wobble: 2, overshoot: false).fill(skin.color(\.card)))
                 .overlay(SketchBoxShape(seed: 21, wobble: 2).stroke(skin.color(\.ink), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)).allowsHitTesting(false))
         }
+    }
+}
+
+/// Sets an accessibility identifier only when there is one, so fields without one are not given an empty id.
+private struct OptionalIdentifier: ViewModifier {
+    let identifier: String?
+    @ViewBuilder func body(content: Content) -> some View {
+        if let identifier { content.accessibilityIdentifier(identifier) } else { content }
     }
 }
 

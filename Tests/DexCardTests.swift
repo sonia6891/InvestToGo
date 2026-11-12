@@ -64,6 +64,11 @@ final class DexCardTests: XCTestCase {
         XCTAssertEqual(SkinChange.text(percent: 0, amount: nil), "－ 0.00%")
         XCTAssertEqual(SkinChange.text(percent: 0.75, amount: 1.25), "▲ 1.25 (+0.75%)")
         XCTAssertEqual(SkinChange.text(percent: -1.5, amount: -0.9), "▼ 0.90 (-1.50%)")
+        XCTAssertEqual(SkinChange.text(percent: -0.001, amount: nil), "－ 0.00%", "-0.00 is folded into 0")
+        XCTAssertEqual(SkinChange.text(percent: -0.001, amount: -0.01), "－ 0.01 (0.00%)", "Flat has no sign")
+        XCTAssertEqual(SkinChange.spoken(percent: 0.751, amount: nil), "上漲 0.75%")
+        XCTAssertEqual(SkinChange.spoken(percent: -1.5, amount: -0.9), "下跌 0.90 元，1.50%")
+        XCTAssertEqual(SkinChange.spoken(percent: -0.001, amount: nil), "持平 0.00%")
     }
 
     func testSteppedLineKeepsFirstAndLastDay() {

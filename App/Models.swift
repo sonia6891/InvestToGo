@@ -108,12 +108,9 @@ import SwiftUI
         try commit(next)
     }
     func addToComparison(_ symbol: String) {
-        var list = data.comparison ?? []
+        let list = data.comparison ?? []
         if list.contains(symbol) { message = "\(symbol) 已在比較清單，可到「工具 › 三檔比較」查看。"; return }
-        if list.count >= 3 { list.removeFirst() }
-        list.append(symbol)
-        var next = data; next.comparison = list
-        do { try commit(next); message = "已加入比較：\(list.joined(separator: "、"))。可到「工具 › 三檔比較」查看。" } catch { message = error.localizedDescription }
+        do { try appendToComparison(symbol); message = "已加入比較：\((data.comparison ?? []).joined(separator: "、"))。可到「工具 › 三檔比較」查看。" } catch { message = error.localizedDescription }
     }
     func removeDividend(_ dividend: Dividend) throws { var next = data; next.dividends.removeAll { $0.id == dividend.id }; try commit(next) }
     func saveDividend(_ dividend: Dividend) throws {

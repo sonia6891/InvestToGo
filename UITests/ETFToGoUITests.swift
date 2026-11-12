@@ -264,10 +264,13 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertGreaterThan(changes.count, 3, "The filtered rows show their change")
         // A move is ▲ or ▼ plus its size; only an unchanged price reads "－ 0.00%" (there is no direction to show).
         let move = NSPredicate(format: "SELF MATCHES %@", "^[▲▼] [0-9]+\\.[0-9]{2}%$")
-        for change in changes {
-            XCTAssertTrue(move.evaluate(with: change.label) || change.label == "－ 0.00%", "\(change.identifier) shows ▲ or ▼ and a percentage: \(change.label)")
+        // The shown text is the element's value; its label is the spoken 上漲 / 下跌 / 持平.
+        let shown = changes.map { ($0.identifier, $0.value as? String ?? "", $0.label) }
+        for (id, text, spoken) in shown {
+            XCTAssertTrue(move.evaluate(with: text) || text == "－ 0.00%", "\(id) shows ▲ or ▼ and a percentage: \(text)")
+            XCTAssertTrue(["上漲 ", "下跌 ", "持平 "].contains { spoken.hasPrefix($0) }, "\(id) is spoken as a direction: \(spoken)")
         }
-        XCTAssertTrue(changes.contains { move.evaluate(with: $0.label) }, "At least one row moved")
+        XCTAssertTrue(shown.contains { move.evaluate(with: $0.1) }, "At least one row moved")
         capture(app, "find-high-dividend")
 
         // Search 0050 and open it: the code, the four tabs and, the first time, the dex toast.

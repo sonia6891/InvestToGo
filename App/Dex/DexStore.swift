@@ -16,14 +16,8 @@ extension PortfolioStore {
         funds.first { $0.id == symbol } ?? Fund(id: symbol, name: name(for: symbol), strategy: .unclassified)
     }
 
-    /// Announced distributions with an ex-date in the past year over the latest price, in percent. Nil until the
-    /// official record covers a whole year, or without a price.
-    func trailingYield(_ symbol: String) -> Double? {
-        guard let amount = official.trailingAmount(symbol), let price = quote(symbol)?.price, price > 0 else { return nil }
-        return amount / price * 100
-    }
-
-    /// Every fact the five bars rank on, for the whole catalogue (bands are relative, so all funds take part).
+    /// Every fact the five bars rank on, for the whole catalogue (bands are relative, so all funds take part). The
+    /// yield is `trailingYield` (ToolsView), the same figure the comparison page shows.
     func dexFacts() -> DexFacts {
         var facts = DexFacts()
         if let fees = AnnualFeeCatalog.bundled?.records { facts.feeRate = fees.mapValues(\.total) }
@@ -37,10 +31,11 @@ extension PortfolioStore {
         return facts
     }
 
-    /// The collected cards in code order, plus `symbol` when it is not collected yet: what the dex card swipes through.
-    func dexDeck(showing symbol: String) -> [String] {
+    /// The collected cards in code order, plus the card that was opened and the one on screen, even when collecting
+    /// them was not saved: what the dex card swipes through.
+    func dexDeck(opened: String, showing: String) -> [String] {
         var codes = Set((data.game ?? GameState()).collected.keys)
-        codes.insert(symbol)
+        codes.insert(opened); codes.insert(showing)
         return codes.sorted()
     }
 
@@ -52,8 +47,9 @@ extension PortfolioStore {
         return fresh
     }
 
-    /// 「PK 比一比」: puts the fund in the three-fund comparison, dropping the oldest when it is full.
-    func addToPK(_ symbol: String) throws {
+    /// Puts the fund in the three-fund comparison, dropping the oldest when it is full; nothing when it is already
+    /// there. 「PK 比一比」 calls it directly, 「加入比較」 through `addToComparison`, which also reports the result.
+    func appendToComparison(_ symbol: String) throws {
         var list = data.comparison ?? []
         guard !list.contains(symbol) else { return }
         if list.count >= 3 { list.removeFirst() }
@@ -114,8 +110,9 @@ enum DexText {
     static func riskStars(_ fund: Fund) -> Int {
         switch fund.riskLevel {
         case "高": return 5
+        case "中高": return 4
         case "中": return 3
-        default: return 4
+        default: return 0
         }
     }
 }

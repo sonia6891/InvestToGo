@@ -74,7 +74,8 @@ struct TintedIconLabel: LabelStyle {
 
 /* ---------- skin pieces for 找 ETF, the ETF page and the dex card ---------- */
 /// A day's move in the skin's 紅漲綠跌 colours, never colour alone: "▲ 0.75%", "▼ 0.27%", "－ 0.00%" when unchanged;
-/// with `withAmount`, "▲ 1.25 (+0.75%)". Without a change figure it shows "—" and invents nothing.
+/// with `withAmount`, "▲ 1.25 (+0.75%)". Without a change figure it shows "—" and invents nothing. VoiceOver hears
+/// 上漲 / 下跌 / 持平 instead of glyph names; the shown text stays the element's value.
 struct SkinChange: View {
     @Environment(\.skin) private var skin
     let quote: Quote?
@@ -82,20 +83,37 @@ struct SkinChange: View {
     var withAmount = false
     var body: some View {
         if let quote, quote.trial != true, let percent = quote.changePercent, percent.isFinite {
-            let rounded = (percent * 100).rounded() / 100
-            Text(Self.text(percent: percent, amount: withAmount ? quote.changeAmount : nil))
+            let rounded = Self.rounded(percent)
+            let amount = withAmount ? quote.changeAmount : nil
+            Text(Self.text(percent: percent, amount: amount))
                 .skinFont(.mono(size)).lineLimit(1)
                 .foregroundStyle(rounded > 0 ? skin.color(\.up) : (rounded < 0 ? skin.color(\.down) : skin.color(\.sub)))
+                .accessibilityLabel(Self.spoken(percent: percent, amount: amount))
+                .accessibilityValue(Self.text(percent: percent, amount: amount))
         } else {
             Text(quote?.trial == true ? "試撮中" : "—").skinFont(.mono(size)).skinForeground(\.sub)
         }
     }
-    /// The arrow follows the percentage as shown (two decimals), so a move that rounds to 0.00% reads as unchanged.
+    /// The percentage as shown (two decimals), with -0.00 folded into 0 so a flat move never reads "-0.00%".
+    static func rounded(_ percent: Double) -> Double {
+        let value = (percent * 100).rounded() / 100
+        return value == 0 ? 0 : value
+    }
+    /// The arrow follows the rounded percentage, so a move that rounds to 0.00% reads as unchanged and unsigned.
     static func text(percent: Double, amount: Double?) -> String {
-        let rounded = (percent * 100).rounded() / 100
-        let arrow = rounded > 0 ? "▲" : (rounded < 0 ? "▼" : "－")
-        guard let amount, amount.isFinite else { return "\(arrow) \(String(format: "%.2f", abs(rounded)))%" }
-        return "\(arrow) \(priceText(abs(amount))) (\(String(format: "%+.2f", rounded))%)"
+        let value = rounded(percent)
+        let arrow = value > 0 ? "▲" : (value < 0 ? "▼" : "－")
+        guard let amount, amount.isFinite else { return "\(arrow) \(String(format: "%.2f", abs(value)))%" }
+        let signed = value == 0 ? "0.00" : String(format: "%+.2f", value)
+        return "\(arrow) \(priceText(abs(amount))) (\(signed)%)"
+    }
+    /// What VoiceOver reads: "上漲 0.75%", "下跌 1.25 元，1.50%", "持平 0.00%".
+    static func spoken(percent: Double, amount: Double?) -> String {
+        let value = rounded(percent)
+        let word = value > 0 ? "上漲" : (value < 0 ? "下跌" : "持平")
+        let size = "\(String(format: "%.2f", abs(value)))%"
+        guard let amount, amount.isFinite else { return "\(word) \(size)" }
+        return "\(word) \(priceText(abs(amount))) 元，\(size)"
     }
 }
 
@@ -132,7 +150,7 @@ struct SkinTrendLine: View {
     }
     private var summary: String {
         guard let first = points.first, let last = points.last, first.value > 0 else { return "" }
-        let move = SkinChange.text(percent: (last.value / first.value - 1) * 100, amount: nil)
+        let move = SkinChange.spoken(percent: (last.value / first.value - 1) * 100, amount: nil)
         return "從 \(priceText(first.value)) 到 \(priceText(last.value))，\(move)"
     }
     private func lineColor(_ style: SkinStyle.ChartKind) -> Color {

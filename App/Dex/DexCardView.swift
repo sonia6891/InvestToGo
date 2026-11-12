@@ -12,19 +12,26 @@ struct DexCardView: View {
     /// The card on screen once the user has swiped; nil shows `symbol`.
     @State private var swiped: String?
     @State private var forward = true
+    /// The catalogue's facts and unique funds, built once when the screen appears (they rank the whole catalogue, so
+    /// they are not rebuilt on every swipe).
+    @State private var ranking: (facts: DexFacts, funds: [Fund])?
 
     var body: some View {
         let current = swiped ?? symbol
-        let deck = store.dexDeck(showing: current)
+        let deck = store.dexDeck(opened: symbol, showing: current)
         let fund = store.dexFund(current)
         let series = DexSeries.of(fund)
-        let progress = (store.data.game ?? GameState()).seriesProgress(series, funds: store.dexFunds)
+        let funds = ranking?.funds ?? []
+        let progress = (store.data.game ?? GameState()).seriesProgress(series, funds: funds)
         Page {
             ZStack {
-                DexCard(fund: fund, facts: store.dexFacts(), among: store.dexFunds)
-                    .id(current)
-                    .transition(transition)
+                if let ranking {
+                    DexCard(fund: fund, facts: ranking.facts, among: ranking.funds)
+                        .id(current)
+                        .transition(transition)
+                }
             }
+            .frame(maxWidth: .infinity, minHeight: 200)
             .simultaneousGesture(DragGesture(minimumDistance: 30).onEnded { value in
                 let dx = value.translation.width
                 guard abs(dx) > 60, abs(dx) > abs(value.translation.height) else { return }
@@ -38,7 +45,7 @@ struct DexCardView: View {
                 .frame(maxWidth: .infinity)
             HStack(spacing: 12) {
                 Button("PK 比一比") {
-                    do { try store.addToPK(current); navigation.push(.comparison) } catch { store.message = error.localizedDescription }
+                    do { try store.appendToComparison(current); navigation.push(.comparison) } catch { store.message = error.localizedDescription }
                 }
                 .buttonStyle(SkinButtonStyle(primary: false, horizontal: 20, seed: SkinSeed.of("PK 比一比")))
                 NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: current)) { Text("加入口袋") }
@@ -48,6 +55,7 @@ struct DexCardView: View {
             Text("能力條把官方數據換算成 1–10 格：費用越低、上市越久，格數越多；規模與上市時間在全部 ETF 裡排，殖利率與波動在同類型裡排。缺資料顯示「—」。只描述事實，不是評分或推薦。")
                 .skinFont(.body(11)).skinForeground(\.sub)
         }
+        .task { if ranking == nil { ranking = (store.dexFacts(), store.dexFunds) } }
         .navigationTitle("ETF 圖鑑").navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
     }
@@ -137,12 +145,13 @@ private struct DexCard: View {
         .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(skin.color(\.accent), lineWidth: 3))
     }
 
+    /// Neutral ink, never the accent: these stars are a risk level, and gold would read as "better".
     private func stars(_ count: Int, color: Color) -> some View {
         HStack(spacing: 2) {
             Text("風險").skinFont(.mono(10)).padding(.trailing, 2)
             ForEach(1...5, id: \.self) { i in
                 Image(systemName: i <= count ? "star.fill" : "star").font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(i <= count ? skin.color(\.accent) : color.opacity(0.35))
+                    .foregroundStyle(i <= count ? color : color.opacity(0.3))
             }
         }
         .accessibilityElement(children: .ignore)
