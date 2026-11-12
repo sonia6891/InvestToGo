@@ -17,10 +17,13 @@ enum MembershipProducts {
     @Published private(set) var loading = false
     /// The App Store did not answer, or answered without the plans.
     @Published private(set) var failed = false
-    /// Any paid plan, current and not refunded (StoreKit's own record of this Apple ID's purchases).
-    @Published private(set) var isMember = false
+    /// The paid plans this Apple ID holds, current and not refunded (StoreKit's own record of its purchases).
+    @Published private(set) var owned: Set<String> = []
+    var isMember: Bool { !owned.isEmpty }
     @Published var message: String?
     private var updates: Task<Void, Never>?
+    /// One App Store request at a time: a second caller waits for the first instead of clearing the spinner early.
+    private var loadTask: Task<Void, Never>?
 
     /// Reads the prices and the membership, and follows purchases made elsewhere (renewals, Ask to Buy, refunds).
     func start() async {
@@ -37,6 +40,14 @@ enum MembershipProducts {
     }
 
     func loadProducts() async {
+        if let loadTask { await loadTask.value; return }
+        let task = Task { await self.fetchProducts() }
+        loadTask = task
+        await task.value
+        loadTask = nil
+    }
+
+    private func fetchProducts() async {
         loading = true; failed = false
         defer { loading = false }
         do {
@@ -49,13 +60,13 @@ enum MembershipProducts {
     }
 
     func refreshMembership() async {
-        var member = false
+        var held: Set<String> = []
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result, MembershipProducts.all.contains(transaction.productID), transaction.revocationDate == nil {
-                member = true
+                held.insert(transaction.productID)
             }
         }
-        isMember = member
+        owned = held
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.
@@ -63,9 +74,11 @@ enum MembershipProducts {
         guard let product = products[id] else { return }
         do {
             switch try await product.purchase() {
-            case .success(let verification):
-                if case .verified(let transaction) = verification { await transaction.finish() }
+            case .success(.verified(let transaction)):
+                await transaction.finish()
                 await refreshMembership()
+            case .success(.unverified):
+                message = "購買未能驗證，請稍後按「恢復購買」再試一次。"
             case .pending: message = "購買等待確認中，完成後會自動解鎖。"
             case .userCancelled: break
             @unknown default: break
@@ -76,7 +89,13 @@ enum MembershipProducts {
     }
 
     func restore() async {
-        do { try await AppStore.sync() } catch { message = "恢復購買沒有完成，請稍後再試一次。" }
+        do {
+            try await AppStore.sync()
+        } catch StoreKitError.userCancelled {
+            return  // The person closed the App Store sign-in themselves: nothing to report.
+        } catch {
+            message = "恢復購買沒有完成，請稍後再試一次。"
+        }
         await refreshMembership()
         if !isMember && message == nil { message = "這個 Apple ID 沒有可恢復的會員方案。" }
     }
@@ -121,7 +140,7 @@ struct MemberView: View {
     var body: some View {
         Page {
             Text("MBR×001").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-            SkinStage(size: 230) { SkinImage(.crown).frame(width: 190, height: 190) }
+            SkinStage(size: 180) { SkinImage(.crown).frame(width: 150, height: 150) }
                 .accessibilityHidden(true)
                 .frame(maxWidth: .infinity)
             VStack(spacing: 8) {
@@ -137,10 +156,17 @@ struct MemberView: View {
                     .frame(maxWidth: .infinity)
                     .accessibilityIdentifier("member-retry")
             }
-            VStack(spacing: 14) {
+            Text("訂閱會自動續訂，可隨時在 App Store 的訂閱設定取消；價格以 App Store 顯示為準。")
+                .skinFont(.body(11)).skinForeground(\.sub).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+        }
+        // The main button stays on screen above the bottom bar, whatever the phone's height (spec 5.10).
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            VStack(spacing: 2) {
                 Button { if let id = plan.product { Task { await membership.purchase(id) } } } label: { Text(buyTitle) }
                     .buttonStyle(SkinButtonStyle(primary: true, seed: 7))
-                    .disabled(plan.product.map { membership.products[$0] == nil } ?? true)
+                    .disabled(buyDisabled)
                     .accessibilityIdentifier("member-buy")
                 HStack(spacing: 6) {
                     Button { Task { await membership.restore() } } label: { Text("恢復購買").frame(minHeight: 44).contentShape(Rectangle()) }
@@ -152,11 +178,10 @@ struct MemberView: View {
                     Text("隨時可取消")
                 }
                 .skinFont(.mono(12)).skinForeground(\.sub)
-                Text("訂閱會自動續訂，可隨時在 App Store 的訂閱設定取消；價格以 App Store 顯示為準。")
-                    .skinFont(.body(11)).skinForeground(\.sub).multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
             }
+            .padding(.top, 10)
             .frame(maxWidth: .infinity)
+            .background(skin.color(\.page))
         }
         .toolbar(.hidden, for: .navigationBar)
         .task { await membership.start() }
@@ -165,7 +190,16 @@ struct MemberView: View {
         } message: { Text(membership.message ?? "") }
     }
 
-    private var buyTitle: String { plan == .free ? "目前使用免費版" : "選這個方案" }
+    /// The selected plan is already this Apple ID's.
+    private var ownsPlan: Bool { plan.product.map { membership.owned.contains($0) } ?? !membership.isMember }
+    private var buyTitle: String {
+        if plan == .free { return membership.isMember ? "免費版" : "目前使用免費版" }
+        return ownsPlan ? "目前方案" : "選這個方案"
+    }
+    private var buyDisabled: Bool {
+        guard let id = plan.product else { return true }
+        return ownsPlan || membership.products[id] == nil
+    }
 
     /// 換膚: the current skin's badge and name.
     private var skinsEntry: some View {
@@ -191,15 +225,18 @@ struct MemberView: View {
 
     private func planCard(_ item: Plan) -> some View {
         let selected = plan == item
+        // 選中的反白並打勾: the chosen card is filled with the main colour, its text in whichever of page or ink reads on it.
+        let text = selected ? skin.onFill(skin.colors.accent) : skin.color(\.ink)
+        let detail = selected ? skin.onFill(skin.colors.accent) : skin.color(\.sub)
         return Button { plan = item; Haptics.tick() } label: {
             HStack(spacing: 12) {
                 SkinCheck(done: selected)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(item.title).skinFont(.title(15)).skinForeground(\.ink)
-                    Text(item.detail).skinFont(.body(11)).skinForeground(\.sub).fixedSize(horizontal: false, vertical: true)
+                    Text(item.title).skinFont(.title(15)).foregroundStyle(text)
+                    Text(item.detail).skinFont(.body(11)).foregroundStyle(detail).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
-                price(item)
+                price(item).foregroundStyle(detail)
             }
             .padding(.horizontal, 16).padding(.vertical, 12)
             .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
@@ -215,7 +252,7 @@ struct MemberView: View {
         Group {
             if let id = item.product {
                 if let product = membership.products[id] {
-                    Text("\(product.displayPrice) / 月")
+                    Text("\(product.displayPrice) / \(Self.period(product))")
                 } else {
                     Text(membership.loading ? "…" : "—").accessibilityLabel(membership.loading ? "價格讀取中" : "價格暫時無法取得")
                 }
@@ -223,28 +260,40 @@ struct MemberView: View {
                 Text("免費")
             }
         }
-        .skinFont(.mono(12)).skinForeground(\.sub).lineLimit(1)
+        .skinFont(.mono(12)).lineLimit(1)
+    }
+
+    /// 「月」, 「年」, 「3 個月」…: the billing period as the App Store states it, never assumed.
+    static func period(_ product: Product) -> String {
+        guard let period = product.subscription?.subscriptionPeriod else { return "次" }
+        let unit: String
+        switch period.unit {
+        case .day: unit = "天"
+        case .week: unit = "週"
+        case .month: unit = period.value == 1 ? "月" : "個月"
+        case .year: unit = "年"
+        @unknown default: unit = "期"
+        }
+        return period.value == 1 ? unit : "\(period.value) \(unit)"
     }
 }
 
-/// A plan card: the skin's card, and the chosen one outlined in the accent colour.
+/// A plan card: the skin's card; the chosen one filled with the main colour (反白).
 private struct PlanBackground: View {
     @Environment(\.skin) private var skin
     let selected: Bool
     var body: some View {
-        let accent = skin.color(\.accent), card = skin.color(\.card)
+        let fill = selected ? skin.color(\.accent) : skin.color(\.card)
         switch skin.style.button {
         case .hex:
-            RoundedRectangle(cornerRadius: 22).fill(card)
-                .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(accent, lineWidth: selected ? 3 : 0))
+            RoundedRectangle(cornerRadius: 22).fill(fill)
         case .pixelBlock:
-            Rectangle().fill(card).hardShadow(skin.extra(2, or: \.line))
-                .overlay(Rectangle().strokeBorder(accent, lineWidth: selected ? 3 : 0))
+            Rectangle().fill(fill).hardShadow(skin.extra(2, or: \.line))
         case .paperStitch:
-            RoundedRectangle(cornerRadius: 14).fill(card).paperShadow()
-                .overlay(StitchSeam(color: selected ? accent : skin.color(\.dim), cornerRadius: 14, inset: 5, lineWidth: selected ? 2.5 : 1.5))
+            RoundedRectangle(cornerRadius: 14).fill(fill).paperShadow()
+                .overlay(StitchSeam(color: selected ? skin.color(\.card) : skin.color(\.dim), cornerRadius: 14, inset: 5, lineWidth: 1.5))
         case .sketchBox:
-            SketchBoxShape(seed: 11, overshoot: false).fill(card)
+            SketchBoxShape(seed: 11, overshoot: false).fill(fill)
                 .overlay(SketchBoxShape(seed: 11).stroke(selected ? skin.color(\.ink) : skin.color(\.line), style: StrokeStyle(lineWidth: selected ? 2.5 : 1.5, lineCap: .round)))
         }
     }

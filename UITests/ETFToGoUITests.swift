@@ -503,6 +503,50 @@ final class ETFToGoUITests: XCTestCase {
             let labels: [String] = app.staticTexts.allElementsBoundByIndex.map { $0.label }
             let bare = labels.filter(isBareNumber)
             XCTAssertEqual(bare, [], "\(id): no bare numbers on the skin page")
+            // Cards and style badges carry no figures at all; only 「LV.n」 and 「n / 4」 may hold digits.
+            let tagged = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "identifier BEGINSWITH 'skin-card-' OR identifier BEGINSWITH 'skin-badge-'"))
+                .allElementsBoundByIndex.map { $0.label }
+            XCTAssertFalse(tagged.isEmpty, "\(id): cards and badges are on the page")
+            let withDigits = tagged.filter(hasFiguresBesidesLevels)
+            XCTAssertEqual(withDigits, [], "\(id): no figures on cards or badges")
         }
+    }
+
+    /// Digits left after removing 「LV.n」 and 「n / m」.
+    private func hasFiguresBesidesLevels(_ label: String) -> Bool {
+        let stripped = label
+            .replacingOccurrences(of: "LV\\.\\d+", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\\d+ / \\d+", with: "", options: .regularExpression)
+        return stripped.contains { $0.isNumber }
+    }
+
+    private func isDark(_ colour: UInt32) -> Bool {
+        let red = Int((colour >> 16) & 0xFF), green = Int((colour >> 8) & 0xFF), blue = Int(colour & 0xFF)
+        return red < 0x50 && green < 0x50 && blue < 0x50
+    }
+
+    /// Holding a card only previews: the worn skin and the app stay as they were.
+    func testTryOnChangesNothing() {
+        let app = launch(["--demo-level", "7", "--open", "skins"])
+        let status = app.descendants(matching: .any)["skin-status"]
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "換膚 opens")
+        waitForLabel(status, containing: "使用中")
+        app.buttons["skin-badge-sketch"].tap()
+        waitForLabel(status, containing: "已解鎖")
+        let card = app.descendants(matching: .any)["skin-card-sketch"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5), "The sketch card is shown")
+        card.press(forDuration: 1.0)
+        sleep(1)
+        XCTAssertTrue(app.buttons["skin-badge-blackgold"].label.contains("使用中"), "Black-gold is still worn: \(app.buttons["skin-badge-blackgold"].label)")
+        app.buttons["skin-badge-blackgold"].tap()
+        waitForLabel(status, containing: "使用中")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "Back in the lobby")
+        sleep(2)
+        let points = [CGVector(dx: 0.5, dy: 0.035), CGVector(dx: 0.5, dy: 0.15), CGVector(dx: 0.5, dy: 0.25)]
+        let colours = points.map { pixel(app, $0) }
+        let dark = colours.filter(isDark)
+        XCTAssertGreaterThanOrEqual(dark.count, 2, "The lobby is still black-gold: \(colours.map { String(format: "%06X", $0) })")
     }
 }

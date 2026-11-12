@@ -238,6 +238,8 @@ struct SkinCarousel: View {
         .accessibilityLabel("\(item.name)皮膚的口袋")
         .accessibilityHint("長按可以全螢幕試穿")
         .accessibilityAddTraits(.isImage)
+        // VoiceOver cannot hold a card: 「試穿」 opens the preview and the next action (or escape) closes it.
+        .accessibilityAction(named: "試穿") { skins.tryOn = skins.tryOn == item.id ? nil : item.id }
         .accessibilityIdentifier("skin-card-\(item.id)")
     }
 }
@@ -263,5 +265,10 @@ struct TryOnPreview: View {
         .allowsHitTesting(false)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("正在試穿\(skin.name)")
+        .accessibilityHint("點兩下或用兩指擦掉手勢結束試穿")
+        .accessibilityAddTraits(.isModal)
+        // Opened from VoiceOver's 「試穿」 action there is no finger to lift: activating or escaping ends it.
+        .accessibilityAction { SkinStore.shared.tryOn = nil }
+        .accessibilityAction(.escape) { SkinStore.shared.tryOn = nil }
     }
 }
