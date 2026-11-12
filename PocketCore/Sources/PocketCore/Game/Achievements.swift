@@ -63,12 +63,12 @@ enum Achievements {
         Achievement(id: "holdingAnniversary", title: "持有週年紀念", goal: holdingAnniversaryGoal) { _, p, now in hasAnniversary(p, now: now) ? 1 : 0 },
         Achievement(id: "dcaPunchCard", title: "定期定額打卡", goal: dcaPunchCardGoal) { g, _, _ in g.dcaMonths.count },
         Achievement(id: "steadyYear", title: "一年不亂動", goal: steadyYearGoal) { _, p, now in steady(p, now: now) ? 1 : 0 },
-        Achievement(id: "reconcileMaster", title: "對帳達人", goal: reconcileMasterGoal) { g, _, _ in g.counts["reconciled", default: 0] },
-        Achievement(id: "feeSaver", title: "省費達人", goal: feeSaverGoal) { g, _, _ in g.counts["feeCompared", default: 0] },
-        Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal) { g, _, _ in g.counts["checkup", default: 0] },
+        Achievement(id: "reconcileMaster", title: "對帳達人", goal: reconcileMasterGoal) { g, _, _ in g.counter(.reconciled) },
+        Achievement(id: "feeSaver", title: "省費達人", goal: feeSaverGoal) { g, _, _ in g.counter(.feeCompared) },
+        Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal) { g, _, _ in g.counter(.checkup) },
         Achievement(id: "dexCollector", title: "ETF 圖鑑", goal: dexCollectorGoal) { g, _, _ in g.collected.count },
-        Achievement(id: "exDividendSkin", title: "除息季限定皮膚", goal: exDividendSkinGoal) { g, _, _ in g.counts["exDividendSeason", default: 0] },
-        Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal) { g, _, _ in g.counts["yearReport", default: 0] },
+        Achievement(id: "exDividendSkin", title: "除息季限定皮膚", goal: exDividendSkinGoal) { g, _, _ in g.counter(.exDividendSeason) },
+        Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal) { g, _, _ in g.counter(.yearReport) },
         Achievement(id: "dividendMilestone", title: "累計領息里程碑", goal: dividendMilestoneGoal) { _, p, _ in p.dividends.filter { $0.status == .paid }.count }
     ]
 }

@@ -33,7 +33,11 @@ struct GameState: Codable, Equatable {
     /// Event counters for achievements whose data source has no record of its own (see `count(_:)`).
     var counts: [String: Int] = [:]
 
-    mutating func count(_ key: String) { counts[key, default: 0] += 1 }
+    mutating func count(_ key: CounterKey) { counts[key.rawValue, default: 0] += 1 }
+    func counter(_ key: CounterKey) -> Int { counts[key.rawValue, default: 0] }
+
+    /// Spec 5.3: a newbie is someone who has not started a DCA yet.
+    var isNewbie: Bool { dcaMonths.isEmpty }
 }
 
 /// Every field falls back to its default so progress saved by an older build never fails to decode

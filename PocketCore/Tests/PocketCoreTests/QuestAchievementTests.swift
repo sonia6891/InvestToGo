@@ -59,10 +59,45 @@ final class QuestAchievementTests: XCTestCase {
         XCTAssertEqual(g.xp, 0)
     }
 
+    private let allTriggers: [QuestTrigger] = [.dcaLogged, .dividendsViewed, .newETFResearched, .reminderSet, .reconciled, .firstPlanSet, .firstDexCard]
+
+    func testNonNewbieCannotCompleteNewbieQuests() {
+        var g = GameState()
+        _ = g.recordDCA(on: date(2026, 10, 5))
+        XCTAssertFalse(g.isNewbie)
+        XCTAssertEqual(g.complete(.firstDexCard, now: date(2026, 11, 12)), [])
+        XCTAssertEqual(g.complete(.firstPlanSet, now: date(2026, 11, 12)), [])
+        XCTAssertNil(g.questsDone["2026-11"])
+    }
+
+    func testQuestsDoneNeverExceedsThree() {
+        for newbie in [true, false] {
+            var g = GameState()
+            if !newbie { _ = g.recordDCA(on: date(2026, 10, 5)) }
+            for t in allTriggers { _ = g.complete(t, now: date(2026, 11, 12)) }
+            XCTAssertEqual(g.questsDone["2026-11"]?.count, 3)
+        }
+    }
+
+    func testNewbieCannotCompleteQuestOutsideTheirList() {
+        var g = GameState()
+        g.habit = .dca
+        let shown = Quests.forMonth(YearMonth(year: 2026, month: 11), habit: .dca, isNewbie: true).map(\.trigger)
+        let hidden = [QuestTrigger.dividendsViewed, .newETFResearched, .reminderSet, .reconciled].first { !shown.contains($0) }!
+        XCTAssertEqual(g.complete(hidden, now: date(2026, 11, 12)), [])
+    }
+
+    func testNewbieQuestOnlyOnceEver() {
+        var g = GameState()
+        XCTAssertTrue(g.isNewbie)
+        XCTAssertEqual(g.complete(.firstPlanSet, now: date(2026, 11, 12)), [.questDone])
+        XCTAssertEqual(g.complete(.firstPlanSet, now: date(2026, 12, 3)), [])
+    }
+
     func testAwardCountsEvents() {
         var g = GameState()
         g.award(.reconciled); g.award(.reconciled)
-        g.count("feeCompared")
+        g.count(.feeCompared)
         XCTAssertEqual(g.counts["reconciled"], 2)
         XCTAssertEqual(g.counts["feeCompared"], 1)
     }
@@ -132,8 +167,8 @@ final class QuestAchievementTests: XCTestCase {
     func testCounterAchievements() {
         var g = GameState()
         for _ in 0..<5 { g.award(.reconciled) }
-        for _ in 0..<3 { g.count("feeCompared") }
-        g.count("checkup"); g.count("exDividendSeason"); g.count("yearReport")
+        for _ in 0..<3 { g.count(.feeCompared) }
+        g.count(.checkup); g.count(.exDividendSeason); g.count(.yearReport)
         for i in 0..<10 { g.collected["etf\(i)"] = date(2026, 1, 1) }
         let ids = g.refreshAchievements(Portfolio(), now: date(2026, 11, 12))
         for id in ["reconcileMaster", "feeSaver", "checkupDone", "exDividendSkin", "yearReport", "dexCollector"] {
@@ -157,7 +192,7 @@ final class QuestAchievementTests: XCTestCase {
     func testGameStateRoundTripsNewFields() throws {
         var g = GameState()
         g.habit = .savingGoal
-        g.count("checkup")
+        g.count(.checkup)
         let back = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(g))
         XCTAssertEqual(back, g)
     }

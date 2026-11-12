@@ -2,15 +2,21 @@ import Foundation
 
 enum XPEvent: Hashable { case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled }
 
+/// Keys of `GameState.counts`; shared by `award`, later feature code (`count(_:)`) and the achievements.
+enum CounterKey: String {
+    case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled
+    case feeCompared, checkup, exDividendSeason, yearReport
+}
+
 extension XPEvent {
-    /// The `GameState.counts` key `award` increments.
-    var counterKey: String {
+    /// The counter `award` increments.
+    var counterKey: CounterKey {
         switch self {
-        case .monthlyDCA: return "monthlyDCA"
-        case .questDone: return "questDone"
-        case .firstDexCard: return "firstDexCard"
-        case .dividendLogged: return "dividendLogged"
-        case .reconciled: return "reconciled"
+        case .monthlyDCA: return .monthlyDCA
+        case .questDone: return .questDone
+        case .firstDexCard: return .firstDexCard
+        case .dividendLogged: return .dividendLogged
+        case .reconciled: return .reconciled
         }
     }
 }

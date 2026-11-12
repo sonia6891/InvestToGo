@@ -22,6 +22,8 @@ enum Quests {
 
     /// The fixed question bank: five monthly quests, then the two newbie ones.
     static let pool: [Quest] = [dcaLogged, dividendsViewed, newETFResearched, reminderSet, reconciled, firstPlanSet, firstDexCard]
+    /// Earned once ever, never again in a later month.
+    static let newbieOnly: Set<QuestTrigger> = [.firstPlanSet, .firstDexCard]
     private static let monthly = Array(pool.prefix(5))
 
     /// Each habit always keeps its own quest; the other two rotate through the rest by month.
@@ -45,13 +47,13 @@ enum Quests {
 }
 
 extension GameState {
-    /// Finishes this month's quest for `trigger`. `[.questDone]` the first time only; `[]` when it is
-    /// not among this month's quests (regular or newbie) or was already done.
+    /// Finishes this month's quest for `trigger`, only from the list the lobby shows this player
+    /// (`Quests.forMonth` with `isNewbie`). `[.questDone]` once per quest per month; the newbie-only
+    /// quests (設定第一筆定投, 收集第 1 張圖鑑卡) can be finished once ever. Otherwise `[]`.
     mutating func complete(_ q: QuestTrigger, now: Date) -> [XPEvent] {
         let m = YearMonth(now)
-        let h = habit ?? .dca
-        let candidates = Quests.forMonth(m, habit: h, isNewbie: false) + Quests.forMonth(m, habit: h, isNewbie: true)
-        guard let quest = candidates.first(where: { $0.trigger == q }) else { return [] }
+        guard let quest = Quests.forMonth(m, habit: habit ?? .dca, isNewbie: isNewbie).first(where: { $0.trigger == q }) else { return [] }
+        if Quests.newbieOnly.contains(quest.trigger), questsDone.values.contains(where: { $0.contains(quest.id) }) { return [] }
         guard questsDone[m.key, default: []].insert(quest.id).inserted else { return [] }
         award(.questDone)
         return [.questDone]
