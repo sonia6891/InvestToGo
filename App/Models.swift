@@ -5,6 +5,9 @@ import SwiftUI
 @MainActor final class PortfolioStore: ObservableObject {
     @Published private(set) var data = Portfolio()
     @Published var message: String?
+    /// 記一筆配息 rewards earned but not yet shown, in experience. In memory only: the root-level `RewardToast`
+    /// shows them wherever the viewer is once the form has closed, then clears them (ruling R25).
+    @Published var pendingReward = 0
     @Published var refreshing = false
     @Published private(set) var catalog = CatalogSnapshot.bundled()
     @Published var catalogMessage: String?
@@ -118,13 +121,20 @@ import SwiftUI
     func saveDividend(_ dividend: Dividend, rewardNew: Bool = false) throws {
         guard !dividend.symbol.isEmpty, dividend.amount.isFinite, dividend.amount > 0, dividend.detailsValid else { throw AppDataError("請填寫代碼、股數與每股配息；扣繳後的入帳金額必須大於 0。") }
         var next = data
+        var earned = 0
         if let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) {
             next.dividends[i] = dividend
         } else {
             next.dividends.append(dividend)
-            if rewardNew { var game = next.game ?? GameState(); game.award(.dividendLogged); next.game = game }
+            if rewardNew {
+                var game = next.game ?? GameState()
+                let before = game.xp
+                game.award(.dividendLogged); next.game = game
+                earned = game.xp - before
+            }
         }
         try commit(next)
+        if earned > 0 { pendingReward += earned }
     }
     /// Marks a record as received; a payment date still in the future becomes today.
     @discardableResult func confirmPaid(_ dividend: Dividend) throws -> Dividend {

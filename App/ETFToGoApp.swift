@@ -56,6 +56,8 @@ struct RootView: View {
                     .ignoresSafeArea(.keyboard)
             }
         }
+        // 記一筆配息's coin drop and 「+20」, wherever the dividend was logged from (ruling R25).
+        .overlay(alignment: .top) { RewardToast() }
         .onChange(of: path) { _, value in if value.isEmpty { feature = nil } }
         .fullScreenCover(isPresented: $skins.showcaseOpen) { DesignShowcase(close: { skins.showcaseOpen = false }) }
         .modifier(SkinKitLaunch())

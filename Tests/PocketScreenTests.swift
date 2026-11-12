@@ -81,6 +81,14 @@ final class PocketScreenTests: XCTestCase {
         XCTAssertEqual(items[0].estimate, 1500)
         XCTAssertEqual(items[1].holding, other.id)
         XCTAssertNil(items[1].estimate, "No amount announced yet: no estimate")
+        // Once logged, an announcement drops out: by its ex-date, or by an announced or estimated payment after it.
+        var byEx = Dividend(symbol: "00878", date: day(2026, 12, 16), amount: 1500, status: .announced)
+        byEx.exDate = day(2026, 11, 18)
+        XCTAssertEqual(UpcomingDividend.from(entries, today: "2026-11-12", logged: [byEx]).map(\.id), ["0056-2026-12-19"])
+        let estimated = Dividend(symbol: "0056", date: day(2027, 1, 20), amount: 900, status: .estimated)
+        XCTAssertEqual(UpcomingDividend.from(entries, today: "2026-11-12", logged: [estimated]).map(\.id), ["00878-2026-11-18"])
+        let received = Dividend(symbol: "0056", date: day(2027, 1, 20), amount: 900, status: .paid)
+        XCTAssertEqual(UpcomingDividend.from(entries, today: "2026-11-12", logged: [received]).count, 2, "A received record without an ex-date says nothing about a coming one")
     }
 
     @MainActor func testLoggingADividendEarnsTwentyWhateverTheAmount() throws {
@@ -92,13 +100,17 @@ final class PocketScreenTests: XCTestCase {
         XCTAssertEqual(store.data.game?.xp, 20)
         XCTAssertEqual(store.data.game?.coins, 20)
         XCTAssertEqual(store.data.game?.counter(.dividendLogged), 1)
+        XCTAssertEqual(store.pendingReward, 20, "The reward waits, in memory, for the root toast to show it")
         try store.saveDividend(Dividend(symbol: "00878", date: Date(), amount: 1_000_000, status: .paid), rewardNew: true)
         XCTAssertEqual(store.data.game?.xp, 40, "A large dividend earns the same +20")
+        XCTAssertEqual(store.pendingReward, 40, "Two logs before the toast shows are never lost")
+        store.pendingReward = 0
         small.amount = 5
         try store.saveDividend(small, rewardNew: true)
         XCTAssertEqual(store.data.game?.xp, 40, "Editing a record earns nothing")
         try store.saveDividend(Dividend(symbol: "0056", date: Date(), amount: 10, status: .paid))
         XCTAssertEqual(store.data.game?.xp, 40, "Records saved without 記一筆配息 earn nothing")
+        XCTAssertEqual(store.pendingReward, 0, "Edits and plain saves show no reward")
         XCTAssertEqual(PortfolioStore(url: directory.appendingPathComponent("p.json")).data.game?.xp, 40, "Saved with the record")
     }
 
@@ -117,5 +129,18 @@ final class PocketScreenTests: XCTestCase {
         XCTAssertEqual(store.data.game?.xp ?? 0, 0, "Seeding is not logging")
         DemoArguments.seedPocket(store, args: ["--ui-testing", "--demo-pocket"], now: now, calendar: calendar)
         XCTAssertEqual(store.data.holdings.count, 4, "A filled pocket is left alone")
+    }
+
+    @MainActor func testDemoPocketHasThisYearsDividendsEvenInJanuary() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("p.json"))
+        let january = day(2027, 1, 3)
+        DemoArguments.seedPocket(store, args: ["--ui-testing", "--demo-pocket"], now: january, calendar: calendar)
+        XCTAssertFalse(store.data.dividends.contains { $0.date > january }, "Nothing is dated in the future")
+        let year = DividendYear.of(store.data.dividends, now: january, calendar: calendar)
+        XCTAssertEqual(year.total, 8640)
+        XCTAssertEqual(year.count, 7)
+        XCTAssertEqual(year.tag(hidden: false), "領了 7 次 · 比去年多 1,920")
     }
 }

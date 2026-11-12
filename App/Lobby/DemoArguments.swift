@@ -31,7 +31,7 @@ enum DemoArguments {
         ("0050", 1000, 0.182), ("00878", 2000, 0.061), ("006208", 200, 0.154), ("00679B", 1000, -0.06),
     ]
     /// Received dividends of the dividends canvas (spec 5.8): month, code and amount, this year and last year (for
-    /// 「比去年多」). This year only months before the current one are used, so nothing is dated in the future.
+    /// 「比去年多」). `seedPocket` never dates one in the future: a month not reached yet is moved to today.
     static let dividendSample: [(month: Int, symbol: String, amount: Double)] = [
         (1, "00878", 1500), (2, "0050", 1000), (4, "00878", 1500), (5, "006208", 940), (7, "00878", 1500), (8, "0050", 700), (10, "00878", 1500),
     ]
@@ -49,10 +49,15 @@ enum DemoArguments {
             try? store.save(Holding(symbol: item.symbol, name: fund?.name ?? item.symbol, shares: item.shares, unitCost: price / (1 + item.gain),
                                     broker: "", strategy: fund?.strategy ?? .unclassified))
         }
-        let year = calendar.component(.year, from: now), month = calendar.component(.month, from: now)
-        let records = dividendSample.filter { $0.month < month }.map { (year, $0) } + lastYearSample.map { (year - 1, $0) }
-        for (y, item) in records {
-            guard let date = calendar.date(from: DateComponents(year: y, month: item.month, day: 15)) else { continue }
+        // Every sample record is kept, so this year always has received dividends (even in January) and the totals
+        // match the canvas. Each date is the 15th of its month, or today when that is still ahead; last year's records
+        // likewise stop at today's date a year ago, so they all fall in the period 「比去年」 compares with.
+        let year = calendar.component(.year, from: now)
+        let aYearAgo = calendar.date(byAdding: .year, value: -1, to: now) ?? now
+        let records = dividendSample.map { (year, now, $0) } + lastYearSample.map { (year - 1, aYearAgo, $0) }
+        for (y, latest, item) in records {
+            guard let fifteenth = calendar.date(from: DateComponents(year: y, month: item.month, day: 15)) else { continue }
+            let date = min(fifteenth, latest)
             try? store.saveDividend(Dividend(symbol: item.symbol, date: date, amount: item.amount, status: .paid, source: DividendSource.broker.rawValue))
         }
     }

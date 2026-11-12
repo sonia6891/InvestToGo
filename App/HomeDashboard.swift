@@ -143,7 +143,7 @@ struct HomeView: View {
                 .padding(.bottom, 6)
             ForEach(rows, id: \.element.id) { i, row in
                 NavigationLink(value: AppRoute.holdingDetail(row.holding.id)) {
-                    PocketHoldingRow(row: row, color: colors[i % colors.count], hidden: hidden)
+                    PocketHoldingRow(row: row, color: colors[i % colors.count], hidden: hidden, quoted: store.quote(row.holding.symbol) != nil)
                 }
                 .buttonStyle(.plain)
                 Rectangle().fill(skin.color(\.line)).frame(height: 1).accessibilityHidden(true)

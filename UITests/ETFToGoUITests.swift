@@ -145,6 +145,7 @@ final class ETFToGoUITests: XCTestCase {
         let total = app.staticTexts["portfolio-value"]
         XCTAssertTrue(total.waitForExistence(timeout: 5), "The pocket shows its total once it holds an ETF")
         XCTAssertTrue(total.label.hasPrefix("NT$ "), "The total is the saved holding's value: \(total.label)")
+        XCTAssertNotEqual(total.label, "NT$ —", "The holding is priced")
         app.terminate(); app.launchArguments = ["--ui-testing", "--open", "pocket"]; app.launch()
         XCTAssertTrue(app.staticTexts["portfolio-value"].waitForExistence(timeout: 10), "The holding is still in the pocket after a relaunch")
         XCTAssertTrue(app.staticTexts["0050"].exists, "The pocket lists the holding")
@@ -410,6 +411,7 @@ final class ETFToGoUITests: XCTestCase {
             let total = app.staticTexts["portfolio-value"]
             XCTAssertTrue(total.waitForExistence(timeout: 10), "\(id): the pocket shows its total")
             XCTAssertTrue(total.label.hasPrefix("NT$ "), "\(id): the total is in NT$: \(total.label)")
+            XCTAssertNotEqual(total.label, "NT$ —", "\(id): the sample holdings are priced")
             XCTAssertTrue(app.staticTexts["我的口袋 · 4 檔"].exists, "\(id): the pocket counts its ETFs")
             let loss = app.staticTexts["pocket-change-00679B"]
             XCTAssertTrue(loss.waitForExistence(timeout: 5), "\(id): the losing holding is listed")

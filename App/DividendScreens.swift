@@ -73,9 +73,16 @@ struct UpcomingDividend: Identifiable, Equatable {
     /// Before tax and fees, so the page marks it 「≈」.
     var estimate: Double? { perShare.map { ($0 * shares).rounded() } }
 
-    static func from(_ entries: [(symbol: String, event: OfficialDistribution, shares: Double, holding: Holding)], today: String) -> [UpcomingDividend] {
+    /// Announced ex-dates from `today` on, one row per code and ex-date. One the viewer has already logged drops out:
+    /// a record of the code with that ex-date, or an announced or estimated record (not yet received) dated on or after
+    /// the ex-date, which is the payment that ex-date leads to.
+    static func from(_ entries: [(symbol: String, event: OfficialDistribution, shares: Double, holding: Holding)], today: String,
+                     logged: [Dividend] = []) -> [UpcomingDividend] {
+        func isLogged(_ symbol: String, _ ex: String) -> Bool {
+            logged.contains { $0.symbol == symbol && ($0.exDate.map { DataChecks.day($0) } == ex || ($0.status != .paid && DataChecks.day($0.date) >= ex)) }
+        }
         var result: [UpcomingDividend] = []
-        for entry in entries where entry.event.ex >= today {
+        for entry in entries where entry.event.ex >= today && !isLogged(entry.symbol, entry.event.ex) {
             if let i = result.firstIndex(where: { $0.symbol == entry.symbol && $0.ex == entry.event.ex }) {
                 let old = result[i]
                 result[i] = UpcomingDividend(symbol: old.symbol, ex: old.ex, perShare: old.perShare, shares: old.shares + entry.shares, holding: nil)
@@ -89,19 +96,12 @@ struct UpcomingDividend: Identifiable, Equatable {
 
 /// 配息 (spec 5.8): the skin's coin pile, this year's received total in the big face with a tag (how many times, and
 /// against last year), twelve month checks (this month underlined), the coming ex-dividends of held ETFs, and
-/// 「記一筆配息」. Logging one earns a flat +20 and, back on this page, a coin drops onto the pile (a fade with Reduce
-/// Motion). A newcomer sees the pile, one sentence and the button — never an NT$ 0 (ruling R15).
+/// 「記一筆配息」. Logging one earns a flat +20, shown by the root-level `RewardToast` wherever the viewer returns to.
+/// A newcomer sees the pile, one sentence and the button — never an NT$ 0 (ruling R15).
 struct DividendsView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("hideAmounts") private var hidden = false
-    /// How many dividends had been logged when the page last appeared; more on the way back plays the coin drop.
-    /// The 記一筆配息 count when 配息 last appeared. Kept outside the view so a page rebuilt on the way back from the
-    /// form still knows a dividend was logged meanwhile; −1 until the first visit.
-    @AppStorage("dividendLogsSeen") private var seenLogs = -1
-    @State private var drops = 0
-    @State private var rewarded = false
 
     var body: some View {
         let now = Date()
@@ -128,22 +128,19 @@ struct DividendsView: View {
             }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .overlay(alignment: .top) { if rewarded { toast } }
-        .onAppear(perform: appeared)
+        // Ticks 看一次配息 when it is one of this month's quests.
+        .onAppear { try? store.updateGame { _ = $0.complete(.dividendsViewed, now: Date()) } }
     }
 
     // MARK: Hero
 
     private func hero(_ year: DividendYear) -> some View {
-        ZStack {
-            // The coin pile is read as what it stands for.
-            SkinImage(.dividends)
-                .accessibilityElement()
-                .accessibilityLabel(year.total > 0 ? "金幣堆，今年已領股息 NT$ \(shown(money(year.total), hidden: hidden))" : "金幣堆，今年還沒有領到股息")
-            CoinDrop(trigger: drops)
-        }
-        .frame(width: 200, height: 200)
-        .frame(maxWidth: .infinity)
+        // The coin pile is read as what it stands for.
+        SkinImage(.dividends)
+            .accessibilityElement()
+            .accessibilityLabel(year.total > 0 ? "金幣堆，今年已領股息 NT$ \(shown(money(year.total), hidden: hidden))" : "金幣堆，今年還沒有領到股息")
+            .frame(width: 200, height: 200)
+            .frame(maxWidth: .infinity)
     }
 
     /// This year's total, or one sentence while nothing has come in yet this year.
@@ -189,12 +186,12 @@ struct DividendsView: View {
     // MARK: Coming ex-dividends
 
     private var upcoming: some View {
-        let items = Array(UpcomingDividend.from(store.officialForHoldings(), today: DataChecks.day()).prefix(5))
+        let items = Array(UpcomingDividend.from(store.officialForHoldings(), today: DataChecks.day(), logged: store.data.dividends).prefix(5))
         return VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text("即將除息")
                 Spacer()
-                Text("預估入帳")
+                if !items.isEmpty { Text("預估入帳") }
             }
             .skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
             .padding(.bottom, 4)
@@ -257,38 +254,61 @@ struct DividendsView: View {
         }
         .padding(.top, 8)
     }
+}
 
-    // MARK: Reward
+/// The 記一筆配息 reward (ruling R25), mounted once above the navigation stack: when the store reports experience
+/// earned by a new dividend record, it waits for the form to close, then drops a coin and shows 「記一筆配息 +20 經驗」
+/// on whatever page the viewer is on. With Reduce Motion the coin only fades. Rewards that arrive together are shown
+/// as one sum; one arriving while the toast is up replaces it and restarts its timer.
+struct RewardToast: View {
+    @EnvironmentObject var store: PortfolioStore
+    @Environment(\.skin) private var skin
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var xp: Int?
+    @State private var drops = 0
+    @State private var hide: Task<Void, Never>?
 
-    private var toastText: String { "記一筆配息 +\(GameRules.xp[.dividendLogged] ?? 0) 經驗" }
-    private var toast: some View {
-        Text(toastText)
-            .skinFont(.title(14))
-            .foregroundStyle(skin.onFill(skin.colors.accent))
-            .padding(.horizontal, 18).padding(.vertical, 10)
-            .background(Capsule().fill(skin.color(\.accent)))
-            .padding(.top, 8)
-            .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
-            .accessibilityIdentifier("dividend-xp-toast")
+    static func text(_ xp: Int) -> String { "記一筆配息 +\(xp) 經驗" }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            if let xp {
+                Text(Self.text(xp))
+                    .skinFont(.title(14))
+                    .foregroundStyle(skin.onFill(skin.colors.accent))
+                    .padding(.horizontal, 18).padding(.vertical, 10)
+                    .background(Capsule().fill(skin.color(\.accent)))
+                    .padding(.top, 8)
+                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+                    .accessibilityIdentifier("dividend-xp-toast")
+            }
+            CoinDrop(trigger: drops).frame(width: 200, height: 160)
+        }
+        .frame(maxWidth: .infinity)
+        .allowsHitTesting(false)
+        .task(id: store.pendingReward) { await consume() }
     }
 
-    /// Ticks 看一次配息 when it is one of this month's quests, and plays the coin drop for dividends logged since the
-    /// page last appeared (on the way back from the form).
-    private func appeared() {
-        try? store.updateGame { _ = $0.complete(.dividendsViewed, now: Date()) }
-        let logs = (store.data.game ?? GameState()).counter(.dividendLogged)
-        if seenLogs >= 0, logs > seenLogs { celebrate() }
-        seenLogs = logs
+    private func consume() async {
+        guard store.pendingReward > 0 else { return }
+        // The form dismisses itself right after saving; the reward lands on the page underneath.
+        try? await Task.sleep(for: .milliseconds(600))
+        guard !Task.isCancelled, store.pendingReward > 0 else { return }
+        let earned = store.pendingReward
+        store.pendingReward = 0
+        show(earned)
     }
 
-    private func celebrate() {
-        drops += 1
+    private func show(_ earned: Int) {
         let animation: Animation = reduceMotion ? .easeInOut(duration: 0.2) : .snappy
-        withAnimation(animation) { rewarded = true }
-        AccessibilityNotification.Announcement(toastText).post()
-        Task {
+        hide?.cancel()
+        withAnimation(animation) { xp = earned }
+        drops += 1
+        AccessibilityNotification.Announcement(Self.text(earned)).post()
+        hide = Task {
             try? await Task.sleep(for: .seconds(5))
-            withAnimation(animation) { rewarded = false }
+            guard !Task.isCancelled else { return }
+            withAnimation(animation) { xp = nil }
         }
     }
 }

@@ -91,6 +91,8 @@ struct PocketHoldingRow: View {
     let row: PocketSummary.Row
     let color: Color
     let hidden: Bool
+    /// Has a quote, but not in NT$ (so no value): 「外幣報價」 rather than 「尚無報價」.
+    var quoted = false
     var body: some View {
         HStack(spacing: 12) {
             RoundedRectangle(cornerRadius: skin.style.button == .pixelBlock ? 0 : 5).fill(color).frame(width: 10, height: 10)
@@ -101,7 +103,7 @@ struct PocketHoldingRow: View {
             }
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 4) {
-                Text(row.value.map { shown(money($0), hidden: hidden) } ?? "尚無報價")
+                Text(row.value.map { shown(money($0), hidden: hidden) } ?? (quoted ? "外幣報價" : "尚無報價"))
                     .skinFont(.mono(13)).foregroundStyle(skin.color(row.value == nil ? \SkinColors.sub : \SkinColors.ink))
                 if hidden {
                     Text("＊＊＊＊").skinFont(.mono(11)).skinForeground(\.sub)
