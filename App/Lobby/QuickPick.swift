@@ -15,7 +15,7 @@ struct QuickPick: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(skin.lightText ? 0.6 : 0.4)
+            Color.black.opacity(skin.lightText ? 0.6 : 0.5)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
                 .onTapGesture { open = false }
@@ -41,7 +41,7 @@ struct QuickPick: View {
     private func button(_ feature: Feature) -> some View {
         Button { pick(feature) } label: {
             VStack(spacing: 6) {
-                SkinStage(size: disc) { SkinImage(feature.art).frame(width: disc * 0.72, height: disc * 0.72) }
+                discView(feature)
                 SkinTag(feature.title)
             }
             .contentShape(Rectangle())
@@ -49,6 +49,19 @@ struct QuickPick: View {
         .buttonStyle(.plain)
         .accessibilityLabel(feature.title)
         .accessibilityIdentifier("quick-\(feature.rawValue)")
+    }
+
+    /// The skin's stage as the disc; a skin without a stage (sketch) gets a hand-drawn paper disc, so the object
+    /// never floats over the dimmed page.
+    @ViewBuilder private func discView(_ feature: Feature) -> some View {
+        let art = SkinImage(feature.art).frame(width: disc * 0.72, height: disc * 0.72)
+        if skin.style.stage == .none {
+            art.frame(width: disc, height: disc)
+                .background(SketchCircleShape(seed: 7).fill(skin.color(\.card)))
+                .overlay(SketchCircleShape(seed: 7).stroke(skin.color(\.ink), style: StrokeStyle(lineWidth: 2, lineCap: .round)))
+        } else {
+            SkinStage(size: disc) { art }
+        }
     }
 
     /// Discs sit on an arc centred on the quick button, from lower left (160°) over the top to lower right (20°),
