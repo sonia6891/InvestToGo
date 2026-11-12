@@ -1,8 +1,9 @@
 import SwiftUI
 import Charts
 
-/// Every pushed screen, so all five tab stacks share one set of destinations.
+/// Every pushed screen above the lobby: a feature's first screen, then everything opened from it.
 enum AppRoute: Hashable {
+    case feature(Feature), dcaHistory, holdings
     case overview, monthDividends(next: Bool), notices, settings, sources, privacy, about
     case recentDividends, yearDividends, dividendDetail(UUID), dividendForm(id: UUID?, symbol: String?, officialEx: String?, holding: UUID? = nil), dividendDone(UUID)
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
@@ -19,6 +20,9 @@ struct RouteView: View {
     let route: AppRoute
     var body: some View {
         switch route {
+        case .feature(let feature): FeatureScreen(feature: feature)
+        case .dcaHistory: DCAHistoryView()
+        case .holdings: HoldingsView()
         case .overview: OverviewView()
         case .monthDividends(let next): MonthDividendsView(startNextMonth: next)
         case .notices: NoticesView()
@@ -60,8 +64,8 @@ struct RouteView: View {
 }
 extension View {
     func appRoutes() -> some View {
-        navigationDestination(for: AppRoute.self) { RouteView(route: $0).tabBarSpace() }
-            .navigationDestination(for: Fund.self) { FundDetail(fund: $0).tabBarSpace() }
+        navigationDestination(for: AppRoute.self) { RouteView(route: $0).gameBarSpace() }
+            .navigationDestination(for: Fund.self) { FundDetail(fund: $0).gameBarSpace() }
     }
 }
 

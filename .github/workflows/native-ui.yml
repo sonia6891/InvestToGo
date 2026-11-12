@@ -48,7 +48,7 @@ jobs:
           mkdir -p build/screens
           xcodebuild build-for-testing -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only simulator app')"
-      - name: Capture all five real SwiftUI screens
+      - name: Capture the lobby and every feature screen
         timeout-minutes: 3
         continue-on-error: true
         env:
@@ -56,11 +56,11 @@ jobs:
         run: |
           set -euo pipefail
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
-          for TAB in 0 1 2 3 4; do
+          for SCREEN in lobby find dividends pocket tools achievements; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --tab "$TAB"
-            sleep 4
-            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$TAB.png"
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --demo-streak 12 --demo-level 7 --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png"
           done
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2

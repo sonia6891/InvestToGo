@@ -1,7 +1,7 @@
 import SwiftUI
 
 /* ---------- home: assets, market, watchlist, dividends and the combined simulation ---------- */
-/// Opens 探索, optionally with the search field focused. Sent by the home page.
+/// Opens 找 ETF, optionally with the search field focused. Sent by the pocket page.
 struct DiscoverRequest: Equatable {
     var search: Bool
     let id = UUID()
@@ -9,9 +9,7 @@ struct DiscoverRequest: Equatable {
 
 struct HomeView: View {
     @EnvironmentObject var store: PortfolioStore
-    @Binding var tab: Int
-    /// Returns the 探索 tab to its first screen, so a request is not hidden behind a pushed page.
-    var resetDiscover: () -> Void = {}
+    @Environment(\.lobbyNavigation) private var navigation
     @State private var overview = false
     @AppStorage("hideAmounts") private var hidden = false
     @AppStorage("readNotices") private var readNotices = ""
@@ -32,7 +30,7 @@ struct HomeView: View {
             let symbols = store.data.holdings.map(\.symbol) + store.data.favorites.sorted()
             if !symbols.isEmpty { await store.refresh(symbols: symbols) }
         }
-        .navigationDestination(isPresented: $overview) { OverviewView().tabBarSpace() }
+        .navigationDestination(isPresented: $overview) { OverviewView().gameBarSpace() }
     }
 
     /* ---------- poster: the 3D pocket, the total in huge type, two hex actions ---------- */
@@ -105,14 +103,16 @@ struct HomeView: View {
                 Button { openDiscover(search: true) } label: { Text("搜尋 ETF") }
                     .buttonStyle(HexButtonStyle(skin: skin, horizontal: 22)).accessibilityIdentifier("home-search").accessibilityLabel("搜尋 ETF")
             }
-            .padding(.top, 10).padding(.bottom, 8)
+            .padding(.top, 10)
+            NavigationLink(value: AppRoute.holdings) { Text("我的持有") }
+                .buttonStyle(SkinButtonStyle(primary: false)).accessibilityIdentifier("home-holdings")
+                .padding(.bottom, 8)
         }
     }
 
     private func openDiscover(search: Bool) {
         store.discoverRequest = DiscoverRequest(search: search)
-        resetDiscover()
-        tab = 1
+        navigation.open(.find)
     }
 
     /* ---------- assets ---------- */

@@ -382,7 +382,7 @@ struct WatchlistView: View {
         }
         .navigationTitle("我的自選").navigationBarTitleDisplayMode(.inline)
         .toolbar { if !favorites.isEmpty { ToolbarItem(placement: .topBarTrailing) { Button(editing ? "完成" : "編輯") { if !editing && selection.isEmpty { selection = Array(favorites.prefix(3).map(\.id)) }; editing.toggle() } } } }
-        .navigationDestination(isPresented: $compare) { ComparisonView().tabBarSpace() }
+        .navigationDestination(isPresented: $compare) { ComparisonView().gameBarSpace() }
     }
     private func toggle(_ code: String, chosen: [String]) {
         var next = chosen

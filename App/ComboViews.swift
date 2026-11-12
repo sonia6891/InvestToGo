@@ -252,7 +252,7 @@ struct ComboSettingsView: View {
         }
         .navigationTitle("試算設定").navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: load)
-        .navigationDestination(isPresented: $showResult) { ComboResultView(fromSettings: true).tabBarSpace() }
+        .navigationDestination(isPresented: $showResult) { ComboResultView(fromSettings: true).gameBarSpace() }
     }
     private var draft: ComboSettings {
         var c = store.combo

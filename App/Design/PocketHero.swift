@@ -24,10 +24,10 @@ import UIKit
 /// stitched pocket with a hovering coin above it. Increasing `drops` plays the coin falling into the pocket.
 struct PocketHero: View {
     var value: String
-    var showsPocket: Bool
+    var showsPocket = false
     var skin: Skin
-    var drops: Int
-    var label: String
+    var drops = 0
+    var label = ""
     /// Called when the coin passes the lip: the caller updates its numbers, plays the burst, sound and haptics.
     var onLanded: () -> Void = {}
 
@@ -92,16 +92,21 @@ struct PocketHero: View {
         let valueChanged = scene.builtKey.map { !$0.hasPrefix(value + "|") } ?? false
         scene.builtKey = key
         scene.showsPocket = showsPocket
-        let matte = Self.material(skin.matte, metalness: 0, roughness: 0.85)
+        // The pixel skin builds its numerals from small square cells in its accent and metal colours; the others
+        // from smooth strokes, matte and metal. The metal is the skin's own (`skin.metal`).
+        let voxel = skin.art.kind == .voxel3D
+        let matte = voxel ? Self.material(skin.colors.accent, metalness: 0, roughness: 0.7) : Self.material(skin.matte, metalness: 0, roughness: 0.85)
         let metal = Self.material(skin.metalOrDefault.color, metalness: skin.metalOrDefault.metalness, roughness: skin.metalOrDefault.roughness)
 
         numeral.children.removeAll()
         let layout = BlockGlyphs.layout(value)
-        for block in layout.blocks {
+        let blocks = voxel ? BlockGlyphs.voxelize(layout.blocks, cell: BlockGlyphs.stroke / 2) : layout.blocks
+        for block in blocks {
             let mesh: MeshResource
             switch block.shape {
             case .box, .slash:
-                mesh = .generateBox(width: Float(block.width), height: Float(block.height), depth: Float(block.depth), cornerRadius: Float(min(BlockGlyphs.radius, block.width / 2.1)))
+                let radius = voxel ? 0.015 : min(BlockGlyphs.radius, block.width / 2.1)
+                mesh = .generateBox(width: Float(block.width), height: Float(block.height), depth: Float(block.depth), cornerRadius: Float(radius))
             case .ring:
                 mesh = Self.ringMesh(radius: BlockGlyphs.ringRadius, tube: 0.1, depth: block.depth)
             }

@@ -251,7 +251,6 @@ struct Page<Content: View>: View {
                 .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 28)
         }
         .scrollDismissesKeyboard(.interactively)
-        .modifier(MinimizeOnScroll())
         .background { Palette.page.ignoresSafeArea() }
     }
 }
@@ -470,206 +469,7 @@ struct PrimaryButtonLabel: View {
     }
 }
 
-/* Components for the template set: floating tab bar, date boxes, accent rows, donut and bar lists. */
-struct TabSpec {
-    let title: String
-    let icon: String
-    let colors: [Color]
-}
-enum AppTabs {
-    static let items: [TabSpec] = [
-        TabSpec(title: "首頁", icon: "house.fill", colors: [Color(red: 0.37, green: 0.64, blue: 1.0), Palette.blue]),
-        TabSpec(title: "探索", icon: "magnifyingglass", colors: [Color(red: 0.25, green: 0.84, blue: 0.84), Color(red: 0.05, green: 0.62, blue: 0.71)]),
-        TabSpec(title: "持有", icon: "bag.fill", colors: [Color(red: 1.0, green: 0.75, blue: 0.31), Palette.orange]),
-        TabSpec(title: "配息", icon: "calendar", colors: [Color(red: 1.0, green: 0.49, blue: 0.67), Palette.pink]),
-        TabSpec(title: "工具", icon: "square.grid.2x2.fill", colors: [Color(red: 0.67, green: 0.55, blue: 1.0), Palette.purple]),
-    ]
-}
-/// The design's floating tab bar with iOS 26-style motion. Each icon is a glass orb; the selection is a round glass
-/// lens that flows like a droplet from the old orb to the new one and settles around it. Icons bounce, presses
-/// squeeze, and scrolling down shrinks the bar to the current tab (scrolling up or tapping restores it).
-/// On iOS 26 the bar and orbs use Liquid Glass; earlier versions draw glossy orbs on a frosted bar.
-struct FloatingTabBar: View {
-    @Binding var selection: Int
-    var minimized = false
-    var reselect: (Int) -> Void
-    var expand: () -> Void = {}
-    @State private var bounce = [0, 0, 0, 0, 0]
-    @State private var centres: [Int: CGFloat] = [:]
-    @State private var lensX: CGFloat = 0
-    @State private var lensWidth: CGFloat = 52
-    @State private var flowing = false
-    /// Vertical centre of an orb inside the row of tabs.
-    private let orbCentreY: CGFloat = 20
-    var body: some View {
-        HStack(spacing: 0) {
-            if minimized {
-                Button(action: expand) { orb(selection, on: false).padding(6) }
-                    .buttonStyle(PressScale())
-                    .accessibilityLabel("展開分頁列，目前在\(AppTabs.items[selection].title)")
-            } else {
-                ForEach(AppTabs.items.indices, id: \.self) { index in item(index) }
-            }
-        }
-        .coordinateSpace(.named("tabbar"))
-        .background(alignment: .topLeading) {
-            if !minimized {
-                SelectionLens()
-                    .frame(width: lensWidth, height: flowing ? 46 : 52)
-                    .offset(x: lensX, y: orbCentreY - (flowing ? 23 : 26))
-                    .allowsHitTesting(false)
-            }
-        }
-        .onPreferenceChange(OrbCentresKey.self) { value in
-            centres = value
-            if !flowing, let centre = value[selection] { lensX = centre - 26; lensWidth = 52 }
-        }
-        .onChange(of: selection) { old, new in flow(from: old, to: new) }
-        .padding(.vertical, minimized ? 0 : 7).padding(.horizontal, minimized ? 0 : 4)
-        .modifier(LiquidGlass(shape: RoundedRectangle(cornerRadius: 30, style: .continuous)))
-        .frame(maxWidth: .infinity, alignment: minimized ? .leading : .center)
-        .padding(.horizontal, minimized ? 16 : 12).padding(.bottom, 4)
-        .animation(.spring(response: 0.45, dampingFraction: 0.82), value: minimized)
-        .sensoryFeedback(.selection, trigger: selection)
-    }
-    private func flow(from old: Int, to new: Int) {
-        guard let a = centres[old], let b = centres[new] else { return }
-        withAnimation(.easeInOut(duration: 0.2)) { lensX = min(a, b) - 26; lensWidth = abs(b - a) + 52; flowing = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.19) {
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.6)) { lensX = b - 26; lensWidth = 52; flowing = false }
-        }
-    }
-    private func item(_ index: Int) -> some View {
-        let item = AppTabs.items[index], on = selection == index
-        return Button {
-            if on { reselect(index) } else { bounce[index] += 1; selection = index }
-        } label: {
-            VStack(spacing: 3) {
-                orb(index, on: on)
-                Text(item.title).font(.caption2.weight(on ? .heavy : .bold)).foregroundStyle(Palette.ink)
-            }
-            .frame(maxWidth: .infinity).padding(.vertical, 3)
-            .background(GeometryReader { proxy in Color.clear.preference(key: OrbCentresKey.self, value: [index: proxy.frame(in: .named("tabbar")).midX]) })
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(PressScale())
-        .accessibilityLabel(item.title)
-        .accessibilityIdentifier("tab-\(item.title)")
-        .accessibilityAddTraits(on ? .isSelected : [])
-    }
-    private func orb(_ index: Int, on: Bool) -> some View {
-        let item = AppTabs.items[index]
-        return Image(systemName: item.icon).font(.system(size: 17, weight: .bold)).foregroundStyle(.white)
-            .shadow(color: Color.black.opacity(0.18), radius: 1, y: 1)
-            .symbolEffect(.bounce, value: bounce[index])
-            .frame(width: 40, height: 40)
-            .modifier(GlassOrb(colors: item.colors))
-            .scaleEffect(on ? 1.12 : 1).offset(y: on ? -3 : 0)
-            .animation(.spring(response: 0.38, dampingFraction: 0.6), value: on)
-    }
-}
-private struct OrbCentresKey: PreferenceKey {
-    static let defaultValue: [Int: CGFloat] = [:]
-    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) { value.merge(nextValue()) { $1 } }
-}
-/// A coloured orb: tinted, interactive Liquid Glass on iOS 26; a glossy sphere (highlight, rim, inner shade) before that.
-struct GlassOrb: ViewModifier {
-    let colors: [Color]
-    @ViewBuilder func body(content: Content) -> some View {
-        #if compiler(>=6.2)
-        if #available(iOS 26.0, *) {
-            content
-                .glassEffect(.regular.tint(colors.last ?? Palette.blue).interactive(), in: Circle())
-                .shadow(color: (colors.last ?? Palette.blue).opacity(0.35), radius: 6, y: 3)
-        } else {
-            glossy(content)
-        }
-        #else
-        glossy(content)
-        #endif
-    }
-    private func glossy(_ content: Content) -> some View {
-        content
-            .background {
-                ZStack {
-                    Circle().fill(LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom))
-                    Circle().fill(RadialGradient(colors: [Color.white.opacity(0.5), Color.white.opacity(0)], center: UnitPoint(x: 0.3, y: 0.22), startRadius: 0, endRadius: 18))
-                    Ellipse().fill(LinearGradient(colors: [Color.white.opacity(0.75), Color.white.opacity(0)], startPoint: .top, endPoint: .bottom))
-                        .frame(width: 26, height: 15).offset(y: -10)
-                    Circle().strokeBorder(Color.white.opacity(0.45), lineWidth: 1)
-                    Circle().strokeBorder(LinearGradient(colors: [Color.clear, Color.black.opacity(0.14)], startPoint: .top, endPoint: .bottom), lineWidth: 4).blur(radius: 2)
-                }
-                .clipShape(Circle())
-            }
-            .shadow(color: (colors.last ?? Palette.blue).opacity(0.35), radius: 6, y: 3)
-    }
-}
-/// The round glass lens around the selected orb.
-struct SelectionLens: View {
-    var body: some View {
-        Capsule(style: .continuous)
-            .fill(RadialGradient(colors: [Color.white.opacity(0.55), Color.white.opacity(0.18)], center: UnitPoint(x: 0.5, y: 0.28), startRadius: 0, endRadius: 34))
-            .overlay(Capsule(style: .continuous).strokeBorder(Color.white.opacity(0.85), lineWidth: 1.5))
-            .overlay(Capsule(style: .continuous).strokeBorder(LinearGradient(colors: [Color.clear, Palette.blue.opacity(0.18)], startPoint: .top, endPoint: .bottom), lineWidth: 5).blur(radius: 3))
-            .shadow(color: Palette.blue.opacity(0.22), radius: 10, y: 6)
-    }
-}
-/// Buttons squeeze while pressed and spring back.
-struct PressScale: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.9 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.55), value: configuration.isPressed)
-    }
-}
-/// Liquid Glass on iOS 26 (interactive, so it reacts to touch); a frosted material with a light rim before that.
-struct LiquidGlass<S: Shape>: ViewModifier {
-    let shape: S
-    var interactive = true
-    @ViewBuilder func body(content: Content) -> some View {
-        #if compiler(>=6.2)
-        if #available(iOS 26.0, *) {
-            content.glassEffect(interactive ? .regular.interactive() : .regular, in: shape)
-        } else {
-            frosted(content)
-        }
-        #else
-        frosted(content)
-        #endif
-    }
-    private func frosted(_ content: Content) -> some View {
-        content
-            .background(.ultraThinMaterial, in: shape)
-            .overlay(shape.stroke(Color.white.opacity(0.45), lineWidth: 1))
-            .shadow(color: Color.black.opacity(0.12), radius: 16, y: 8)
-    }
-}
-/// Pages report scrolling so the tab bar can shrink while reading and come back when scrolling up.
-private struct TabBarMinimizeKey: EnvironmentKey {
-    static let defaultValue: (Bool) -> Void = { _ in }
-}
-extension EnvironmentValues {
-    var tabBarMinimize: (Bool) -> Void {
-        get { self[TabBarMinimizeKey.self] }
-        set { self[TabBarMinimizeKey.self] = newValue }
-    }
-}
-struct MinimizeOnScroll: ViewModifier {
-    @Environment(\.tabBarMinimize) private var report
-    @ViewBuilder func body(content: Content) -> some View {
-        #if compiler(>=6.0)
-        if #available(iOS 18.0, *) {
-            content.onScrollGeometryChange(for: CGFloat.self, of: { $0.contentOffset.y + $0.contentInsets.top }) { old, new in
-                if new < 60 { report(false) } else if new - old > 8 { report(true) } else if old - new > 8 { report(false) }
-            }
-        } else {
-            content
-        }
-        #else
-        content
-        #endif
-    }
-}
+/* Components for the template set: date boxes, accent rows, donut and bar lists. */
 struct DateBox: View {
     let date: Date
     var body: some View {
@@ -695,8 +495,9 @@ struct AccentRow: ViewModifier {
 }
 extension View {
     func accentRow(_ color: Color) -> some View { modifier(AccentRow(color: color)) }
-    /// Room for the floating tab bar. The tab stack's own inset does not reach pushed screens, so every destination adds it.
-    func tabBarSpace() -> some View { safeAreaInset(edge: .bottom) { Color.clear.frame(height: 76) } }
+    /// Room for the game bottom bar, which floats over every screen above the lobby. An inset on the navigation stack
+    /// does not reach pushed screens, so every destination adds it.
+    func gameBarSpace() -> some View { safeAreaInset(edge: .bottom) { Color.clear.frame(height: GameBottomBar.height) } }
 }
 /// Rising bars drawn on the blue hero cards.
 struct HeroDeco: View {

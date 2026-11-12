@@ -65,6 +65,14 @@ import SwiftUI
         try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
     }
+    /// Changes the game progress and saves it with the records; nothing is written when it does not change.
+    func updateGame(_ change: (inout GameState) -> Void) throws {
+        var game = data.game ?? GameState()
+        change(&game)
+        guard game != (data.game ?? GameState()) else { return }
+        var next = data; next.game = game
+        try commit(next)
+    }
     /// False while the records file still holds histories from an earlier version, so the next save moves them out.
     private var historiesSaved = false
     func save(_ holding: Holding) throws {
