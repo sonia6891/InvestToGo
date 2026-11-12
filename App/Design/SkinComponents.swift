@@ -47,7 +47,8 @@ struct SkinButtonChrome<Label: View>: View {
         case .pixelBlock:
             // Primary: accent block, 2pt white frame, 4pt hard shadow, "▶" lead. Secondary: cyan outline block.
             HStack(spacing: 8) {
-                if primary { Text("▶").accessibilityHidden(true) }
+                // U+FE0E keeps the triangle a text glyph instead of the play-button emoji.
+                if primary { Text("\u{25B6}\u{FE0E}").accessibilityHidden(true) }
                 label
             }
             .skinFont(.title(primary ? 18 : 16))

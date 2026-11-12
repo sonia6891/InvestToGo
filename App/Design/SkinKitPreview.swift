@@ -58,7 +58,7 @@ struct SkinKitPreview: View {
                 }
                 SkinCard {
                     VStack(alignment: .leading, spacing: 8) {
-                        HStack { Text("本月任務 2/3"); Spacer(); Text("+120 XP").skinForeground(\.accent) }
+                        HStack { Text("本月任務 2/3"); Spacer(); Text("+120 XP").foregroundStyle(skin.color(skin.lightText ? \.accent : \.ink)) }
                             .skinFont(.mono(11)).skinForeground(\.sub)
                         HStack(spacing: 14) {
                             quest(true, "定投一次"); quest(true, "看配息"); quest(false, "研究新 ETF")
