@@ -25,7 +25,51 @@ final class DexTests: XCTestCase {
         }
         XCTAssertEqual(Dex.stats(for: funds[0], among: [funds[0]], facts: facts).size, 10)
         facts.aum = Dictionary(uniqueKeysWithValues: funds.map { ($0.id, 5.0) })
-        XCTAssertEqual(Set(funds.map { Dex.stats(for: $0, among: funds, facts: facts).size }).count, 1)
+        XCTAssertEqual(funds.map { Dex.stats(for: $0, among: funds, facts: facts).size }, Array(repeating: 10, count: 10))
+    }
+
+    func testTiedCheapestFeeBothGetTen() {
+        let a = fund("a"), b = fund("b"), c = fund("c")
+        let facts = DexFacts(feeRate: ["a": 0.1, "b": 0.1, "c": 0.5])
+        XCTAssertEqual(Dex.stats(for: a, among: [a, b, c], facts: facts).fee, 10)
+        XCTAssertEqual(Dex.stats(for: b, among: [a, b, c], facts: facts).fee, 10)
+        XCTAssertLessThan(Dex.stats(for: c, among: [a, b, c], facts: facts).fee, 10)
+    }
+
+    func testHigherVolatilityMoreBars() {
+        let a = fund("a"), b = fund("b")
+        let facts = DexFacts(volatility: ["a": 30, "b": 10])
+        XCTAssertGreaterThan(Dex.stats(for: a, among: [a, b], facts: facts).volatility,
+                             Dex.stats(for: b, among: [a, b], facts: facts).volatility)
+    }
+
+    func testMissingSizeAndHistoryAreZero() {
+        let a = fund("a")
+        let s = Dex.stats(for: a, among: [a], facts: DexFacts())
+        XCTAssertEqual(s.size, 0); XCTAssertEqual(s.history, 0); XCTAssertEqual(s.fee, 0)
+    }
+
+    func testNonFiniteIsZeroAndExcluded() {
+        let a = fund("a"), b = fund("b"), c = fund("c")
+        let facts = DexFacts(aum: ["a": .nan, "b": 1, "c": 2])
+        XCTAssertEqual(Dex.stats(for: a, among: [a, b, c], facts: facts).size, 0)
+        XCTAssertEqual(Dex.stats(for: b, among: [a, b, c], facts: facts).size, 5)
+        XCTAssertEqual(Dex.stats(for: c, among: [a, b, c], facts: facts).size, 10)
+    }
+
+    func testDuplicateIdsInAmongDoNotSkew() {
+        let a = fund("a"), b = fund("b")
+        let facts = DexFacts(aum: ["a": 1, "b": 2])
+        XCTAssertEqual(Dex.stats(for: a, among: [a, a, a, b], facts: facts), Dex.stats(for: a, among: [a, b], facts: facts))
+        XCTAssertEqual(Dex.stats(for: a, among: [a, b], facts: facts).size, 5)
+    }
+
+    func testEachNewCardEarnsXP() {
+        var g = GameState()
+        let now = Date()
+        XCTAssertEqual(g.collect("0050", now: now), [.firstDexCard])
+        XCTAssertEqual(g.collect("0056", now: now), [.firstDexCard])
+        XCTAssertEqual(g.xp, 60)
     }
 
     func testLowerFeeMoreBars() {

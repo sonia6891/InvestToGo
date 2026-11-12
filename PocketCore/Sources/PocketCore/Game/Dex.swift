@@ -33,11 +33,15 @@ struct DexFacts {
 }
 
 enum Dex {
-    /// `band = ceil(rank / count * 10)`, rank 1-based ascending, ties share the best (lowest) rank.
+    /// `band = ceil(rank / count * 10)` with `rank` = how many values are <= this fund's (so a tie shares the
+    /// HIGHEST rank of its group: tied leaders all get 10 bars, and all-equal values all get 10).
+    /// Non-finite values are treated as missing: 0 bars and left out of `count`.
     /// Fee is reversed (lower fee -> more bars) and history ranks by age (older -> more bars).
     /// Size and history rank across `among`; yield and volatility only within the fund's own series.
     static func stats(for fund: Fund, among: [Fund], facts: DexFacts) -> DexStats {
-        let all = among.contains { $0.id == fund.id } ? among : among + [fund]
+        var seen = Set<String>()
+        let unique = (among + [fund]).filter { seen.insert($0.id).inserted }
+        let all = unique
         let series = DexSeries.of(fund)
         let sameSeries = all.filter { DexSeries.of($0) == series }
         return DexStats(
@@ -51,7 +55,7 @@ enum Dex {
     private static func band(of fund: Fund, in funds: [Fund], value: (Fund) -> Double?) -> Int {
         guard let mine = value(fund), mine.isFinite else { return 0 }
         let values = funds.compactMap(value).filter(\.isFinite)
-        let rank = values.filter { $0 < mine }.count + 1
+        let rank = values.filter { $0 <= mine }.count
         return min(10, max(1, Int((Double(rank) / Double(values.count) * 10).rounded(.up))))
     }
 }
