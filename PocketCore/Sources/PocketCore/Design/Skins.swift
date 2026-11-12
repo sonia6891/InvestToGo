@@ -152,8 +152,15 @@ enum Skins {
     /// Unknown or retired ids fall back to black-gold.
     static func named(_ id: String) -> Skin { all.first { $0.id == id } ?? all.first { $0.id == "blackgold" } ?? all[0] }
     static let carouselOrder = ["voxel", "blackgold", "stitch", "sketch"]
-    /// Whether a skin can be worn (stub until Task 10 lands).
-    static func isUnlocked(_ skin: Skin, level: Int, member: Bool) -> Bool { false }
+    /// Whether a skin can be worn: black-gold always, a level skin from its level on (G3, G6), and every skin for
+    /// members (2026-11-11 文件第 7 節).
+    static func isUnlocked(_ skin: Skin, level: Int, member: Bool) -> Bool {
+        switch skin.unlock {
+        case .free: return true
+        case .level(let needed): return member || level >= needed
+        case .member: return member
+        }
+    }
 }
 
 /// WCAG contrast ratio of two 0xRRGGBB colours (1…21).
