@@ -9,6 +9,7 @@ import SwiftUI
         let args = ProcessInfo.processInfo.arguments
         let testURL = args.contains("--ui-testing") ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
         let store = PortfolioStore(url: testURL, reset: args.contains("--reset"))
+        Onboarding.reset(args)
         // UI tests and screenshots set up game progress with `--demo-…` (only with `--ui-testing`).
         try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
         DemoArguments.seedPocket(store, args: args, now: Date())
@@ -16,13 +17,41 @@ import SwiftUI
     }
     var body: some Scene {
         WindowGroup {
-            RootView().environmentObject(store)
+            LaunchGate().environmentObject(store)
                 // The skin kit's components read the current skin from here.
                 .environment(\.skin, skins.skin)
                 .preferredColorScheme(skins.colorScheme)
         }
     }
 }
+/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby.
+struct LaunchGate: View {
+    @AppStorage(Onboarding.doneKey) private var onboarded = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
+    @State private var start: OnboardingStart?
+
+    init() {
+        _start = State(initialValue: Onboarding.start(ProcessInfo.processInfo.arguments,
+                                                      onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey)))
+    }
+
+    var body: some View {
+        ZStack {
+            if let start {
+                FirstLaunchView(start: start) {
+                    onboarded = true
+                    UserDefaults.standard.synchronize()
+                    withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
+                }
+                .transition(.opacity)
+            } else {
+                RootView().transition(.opacity)
+            }
+        }
+    }
+}
+
 /// The lobby is the navigation root; every feature is pushed above it (spec 4.1). Feature screens share the bottom
 /// bar: 「‹ 大廳」, the quick pick, the page name.
 struct RootView: View {
@@ -34,6 +63,8 @@ struct RootView: View {
     /// The feature at the bottom of the stack; nil in the lobby and on screens pushed straight from it.
     @State private var feature: Feature?
     @ObservedObject private var skins = SkinStore.shared
+    /// The LEVEL×UP on screen (spec 5.12); the level is saved as celebrated when it is accepted.
+    @State private var levelUp: LevelUpMoment?
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
@@ -70,6 +101,14 @@ struct RootView: View {
                 .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: skins.tryOn)
         }
         .onChange(of: path) { _, value in if value.isEmpty { feature = nil } }
+        // Crossing a whole level shows LEVEL×UP once, over everything (spec 5.12).
+        .fullScreenCover(item: $levelUp) { moment in
+            LevelUpView(moment: moment) { accept(moment) }
+                .environmentObject(store)
+                .environment(\.skin, skins.skin)
+                .preferredColorScheme(skins.colorScheme)
+        }
+        .task(id: store.data.game?.levelUpDue) { await celebrateWhenDue() }
         .modifier(SkinKitLaunch())
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Membership unlocks skins; StoreKit's record of this Apple ID is read once at launch and followed after.
@@ -84,6 +123,30 @@ struct RootView: View {
         .onChange(of: phase) { _, value in if value == .background { store.live.stop() } }
         .task(id: store.data.dividends.map(\.id)) { await DividendReminders.syncIfEnabled(store.data.dividends) }
         .alert("投資袋著走", isPresented: Binding(get: { store.message != nil }, set: { if !$0 { store.message = nil } })) { Button("知道了", role: .cancel) { store.message = nil } } message: { Text(store.message ?? "") }
+    }
+
+    /// Waits for the action's own feedback first: 記一筆配息's toast appears 0.6 s after the save and the coin drops
+    /// (ruling R25); LEVEL×UP follows about two seconds later, so neither is lost. Achievements reached with the
+    /// level are recorded here and listed among the rewards.
+    private func celebrateWhenDue() async {
+        guard store.data.game?.levelUpDue != nil, levelUp == nil else { return }
+        try? await Task.sleep(for: .milliseconds(150))
+        let hadReward = store.pendingReward > 0
+        var waits = 0
+        while store.pendingReward > 0, waits < 20, !Task.isCancelled {
+            try? await Task.sleep(for: .milliseconds(150)); waits += 1
+        }
+        if hadReward { try? await Task.sleep(for: .seconds(2)) }
+        guard !Task.isCancelled, levelUp == nil, let level = store.data.game?.levelUpDue else { return }
+        var fresh: [String] = []
+        try? store.updateGame { fresh = $0.refreshAchievements(store.data, now: Date()) }
+        levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, fresh: fresh, now: Date())
+    }
+
+    /// 收下: saved as celebrated, so it is never shown again (not after leaving a screen, nor after a relaunch).
+    private func accept(_ moment: LevelUpMoment) {
+        do { try store.updateGame { $0.celebrate(moment.level) } } catch { store.message = error.localizedDescription }
+        levelUp = nil
     }
 
     private var navigation: LobbyNavigation {

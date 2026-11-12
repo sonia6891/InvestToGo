@@ -64,17 +64,19 @@ extension GameState {
     mutating func award(_ e: XPEvent) {
         let gain = GameRules.xp[e] ?? 0
         xp += gain; coins += gain
+        lastAward = e
         count(e.counterKey)
     }
 
     /// The level to celebrate with LEVEL×UP, or nil: the current level once experience has crossed a whole level
     /// above the last one celebrated. Several levels crossed at once are celebrated together, as the highest.
     var levelUpDue: Int? {
-        nil // RED: not implemented yet
+        let level = GameRules.level(xp: xp)
+        return level > celebratedLevel ? level : nil
     }
 
     /// Records that LEVEL×UP for `level` was shown; it never goes back down.
     mutating func celebrate(_ level: Int) {
-        // RED: not implemented yet
+        celebratedLevel = max(celebratedLevel, level)
     }
 }

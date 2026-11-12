@@ -49,24 +49,31 @@ jobs:
           xcodebuild build-for-testing -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only simulator app')"
       - name: Capture the lobby and every feature screen
-        timeout-minutes: 8
+        timeout-minutes: 10
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
-          for SCREEN in lobby find dividends pocket tools achievements member skins; do
+          for SCREEN in lobby find dividends pocket tools achievements member skins splash levelup; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --demo-streak 12 --demo-level 7 --open "$SCREEN"
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --open "$SCREEN"
             sleep 5
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png"
           done
           # 換膚 worn in the light sketch skin, to check the carousel's frame and badges on paper.
           xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --demo-level 7 --skin sketch --open skins
+          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-level 7 --skin sketch --open skins
           sleep 5
           xcrun simctl io "$DEVICE" screenshot "build/screens/screen-skins-sketch.png"
+          # 新手引導, each of its four pages (spec 5.2).
+          for PAGE in 1 2 3 4; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --open onboarding --page "$PAGE"
+            sleep 4
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-onboarding-$PAGE.png"
+          done
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2
         continue-on-error: true
@@ -76,7 +83,7 @@ jobs:
           set -euo pipefail
           for SKIN in blackgold voxel stitch sketch; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skin "$SKIN" --open skinKit
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open skinKit
             sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
           done

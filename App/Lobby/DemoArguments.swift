@@ -5,9 +5,11 @@ import Foundation
 /// - `--demo-streak <n>`: DCA recorded in each of the n months up to and including this one.
 /// - `--demo-level <n>`: experience at the start of level n, `(n - 1) × GameRules.xpPerLevel`.
 /// - `--demo-xp <n>`: experience n (wins over `--demo-level`).
+/// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
 /// - `--demo-pocket`: four sample holdings, one of them at a loss, and a year of received dividends (`seedPocket`).
 ///
-/// Read elsewhere: `--skin <id>` (SkinStore), `--open <feature>` (the root view), `--offline` and `--reduce-motion`.
+/// Read elsewhere: `--skin <id>` (SkinStore), `--open <feature>` (the root view), `--skip-onboarding`,
+/// `--open splash` and `--open onboarding [--page n]` (`Onboarding.start`), `--offline` and `--reduce-motion`.
 enum DemoArguments {
     static func apply(to game: inout GameState, args: [String], now: Date) {
         guard args.contains("--ui-testing") else { return }
@@ -23,6 +25,13 @@ enum DemoArguments {
         }
         if let level = number("--demo-level"), level >= 1 { game.xp = (level - 1) * GameRules.xpPerLevel }
         if let xp = number("--demo-xp") { game.xp = xp }
+        // Demo progress is set-up, not an earned level: no LEVEL×UP for it (spec 5.12 celebrates crossing a level).
+        if number("--demo-level") != nil || number("--demo-xp") != nil { game.celebratedLevel = GameRules.level(xp: game.xp) }
+        // `--open levelup`: the current level is still to be celebrated, earned by this month's DCA (screenshots).
+        if let i = args.firstIndex(of: "--open"), args.indices.contains(i + 1), args[i + 1] == "levelup" {
+            game.celebratedLevel = max(1, GameRules.level(xp: game.xp) - 1)
+            game.lastAward = .monthlyDCA
+        }
     }
 
     /// The holdings of the pocket canvas (spec 5.7) for screenshots and UI tests: shares and the gain or loss on cost,

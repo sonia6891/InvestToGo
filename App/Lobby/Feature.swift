@@ -109,7 +109,7 @@ struct FeatureScreen: View {
         case .dividends: DividendsView()
         case .pocket: HomeView()
         case .tools: ToolsView()
-        case .achievements: AchievementListView()
+        case .achievements: AchievementsView()
         }
     }
 
@@ -147,7 +147,7 @@ struct FadeInWithReducedMotion: ViewModifier {
     }
 }
 
-/// Feature screens' scroll views report whether they are at the top (`Page` and the achievement list do).
+/// Feature screens' scroll views report whether they are at the top (`Page` and the achievement wall do).
 private struct ScrollAtTopKey: EnvironmentKey { static let defaultValue: (Bool) -> Void = { _ in } }
 
 extension EnvironmentValues {
@@ -167,45 +167,5 @@ struct ReportsScrollTop: ViewModifier {
     @Environment(\.scrollAtTop) private var report
     func body(content: Content) -> some View {
         content.onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y + $0.contentInsets.top <= 1 }) { _, value in report(value) }
-    }
-}
-
-/// 成就 until the badge wall arrives (Task 11): every achievement with a check and its progress.
-struct AchievementListView: View {
-    @EnvironmentObject var store: PortfolioStore
-    @Environment(\.skin) private var skin
-
-    var body: some View {
-        let game = store.data.game ?? GameState(), now = Date()
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("BADGE×\(String(format: "%03d", game.unlocked.count))").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-                        Text("成就").skinFont(.title(34)).skinForeground(\.ink)
-                    }
-                    Spacer()
-                    SkinImage(.achievements).frame(width: 96, height: 96).accessibilityHidden(true)
-                }
-                SkinCard {
-                    VStack(spacing: 12) {
-                        ForEach(Achievements.all) { item in
-                            let progress = min(item.progress(game, store.data, now), item.goal)
-                            HStack(spacing: 10) {
-                                SkinCheck(done: game.unlocked[item.id] != nil)
-                                Text(item.title).skinFont(.body(14))
-                                Spacer()
-                                Text("\(progress)/\(item.goal)").skinFont(.mono(12)).skinForeground(\.sub)
-                            }
-                            .accessibilityElement(children: .combine)
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 24)
-        }
-        .modifier(ReportsScrollTop())
-        .background(skin.color(\.page).ignoresSafeArea())
-        .toolbar(.hidden, for: .navigationBar)
     }
 }
