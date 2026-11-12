@@ -388,11 +388,12 @@ final class ETFToGoUITests: XCTestCase {
         symbol.tap(); symbol.typeText("0050")
         app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
         app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
-        app.navigationBars.firstMatch.tap() // put the number pad away so the save button can be reached
-        reveal(app, app.buttons["save-dividend"])
-        XCTAssertTrue(app.buttons["save-dividend"].waitForNonExistence(timeout: 5), "The form closes after saving")
+        capture(app, "dividend-form")
+        app.buttons["save-dividend"].tap()
+        // The toast stays a few seconds; look for it first, then check the form is gone.
         let toast = app.staticTexts["dividend-xp-toast"]
         XCTAssertTrue(toast.waitForExistence(timeout: 5), "Back on 配息, the reward is shown")
+        XCTAssertFalse(app.buttons["save-dividend"].exists, "The form closes after saving")
         XCTAssertEqual(toast.label, "記一筆配息 +20 經驗")
         capture(app, "dividend-logged")
         app.buttons["bar-lobby"].tap()

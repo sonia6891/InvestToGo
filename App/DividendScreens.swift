@@ -97,7 +97,9 @@ struct DividendsView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("hideAmounts") private var hidden = false
     /// How many dividends had been logged when the page last appeared; more on the way back plays the coin drop.
-    @State private var seenLogs: Int?
+    /// The 記一筆配息 count when 配息 last appeared. Kept outside the view so a page rebuilt on the way back from the
+    /// form still knows a dividend was logged meanwhile; −1 until the first visit.
+    @AppStorage("dividendLogsSeen") private var seenLogs = -1
     @State private var drops = 0
     @State private var rewarded = false
 
@@ -275,7 +277,7 @@ struct DividendsView: View {
     private func appeared() {
         try? store.updateGame { _ = $0.complete(.dividendsViewed, now: Date()) }
         let logs = (store.data.game ?? GameState()).counter(.dividendLogged)
-        if let seenLogs, logs > seenLogs { celebrate() }
+        if seenLogs >= 0, logs > seenLogs { celebrate() }
         seenLogs = logs
     }
 
@@ -285,7 +287,7 @@ struct DividendsView: View {
         withAnimation(animation) { rewarded = true }
         AccessibilityNotification.Announcement(toastText).post()
         Task {
-            try? await Task.sleep(for: .seconds(3))
+            try? await Task.sleep(for: .seconds(5))
             withAnimation(animation) { rewarded = false }
         }
     }
