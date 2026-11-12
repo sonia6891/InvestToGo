@@ -72,7 +72,7 @@ jobs:
           for SKIN in blackgold voxel stitch sketch; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skin "$SKIN" --open skinKit
-            sleep 4
+            sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
           done
       - name: Publish screenshots immediately for inspection

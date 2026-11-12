@@ -28,7 +28,9 @@ import UIKit
             for name in [skin.fonts.big, skin.fonts.title, skin.fonts.body, skin.fonts.mono] {
                 XCTAssertNotNil(UIFont(name: name, size: 17), "\(skin.id) font \(name) is not registered")
             }
-            XCTAssertNotNil(UIImage(named: skin.art.image(.find)), "\(skin.id) has no find art")
+            for name in SkinArtName.allCases {
+                XCTAssertNotNil(UIImage(named: skin.art.image(name)), "\(skin.id) has no \(name.rawValue) art")
+            }
             assertDrawn("tag", SkinTag("連續定期定額"), skin)
             assertDrawn("primary button", SkinButton("加入口袋") {}, skin)
             assertDrawn("secondary button", SkinButton("＋ 加一檔", primary: false) {}, skin)
