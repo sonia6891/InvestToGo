@@ -205,7 +205,12 @@ struct SkinSearchField: View {
     @Environment(\.skin) private var skin
     @Binding var text: String
     let prompt: String
-    init(text: Binding<String>, prompt: String) { _text = text; self.prompt = prompt }
+    /// The text field's own focus and accessibility identifier, which modifiers on the whole box cannot reach.
+    private let focus: FocusState<Bool>.Binding?
+    private let identifier: String?
+    init(text: Binding<String>, prompt: String, focus: FocusState<Bool>.Binding? = nil, identifier: String? = nil) {
+        _text = text; self.prompt = prompt; self.focus = focus; self.identifier = identifier
+    }
 
     private var isPixel: Bool { skin.style.button == .pixelBlock }
 
@@ -216,15 +221,21 @@ struct SkinSearchField: View {
             }
             .foregroundStyle(skin.color(\.dim))
             .accessibilityHidden(true)
-            TextField("", text: $text, prompt: Text(prompt).foregroundStyle(skin.color(\.dim)))
+            input
                 .skinFont(.body(isPixel ? 14 : 13))
                 .foregroundStyle(skin.color(\.ink))
                 .tint(skin.color(\.accent))
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
+                .accessibilityIdentifier(identifier ?? "")
         }
         .frame(minHeight: 44)
+    }
+
+    @ViewBuilder private var input: some View {
+        let field = TextField("", text: $text, prompt: Text(prompt).foregroundStyle(skin.color(\.dim)))
+        if let focus { field.focused(focus) } else { field }
     }
 
     var body: some View {

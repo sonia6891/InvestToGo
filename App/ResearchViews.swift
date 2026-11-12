@@ -15,7 +15,7 @@ struct ComponentsContent: View {
     private var snapshot: ComponentSnapshot? { store.data.components?[symbol] }
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Card {
+            SkinPanel {
                 Text("\(symbol) 成分股").font(.title3.bold()).foregroundStyle(Palette.ink)
                 Button(busy ? "取得中…" : "更新成分股") { Task { busy = true; error = nil; defer { busy = false }; do { try store.saveComponents(await Fugle.components(symbol: symbol)) } catch { self.error = error.localizedDescription } } }.buttonStyle(.borderedProminent).disabled(busy).padding(.vertical, 12)
                 Button("匯入成分股 JSON") { importing = true }
@@ -23,9 +23,9 @@ struct ComponentsContent: View {
             }
             if let error { Text(error).foregroundStyle(Palette.red) }
             if let snapshot {
-                Card { LabeledContent("資料日期", value: snapshot.date); LabeledContent("揭露股票權重", value: "\(decimal(snapshot.totalWeight))%").padding(.vertical, 12) }
+                SkinPanel { LabeledContent("資料日期", value: snapshot.date); LabeledContent("揭露股票權重", value: "\(decimal(snapshot.totalWeight))%").padding(.vertical, 12) }
                 Text("只包含已揭露股票部位，可能未含現金、債券與期貨；不是基金全部資產。").font(.caption).foregroundStyle(Palette.muted)
-                Card(padding: 12) {
+                SkinPanel {
                     LazyVStack(spacing: 0) {
                         ForEach(snapshot.components.sorted { $0.weight > $1.weight }) { c in
                             VStack(alignment: .leading, spacing: 6) {
@@ -140,41 +140,47 @@ struct OverlapPanel: View {
         HStack { NavigationLink("\(left) 成分股") { ComponentsView(symbol: left) }; Spacer(); NavigationLink("\(right) 成分股") { ComponentsView(symbol: right) } }.font(.subheadline).padding(.top, 14)
     } }
 }
+/// The 走勢 tab's history panel: fetching adjusted closes and the statistics they give. The line itself is drawn
+/// above it by the ETF page.
 struct HistoryContent: View {
     @EnvironmentObject var store: PortfolioStore
     let symbol: String
     @State private var years = 3
-    @State private var range = ChartRange.all
     @State private var busy = false
     @State private var error: String?
     private var history: PriceHistory? { store.data.histories?[symbol] }
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Card {
-                Picker("查詢期間", selection: $years) { Text("1 年").tag(1); Text("3 年").tag(3); Text("5 年").tag(5); Text("10 年").tag(10); Text("最長 16 年").tag(16) }.pickerStyle(.menu)
-                Button(busy ? "分段取得歷史資料…" : "更新歷史績效") { Task { busy = true; error = nil; defer { busy = false }; do { try store.saveHistory(await Fugle.history(symbol: symbol, years: years)) } catch { self.error = error.localizedDescription } } }.buttonStyle(.borderedProminent).disabled(busy)
-                Text("取實際還原日收盤價，最早自 2010 年或基金上市日開始。長區間會分段查詢，約需數十秒。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 12)
+        VStack(alignment: .leading, spacing: 14) {
+            SkinPanel {
+                HStack {
+                    Text("歷史績效").skinFont(.title(16))
+                    Spacer()
+                    Picker("查詢期間", selection: $years) { Text("1 年").tag(1); Text("3 年").tag(3); Text("5 年").tag(5); Text("10 年").tag(10); Text("最長 16 年").tag(16) }.pickerStyle(.menu)
+                }
+                Button(busy ? "分段取得歷史資料…" : "更新歷史績效") { Task { busy = true; error = nil; defer { busy = false }; do { try store.saveHistory(await Fugle.history(symbol: symbol, years: years)) } catch { self.error = error.localizedDescription } } }
+                    .buttonStyle(SkinButtonStyle(primary: false, seed: SkinSeed.of("更新歷史績效"))).disabled(busy).padding(.top, 8)
+                Text("取實際還原日收盤價，最早自 2010 年或基金上市日開始。長區間會分段查詢，約需數十秒。").skinFont(.body(11)).skinForeground(\.sub).padding(.top, 10)
             }
-            if let error { Text(error).foregroundStyle(Palette.red) }
+            if let error { Text(error).skinFont(.body(12)).foregroundStyle(Palette.red) }
             if let history, let stats = try? PerformanceStats(history) {
-                let points = TrendMath.slice(TrendMath.points(history), range)
-                Card(padding: 14) {
-                    Text("還原價格走勢").font(.headline).foregroundStyle(Palette.ink)
-                    RangeChips(options: [.month, .year, .fiveYears, .all], selection: $range).padding(.vertical, 10)
-                    if points.count >= 2 { ValueChart(points: points, showAxes: true, height: 220) } else { Text("此區間資料不足。").font(.caption).foregroundStyle(Palette.muted) }
-                    Text("\(history.points.first!.date) ～ \(history.points.last!.date) · \(history.points.count) 筆").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
+                SkinPanel {
+                    stat("區間報酬", stats.change); stat("年化報酬", stats.annualized)
+                    stat("最大回撤", stats.drawdown); stat("年化波動率", stats.volatility)
+                    Text("\(history.points.first!.date) ～ \(history.points.last!.date) · \(history.points.count) 筆").skinFont(.mono(10)).skinForeground(\.sub).padding(.top, 6)
                 }
-                Card {
-                    stat("區間報酬", stats.change); Divider().padding(.vertical, 12)
-                    stat("年化報酬", stats.annualized); Divider().padding(.vertical, 12)
-                    stat("最大回撤", stats.drawdown); Divider().padding(.vertical, 12)
-                    stat("年化波動率", stats.volatility)
-                }
-                Text("資料取得日 \(history.fetchedDay)。依還原價格計算，並非你的交易損益；未另計稅費、匯率或個人配息再投入。年化報酬至少需一年，波動率至少需 20 個報酬樣本。無資料期間不補造價格。").font(.caption).foregroundStyle(Palette.muted)
-            } else { ContentUnavailableView("尚無歷史資料", systemImage: "chart.xyaxis.line", description: Text("使用你的行情金鑰取得資料後才計算，不使用情境試算代替。")) }
+                Text("資料取得日 \(history.fetchedDay)。依還原價格計算，並非你的交易損益；未另計稅費、匯率或個人配息再投入。年化報酬至少需一年，波動率至少需 20 個報酬樣本。無資料期間不補造價格。").skinFont(.body(11)).skinForeground(\.sub)
+            }
         }
     }
-    private func stat(_ title: String, _ value: Double?) -> some View { LabeledContent(title, value: value.map { "\(decimal($0 * 100))%" } ?? "資料期間不足") }
+    private func stat(_ title: String, _ value: Double?) -> some View {
+        HStack {
+            Text(title).skinFont(.body(13)).skinForeground(\.sub)
+            Spacer(minLength: 8)
+            Text(value.map { "\(decimal($0 * 100))%" } ?? "資料期間不足").skinFont(.mono(13))
+        }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
+    }
 }
 struct FeesContent: View {
     @EnvironmentObject var store: PortfolioStore
@@ -182,7 +188,7 @@ struct FeesContent: View {
     @State private var editing = false
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Card {
+            SkinPanel {
                 Text("已公布的年度實際費用").font(.title3.bold()).foregroundStyle(Palette.ink).accessibilityIdentifier("annual-fee-heading")
                 if let catalog = AnnualFeeCatalog.bundled, let fee = catalog.records[fund.id] {
                     LabeledContent("\(String(fee.year)) 年總費用率", value: "\(decimal(fee.total))%")
@@ -201,7 +207,7 @@ struct FeesContent: View {
                     Text("這檔尚未配對到已核對的年度費用資料。新掛牌、主動式、期貨型或更名基金可能缺值；不顯示為 0%。").foregroundStyle(Palette.muted).padding(.top, 14)
                 }
             }
-            Card {
+            SkinPanel {
                 Text("費用率與級距").font(.title3.bold()).foregroundStyle(Palette.ink)
                 if let fee = store.data.fees?[fund.id] {
                     Text("經理費").font(.headline).padding(.top, 18); Text(fee.management).padding(.top, 5)
@@ -213,7 +219,7 @@ struct FeesContent: View {
                 } else { Text("尚未收錄經核對的費用率，缺值不當成 0%。").foregroundStyle(Palette.muted).padding(.vertical, 14) }
                 Button("記錄／更新費用資料") { editing = true }.buttonStyle(.bordered).padding(.top, 14)
             }
-            Card { Text("三種費用不能混用").font(.headline).foregroundStyle(Palette.ink); Text("經理費與保管費可能依基金規模分級距；年度總費用率還包含其他實際支出。不要把兩項契約費率相加，當成完整年度總費用率。").font(.subheadline).padding(.top, 12) }
+            SkinPanel { Text("三種費用不能混用").font(.headline).foregroundStyle(Palette.ink); Text("經理費與保管費可能依基金規模分級距；年度總費用率還包含其他實際支出。不要把兩項契約費率相加，當成完整年度總費用率。").font(.subheadline).padding(.top, 12) }
             Link("前往官方 ETF 資料專區", destination: URL(string: fund.market == "TPEx" ? "https://info.tpex.org.tw/ETF/zh/" : "https://www.twse.com.tw/zh/ETFortune/etfInfo/\(fund.id)")!)
         }
         .sheet(isPresented: $editing) { FeeEditor(symbol: fund.id).silencesScrollTop() }

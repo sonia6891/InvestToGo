@@ -108,29 +108,46 @@ struct OptionChip: View {
     }
 }
 
+/// 找 ETF (spec 5.4): title with the skin's magnifier, the search box, series chips (全部、市值型、高股息、債券、主題) and
+/// the list: code in the big numeral font, name, price and the day's move as ▲/▼ with a percentage.
 struct DiscoverView: View {
     @EnvironmentObject var store: PortfolioStore
+    @Environment(\.skin) private var skin
     @State private var query = ""
+    /// The series chip; nil is 全部.
+    @State private var series: DexSeries?
+    /// 更多條件: the full filter sheet, on top of the series.
     @State private var filter = FundFilter()
     @State private var showFilter = false
     @FocusState private var searchFocused: Bool
     private var funds: [Fund] {
         let text = query.trimmingCharacters(in: .whitespaces)
         return store.funds.filter { fund in
-            filter.matches(fund, frequency: store.official.frequency(fund.id)) && (text.isEmpty || fund.id.localizedCaseInsensitiveContains(text) || fund.name.localizedCaseInsensitiveContains(text))
+            (series == nil || DexSeries.of(fund) == series)
+                && filter.matches(fund, frequency: store.official.frequency(fund.id))
+                && (text.isEmpty || fund.id.localizedCaseInsensitiveContains(text) || fund.name.localizedCaseInsensitiveContains(text))
         }
     }
     var body: some View {
         let items = funds
         Page {
-            searchField
-            etfContent(items)
+            header
+            SkinSearchField(text: $query, prompt: "輸入代號或名稱", focus: $searchFocused, identifier: "fund-search")
+                .onSubmit { searchFocused = false }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    SkinChip("全部", selected: series == nil) { series = nil }
+                    ForEach(DexSeries.allCases, id: \.self) { item in
+                        SkinChip(item.rawValue, selected: series == item) { series = series == item ? nil : item }
+                    }
+                }
+            }
+            countRow(items.count)
+            list(items)
+            footer
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("探索 ETF").font(.headline).foregroundStyle(Palette.ink); Text("台灣上市・上櫃 ETF").font(.caption2).foregroundStyle(Palette.muted) } }
-            ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } }
-        }
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar { ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } } }
         .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter).silencesScrollTop() }
         .onAppear(perform: applyRequest)
         .onChange(of: store.discoverRequest) { _, _ in applyRequest() }
@@ -140,127 +157,79 @@ struct DiscoverView: View {
         store.discoverRequest = nil
         if request.search {
             // A search from the home page starts clean, so an earlier ETF filter cannot hide its results.
-            filter = FundFilter(); query = ""
+            filter = FundFilter(); series = nil; query = ""
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { searchFocused = true }
         }
     }
-    @ViewBuilder private func etfContent(_ items: [Fund]) -> some View {
-            HStack(alignment: .firstTextBaseline) { NumberedHeading(number: 1, title: "系統用途分類"); Spacer(); Text("依名稱規則整理，點選即可篩選").font(.caption2).foregroundStyle(Palette.muted) }
-            HStack(spacing: 10) { ForEach([Strategy.saving, .income, .risk]) { categoryCard($0) } }
-            NumberedHeading(number: 2, title: "依 ETF 類型找")
-            Card(padding: 14) {
-                VStack(alignment: .leading, spacing: 12) {
-                    quickRow(.management, options: ["主動型", "被動型"], all: true)
-                    quickRow(.theme, options: ["市值型", "高股息", "產業主題"])
-                    quickRow(.industry, options: ["科技", "金融", "傳產", "跨產業"])
-                    if !store.official.freq.isEmpty { quickRow(.frequency, options: ["月配", "季配"], more: true) }
-                }
+    private var header: some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("FIND×ETF").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                Text("找 ETF").skinFont(.title(34)).skinForeground(\.ink)
+                Text("台灣上市・上櫃 ETF").skinFont(.body(12)).skinForeground(\.sub)
             }
-            HStack {
-                Text("\(filter.isEmpty ? "全部 ETF" : "符合條件") (\(items.count))").font(.headline).foregroundStyle(Palette.ink)
-                Spacer()
-                NavigationLink(value: AppRoute.watchlist) { Label("我的自選 \(store.data.favorites.count)", systemImage: "star.fill").font(.caption.bold()) }
-                Button { showFilter = true } label: { Label("完整分類", systemImage: "line.3.horizontal.decrease").font(.caption.bold()) }.padding(.leading, 8)
-            }
+            Spacer(minLength: 8)
+            // The skin's decoration stays inside the magnifier's own square, away from the title and the search box.
+            SkinImage(.find).frame(width: 104, height: 104)
+                .background(SkinDecor(page: .other))
+                .accessibilityHidden(true)
+        }
+    }
+    private func countRow(_ count: Int) -> some View {
+        HStack(spacing: 12) {
+            Text("\(series?.rawValue ?? "全部") · \(count) 檔").skinFont(.mono(11)).skinForeground(\.sub)
+            Spacer(minLength: 8)
             if !filter.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(filter.chips, id: \.self) { chip in
-                            Button { filter.remove(chip) } label: { HStack(spacing: 4) { Text(chip); Image(systemName: "xmark").font(.caption2.bold()) }.font(.caption.weight(.semibold)).padding(.horizontal, 11).padding(.vertical, 7).foregroundStyle(.white).background(Palette.blue, in: Capsule()) }
-                                .buttonStyle(.plain).accessibilityLabel("移除篩選 \(chip)")
-                        }
-                        Button("清除") { filter = FundFilter() }.font(.caption.bold())
-                    }
-                }
+                Button("清除條件") { filter = FundFilter() }.buttonStyle(.plain)
+                    .skinFont(.mono(11)).skinForeground(\.sub).frame(minHeight: 44)
             }
-            Card(padding: 6) {
-                if items.isEmpty { ContentUnavailableView.search(text: query) }
-                LazyVStack(spacing: 0) {
-                    ForEach(items) { fund in
-                        HStack(spacing: 6) {
-                            NavigationLink(value: fund) { FundRow(fund: fund) }.buttonStyle(.plain)
-                            favoriteButton(fund.id)
-                        }.padding(.horizontal, 10)
-                        if fund.id != items.last?.id { Divider().padding(.leading, 10) }
-                    }
-                }
-            }
-            footer
-    }
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass").foregroundStyle(Palette.muted)
-            TextField("搜尋代號或名稱（例：0050）", text: $query)
-                .autocorrectionDisabled().textInputAutocapitalization(.never)
-                .focused($searchFocused).submitLabel(.search).onSubmit { searchFocused = false }
-                .accessibilityIdentifier("fund-search")
-            if !query.isEmpty { Button { query = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(Palette.muted) }.accessibilityLabel("清除搜尋") }
-        }
-        .padding(13)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Palette.blue.opacity(0.05), radius: 8, y: 2)
-    }
-    private func categoryCard(_ strategy: Strategy) -> some View {
-        let selected = filter.strategies == [strategy]
-        let count = store.funds.filter { $0.strategy == strategy }.count
-        let color = Palette.strategy(strategy)
-        return Button { filter.strategies = selected ? [] : [strategy] } label: {
-            VStack(spacing: 4) {
-                StrategyArt(strategy: strategy, size: 64)
-                Text(strategy.rawValue).font(.headline).foregroundStyle(Palette.ink).padding(.top, 2)
-                Text(strategy.tagline).font(.caption).foregroundStyle(Palette.muted)
-            }
-            .frame(maxWidth: .infinity).padding(.vertical, 14)
-            .background(LinearGradient(colors: [color.opacity(selected ? 0.22 : 0.13), color.opacity(selected ? 0.12 : 0.04)], startPoint: .top, endPoint: .bottom), in: RoundedRectangle(cornerRadius: 20))
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(color.opacity(selected ? 0.8 : 0), lineWidth: 1.5))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(strategy.rawValue)，\(strategy.tagline)，\(count) 檔")
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
-    private func quickRow(_ group: FilterGroup, options: [String], all: Bool = false, more: Bool = false) -> some View {
-        HStack(alignment: .center, spacing: 8) {
-            HStack(spacing: 6) { Capsule().fill(Palette.orange).frame(width: 3, height: 14); Text(group.title).font(.subheadline.bold()).foregroundStyle(Palette.ink) }.frame(width: 76, alignment: .leading)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    if all { OptionChip(title: "全部", on: group.isEmpty(filter)) { group.clear(&filter) } }
-                    ForEach(options, id: \.self) { option in OptionChip(title: option, on: group.isOn(filter, option)) { group.toggle(&filter, option) } }
-                    if more { OptionChip(title: "更多 ⌄", on: false) { showFilter = true } }
-                }
-            }
+            Button(filter.isEmpty ? "更多條件" : "更多條件（\(filter.chips.count)）") { showFilter = true }.buttonStyle(.plain)
+                .skinFont(.mono(11)).foregroundStyle(skin.lightText ? skin.color(\.accent) : skin.color(\.ink)).frame(minHeight: 44)
         }
     }
-    private func favoriteButton(_ symbol: String) -> some View {
-        let on = store.data.favorites.contains(symbol)
-        return Button { store.favorite(symbol) } label: {
-            Image(systemName: on ? "star.fill" : "star").font(.body).foregroundStyle(on ? Palette.orange : Palette.muted.opacity(0.5)).frame(width: 32, height: 44)
-        }.buttonStyle(.plain).accessibilityLabel(on ? "取消自選 \(symbol)" : "加入自選 \(symbol)")
+    @ViewBuilder private func list(_ items: [Fund]) -> some View {
+        if items.isEmpty {
+            Text(query.isEmpty ? "沒有符合條件的 ETF" : "找不到「\(query)」").skinFont(.body(14)).skinForeground(\.sub)
+                .frame(maxWidth: .infinity).padding(.vertical, 24)
+        }
+        LazyVStack(spacing: 0) {
+            ForEach(items) { fund in
+                NavigationLink(value: fund) { FundRow(fund: fund) }.buttonStyle(.plain)
+                Rectangle().fill(skin.color(\.line)).frame(height: 1).accessibilityHidden(true)
+            }
+        }
     }
     @ViewBuilder private var footer: some View {
-        Text("上市 \(store.funds.filter { $0.market == "TWSE" }.count) · 上櫃 \(store.funds.filter { $0.market == "TPEx" }.count) 個代碼。配息頻率依近一年除息次數推算，上櫃 ETF 未收錄；產業依名稱歸類。").font(.caption).foregroundStyle(Palette.muted)
-        if let catalog = store.catalog { Text("上市資料日 \(catalog.listedDate) · 上櫃取得日 \(catalog.fetchedDay)").font(.caption).foregroundStyle(Palette.muted) }
-        if let message = store.catalogMessage { Text(message).font(.caption).foregroundStyle(Palette.muted) }
-        Button(store.catalogRefreshing ? "更新中…" : "更新上市櫃名單") { Task { await store.refreshCatalog() } }.font(.subheadline).disabled(store.catalogRefreshing)
+        VStack(alignment: .leading, spacing: 6) {
+            Text("上市 \(store.funds.filter { $0.market == "TWSE" }.count) · 上櫃 \(store.funds.filter { $0.market == "TPEx" }.count) 個代碼。系列依名稱與基金類型歸類；配息頻率依近一年除息次數推算。")
+            if let catalog = store.catalog { Text("上市資料日 \(catalog.listedDate) · 上櫃取得日 \(catalog.fetchedDay)") }
+            if let message = store.catalogMessage { Text(message) }
+        }
+        .skinFont(.body(11)).skinForeground(\.sub)
+        Button(store.catalogRefreshing ? "更新中…" : "更新上市櫃名單") { Task { await store.refreshCatalog() } }
+            .buttonStyle(.plain).skinFont(.mono(11)).skinForeground(\.ink).frame(minHeight: 44)
+            .disabled(store.catalogRefreshing)
     }
 }
+/// One 找 ETF row: code (big numerals) and name, price and the day's move.
 struct FundRow: View {
     @EnvironmentObject var store: PortfolioStore
     let fund: Fund
     var body: some View {
         let quote = store.quote(fund.id)
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(fund.id).font(.headline).foregroundStyle(Palette.ink)
-                Text(fund.name).font(.caption).foregroundStyle(Palette.muted).lineLimit(1)
+                Text(fund.id).skinFont(.big(22)).skinForeground(\.ink).lineLimit(1).minimumScaleFactor(0.6)
+                Text(fund.name).skinFont(.body(12)).skinForeground(\.sub).lineLimit(1)
             }
-            Spacer(minLength: 6)
+            Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 4) {
-                Text(quote.map { priceText($0.price) } ?? "—").font(.headline).monospacedDigit().foregroundStyle(Palette.ink)
-                QuoteChange(quote: quote, font: .caption2)
+                Text(quote.map { priceText($0.price) } ?? "—").skinFont(.mono(14)).skinForeground(\.ink)
+                SkinChange(quote: quote, size: 11).accessibilityIdentifier("fund-change-\(fund.id)")
             }
-            StrategyPill(strategy: fund.strategy).frame(width: 56)
         }
-        .padding(.vertical, 11)
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
         .contentShape(Rectangle())
     }
 }
@@ -391,160 +360,169 @@ struct WatchlistView: View {
     }
 }
 
+/// ETF 詳情 (spec 5.5): the big code, name, series tag, price and move; tabs 走勢／持股／配息／資訊; the skin's trend
+/// line with 1月／3月／1年／5年／全部 and four facts; 「加入口袋」 and 「用 0050 試算定期定額」. The first visit collects the
+/// fund's dex card (spec 6.4) and shows 「收進圖鑑 +30 經驗」 once.
 struct FundDetail: View {
     @EnvironmentObject var store: PortfolioStore
+    @Environment(\.skin) private var skin
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let fund: Fund
     @State private var section = 0
     @State private var range = ChartRange.year
-    @State private var busy = false
-    @State private var error: String?
+    @State private var collected = false
+    private static let tabs = ["走勢", "持股", "配息", "資訊"]
     private var quote: Quote? { store.quote(fund.id) }
-    private var stats: PerformanceStats? {
-        guard let history = store.data.histories?[fund.id] else { return nil }
-        return try? PerformanceStats(history)
-    }
     var body: some View {
         Page {
-            priceBlock
-            SegmentBar(items: ["總覽", "走勢", "持股", "配息", "資訊"], selection: $section, pill: true, filled: true)
+            header
+            HStack(spacing: 6) {
+                ForEach(Self.tabs.indices, id: \.self) { i in SkinChip(Self.tabs[i], selected: section == i) { section = i } }
+            }
             switch section {
-            case 1: HistoryContent(symbol: fund.id)
-            case 2: FundHoldingsContent(fund: fund)
-            case 3: FundDividends(fund: fund)
-            case 4: FundInfo(fund: fund)
-            default: overview
+            case 1: FundHoldingsContent(fund: fund)
+            case 2: FundDividends(fund: fund)
+            case 3: FundInfo(fund: fund)
+            default: trend
             }
         }
-        .safeAreaInset(edge: .bottom) { actionBar }
+        .safeAreaInset(edge: .bottom) { actions }
+        .overlay(alignment: .top) { if collected { toast } }
         .task { await store.refreshDaily() }
-        .onAppear { store.liveFocus = fund.id; store.live.syncSoon() }
+        .onAppear {
+            store.liveFocus = fund.id; store.live.syncSoon()
+            if store.collectDexCard(fund.id) { showToast() }
+        }
         .onDisappear { if store.liveFocus == fund.id { store.liveFocus = nil; store.live.syncSoon() } }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 0) {
-                    Text("\(fund.id) \(fund.name)").font(.headline).foregroundStyle(Palette.ink).lineLimit(1).minimumScaleFactor(0.7)
-                    Text([fund.market == nil ? "" : "台灣\(fund.marketName)", fund.theme, fund.assetKind].filter { !$0.isEmpty }.joined(separator: "・")).font(.caption2).foregroundStyle(Palette.muted)
-                }
-            }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 LiveQuoteButton(symbol: fund.id, market: fund.market)
-                Button { store.favorite(fund.id) } label: { Image(systemName: store.data.favorites.contains(fund.id) ? "star.fill" : "star").foregroundStyle(Palette.orange) }.accessibilityLabel("切換收藏")
+                favoriteButton
                 ShareLink(item: "\(fund.id) \(fund.name)｜投資袋著走") { Image(systemName: "square.and.arrow.up") }.accessibilityLabel("分享")
             }
         }
     }
-    private var priceBlock: some View {
-        VStack(alignment: .leading, spacing: 6) {
+    private var favoriteButton: some View {
+        let on = store.data.favorites.contains(fund.id)
+        return Button { store.favorite(fund.id) } label: { Text(on ? "★ 已收藏" : "☆ 收藏").skinFont(.mono(12)).skinForeground(\.sub) }
+            .accessibilityLabel(on ? "取消收藏" : "收藏")
+    }
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("ETF×\(fund.id)").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                    Text(fund.id).skinFont(.big(84)).skinForeground(\.ink).lineLimit(1).minimumScaleFactor(0.5)
+                        .accessibilityIdentifier("detail-code")
+                }
+                Spacer(minLength: 8)
+                NavigationLink(value: AppRoute.dexCard(fund.id)) { Text("圖鑑卡") }
+                    .buttonStyle(SkinButtonStyle(primary: false, horizontal: 16, seed: SkinSeed.of("圖鑑卡")))
+            }
+            HStack(spacing: 10) {
+                Text(fund.name).skinFont(.title(18)).skinForeground(\.ink).lineLimit(2)
+                SkinTag(DexSeries.of(fund).rawValue)
+            }
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text(quote.map { priceText($0.price) } ?? "--").font(.system(size: 34, weight: .heavy, design: .rounded)).monospacedDigit().foregroundStyle(Palette.ink)
-                QuoteChange(quote: quote, font: .subheadline)
-                Spacer(minLength: 0)
+                Text(quote.map { priceText($0.price) } ?? "—").skinFont(.mono(24)).skinForeground(\.ink)
+                SkinChange(quote: quote, size: 12, withAmount: true)
             }
             HStack {
-                Text(updatedText).font(.caption).foregroundStyle(Palette.muted)
-                Spacer()
-                Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh(symbols: [fund.id]) } }.font(.caption.bold()).disabled(store.refreshing)
+                Text(updatedText).skinFont(.mono(10)).skinForeground(\.sub)
+                Spacer(minLength: 8)
+                Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh(symbols: [fund.id]) } }
+                    .buttonStyle(.plain).skinFont(.mono(11)).skinForeground(\.ink).frame(minHeight: 44).disabled(store.refreshing)
             }
         }
     }
     private var updatedText: String {
-        guard let quote else { return "更新時間 --/-- --:--・按「更新報價」取得" }
+        guard let quote else { return "尚無報價・按「更新報價」取得" }
         if quote.isDailyClose { return "\(quote.date.replacingOccurrences(of: "-", with: "/")) 收盤價" }
         return "報價日期 \(quote.date) · 取得於 \(quote.fetchedAt.formatted(date: .abbreviated, time: .shortened))"
     }
-    private var overview: some View {
-        let strategy = fund.strategy, color = Palette.strategy(strategy)
-        return VStack(alignment: .leading, spacing: 16) {
-            SectionHeading(title: "價格走勢")
-            chartCard
-            SectionHeading(title: strategy == .unclassified ? "系統分類（待分析）" : "系統分類")
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    TagChip(title: strategy.tagline, icon: "tag.fill", art: strategy.artwork)
-                    TagChip(title: fund.theme, icon: "chart.bar.fill")
-                    TagChip(title: fund.industry ?? fund.assetKind, icon: "square.stack.3d.up")
-                    if let frequency = store.official.frequency(fund.id) { TagChip(title: frequency, icon: "calendar") }
-                }.padding(.vertical, 2)
-            }
-            Card {
-                HStack(alignment: .top, spacing: 12) {
-                    StrategyArt(strategy: strategy, size: 54).frame(width: 64, height: 64).background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack(spacing: 0) {
-                            Text("系統分類：").font(.subheadline.bold()).foregroundStyle(Palette.ink)
-                            Text(strategy.rawValue).font(.subheadline.bold()).foregroundStyle(color)
-                            Spacer(minLength: 4)
-                            Text("風險：\(fund.riskLevel)").font(.caption2.bold()).foregroundStyle(Palette.orange).padding(.horizontal, 8).padding(.vertical, 4).background(Palette.orange.opacity(0.12), in: Capsule())
-                        }
-                        Text("\(strategy.tagline)・\(fund.managementType)").font(.caption).foregroundStyle(Palette.muted)
-                    }
-                }
-                Text(explanation).font(.subheadline).foregroundStyle(Palette.ink.opacity(0.85)).padding(.top, 12)
-                NavigationLink(value: AppRoute.basis(fund.id)) { HStack(spacing: 2) { Text("為什麼這樣分類？查看分類依據"); Image(systemName: "chevron.right") }.font(.caption.bold()) }.padding(.top, 8)
-            }
-            Card {
-                Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 12) {
-                    GridRow { stat("開盤", quote?.open.map(priceText)); stat("最高", quote?.high.map(priceText)) }
-                    GridRow { stat("最低", quote?.low.map(priceText)); stat("成交量", quote?.volume.map { "\(money($0)) 張" }) }
-                }
-            }
-            NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: fund.id)) { Label("新增到我的持有", systemImage: "plus").font(.subheadline.bold()).frame(maxWidth: .infinity).padding(.vertical, 12).background(Palette.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 14)) }.buttonStyle(.plain).foregroundStyle(Palette.blue)
-            Text("策略分類是整理持有的方式，不是收益保證。配息可能來自收益或本金；槓桿策略需注意每日重設及波動風險。").font(.caption).foregroundStyle(Palette.muted)
-        }
-    }
-    private var explanation: String {
-        var text = fund.strategy.explanation
-        if fund.strategy != .unclassified { text += fund.riskSentence }
-        if let volatility = stats?.volatility { text += "近期年化波動 \(decimal(volatility * 100))%。" }
-        return text
-    }
-    private var chartCard: some View {
+    /// 走勢: the line, the four facts, then fetching the history and its statistics.
+    private var trend: some View {
         let points = store.data.histories?[fund.id].map(TrendMath.points) ?? []
         let visible = TrendMath.slice(points, range)
-        return Card(padding: 14) {
-            RangeChips(options: [.week, .month, .quarter, .year, .threeYears, .fiveYears], selection: $range).padding(.bottom, 10)
+        return VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 4) {
+                ForEach([ChartRange.month, .quarter, .year, .fiveYears, .all]) { option in
+                    SkinChip(option.rawValue, selected: range == option) { range = option }
+                }
+            }
             if visible.count >= 2 {
-                ValueChart(points: visible, showAxes: true, height: 170)
-                Text("還原日收盤價 · 資料至 \(store.data.histories?[fund.id]?.points.last?.date ?? "")").font(.caption2).foregroundStyle(Palette.muted).padding(.top, 8)
+                SkinTrendLine(points: visible, height: 150)
+                Text("還原日收盤價 · 資料至 \(store.data.histories?[fund.id]?.points.last?.date ?? "")").skinFont(.mono(10)).skinForeground(\.sub)
             } else {
-                Label("尚無歷史走勢", systemImage: "chart.xyaxis.line").font(.subheadline.bold()).foregroundStyle(Palette.ink)
-                Text("使用你的行情金鑰取得近 5 年還原日收盤價，約需 10 秒；不以試算資料代替。").font(.caption).foregroundStyle(Palette.muted).padding(.vertical, 6)
-                Button(busy ? "取得中…" : "取得歷史走勢") { Task { await loadHistory() } }.buttonStyle(.borderedProminent).disabled(busy)
-                if let error { Text(error).font(.caption).foregroundStyle(Palette.red).padding(.top, 6) }
+                VStack(spacing: 6) {
+                    Text("尚無歷史資料").skinFont(.title(15)).skinForeground(\.ink)
+                    Text("用你的行情金鑰取得還原日收盤價後才畫走勢，不用試算資料代替。").skinFont(.body(12)).skinForeground(\.sub)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, minHeight: 120)
+            }
+            facts
+            HistoryContent(symbol: fund.id)
+        }
+    }
+    /// 內扣費用、近一年殖利率、配息頻率、成分股數; "—" when a fact is not known.
+    private var facts: some View {
+        let fee = AnnualFeeCatalog.bundled?.records[fund.id]
+        let items: [(String, String)] = [
+            (fee.map { "\(decimal($0.total))%" } ?? "—", "內扣費用 / 年"),
+            (store.trailingYield(fund.id).map { "\(decimal($0))%" } ?? "—", "近一年殖利率"),
+            (store.official.frequency(fund.id) ?? "—", "配息頻率"),
+            (store.data.components?[fund.id].map { "\($0.components.count) 檔" } ?? "—", "成分股"),
+        ]
+        return LazyVGrid(columns: [GridItem(.flexible(), spacing: 24, alignment: .leading), GridItem(.flexible(), alignment: .leading)], spacing: 0) {
+            ForEach(items.indices, id: \.self) { i in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(items[i].0).skinFont(.mono(16)).skinForeground(\.ink)
+                    Text(items[i].1).skinFont(.body(11)).skinForeground(\.sub)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 10)
+                .overlay(alignment: .top) { Rectangle().fill(skin.color(\.line)).frame(height: 1) }
+                .accessibilityElement(children: .combine)
             }
         }
     }
-    private func loadHistory() async {
-        busy = true; error = nil
-        defer { busy = false }
-        do { try store.saveHistory(await Fugle.history(symbol: fund.id, years: 5)) } catch { self.error = error.localizedDescription }
-    }
-    private func stat(_ title: String, _ value: String?) -> some View {
-        HStack {
-            Text(title).font(.subheadline).foregroundStyle(Palette.muted)
-            Spacer(minLength: 4)
-            Text(value ?? "—").font(.subheadline.bold()).monospacedDigit().foregroundStyle(Palette.ink)
-        }.frame(maxWidth: .infinity)
-    }
-    private var actionBar: some View {
-        let favorite = store.data.favorites.contains(fund.id)
-        let compared = (store.data.comparison ?? []).contains(fund.id)
-        return HStack(spacing: 12) {
-            Button { store.favorite(fund.id) } label: {
-                Text(favorite ? "已加入自選" : "加入自選").font(.headline).frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .foregroundStyle(Palette.blue)
-                    .background(Palette.card, in: RoundedRectangle(cornerRadius: 14))
-                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Palette.blue, lineWidth: 1.2))
+    /// The main button and the DCA link, kept above the game bar.
+    private var actions: some View {
+        VStack(spacing: 0) {
+            NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: fund.id)) { Text("加入口袋") }
+                .buttonStyle(SkinButtonStyle(primary: true, seed: SkinSeed.of("加入口袋")))
+            NavigationLink(value: AppRoute.comboAdding(fund.id)) {
+                Text("→ 用 \(fund.id) 試算定期定額 ←").skinFont(.mono(11)).skinForeground(\.sub)
+                    .frame(minHeight: 44).contentShape(Rectangle())
             }
-            Button { store.addToComparison(fund.id) } label: {
-                Text(compared ? "已在比較清單" : "加入比較").font(.headline).frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .foregroundStyle(.white)
-                    .background(Palette.hero, in: RoundedRectangle(cornerRadius: 14))
-            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("用 \(fund.id) 試算定期定額")
         }
-        .buttonStyle(.plain)
-        .padding(.horizontal, 16).padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+        .background(skin.color(\.page).ignoresSafeArea(edges: .bottom))
+    }
+    private var toastText: String { "收進圖鑑 +\(GameRules.xp[.firstDexCard] ?? 0) 經驗" }
+    private var toast: some View {
+        Text(toastText)
+            .skinFont(.title(14))
+            .foregroundStyle(skin.onFill(skin.colors.accent))
+            .padding(.horizontal, 18).padding(.vertical, 10)
+            .background(Capsule().fill(skin.color(\.accent)))
+            .padding(.top, 8)
+            .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+    }
+    private func showToast() {
+        let animation: Animation = reduceMotion ? .easeInOut(duration: 0.2) : .snappy
+        withAnimation(animation) { collected = true }
+        AccessibilityNotification.Announcement(toastText).post()
+        Task {
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation(animation) { collected = false }
+        }
     }
 }
 /// 持股 tab: component weights from the existing research view, plus fund facts.
@@ -560,14 +538,14 @@ struct FundHoldingsContent: View {
                 let rest = max(100 - five.reduce(0.0) { $0 + $1.weight }, 0)
                 let named: [Slice] = five.enumerated().map { pair in Slice(label: pair.element.name ?? pair.element.symbol, amount: pair.element.weight, color: Palette.series[pair.offset]) }
                 let rows: [Slice] = named + [Slice(label: "其他", amount: rest, color: Palette.series[6])]
-                Card {
+                SkinPanel {
                     HStack { SectionHeading(title: "持股組成"); Text("前十大合計 \(decimal(topWeight))%").font(.caption.bold()).foregroundStyle(Palette.blue) }
                     DonutChart(slices: rows, center: ("前十大", "\(decimal(topWeight))%")).padding(.top, 12)
                     Text("資料日 \(snapshot.date)").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
                 }
             }
             ComponentsContent(symbol: fund.id)
-            Card {
+            SkinPanel {
                 SectionHeading(title: "基金資訊")
                 let fee = AnnualFeeCatalog.bundled?.records[fund.id]
                 VStack(spacing: 0) {
@@ -594,14 +572,14 @@ struct FundDividends: View {
         let items = store.data.dividends.filter { $0.symbol == fund.id }.sorted { $0.date > $1.date }
         let official = Array(store.official.list(fund.id).prefix(12))
         VStack(alignment: .leading, spacing: 14) {
-            Card {
+            SkinPanel {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) { Text("官方配息頻率").font(.caption).foregroundStyle(Palette.muted); Text(store.official.frequency(fund.id) ?? (store.official.coversYear ? "未收錄" : "累積中")).font(.title2.bold()).foregroundStyle(Palette.ink) }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 4) { Text("你記錄的已入帳").font(.caption).foregroundStyle(Palette.muted); Text(shown(money(items.filter { $0.status == .paid }.reduce(0) { $0 + $1.amount }), hidden: hidden)).font(.title3.bold()).monospacedDigit().foregroundStyle(Palette.ink) }
                 }
             }
-            Card(padding: 12) {
+            SkinPanel {
                 if official.isEmpty {
                     Text(store.official.coversYear ? "近一年沒有這檔的除息公告。" : "目前沒有這檔的除息公告；官方公告自 \((store.official.since ?? "").replacingOccurrences(of: "-", with: "/")) 起累積。").font(.subheadline).foregroundStyle(Palette.muted).padding(4)
                 } else {
@@ -627,7 +605,7 @@ struct FundInfo: View {
     let fund: Fund
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Card {
+            SkinPanel {
                 Text("基本資料").font(.headline).foregroundStyle(Palette.ink).padding(.bottom, 6)
                 row("代號", fund.id); row("名稱", fund.name)
                 if let full = fund.fullName { row("基金全名", full) }
@@ -635,6 +613,13 @@ struct FundInfo: View {
                 row("管理方式", fund.managementType); row("資產類別", fund.assetKind); row("商品結構", fund.structure); row("投資地區", fund.region)
                 row("市場", fund.marketName)
                 if let listing = fund.listingDate { row("掛牌日期", listing) }
+            }
+            // Was the 總覽 tab: the system's label for the fund, what it means, and where the label comes from.
+            SkinPanel {
+                Text("系統分類：\(fund.strategy.rawValue)・風險\(fund.riskLevel)").font(.headline).foregroundStyle(Palette.ink)
+                Text(fund.strategy.explanation + (fund.strategy == .unclassified ? "" : fund.riskSentence)).font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 8)
+                NavigationLink(value: AppRoute.basis(fund.id)) { HStack(spacing: 2) { Text("為什麼這樣分類？查看分類依據"); Image(systemName: "chevron.right") }.font(.caption.bold()).frame(minHeight: 44) }
+                Text("策略分類是整理持有的方式，不是收益保證。配息可能來自收益或本金；槓桿策略需注意每日重設及波動風險。").font(.caption).foregroundStyle(Palette.muted)
             }
             FeesContent(fund: fund)
         }

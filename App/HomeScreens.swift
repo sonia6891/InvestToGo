@@ -7,7 +7,7 @@ enum AppRoute: Hashable {
     case overview, monthDividends(next: Bool), notices, settings, sources, privacy, about
     case recentDividends, yearDividends, dividendDetail(UUID), dividendForm(id: UUID?, symbol: String?, officialEx: String?, holding: UUID? = nil), dividendDone(UUID)
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
-    case watchlist, basis(String)
+    case watchlist, basis(String), dexCard(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     case designShowcase
     #if DEBUG
@@ -40,6 +40,7 @@ struct RouteView: View {
         case .tradeForm: TradeFormView()
         case .watchlist: WatchlistView()
         case .basis(let symbol): BasisView(symbol: symbol)
+        case .dexCard(let symbol): DexCardView(symbol: symbol)
         case .plan: PlanView()
         case .goal: GoalView()
         case .calculator: CalculatorView()
