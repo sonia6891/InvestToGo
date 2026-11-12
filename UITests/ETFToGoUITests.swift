@@ -468,7 +468,9 @@ final class ETFToGoUITests: XCTestCase {
         sleep(1); capture(app, "tools")
         openSkins(app)
         let status = app.descendants(matching: .any)["skin-status"], apply = app.buttons["skin-apply"]
-        XCTAssertTrue(app.descendants(matching: .any)["skin-card-blackgold"].exists, "The carousel has the black-gold card")
+        let worn = app.descendants(matching: .any)["skin-card-blackgold"]
+        XCTAssertTrue(worn.exists, "The carousel has the black-gold card")
+        XCTAssertEqual(worn.frame.midX, app.windows.firstMatch.frame.midX, accuracy: 12, "The carousel opens centred on the skin being worn")
         waitForLabel(status, containing: "使用中")
         waitForLabel(apply, "← 滑動試穿 →")
         sleep(1); capture(app, "skins-blackgold")

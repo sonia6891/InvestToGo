@@ -67,9 +67,9 @@ struct SkinsView: View {
         let focused = Skins.named(focus ?? skins.skin.id)
         let status = SkinStatus(focused, current: skins.skin.id, level: level, member: member)
         Page {
-            VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text("換膚").skinFont(.title(30)).skinForeground(\.ink)
                 Text("SKINS").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-                Text("換膚").skinFont(.title(34)).skinForeground(\.ink)
             }
             SkinCarousel(focus: $focus, tryOn: $skins.tryOn)
             VStack(spacing: 10) {
@@ -83,11 +83,8 @@ struct SkinsView: View {
                 Text(focused.pitch).skinFont(.body(13)).skinForeground(\.sub)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 badges(level: level, member: member)
-                    .padding(.top, 8)
                 applyButton(focused, status: status)
-                    .padding(.top, 8)
-                Text("長按卡片可以全螢幕試穿，放開就還原。").skinFont(.body(11)).skinForeground(\.dim)
-                    .multilineTextAlignment(.center)
+                    .padding(.top, 4)
             }
             .frame(maxWidth: .infinity)
         }
@@ -184,6 +181,7 @@ struct SkinCarousel: View {
 
     var body: some View {
         GeometryReader { proxy in
+          ScrollViewReader { reader in
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 16) {
                     ForEach(Skins.carouselOrder, id: \.self) { id in
@@ -197,14 +195,17 @@ struct SkinCarousel: View {
                     }
                 }
                 .scrollTargetLayout()
-                .padding(.vertical, 14)
+                .padding(.vertical, 10)
             }
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $focus, anchor: .center)
             .safeAreaPadding(.horizontal, max(0, (proxy.size.width - Self.cardSize.width) / 2))
             .scrollClipDisabled()
+            // The bound position alone does not move a scroll view that has not laid out yet: start on the worn skin.
+            .onAppear { DispatchQueue.main.async { reader.scrollTo(focus ?? skins.skin.id, anchor: .center) } }
+          }
         }
-        .frame(height: Self.cardSize.height + 28)
+        .frame(height: Self.cardSize.height + 20)
         // The page's side padding would cut the neighbours off; let them run to the screen edges.
         .padding(.horizontal, -16)
         .onAppear { if focus == nil { focus = skins.skin.id } }
