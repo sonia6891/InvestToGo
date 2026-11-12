@@ -94,6 +94,19 @@ final class QuestAchievementTests: XCTestCase {
         XCTAssertEqual(g.complete(.firstPlanSet, now: date(2026, 12, 3)), [])
     }
 
+    /// The lobby's quest card: a newbie quest finished in an earlier month still shows as done; a monthly quest
+    /// only counts in the month it was finished.
+    func testIsDoneKeepsNewbieQuestsAcrossMonths() {
+        var g = GameState()
+        _ = g.complete(.firstPlanSet, now: date(2026, 10, 12))
+        g.questsDone["2026-10", default: []].insert(Quests.dcaLogged.id)
+        let november = YearMonth(year: 2026, month: 11)
+        XCTAssertTrue(g.isDone(Quests.firstPlanSet, in: november))
+        XCTAssertFalse(g.isDone(Quests.firstDexCard, in: november))
+        XCTAssertFalse(g.isDone(Quests.dcaLogged, in: november))
+        XCTAssertTrue(g.isDone(Quests.dcaLogged, in: YearMonth(year: 2026, month: 10)))
+    }
+
     func testAwardCountsEvents() {
         var g = GameState()
         g.award(.reconciled); g.award(.reconciled)

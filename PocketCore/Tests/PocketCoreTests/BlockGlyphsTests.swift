@@ -37,6 +37,23 @@ final class BlockGlyphsTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(W - 2 * BlockGlyphs.stroke, 0.35 * W, "The hole inside 0/8 must stay readable")
         XCTAssertGreaterThanOrEqual((BlockGlyphs.height - 3 * BlockGlyphs.stroke) / 2, 0.4, "Upper and lower holes of 8 must stay open")
     }
+    func testVoxelizeKeepsBoundsOnGrid() {
+        let cell = 0.25
+        let source = BlockGlyphs.layout("12").blocks
+        let voxels = BlockGlyphs.voxelize(source, cell: cell)
+        XCTAssertFalse(voxels.isEmpty)
+        for v in voxels {
+            XCTAssertEqual(v.width, cell, accuracy: 1e-9)
+            XCTAssertEqual(v.height, cell, accuracy: 1e-9)
+            XCTAssertEqual(v.x / cell, (v.x / cell).rounded(), accuracy: 1e-9, "x on the grid")
+            XCTAssertEqual(v.y / cell, (v.y / cell).rounded(), accuracy: 1e-9, "y on the grid")
+        }
+        XCTAssertEqual(Set(voxels.map { "\(Int((($0.x / cell)).rounded())),\(Int(($0.y / cell).rounded()))" }).count, voxels.count, "No two cubes share a cell")
+        func bounds(_ b: [GlyphBlock]) -> [Double] {
+            [b.map { $0.x - $0.width / 2 }.min()!, b.map { $0.x + $0.width / 2 }.max()!, b.map { $0.y - $0.height / 2 }.min()!, b.map { $0.y + $0.height / 2 }.max()!]
+        }
+        for (a, b) in zip(bounds(source), bounds(voxels)) { XCTAssertLessThan(abs(a - b), cell) }
+    }
     func testUnknownCharactersAreSkipped() {
         XCTAssertEqual(BlockGlyphs.layout("A1 2").blocks, BlockGlyphs.layout("12").blocks)
         XCTAssertTrue(BlockGlyphs.layout("").blocks.isEmpty)
