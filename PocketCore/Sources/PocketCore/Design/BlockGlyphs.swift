@@ -67,4 +67,28 @@ enum BlockGlyphs {
         let shift = (minX + maxX) / 2
         return (blocks.map { var b = $0; b.x -= shift; return b }, maxX - minX)
     }
+
+    /// Re-lays the boxes as square cells of side `cell` for the pixel skin's voxel numerals. Cell centres sit on
+    /// multiples of `cell`; each box keeps the cells whose centres round into it, so every edge moves by at most
+    /// half a cell. Overlapping strokes share a cell once (the first box's colour wins). Rings and slashes have no
+    /// grid shape and pass through unchanged.
+    static func voxelize(_ blocks: [GlyphBlock], cell: Double) -> [GlyphBlock] {
+        guard cell > 0 else { return blocks }
+        func cells(_ centre: Double, _ size: Double) -> ClosedRange<Int> {
+            let low = Int(((centre - size / 2) / cell + 0.5).rounded()), high = Int(((centre + size / 2) / cell - 0.5).rounded())
+            return low...max(low, high)
+        }
+        struct Key: Hashable { let x: Int, y: Int }
+        var taken = Set<Key>()
+        var result: [GlyphBlock] = []
+        for block in blocks {
+            guard block.shape == .box else { result.append(block); continue }
+            for i in cells(block.x, block.width) {
+                for j in cells(block.y, block.height) where taken.insert(Key(x: i, y: j)).inserted {
+                    result.append(GlyphBlock(shape: .box, x: Double(i) * cell, y: Double(j) * cell, width: cell, height: cell, depth: block.depth, gold: block.gold))
+                }
+            }
+        }
+        return result
+    }
 }

@@ -59,3 +59,12 @@ extension GameState {
         return [.questDone]
     }
 }
+
+extension GameState {
+    /// Whether the lobby's quest card ticks `quest` in `month`. Monthly quests count only in the month they were
+    /// finished; the newbie-only ones stay done once finished in any month.
+    func isDone(_ quest: Quest, in month: YearMonth) -> Bool {
+        if Quests.newbieOnly.contains(quest.trigger) { return questsDone.values.contains { $0.contains(quest.id) } }
+        return questsDone[month.key]?.contains(quest.id) ?? false
+    }
+}
