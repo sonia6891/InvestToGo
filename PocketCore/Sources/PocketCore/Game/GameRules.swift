@@ -2,6 +2,19 @@ import Foundation
 
 enum XPEvent: Hashable { case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled }
 
+extension XPEvent {
+    /// The `GameState.counts` key `award` increments.
+    var counterKey: String {
+        switch self {
+        case .monthlyDCA: return "monthlyDCA"
+        case .questDone: return "questDone"
+        case .firstDexCard: return "firstDexCard"
+        case .dividendLogged: return "dividendLogged"
+        case .reconciled: return "reconciled"
+        }
+    }
+}
+
 enum GameRules {
     /// Months are always counted in Taipei time so a debit near midnight lands in the month the user sees.
     static let taipei: Calendar = {
@@ -45,5 +58,6 @@ extension GameState {
     mutating func award(_ e: XPEvent) {
         let gain = GameRules.xp[e] ?? 0
         xp += gain; coins += gain
+        count(e.counterKey)
     }
 }

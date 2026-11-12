@@ -28,4 +28,27 @@ struct GameState: Codable, Equatable {
     var unlocked: [String: Date] = [:]
     /// "2026-11" -> ids of that month's finished quests.
     var questsDone: [String: Set<String>] = [:]
+    /// The habit picked in onboarding; nil until then (callers use `habit ?? .dca`).
+    var habit: Habit? = nil
+    /// Event counters for achievements whose data source has no record of its own (see `count(_:)`).
+    var counts: [String: Int] = [:]
+
+    mutating func count(_ key: String) { counts[key, default: 0] += 1 }
+}
+
+/// Every field falls back to its default so progress saved by an older build never fails to decode
+/// when a field is added. (In an extension to keep the memberwise `GameState()`; encode stays synthesized.)
+extension GameState {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        xp = try c.decodeIfPresent(Int.self, forKey: .xp) ?? 0
+        coins = try c.decodeIfPresent(Int.self, forKey: .coins) ?? 0
+        dcaMonths = try c.decodeIfPresent(Set<YearMonth>.self, forKey: .dcaMonths) ?? []
+        longestStreak = try c.decodeIfPresent(Int.self, forKey: .longestStreak) ?? 0
+        collected = try c.decodeIfPresent([String: Date].self, forKey: .collected) ?? [:]
+        unlocked = try c.decodeIfPresent([String: Date].self, forKey: .unlocked) ?? [:]
+        questsDone = try c.decodeIfPresent([String: Set<String>].self, forKey: .questsDone) ?? [:]
+        habit = try c.decodeIfPresent(Habit.self, forKey: .habit)
+        counts = try c.decodeIfPresent([String: Int].self, forKey: .counts) ?? [:]
+    }
 }
