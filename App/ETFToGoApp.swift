@@ -27,6 +27,7 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.scenePhase) private var phase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var lobby
     @State private var path: NavigationPath
     /// The feature at the bottom of the stack; nil in the lobby and on screens pushed straight from it.
@@ -72,8 +73,16 @@ struct RootView: View {
 
     private var navigation: LobbyNavigation {
         LobbyNavigation(
-            toLobby: { path = NavigationPath(); feature = nil },
-            open: { next in feature = next; path = NavigationPath([AppRoute.feature(next)]) },
-            push: { route in path.append(route) })
+            toLobby: { move { path = NavigationPath(); feature = nil } },
+            open: { next in move { feature = next; path = NavigationPath([AppRoute.feature(next)]) } },
+            push: { route in move { path.append(route) } })
+    }
+
+    /// With Reduce Motion, screens change without the push or zoom; the new screen fades in instead (spec 3.5).
+    private func move(_ change: () -> Void) {
+        guard reduceMotion else { change(); return }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction, change)
     }
 }

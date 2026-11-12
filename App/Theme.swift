@@ -251,6 +251,7 @@ struct Page<Content: View>: View {
                 .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 28)
         }
         .scrollDismissesKeyboard(.interactively)
+        .modifier(ReportsScrollTop())
         .background { Palette.page.ignoresSafeArea() }
     }
 }

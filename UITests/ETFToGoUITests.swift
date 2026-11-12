@@ -213,7 +213,7 @@ final class ETFToGoUITests: XCTestCase {
     }
 
     func testHugeStreakFits() {
-        for skin in ["blackgold", "stitch", "sketch"] {
+        for skin in ["blackgold", "voxel", "stitch", "sketch"] {
             let app = launch(["--demo-streak", "120", "--skin", skin])
             let hero = app.descendants(matching: .any)["連續定投 120 個月"]
             XCTAssertTrue(hero.waitForExistence(timeout: 10), "\(skin): the hero shows 120")
@@ -227,6 +227,10 @@ final class ETFToGoUITests: XCTestCase {
     }
 
     func testNoTabBar() {
+        let lobby = launch([])
+        XCTAssertTrue(lobby.buttons["lobby-find"].waitForExistence(timeout: 10))
+        XCTAssertEqual(lobby.tabBars.count, 0, "No tab bar in the lobby")
+        lobby.terminate()
         let app = launch(["--open", "find"])
         XCTAssertTrue(app.textFields["fund-search"].waitForExistence(timeout: 10))
         XCTAssertEqual(app.tabBars.count, 0)

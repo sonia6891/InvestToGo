@@ -55,6 +55,7 @@ struct LobbyView: View {
             .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 16)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .modifier(FadeInWithReducedMotion())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -79,7 +80,7 @@ struct LobbyView: View {
                 .accessibilityIdentifier("lobby-xp")
             Spacer(minLength: 4)
             HStack(spacing: 5) {
-                Circle().fill(Color(rgb: 0xF2B632)).overlay(Circle().strokeBorder(Color(rgb: 0xC98E12), lineWidth: 3)).frame(width: 14, height: 14)
+                Circle().fill(skin.color(\.accent)).overlay(Circle().strokeBorder(skin.color(\.line), lineWidth: 3)).frame(width: 14, height: 14)
                 Text(game.coins.formatted()).skinFont(.mono(12)).skinForeground(\.ink)
             }
             .accessibilityElement(children: .combine)
@@ -120,7 +121,7 @@ struct LobbyView: View {
         let rows = ForEach(quests) { quest in
             HStack(spacing: 7) {
                 SkinCheck(done: game.isDone(quest, in: month), size: 18)
-                Text(quest.title).skinFont(.body(12)).fixedSize()
+                Text(quest.title).skinFont(.body(12)).fixedSize(horizontal: false, vertical: true)
             }
         }
         return SkinCard {

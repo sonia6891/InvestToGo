@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 /// The five places the lobby and the quick pick open (spec 4.1). Each one is the first screen above the lobby.
 enum Feature: String, CaseIterable, Hashable {
@@ -58,19 +57,29 @@ extension EnvironmentValues {
     }
 }
 
-/// A feature's first screen. Pulling down from the top third of it returns to the lobby (spec 4.3); it zooms out of
-/// the lobby object that opened it.
+/// A feature's first screen. Pulling down from its top third returns to the lobby (spec 4.3), but only while its
+/// list is scrolled to the top (ruling R21), so scrolling back up never leaves the page; 口袋 pulls to refresh
+/// instead and has no pull-to-lobby. It zooms out of the lobby object that opened it, or fades with Reduce Motion.
 struct FeatureScreen: View {
     let feature: Feature
     @Environment(\.lobbyNavigation) private var navigation
     @Environment(\.lobbyNamespace) private var namespace
     @State private var height: CGFloat = 0
+    @State private var atTop = true
+    /// Whether the list was at the top when the current drag began; nil between drags.
+    @State private var startedAtTop: Bool?
 
     var body: some View {
         content
-            .simultaneousGesture(DragGesture(minimumDistance: 24).onEnded { value in
-                if Self.isPullToLobby(start: value.startLocation, translation: value.translation, height: height) { navigation.toLobby() }
-            })
+            .environment(\.scrollAtTop) { value in if atTop != value { atTop = value } }
+            .simultaneousGesture(DragGesture(minimumDistance: 24)
+                .onChanged { _ in if startedAtTop == nil { startedAtTop = atTop } }
+                .onEnded { value in
+                    let wasAtTop = startedAtTop ?? atTop
+                    startedAtTop = nil
+                    guard feature.pullsToLobby, wasAtTop else { return }
+                    if Self.isPullToLobby(start: value.startLocation, translation: value.translation, height: height) { navigation.toLobby() }
+                })
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height = $0 }
             .modifier(ZoomFromLobby(feature: feature, namespace: namespace))
     }
@@ -91,13 +100,49 @@ struct FeatureScreen: View {
     }
 }
 
+extension Feature {
+    /// 口袋 pulls down to refresh prices, so pulling down there never leaves for the lobby (ruling R21).
+    var pullsToLobby: Bool { self != .pocket }
+}
+
 /// The lobby object grows to fill the screen and fades into the feature (about 350ms, the system zoom). With Reduce
-/// Motion on, the system turns the zoom into a cross-fade.
+/// Motion on there is no zoom: the root view pushes without animation and the screen fades in.
 private struct ZoomFromLobby: ViewModifier {
     let feature: Feature
     let namespace: Namespace.ID?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ViewBuilder func body(content: Content) -> some View {
-        if let namespace { content.navigationTransition(.zoom(sourceID: feature, in: namespace)) } else { content }
+        if let namespace, !reduceMotion { content.navigationTransition(.zoom(sourceID: feature, in: namespace)) } else { content.modifier(FadeInWithReducedMotion()) }
+    }
+}
+
+/// With Reduce Motion, screens the root view switches without animation fade in instead (spec 3.5).
+struct FadeInWithReducedMotion: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var shown = false
+    func body(content: Content) -> some View {
+        content
+            .opacity(reduceMotion && !shown ? 0 : 1)
+            .onAppear { withAnimation(.easeOut(duration: 0.25)) { shown = true } }
+            .onDisappear { shown = false }
+    }
+}
+
+/// Feature screens' scroll views report whether they are at the top (`Page` and the achievement list do).
+private struct ScrollAtTopKey: EnvironmentKey { static let defaultValue: (Bool) -> Void = { _ in } }
+
+extension EnvironmentValues {
+    var scrollAtTop: (Bool) -> Void {
+        get { self[ScrollAtTopKey.self] }
+        set { self[ScrollAtTopKey.self] = newValue }
+    }
+}
+
+/// Reports to `scrollAtTop` whether the scroll view's content is at (or pulled past) its top.
+struct ReportsScrollTop: ViewModifier {
+    @Environment(\.scrollAtTop) private var report
+    func body(content: Content) -> some View {
+        content.onScrollGeometryChange(for: Bool.self, of: { $0.contentOffset.y + $0.contentInsets.top <= 1 }) { _, value in report(value) }
     }
 }
 
@@ -120,7 +165,7 @@ struct AchievementListView: View {
                 }
                 SkinCard {
                     VStack(spacing: 12) {
-                        ForEach(Achievement.all) { item in
+                        ForEach(Achievements.all) { item in
                             let progress = min(item.progress(game, store.data, now), item.goal)
                             HStack(spacing: 10) {
                                 SkinCheck(done: game.unlocked[item.id] != nil)
@@ -135,19 +180,8 @@ struct AchievementListView: View {
             }
             .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 24)
         }
+        .modifier(ReportsScrollTop())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
-    }
-}
-
-/// With the navigation bar hidden (lobby, pocket, tools), UIKit turns off the swipe from the left edge. Keep it on
-/// whenever there is a screen to go back to (spec 4.3: 左緣右滑回上一層).
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        gestureRecognizer == interactivePopGestureRecognizer ? viewControllers.count > 1 : true
     }
 }
