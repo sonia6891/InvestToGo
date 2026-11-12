@@ -500,18 +500,6 @@ extension View {
     /// does not reach pushed screens, so every destination adds it.
     func gameBarSpace() -> some View { safeAreaInset(edge: .bottom) { Color.clear.frame(height: GameBottomBar.height + GameBottomBar.fade) } }
 }
-/// Rising bars drawn on the blue hero cards.
-struct HeroDeco: View {
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 5) {
-            ForEach(Array([0.32, 0.46, 0.4, 0.62, 0.78, 0.95].enumerated()), id: \.offset) { index, height in
-                RoundedRectangle(cornerRadius: 4).fill(Color.white.opacity(0.22 + Double(index) * 0.08)).frame(width: 11, height: 58 * height)
-            }
-        }
-        .frame(height: 58)
-        .accessibilityHidden(true)
-    }
-}
 struct Slice: Identifiable {
     let label: String
     let amount: Double

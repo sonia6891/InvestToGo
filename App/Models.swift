@@ -113,10 +113,17 @@ import SwiftUI
         do { try appendToComparison(symbol); message = "已加入比較：\((data.comparison ?? []).joined(separator: "、"))。可到「工具 › 三檔比較」查看。" } catch { message = error.localizedDescription }
     }
     func removeDividend(_ dividend: Dividend) throws { var next = data; next.dividends.removeAll { $0.id == dividend.id }; try commit(next) }
-    func saveDividend(_ dividend: Dividend) throws {
+    /// Saves a dividend record. With `rewardNew` (「記一筆配息」), a new record also earns the flat 記一筆配息 experience
+    /// in the same write — the same +20 for any amount (spec 6); editing a record earns nothing.
+    func saveDividend(_ dividend: Dividend, rewardNew: Bool = false) throws {
         guard !dividend.symbol.isEmpty, dividend.amount.isFinite, dividend.amount > 0, dividend.detailsValid else { throw AppDataError("請填寫代碼、股數與每股配息；扣繳後的入帳金額必須大於 0。") }
         var next = data
-        if let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) { next.dividends[i] = dividend } else { next.dividends.append(dividend) }
+        if let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) {
+            next.dividends[i] = dividend
+        } else {
+            next.dividends.append(dividend)
+            if rewardNew { var game = next.game ?? GameState(); game.award(.dividendLogged); next.game = game }
+        }
         try commit(next)
     }
     /// Marks a record as received; a payment date still in the future becomes today.

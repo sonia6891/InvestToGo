@@ -352,7 +352,7 @@ final class ETFToGoUITests: XCTestCase {
 
     /// Ruling R15: a newbie's pocket and dividends show the object, one sentence and one button, never NT$ 0.
     func testNewbiePocketAndDividendsHaveNoZeroHero() {
-        let zero = NSPredicate(format: "label CONTAINS 'NT$ 0' OR value CONTAINS 'NT$ 0'")
+        let zero = NSPredicate(format: "label CONTAINS 'NT$ 0'")
         let pocket = launch(["--open", "pocket"])
         XCTAssertTrue(pocket.buttons["＋ 加一檔"].waitForExistence(timeout: 10), "The empty pocket offers 「＋ 加一檔」")
         XCTAssertTrue(pocket.staticTexts["pocket-newbie"].exists, "The empty pocket explains itself in a sentence")

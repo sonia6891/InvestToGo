@@ -3,7 +3,7 @@ import Charts
 
 /// Every pushed screen above the lobby: a feature's first screen, then everything opened from it.
 enum AppRoute: Hashable {
-    case feature(Feature), dcaHistory, holdings
+    case feature(Feature), dcaHistory
     case overview, monthDividends(next: Bool), notices, settings, sources, privacy, about
     case recentDividends, yearDividends, dividendDetail(UUID), dividendForm(id: UUID?, symbol: String?, officialEx: String?, holding: UUID? = nil), dividendDone(UUID)
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
@@ -22,7 +22,6 @@ struct RouteView: View {
         switch route {
         case .feature(let feature): FeatureScreen(feature: feature)
         case .dcaHistory: DCAHistoryView()
-        case .holdings: HoldingsView()
         case .overview: OverviewView()
         case .monthDividends(let next): MonthDividendsView(startNextMonth: next)
         case .notices: NoticesView()

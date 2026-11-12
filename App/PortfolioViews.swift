@@ -15,147 +15,127 @@ extension PortfolioStore {
         return SellCosts.net(gross, stock: !isETF(holding.symbol), bond: fund(for: holding).assetKind == "債券", rate: SellCosts.rate(for: holding.broker))
     }
 }
-struct HoldingsView: View {
-    @EnvironmentObject var store: PortfolioStore
-    @AppStorage("hideAmounts") private var hidden = false
-    var body: some View {
-        let holdings = store.data.holdings
-        let etfs = sorted(holdings)
-        let etfValue = etfs.reduce(0.0) { $0 + (store.marketValue(of: $1) ?? 0) }
-        let missing = holdings.filter { store.marketValue(of: $0) == nil }.count
-        Page {
-            HStack {
-                Text("我的持有").font(.title.bold()).foregroundStyle(Palette.ink)
-                Spacer()
-                NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) {
-                    Label("新增持有", systemImage: "plus").font(.subheadline.bold()).foregroundStyle(.white).padding(.horizontal, 14).padding(.vertical, 8).background(Palette.hero, in: Capsule())
-                }.accessibilityIdentifier("add-holding")
-            }.padding(.top, 6)
-            hero(total: etfValue)
-            if holdings.isEmpty {
-                Card {
-                    ContentUnavailableView("把 ETF 放進口袋", systemImage: "bag", description: Text("選擇 ETF，填入股數與總成本，之後就能持續追蹤。"))
-                    NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) { PrimaryButtonLabel(title: "新增持有") }.buttonStyle(.plain)
-                }
-            } else {
-                dataRow(holdings)
-                table(title: "ETF 持有", items: etfs, tint: Palette.blue)
-                if missing > 0 { Text("\(missing) 筆持有尚缺報價，未計入總市值。").font(.caption).foregroundStyle(Palette.muted) }
-                if SellCosts.enabled, holdings.contains(where: { !SellCosts.isSet(for: $0.broker) }) {
-                    NavigationLink(value: AppRoute.settings) {
-                        Label("市值目前用原價手續費估算，到設定填入你的券商折扣會更準", systemImage: "info.circle").font(.caption).foregroundStyle(Palette.blue)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }.buttonStyle(.plain)
-                }
-                NavigationLink(value: AppRoute.combo) { PrimaryButtonLabel(title: "ETF 組合試算", icon: "function") }.buttonStyle(.plain).accessibilityIdentifier("holdings-combo")
-                Label("行情更新不等於券商持股同步", systemImage: "info.circle").font(.caption).foregroundStyle(Palette.muted).frame(maxWidth: .infinity)
-                Card(padding: 12) {
-                    NavigationLink(value: AppRoute.trades) { ToolRow(title: "交易紀錄", subtitle: "買進、賣出、調整與匯入", icon: "arrow.left.arrow.right") }.buttonStyle(.plain).accessibilityIdentifier("holdings-trades")
-                    Divider()
-                    NavigationLink(value: AppRoute.allocation) { ToolRow(title: "資產配置", subtitle: "類型、產業分佈與持股透視", icon: "chart.pie") }.buttonStyle(.plain).accessibilityIdentifier("holdings-allocation")
-                }
-            }
+/* ---------- 口袋 pieces (spec 5.7) ---------- */
+/// The pocket's figures: each holding's value, its share of the total and its gain on cost. Only holdings with a TWD
+/// price are added up; the others count in `missing` and stay in the list without a value.
+struct PocketSummary {
+    struct Row: Identifiable {
+        let holding: Holding
+        let value: Double?
+        /// Percent of the total, for the allocation bar and 「名稱 · 49.8%」.
+        let share: Double?
+        /// Gain or loss on cost, in percent.
+        let gainPercent: Double?
+        var id: UUID { holding.id }
+    }
+    /// Largest value first; holdings without a price last.
+    let rows: [Row]
+    /// Nil when no holding has a price.
+    let total: Double?
+    /// Total gain or loss of the priced holdings, and that as a percent of their cost.
+    let gain: Double
+    let gainPercent: Double?
+    let missing: Int
+
+    static func of(_ holdings: [Holding], value: (Holding) -> Double?) -> PocketSummary {
+        let valued = holdings.map { (holding: $0, value: value($0)) }
+        let priced = valued.filter { $0.value != nil }
+        let total: Double? = priced.isEmpty ? nil : priced.reduce(0) { $0 + ($1.value ?? 0) }
+        let cost = priced.reduce(0) { $0 + $1.holding.cost }
+        let gain = (total ?? 0) - cost
+        let rows = valued.map { item -> Row in
+            let share: Double? = item.value.flatMap { v in total.flatMap { $0 > 0 ? v / $0 * 100 : nil } }
+            let percent: Double? = item.value.flatMap { v in item.holding.cost > 0 ? (v - item.holding.cost) / item.holding.cost * 100 : nil }
+            return Row(holding: item.holding, value: item.value, share: share, gainPercent: percent)
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .refreshable { await store.refresh() }
-    }
-    private func sorted(_ items: [Holding]) -> [Holding] {
-        items.sorted { (store.marketValue(of: $0) ?? -1) > (store.marketValue(of: $1) ?? -1) }
-    }
-    private func hero(total: Double) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: "wallet.pass").font(.title3).frame(width: 40, height: 40).background(Color.white.opacity(0.22), in: RoundedRectangle(cornerRadius: 12))
-                Text("總市值").font(.subheadline.weight(.semibold))
-                Text("(TWD)").font(.caption).opacity(0.8)
-                Spacer()
-                Button { hidden.toggle() } label: { Image(systemName: hidden ? "eye.slash" : "eye") }.accessibilityLabel(hidden ? "顯示金額" : "隱藏金額")
-            }
-            Text(shown(total > 0 ? money(total) : "—", hidden: hidden)).font(.system(size: 36, weight: .heavy, design: .rounded)).monospacedDigit().minimumScaleFactor(0.6).lineLimit(1).accessibilityIdentifier("holdings-total")
-        }
-        .padding(18)
-        .foregroundStyle(.white)
-        .background(alignment: .topTrailing) { HeroDeco().padding(.top, 54).padding(.trailing, 16) }
-        .background(Palette.hero, in: RoundedRectangle(cornerRadius: 22))
-        .shadow(color: Palette.blue.opacity(0.25), radius: 12, y: 5)
-    }
-    private func dataRow(_ holdings: [Holding]) -> some View {
-        let dates = holdings.compactMap { store.quote($0.symbol)?.date }.sorted()
-        return HStack {
-            Text("資料日期：\(dates.last?.replacingOccurrences(of: "-", with: "/") ?? "—")")
-            Spacer()
-            Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh() } }.disabled(store.refreshing)
-        }
-        .font(.caption).foregroundStyle(Palette.muted)
-    }
-    private func table(title: String, items: [Holding], tint: Color) -> some View {
-        Card(padding: 12) {
-            Label(title, systemImage: "chart.bar.fill").font(.headline).foregroundStyle(Palette.ink).labelStyle(TintedIconLabel(tint: tint))
-            HStack(spacing: 4) {
-                Text("商品").frame(maxWidth: .infinity, alignment: .leading)
-                Text("股數").frame(width: 42, alignment: .trailing)
-                Text("現價").frame(width: 54, alignment: .trailing)
-                Text("市值").frame(width: 58, alignment: .trailing)
-                Text("損益").frame(width: 62, alignment: .trailing)
-                Color.clear.frame(width: 10, height: 1)
-            }
-            .font(.caption2.bold()).foregroundStyle(Palette.muted).padding(.top, 10)
-            ForEach(items) { holding in
-                Divider().padding(.vertical, 6)
-                row(holding)
-            }
-        }
-    }
-    private func row(_ h: Holding) -> some View {
-        let quote = store.quote(h.symbol), value = store.marketValue(of: h)
-        let gain = value.map { $0 - h.cost }
-        let tint = gain.map(Palette.trend) ?? Palette.muted
-        return NavigationLink(value: AppRoute.holdingDetail(h.id)) {
-            HStack(spacing: 4) {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 4) { Text(h.symbol).font(.caption.bold()); Text(h.name).font(.caption).lineLimit(1) }
-                    MarketBadge(symbol: h.symbol)
-                }.frame(maxWidth: .infinity, alignment: .leading)
-                Text(decimal(h.shares)).frame(width: 42, alignment: .trailing)
-                Text(quote.map { priceText($0.price) } ?? "—").frame(width: 54, alignment: .trailing)
-                Text(value.map { shown(wanText($0), hidden: hidden) } ?? "—").frame(width: 58, alignment: .trailing)
-                VStack(alignment: .trailing, spacing: 1) {
-                    Text(gain.map { shown(signed($0), hidden: hidden) } ?? "—")
-                    if let gain, h.cost > 0 { Text(shown(percentText(gain / h.cost * 100), hidden: hidden)) }
-                }
-                .font(.caption2.bold()).foregroundStyle(tint)
-                .padding(.horizontal, 5).padding(.vertical, 3)
-                .background(tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
-                .frame(width: 62, alignment: .trailing)
-                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Palette.muted).frame(width: 10)
-            }
-            .font(.caption).monospacedDigit().foregroundStyle(Palette.ink).lineLimit(1).minimumScaleFactor(0.7)
-            .contentShape(Rectangle())
-        }.buttonStyle(.plain)
+        .sorted { ($0.value ?? -1) > ($1.value ?? -1) }
+        return PocketSummary(rows: rows, total: total, gain: gain, gainPercent: total != nil && cost > 0 ? gain / cost * 100 : nil,
+                             missing: valued.count - priced.count)
     }
 }
-struct HoldingRow: View {
-    @EnvironmentObject var store: PortfolioStore
-    let holding: Holding
-    var hidden = false
+
+extension Skin {
+    /// One colour per holding in the pocket's allocation bar, in turn: the skin's accent, ink, its flat accents, then
+    /// its secondary and hint colours. Never `up` or `down`, which mean gains and losses.
+    var allocationColors: [Color] {
+        [color(\.accent), color(\.ink)] + colors.extra.prefix(2).map { Color(rgb: $0) } + [color(\.sub), color(\.dim)]
+    }
+}
+
+/// The allocation bar: one segment per holding, as wide as its share of the total. The rows below carry the same
+/// shares in words, so the bar itself is not read by VoiceOver.
+struct AllocationBar: View {
+    @Environment(\.skin) private var skin
+    let parts: [(share: Double, color: Color)]
     var body: some View {
-        let value = store.marketValue(of: holding), gain = value.map { $0 - holding.cost }
-        HStack(spacing: 8) {
-            VStack(alignment: .leading, spacing: 5) {
-                HStack(spacing: 8) { Text(holding.symbol).font(.headline); Text(holding.name).font(.subheadline.bold()).lineLimit(1) }.foregroundStyle(Palette.ink)
-                Text("\(decimal(holding.shares)) 股 ｜ 成本 \(shown(money(holding.cost), hidden: hidden))\(holding.broker.isEmpty ? "" : " · \(holding.broker)")").font(.caption).foregroundStyle(Palette.muted).lineLimit(1)
-            }
-            Spacer(minLength: 6)
-            VStack(alignment: .trailing, spacing: 3) {
-                Text(value.map { shown(money($0), hidden: hidden) } ?? (store.quote(holding.symbol) == nil ? "尚無報價" : "外幣報價")).font(.headline).monospacedDigit().foregroundStyle(value == nil ? Palette.muted : Palette.ink)
-                if let gain, holding.cost > 0 {
-                    Text(shown(signed(gain), hidden: hidden)).font(.caption.bold()).monospacedDigit().foregroundStyle(Palette.trend(gain))
-                    Text(shown(percentText(gain / holding.cost * 100), hidden: hidden)).font(.caption2.bold()).monospacedDigit().foregroundStyle(Palette.trend(gain))
+        GeometryReader { geo in
+            let gap: CGFloat = 3
+            let sum = parts.reduce(0) { $0 + $1.share }
+            let room = max(geo.size.width - gap * CGFloat(max(parts.count - 1, 0)), 0)
+            HStack(spacing: gap) {
+                ForEach(parts.indices, id: \.self) { i in
+                    Rectangle().fill(parts[i].color).frame(width: sum > 0 ? room * parts[i].share / sum : 0)
                 }
             }
-            Image(systemName: "chevron.right").font(.caption).foregroundStyle(Palette.muted)
         }
-        .accentRow(Palette.theme(store.fund(for: holding).theme))
+        .frame(height: 10)
+        .clipShape(RoundedRectangle(cornerRadius: skin.style.button == .pixelBlock ? 0 : 5))
+        .accessibilityHidden(true)
+    }
+}
+
+/// A holding in the pocket: its colour, the code in the big face, 「名稱 · 占比」, the value and the gain or loss on
+/// cost (▲ / ▼ and a percentage, in the up / down colour).
+struct PocketHoldingRow: View {
+    @Environment(\.skin) private var skin
+    let row: PocketSummary.Row
+    let color: Color
+    let hidden: Bool
+    var body: some View {
+        HStack(spacing: 12) {
+            RoundedRectangle(cornerRadius: skin.style.button == .pixelBlock ? 0 : 5).fill(color).frame(width: 10, height: 10)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(row.holding.symbol).skinFont(.big(20)).skinForeground(\.ink).lineLimit(1).minimumScaleFactor(0.6)
+                Text(detail).skinFont(.body(11)).skinForeground(\.sub).lineLimit(1)
+            }
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(row.value.map { shown(money($0), hidden: hidden) } ?? "尚無報價")
+                    .skinFont(.mono(13)).foregroundStyle(skin.color(row.value == nil ? \SkinColors.sub : \SkinColors.ink))
+                if hidden {
+                    Text("＊＊＊＊").skinFont(.mono(11)).skinForeground(\.sub)
+                } else {
+                    SkinChange(percent: row.gainPercent).accessibilityIdentifier("pocket-change-\(row.holding.symbol)")
+                }
+            }
+        }
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+    }
+    private var detail: String {
+        let name = row.holding.name.isEmpty ? row.holding.symbol : row.holding.name
+        return row.share.map { "\(name) · \(String(format: "%.1f", $0))%" } ?? name
+    }
+}
+
+/// A row that opens another page: title, a line of explanation and 「›」, at least 44pt tall.
+struct SkinLinkRow: View {
+    let title: String
+    let subtitle: String
+    var body: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).skinFont(.title(15)).skinForeground(\.ink)
+                Text(subtitle).skinFont(.body(11)).skinForeground(\.sub)
+            }
+            Spacer(minLength: 8)
+            Text("›").skinFont(.mono(16)).skinForeground(\.sub).accessibilityHidden(true)
+        }
+        .padding(.vertical, 8)
+        .frame(minHeight: 52)
+        .contentShape(Rectangle())
     }
 }
 

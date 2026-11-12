@@ -29,110 +29,265 @@ struct DividendAccentRow: View {
     }
 }
 
-struct DividendsView: View {
-    @EnvironmentObject var store: PortfolioStore
-    @State private var month = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
-    @State private var selectedDay: Date?
-    @AppStorage("hideAmounts") private var hidden = false
-    private var entries: [Dividend] { store.data.dividends.filter { Calendar.current.isDate($0.date, equalTo: month, toGranularity: .month) }.sorted { $0.date < $1.date } }
-    var body: some View {
-        let listed = selectedDay.map { day in entries.filter { Calendar.current.isDate($0.date, inSameDayAs: day) } } ?? entries
-        Page {
-            MonthSwitcher(month: $month).onChange(of: month) { _, _ in selectedDay = nil }
-            HStack(spacing: 10) {
-                tile(.paid, icon: "dollarsign", colors: [Color(red: 1, green: 0.78, blue: 0.3), Color(red: 0.96, green: 0.64, blue: 0.06)], label: "本月已入帳")
-                tile(.announced, icon: "doc.text.fill", colors: [Color(red: 0.37, green: 0.64, blue: 1), Palette.blue], label: "已公告")
-                tile(.estimated, icon: "clock.fill", colors: [Color(red: 1, green: 0.49, blue: 0.67), Palette.pink], label: "預估配息")
-            }
-            Card(padding: 14) {
-                MonthCalendar(month: month, dividends: entries, selected: $selectedDay)
-                HStack(spacing: 16) {
-                    ForEach([DividendStatus.estimated, .announced, .paid], id: \.self) { status in
-                        HStack(spacing: 4) { Circle().fill(Palette.status(status)).frame(width: 8, height: 8); Text(status == .estimated ? "預估配息" : status.rawValue).font(.caption2).foregroundStyle(Palette.muted) }
-                    }
-                }.frame(maxWidth: .infinity).padding(.top, 10)
-            }
-            Card(padding: 12) {
-                NavigationLink(value: AppRoute.recentDividends) { ToolRow(title: "近期配息", subtitle: "依發放日排序，掌握每筆狀態", icon: "list.bullet") }
-                Divider()
-                NavigationLink(value: AppRoute.monthDividends(next: false)) { ToolRow(title: "本月股息", subtitle: "已領與待領一次看", icon: "dollarsign.circle") }
-                Divider()
-                NavigationLink(value: AppRoute.yearDividends) { ToolRow(title: "年度配息統計", subtitle: "每月長條圖與紀錄匯出", icon: "chart.bar.fill") }
-            }.buttonStyle(.plain)
-            HStack {
-                SectionHeading(title: selectedDay.map { "\(monthDay($0)) 配息紀錄" } ?? "\(Calendar.current.component(.month, from: month)) 月配息紀錄")
-                if selectedDay != nil { Button("顯示全月") { selectedDay = nil }.font(.caption) }
-            }
-            if listed.isEmpty {
-                Card { ContentUnavailableView(selectedDay == nil ? "這個月還沒有紀錄" : "這天沒有紀錄", systemImage: "calendar.badge.plus", description: Text("按右上角 + 記下每筆股息，慢慢看見累積。")) }
-            } else {
-                VStack(spacing: 10) { ForEach(listed) { item in NavigationLink(value: AppRoute.dividendDetail(item.id)) { DividendAccentRow(item: item, hidden: hidden) }.buttonStyle(.plain) } }
-            }
-            Text("此頁是你的配息紀錄；官方公告可在「近期配息」一鍵加入。").font(.caption).foregroundStyle(Palette.muted)
-        }
-        .navigationTitle("配息月曆").navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(value: AppRoute.dividendForm(id: nil, symbol: nil, officialEx: nil)) { Image(systemName: "plus") }.accessibilityLabel("新增配息紀錄")
-            }
-        }
+/// 配息's figures for the current year (spec 5.8): what was received so far, in how many payments, the months that
+/// had one, and the same period of last year to compare with. Only received (paid) records count.
+struct DividendYear: Equatable {
+    var total: Double = 0
+    var count = 0
+    var months: Set<Int> = []
+    /// Received from 1 January to this day, a year ago.
+    var previous: Double = 0
+
+    static func of(_ dividends: [Dividend], now: Date, calendar: Calendar = .current) -> DividendYear {
+        let year = calendar.component(.year, from: now)
+        let paid = dividends.filter { $0.status == .paid }
+        let thisYear = paid.filter { calendar.component(.year, from: $0.date) == year }
+        let cutoff = calendar.date(byAdding: .year, value: -1, to: now) ?? now
+        let lastYear = paid.filter { calendar.component(.year, from: $0.date) == year - 1 && $0.date <= cutoff }
+        return DividendYear(total: thisYear.reduce(0) { $0 + $1.amount }, count: thisYear.count,
+                            months: Set(thisYear.map { calendar.component(.month, from: $0.date) }),
+                            previous: lastYear.reduce(0) { $0 + $1.amount })
     }
-    private func tile(_ status: DividendStatus, icon: String, colors: [Color], label: String) -> some View {
-        let items = entries.filter { $0.status == status }
-        return VStack(spacing: 4) {
-            Image(systemName: icon).font(.headline).foregroundStyle(.white).frame(width: 36, height: 36).background(LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom), in: Circle())
-            Text(shown(money(items.reduce(0) { $0 + $1.amount }), hidden: hidden)).font(.headline.bold()).monospacedDigit().foregroundStyle(Palette.ink).minimumScaleFactor(0.6).lineLimit(1)
-            Text("\(label)\n(\(items.count)筆)").font(.caption2).multilineTextAlignment(.center).foregroundStyle(Palette.muted)
-        }
-        .frame(maxWidth: .infinity).padding(.vertical, 12)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 18))
-        .shadow(color: Palette.blue.opacity(0.06), radius: 8, y: 3)
+
+    /// 「領了 7 次 · 比去年多 1,920」; just the count when last year's same period had nothing to compare with.
+    func tag(hidden: Bool) -> String {
+        let times = "領了 \(count) 次"
+        guard previous > 0 else { return times }
+        let difference = (total - previous).rounded()
+        if difference == 0 { return "\(times) · 和去年同期一樣" }
+        return "\(times) · 比去年\(difference > 0 ? "多" : "少") \(shown(money(abs(difference)), hidden: hidden))"
     }
 }
-struct MonthCalendar: View {
-    let month: Date
-    let dividends: [Dividend]
-    @Binding var selected: Date?
-    private let calendar = Calendar.current
+
+/// A coming ex-dividend of a held ETF from the official announcements: the day, the amount per unit and an estimate
+/// for the shares held. One per code and ex-date, whatever the number of brokers holding it.
+struct UpcomingDividend: Identifiable, Equatable {
+    let symbol: String
+    /// The ex-date, "2026-11-18".
+    let ex: String
+    let perShare: Double?
+    let shares: Double
+    /// The holding to record against when only one holds the code.
+    let holding: UUID?
+    var id: String { "\(symbol)-\(ex)" }
+    /// Before tax and fees, so the page marks it 「≈」.
+    var estimate: Double? { perShare.map { ($0 * shares).rounded() } }
+
+    static func from(_ entries: [(symbol: String, event: OfficialDistribution, shares: Double, holding: Holding)], today: String) -> [UpcomingDividend] {
+        var result: [UpcomingDividend] = []
+        for entry in entries where entry.event.ex >= today {
+            if let i = result.firstIndex(where: { $0.symbol == entry.symbol && $0.ex == entry.event.ex }) {
+                let old = result[i]
+                result[i] = UpcomingDividend(symbol: old.symbol, ex: old.ex, perShare: old.perShare, shares: old.shares + entry.shares, holding: nil)
+            } else {
+                result.append(UpcomingDividend(symbol: entry.symbol, ex: entry.event.ex, perShare: entry.event.amount, shares: entry.shares, holding: entry.holding.id))
+            }
+        }
+        return result.sorted { ($0.ex, $0.symbol) < ($1.ex, $1.symbol) }
+    }
+}
+
+/// 配息 (spec 5.8): the skin's coin pile, this year's received total in the big face with a tag (how many times, and
+/// against last year), twelve month checks (this month underlined), the coming ex-dividends of held ETFs, and
+/// 「記一筆配息」. Logging one earns a flat +20 and, back on this page, a coin drops onto the pile (a fade with Reduce
+/// Motion). A newcomer sees the pile, one sentence and the button — never an NT$ 0 (ruling R15).
+struct DividendsView: View {
+    @EnvironmentObject var store: PortfolioStore
+    @Environment(\.skin) private var skin
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AppStorage("hideAmounts") private var hidden = false
+    /// How many dividends had been logged when the page last appeared; more on the way back plays the coin drop.
+    @State private var seenLogs: Int?
+    @State private var drops = 0
+    @State private var rewarded = false
+
     var body: some View {
-        let days = gridDays()
-        VStack(spacing: 6) {
-            HStack(spacing: 0) {
-                ForEach(["日", "一", "二", "三", "四", "五", "六"], id: \.self) { Text($0).font(.caption2.bold()).foregroundStyle($0 == "日" ? Palette.red : Palette.muted).frame(maxWidth: .infinity) }
-            }
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 4) {
-                ForEach(days.indices, id: \.self) { index in
-                    if let day = days[index] { cell(day) } else { Color.clear.frame(height: 42) }
+        let now = Date()
+        let year = DividendYear.of(store.data.dividends, now: now)
+        let newbie = store.data.dividends.isEmpty && store.data.holdings.isEmpty
+        Page {
+            Text("DIV×\(String(Calendar.current.component(.year, from: now)))").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+            hero(year)
+            if newbie {
+                VStack(spacing: 18) {
+                    Text("每記下一筆配息，就有一枚金幣掉進這裡。")
+                        .skinFont(.body(15)).skinForeground(\.ink).multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("dividends-newbie")
+                    logButton(primary: true)
                 }
+                .frame(maxWidth: .infinity)
+            } else {
+                received(year)
+                months(year, now: now)
+                upcoming
+                logButton(primary: false).frame(maxWidth: .infinity)
+                more
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .overlay(alignment: .top) { if rewarded { toast } }
+        .onAppear(perform: appeared)
+    }
+
+    // MARK: Hero
+
+    private func hero(_ year: DividendYear) -> some View {
+        ZStack {
+            // The coin pile is read as what it stands for.
+            SkinImage(.dividends)
+                .accessibilityElement()
+                .accessibilityLabel(year.total > 0 ? "金幣堆，今年已領股息 NT$ \(shown(money(year.total), hidden: hidden))" : "金幣堆，今年還沒有領到股息")
+            CoinDrop(trigger: drops)
+        }
+        .frame(width: 200, height: 200)
+        .frame(maxWidth: .infinity)
+    }
+
+    /// This year's total, or one sentence while nothing has come in yet this year.
+    @ViewBuilder private func received(_ year: DividendYear) -> some View {
+        VStack(spacing: 8) {
+            if year.total > 0 {
+                Text("今年已領股息").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                Text("NT$ \(shown(money(year.total), hidden: hidden))")
+                    .skinFont(.big(44)).skinForeground(\.ink)
+                    .lineLimit(1).minimumScaleFactor(0.4)
+                    .accessibilityIdentifier("dividends-total")
+                SkinTag(year.tag(hidden: hidden))
+            } else {
+                Text("今年還沒有入帳的股息，記下第一筆就會出現在這裡。")
+                    .skinFont(.body(14)).skinForeground(\.sub).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: Months
+
+    /// Twelve checks: a month with a received dividend is ticked; this month's number is underlined.
+    private func months(_ year: DividendYear, now: Date) -> some View {
+        let current = Calendar.current.component(.month, from: now)
+        return HStack(spacing: 0) {
+            ForEach(1...12, id: \.self) { month in
+                let done = year.months.contains(month), isNow = month == current
+                VStack(spacing: 5) {
+                    SkinCheck(done: done, size: 18)
+                    Text("\(month)").underline(isNow).skinFont(.mono(9))
+                        .foregroundStyle(skin.color(isNow ? \SkinColors.ink : \SkinColors.dim))
+                }
+                .frame(maxWidth: .infinity)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(month) 月，\(done ? "已領" : "未領")\(isNow ? "，本月" : "")")
+                .accessibilityIdentifier("dividend-month-\(month)")
             }
         }
     }
-    private func gridDays() -> [Date?] {
-        guard let first = calendar.date(from: calendar.dateComponents([.year, .month], from: month)),
-              let range = calendar.range(of: .day, in: .month, for: first) else { return [] }
-        var result: [Date?] = Array(repeating: nil, count: calendar.component(.weekday, from: first) - 1)
-        for day in range { result.append(calendar.date(byAdding: .day, value: day - 1, to: first)) }
-        return result
-    }
-    private func cell(_ day: Date) -> some View {
-        let items = dividends.filter { calendar.isDate($0.date, inSameDayAs: day) }
-        let statuses = [DividendStatus.estimated, .announced, .paid].filter { status in items.contains { $0.status == status } }
-        let today = calendar.isDateInToday(day)
-        let picked = selected.map { calendar.isDate($0, inSameDayAs: day) } ?? false
-        return Button { selected = picked ? nil : day } label: {
-            VStack(spacing: 3) {
-                Text("\(calendar.component(.day, from: day))")
-                    .font(.subheadline.weight(today || picked ? .bold : .regular)).monospacedDigit()
-                    .foregroundStyle(today ? Color.white : Palette.ink)
-                    .frame(width: 31, height: 31)
-                    .background { if today { RoundedRectangle(cornerRadius: 10).fill(Palette.blue) } else if picked { RoundedRectangle(cornerRadius: 10).stroke(Palette.blue, lineWidth: 1.5) } }
-                HStack(spacing: 2) { ForEach(statuses, id: \.self) { Circle().fill(Palette.status($0)).frame(width: 6, height: 6) } }.frame(height: 6)
+
+    // MARK: Coming ex-dividends
+
+    private var upcoming: some View {
+        let items = Array(UpcomingDividend.from(store.officialForHoldings(), today: DataChecks.day()).prefix(5))
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("即將除息")
+                Spacer()
+                Text("預估入帳")
             }
-            .frame(maxWidth: .infinity, minHeight: 42)
-            .contentShape(Rectangle())
+            .skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+            .padding(.bottom, 4)
+            if items.isEmpty {
+                Text(store.data.holdings.isEmpty ? "口袋裡有 ETF 後，這裡會列出它的除息日。" : "口袋裡的 ETF 目前沒有已公告的除息。")
+                    .skinFont(.body(12)).skinForeground(\.sub)
+                    .padding(.vertical, 10)
+            }
+            ForEach(items) { item in
+                NavigationLink(value: AppRoute.dividendForm(id: nil, symbol: item.symbol, officialEx: item.ex, holding: item.holding)) {
+                    upcomingRow(item)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("記下這筆配息")
+                Rectangle().fill(skin.color(\.line)).frame(height: 1).accessibilityHidden(true)
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(calendar.component(.month, from: day)) 月 \(calendar.component(.day, from: day)) 日\(items.isEmpty ? "" : "，\(items.count) 筆配息")")
+    }
+
+    private func upcomingRow(_ item: UpcomingDividend) -> some View {
+        let day = item.ex.suffix(5).replacingOccurrences(of: "-", with: "/")
+        let dayColor = skin.color(skin.lightText ? \SkinColors.accent : \SkinColors.sub)
+        return HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                (Text(item.symbol) + Text(" · \(day)").foregroundStyle(dayColor))
+                    .skinFont(.big(17)).skinForeground(\.ink).lineLimit(1).minimumScaleFactor(0.6)
+                Text("\(store.name(for: item.symbol)) · \(item.perShare.map { "每股 \(decimal($0)) 元" } ?? "金額待公布")")
+                    .skinFont(.body(11)).skinForeground(\.sub).lineLimit(1)
+            }
+            Spacer(minLength: 8)
+            Text(item.estimate.map { "≈ \(shown(money($0), hidden: hidden))" } ?? "—").skinFont(.mono(13)).skinForeground(\.sub)
+        }
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: Actions
+
+    private func logButton(primary: Bool) -> some View {
+        NavigationLink(value: AppRoute.dividendForm(id: nil, symbol: nil, officialEx: nil)) { Text("記一筆配息") }
+            .buttonStyle(SkinButtonStyle(primary: primary, seed: SkinSeed.of("記一筆配息")))
+            .accessibilityIdentifier("dividends-log")
+    }
+
+    /// The record lists and statistics, below the page.
+    private var more: some View {
+        SkinCard {
+            VStack(spacing: 0) {
+                NavigationLink(value: AppRoute.recentDividends) { SkinLinkRow(title: "近期配息", subtitle: "每筆狀態與官方公告一鍵加入") }
+                    .buttonStyle(.plain).accessibilityIdentifier("dividends-recent")
+                Rectangle().fill(skin.color(\.line)).frame(height: 1).accessibilityHidden(true)
+                NavigationLink(value: AppRoute.monthDividends(next: false)) { SkinLinkRow(title: "本月股息", subtitle: "已領與待領一次看") }
+                    .buttonStyle(.plain).accessibilityIdentifier("dividends-month")
+                Rectangle().fill(skin.color(\.line)).frame(height: 1).accessibilityHidden(true)
+                NavigationLink(value: AppRoute.yearDividends) { SkinLinkRow(title: "年度配息統計", subtitle: "每月長條圖與紀錄匯出") }
+                    .buttonStyle(.plain).accessibilityIdentifier("dividends-year")
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    // MARK: Reward
+
+    private var toastText: String { "記一筆配息 +\(GameRules.xp[.dividendLogged] ?? 0) 經驗" }
+    private var toast: some View {
+        Text(toastText)
+            .skinFont(.title(14))
+            .foregroundStyle(skin.onFill(skin.colors.accent))
+            .padding(.horizontal, 18).padding(.vertical, 10)
+            .background(Capsule().fill(skin.color(\.accent)))
+            .padding(.top, 8)
+            .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+            .accessibilityIdentifier("dividend-xp-toast")
+    }
+
+    /// Ticks 看一次配息 when it is one of this month's quests, and plays the coin drop for dividends logged since the
+    /// page last appeared (on the way back from the form).
+    private func appeared() {
+        try? store.updateGame { _ = $0.complete(.dividendsViewed, now: Date()) }
+        let logs = (store.data.game ?? GameState()).counter(.dividendLogged)
+        if let seenLogs, logs > seenLogs { celebrate() }
+        seenLogs = logs
+    }
+
+    private func celebrate() {
+        drops += 1
+        let animation: Animation = reduceMotion ? .easeInOut(duration: 0.2) : .snappy
+        withAnimation(animation) { rewarded = true }
+        AccessibilityNotification.Announcement(toastText).post()
+        Task {
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation(animation) { rewarded = false }
+        }
     }
 }
 
@@ -390,7 +545,8 @@ struct DividendFormView: View {
         } else if legacy, let value = Double(total.replacingOccurrences(of: ",", with: "")), value > 0 {
             item.amount = value
         } else { error = "請填寫符合資格股數與每股配息金額。"; return }
-        do { try store.saveDividend(item); dismiss() } catch { self.error = error.localizedDescription }
+        // 「記一筆配息」: a new record earns the flat +20 in the same write; the dividends page then plays the coin drop.
+        do { try store.saveDividend(item, rewardNew: id == nil); dismiss() } catch { self.error = error.localizedDescription }
     }
 }
 

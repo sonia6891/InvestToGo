@@ -11,6 +11,7 @@ import SwiftUI
         let store = PortfolioStore(url: testURL, reset: args.contains("--reset"))
         // UI tests and screenshots set up game progress with `--demo-…` (only with `--ui-testing`).
         try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
+        DemoArguments.seedPocket(store, args: args, now: Date())
         _store = StateObject(wrappedValue: store)
     }
     var body: some Scene {

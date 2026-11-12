@@ -107,35 +107,45 @@ struct SkinButton: View {
 // MARK: - Tags and chips
 
 /// A small label: hexagon outline (black-gold), yellow block with pink hard shadow (pixel), cream paper strip with a
-/// red seam (stitch), highlighter stroke under the text (sketch).
+/// red seam (stitch), highlighter stroke under the text (sketch). `tint` colours the text, e.g. a gain or loss in the
+/// skin's up / down colour; the pixel tag then turns into an outline so the colour stays readable.
 struct SkinTag: View {
     @Environment(\.skin) private var skin
     let text: String
-    init(_ text: String) { self.text = text }
+    let tint: Color?
+    init(_ text: String, tint: Color? = nil) { self.text = text; self.tint = tint }
 
     var body: some View {
         switch skin.style.tag {
         case .hexOutline:
             // Tags are short, so their ends are cut deeper than buttons' (half the height, as on the canvas).
             Text(text).skinFont(.title(11)).tracking(0.9)
-                .foregroundStyle(skin.color(\.ink))
+                .foregroundStyle(tint ?? skin.color(\.ink))
                 .padding(.horizontal, 15).padding(.vertical, 4)
                 .background(HexagonShape(cut: 0.5).fill(skin.color(\.page)))
                 .overlay(HexagonShape(cut: 0.5).strokeBorder(skin.color(\.ink), lineWidth: 1.5))
         case .pixelBlock:
-            Text(text).skinFont(.title(12))
-                .foregroundStyle(skin.color(\.page))
-                .padding(.horizontal, 10).padding(.vertical, 3)
-                .background(Rectangle().fill(skin.extra(0, or: \.accent)).hardShadow(skin.color(\.accent), offset: 3))
+            if let tint {
+                Text(text).skinFont(.title(12))
+                    .foregroundStyle(tint)
+                    .padding(.horizontal, 10).padding(.vertical, 3)
+                    .background(Rectangle().fill(skin.color(\.page)).hardShadow(skin.color(\.accent), offset: 3))
+                    .overlay(Rectangle().strokeBorder(tint, lineWidth: 2))
+            } else {
+                Text(text).skinFont(.title(12))
+                    .foregroundStyle(skin.color(\.page))
+                    .padding(.horizontal, 10).padding(.vertical, 3)
+                    .background(Rectangle().fill(skin.extra(0, or: \.accent)).hardShadow(skin.color(\.accent), offset: 3))
+            }
         case .paperStrip:
             Text(text).skinFont(.title(11))
-                .foregroundStyle(skin.color(\.accent))
+                .foregroundStyle(tint ?? skin.color(\.accent))
                 .padding(.horizontal, 13).padding(.vertical, 5)
                 .background(RoundedRectangle(cornerRadius: 4).fill(skin.color(\.card)).paperShadow())
                 .overlay(StitchSeam(color: skin.color(\.accent), cornerRadius: 4, inset: 3, lineWidth: 1.2))
         case .highlighter:
             Text(text).skinFont(.title(13))
-                .foregroundStyle(skin.color(\.ink))
+                .foregroundStyle(tint ?? skin.color(\.ink))
                 .padding(.horizontal, 6)
                 .background {
                     GeometryReader { g in

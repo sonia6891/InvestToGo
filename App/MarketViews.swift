@@ -73,26 +73,42 @@ struct TintedIconLabel: LabelStyle {
 }
 
 /* ---------- skin pieces for 找 ETF, the ETF page and the dex card ---------- */
-/// A day's move in the skin's 紅漲綠跌 colours, never colour alone: "▲ 0.75%", "▼ 0.27%", "－ 0.00%" when unchanged;
-/// with `withAmount`, "▲ 1.25 (+0.75%)". Without a change figure it shows "—" and invents nothing. VoiceOver hears
-/// 上漲 / 下跌 / 持平 instead of glyph names; the shown text stays the element's value.
+/// A move in the skin's 紅漲綠跌 colours, never colour alone: "▲ 0.75%", "▼ 0.27%", "－ 0.00%" when unchanged;
+/// with an amount, "▲ 1.25 (+0.75%)". Without a change figure it shows "—" and invents nothing. VoiceOver hears
+/// 上漲 / 下跌 / 持平 instead of glyph names; the shown text stays the element's value. A day's move comes from a
+/// quote; a holding's gain or loss from its percentage of cost (`init(percent:)`), a loss shown as plainly as a gain.
 struct SkinChange: View {
     @Environment(\.skin) private var skin
-    let quote: Quote?
-    var size: CGFloat = 11
-    var withAmount = false
+    private let percent: Double?
+    private let amount: Double?
+    /// Shown when there is no figure: "—", or 試撮中 for a trial-match quote.
+    private let placeholder: String
+    var size: CGFloat
+    init(quote: Quote?, size: CGFloat = 11, withAmount: Bool = false) {
+        let usable = quote.flatMap { $0.trial == true ? nil : $0 }
+        percent = usable?.changePercent
+        amount = withAmount ? usable?.changeAmount : nil
+        placeholder = quote?.trial == true ? "試撮中" : "—"
+        self.size = size
+    }
+    init(percent: Double?, size: CGFloat = 11) {
+        self.percent = percent; amount = nil; placeholder = "—"; self.size = size
+    }
     var body: some View {
-        if let quote, quote.trial != true, let percent = quote.changePercent, percent.isFinite {
-            let rounded = Self.rounded(percent)
-            let amount = withAmount ? quote.changeAmount : nil
+        if let percent, percent.isFinite {
             Text(Self.text(percent: percent, amount: amount))
                 .skinFont(.mono(size)).lineLimit(1)
-                .foregroundStyle(rounded > 0 ? skin.color(\.up) : (rounded < 0 ? skin.color(\.down) : skin.color(\.sub)))
+                .foregroundStyle(skin.color(Self.tone(percent)))
                 .accessibilityLabel(Self.spoken(percent: percent, amount: amount))
                 .accessibilityValue(Self.text(percent: percent, amount: amount))
         } else {
-            Text(quote?.trial == true ? "試撮中" : "—").skinFont(.mono(size)).skinForeground(\.sub)
+            Text(placeholder).skinFont(.mono(size)).skinForeground(\.sub)
         }
+    }
+    /// The skin colour of a move: `up` (red), `down` (green), `sub` when it rounds to unchanged.
+    static func tone(_ percent: Double) -> KeyPath<SkinColors, UInt32> {
+        let value = rounded(percent)
+        return value > 0 ? \.up : (value < 0 ? \.down : \.sub)
     }
     /// The percentage as shown (two decimals), with -0.00 folded into 0 so a flat move never reads "-0.00%".
     static func rounded(_ percent: Double) -> Double {
@@ -100,20 +116,21 @@ struct SkinChange: View {
         return value == 0 ? 0 : value
     }
     /// The arrow follows the rounded percentage, so a move that rounds to 0.00% reads as unchanged and unsigned.
-    static func text(percent: Double, amount: Double?) -> String {
+    /// `format` writes the amount: a price to two decimals by default, `money` for whole dollars.
+    static func text(percent: Double, amount: Double?, format: (Double) -> String = priceText) -> String {
         let value = rounded(percent)
         let arrow = value > 0 ? "▲" : (value < 0 ? "▼" : "－")
         guard let amount, amount.isFinite else { return "\(arrow) \(String(format: "%.2f", abs(value)))%" }
         let signed = value == 0 ? "0.00" : String(format: "%+.2f", value)
-        return "\(arrow) \(priceText(abs(amount))) (\(signed)%)"
+        return "\(arrow) \(format(abs(amount))) (\(signed)%)"
     }
     /// What VoiceOver reads: "上漲 0.75%", "下跌 1.25 元，1.50%", "持平 0.00%".
-    static func spoken(percent: Double, amount: Double?) -> String {
+    static func spoken(percent: Double, amount: Double?, format: (Double) -> String = priceText) -> String {
         let value = rounded(percent)
         let word = value > 0 ? "上漲" : (value < 0 ? "下跌" : "持平")
         let size = "\(String(format: "%.2f", abs(value)))%"
         guard let amount, amount.isFinite else { return "\(word) \(size)" }
-        return "\(word) \(priceText(abs(amount))) 元，\(size)"
+        return "\(word) \(format(abs(amount))) 元，\(size)"
     }
 }
 

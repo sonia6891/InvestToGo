@@ -65,3 +65,60 @@ struct PosterShards: View {
         .accessibilityHidden(true)
     }
 }
+
+/// A coin falling onto a screen's hero (spec 3.5): it drops from above while turning, lands with the coin chime, a
+/// haptic tap and a burst of shards, then fades. With Reduce Motion it only fades in and out where it lands: no fall,
+/// no turning, no shards. Increasing `trigger` plays it once; the first value plays nothing.
+struct CoinDrop: View {
+    var trigger: Int
+    @Environment(\.skin) private var skin
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject private var skins = SkinStore.shared
+    @State private var offset: CGFloat = 0
+    @State private var turn: Double = 0
+    @State private var opacity: Double = 0
+    @State private var bursts = 0
+
+    var body: some View {
+        ZStack {
+            if !reduceMotion { BurstView(trigger: bursts, center: .center, colors: skin.burst.map { Color(rgb: $0) }) }
+            ZStack {
+                Circle().fill(skin.color(\.accent))
+                Circle().strokeBorder(skin.color(\.ink).opacity(0.35), lineWidth: 3).padding(7)
+            }
+            .frame(width: 46, height: 46)
+            .rotation3DEffect(.degrees(turn), axis: (x: 0, y: 1, z: 0))
+            .offset(y: offset)
+            .opacity(opacity)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+        .onChange(of: trigger) { _, _ in play() }
+    }
+
+    private func play() {
+        var still = Transaction(); still.disablesAnimations = true
+        if reduceMotion {
+            withTransaction(still) { offset = 0; turn = 0; opacity = 0 }
+            withAnimation(.easeOut(duration: 0.25)) { opacity = 1 } completion: {
+                land()
+                withAnimation(.easeIn(duration: 0.35).delay(0.4)) { opacity = 0 }
+            }
+        } else {
+            withTransaction(still) { offset = -170; turn = 0; opacity = 1 }
+            // The start position is set first, so the fall animates from above rather than from where the last coin was.
+            DispatchQueue.main.async {
+                withAnimation(.easeIn(duration: 0.5)) { offset = 0; turn = 540 } completion: {
+                    land()
+                    bursts += 1
+                    withAnimation(.easeOut(duration: 0.3).delay(0.15)) { opacity = 0 }
+                }
+            }
+        }
+    }
+
+    private func land() {
+        SoundFX.coin(enabled: skins.soundOn)
+        Haptics.coinDrop()
+    }
+}
