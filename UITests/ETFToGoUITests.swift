@@ -248,6 +248,80 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(app.buttons["lobby-find"].exists, "Scrolling up did not return to the lobby")
     }
 
+    // MARK: 找 ETF, ETF detail and dex card (spec 5.4–5.6)
+
+    func testFindDetailAndDex() {
+        let app = launch(["--open", "find"])
+        let search = app.textFields["fund-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10))
+        waitForLabel(app.staticTexts["bar-title"], "找 ETF")
+
+        // 高股息 leaves only high-dividend funds, and every row shows its move as an arrow plus a percentage.
+        app.buttons["高股息"].tap()
+        XCTAssertTrue(app.staticTexts["元大高股息"].waitForExistence(timeout: 5), "A high-dividend fund is listed")
+        XCTAssertFalse(app.staticTexts["元大台灣50"].exists, "A market-cap fund is filtered out")
+        let changes = app.staticTexts.matching(NSPredicate(format: "identifier BEGINSWITH 'fund-change-'")).allElementsBoundByIndex
+        XCTAssertGreaterThan(changes.count, 3, "The filtered rows show their change")
+        // A move is ▲ or ▼ plus its size; only an unchanged price reads "－ 0.00%" (there is no direction to show).
+        let move = NSPredicate(format: "SELF MATCHES %@", "^[▲▼] [0-9]+\\.[0-9]{2}%$")
+        for change in changes {
+            XCTAssertTrue(move.evaluate(with: change.label) || change.label == "－ 0.00%", "\(change.identifier) shows ▲ or ▼ and a percentage: \(change.label)")
+        }
+        XCTAssertTrue(changes.contains { move.evaluate(with: $0.label) }, "At least one row moved")
+        capture(app, "find-high-dividend")
+
+        // Search 0050 and open it: the code, the four tabs and, the first time, the dex toast.
+        app.buttons["全部"].tap()
+        search.tap(); search.typeText("0050\n")
+        let row = app.staticTexts["元大台灣50"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        let toast = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '收進圖鑑'")).firstMatch
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "The first visit collects the card")
+        XCTAssertEqual(toast.label, "收進圖鑑 +30 經驗")
+        XCTAssertTrue(app.staticTexts["detail-code"].exists)
+        XCTAssertEqual(app.staticTexts["detail-code"].label, "0050")
+        for tab in ["走勢", "持股", "配息", "資訊"] { XCTAssertTrue(app.buttons[tab].exists, "The detail has the \(tab) tab") }
+        capture(app, "detail-0050")
+
+        // The dex card: five block bars, the fee and history ones named as facts.
+        app.buttons["圖鑑卡"].tap()
+        for bar in ["fee", "size", "yield", "volatility", "history"] {
+            XCTAssertTrue(app.descendants(matching: .any)["dex-bar-\(bar)"].waitForExistence(timeout: 5), "dex-bar-\(bar) is on the card")
+        }
+        XCTAssertTrue(app.descendants(matching: .any)["dex-bar-fee"].label.hasPrefix("低費用"))
+        XCTAssertTrue(app.descendants(matching: .any)["dex-bar-history"].label.hasPrefix("上市時間"))
+        XCTAssertTrue(app.buttons["PK 比一比"].exists)
+        XCTAssertTrue(app.buttons["加入口袋"].exists)
+        capture(app, "dex-0050")
+
+        // Back to the list and in again: already collected, so no toast.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["圖鑑卡"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
+        XCTAssertFalse(toast.waitForExistence(timeout: 3), "A collected card does not toast again")
+    }
+
+    /// 找 ETF, the detail and the dex card in each skin, to compare with the canvas.
+    func testFindDetailAndDexInEverySkin() {
+        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+            let app = launch(["--skin", id, "--open", "find"])
+            let search = app.textFields["fund-search"]
+            XCTAssertTrue(search.waitForExistence(timeout: 10), "\(id): 找 ETF opens")
+            sleep(1); capture(app, "find-\(id)")
+            search.tap(); search.typeText("0050\n")
+            let row = app.staticTexts["元大台灣50"]
+            XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+            XCTAssertTrue(app.buttons["圖鑑卡"].waitForExistence(timeout: 5), "\(id): the detail opens")
+            sleep(3); capture(app, "detail-\(id)")
+            app.buttons["圖鑑卡"].tap()
+            XCTAssertTrue(app.descendants(matching: .any)["dex-bar-fee"].waitForExistence(timeout: 5), "\(id): the dex card opens")
+            sleep(1); capture(app, "dex-\(id)")
+            app.terminate()
+        }
+    }
+
     /// The lobby and the quick pick in each skin, to compare with the canvas.
     func testLobbyAndQuickPickInEverySkin() {
         for id in ["blackgold", "voxel", "stitch", "sketch"] {
