@@ -25,8 +25,26 @@ struct SkinColors: Equatable, Decodable {
     }
 }
 
-/// PostScript font names.
-struct SkinFonts: Equatable, Decodable { var big, title, body, mono: String }
+/// PostScript font names, plus how the big face is drawn.
+struct SkinFonts: Equatable {
+    var big, title, body, mono: String
+    /// The big face is a variable font registered under its Regular instance, drawn bold as on the canvas (sketch's Caveat).
+    var bigBold = false
+    /// How far, in em, the big face's ink reaches past its last glyph's advance. The kit adds that much trailing room so
+    /// the last numeral is never cut off (sketch's bold Caveat leans right).
+    var bigOverhang: Double = 0
+}
+
+extension SkinFonts: Decodable {
+    private enum Keys: String, CodingKey { case big, title, body, mono, bigBold, bigOverhang }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: Keys.self)
+        big = try c.decode(String.self, forKey: .big); title = try c.decode(String.self, forKey: .title)
+        body = try c.decode(String.self, forKey: .body); mono = try c.decode(String.self, forKey: .mono)
+        bigBold = try c.decodeIfPresent(Bool.self, forKey: .bigBold) ?? false
+        bigOverhang = try c.decodeIfPresent(Double.self, forKey: .bigOverhang) ?? 0
+    }
+}
 
 struct SkinStyle: Equatable, Decodable {
     enum TagKind: String, Decodable { case hexOutline, pixelBlock, paperStrip, highlighter }

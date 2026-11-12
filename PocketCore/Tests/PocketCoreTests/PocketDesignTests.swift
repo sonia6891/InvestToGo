@@ -69,7 +69,12 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.named("blackgold").fonts, SkinFonts(big: "Anton-Regular", title: "NotoSansTC-Bold", body: "NotoSansTC-Medium", mono: "JetBrainsMono-Regular"))
         XCTAssertEqual(Skins.named("voxel").fonts, SkinFonts(big: "PressStart2P-Regular", title: "DotGothic16-Regular", body: "DotGothic16-Regular", mono: "PressStart2P-Regular"))
         XCTAssertEqual(Skins.named("stitch").fonts, SkinFonts(big: "BreeSerif-Regular", title: "NotoSerifTC-Bold", body: "NotoSerifTC-Medium", mono: "BreeSerif-Regular"))
-        XCTAssertEqual(Skins.named("sketch").fonts, SkinFonts(big: "Caveat-Regular", title: "LXGWWenKaiTC-Medium", body: "LXGWWenKaiTC-Medium", mono: "LXGWWenKaiTC-Medium"))
+        XCTAssertEqual(Skins.named("sketch").fonts, SkinFonts(big: "Caveat-Regular", title: "LXGWWenKaiTC-Medium", body: "LXGWWenKaiTC-Medium", mono: "LXGWWenKaiTC-Medium",
+                                                                 bigBold: true, bigOverhang: 0.12))
+        // Only the sketch skin's big face is drawn bold and needs room for its overhang; the others keep the defaults.
+        for id in ["blackgold", "voxel", "stitch"] {
+            XCTAssertFalse(Skins.named(id).fonts.bigBold, id); XCTAssertEqual(Skins.named(id).fonts.bigOverhang, 0, id)
+        }
         XCTAssertEqual(Skins.all.map(\.feedback.sound), ["thud", "chip", "snip", "scribble"])
         XCTAssertEqual(Skins.named("sketch").feedback.haptic, .faint)
         XCTAssertEqual(Skins.named("stitch").art.folder, "Skins/stitch")

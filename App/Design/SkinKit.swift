@@ -24,11 +24,6 @@ enum SkinFont {
         switch self { case .big(let s), .title(let s), .body(let s), .mono(let s): return s }
     }
 
-    /// Variable fonts are registered under their Regular instance's PostScript name; the canvas draws them bold.
-    /// Caveat (the sketch skin's big numerals) is one: `Caveat-Variable.ttf` registers as "Caveat-Regular", and the
-    /// canvas sets it at weight 700, so the big role asks for `.bold` on it.
-    static let boldVariableFonts: Set<String> = ["Caveat-Regular"]
-
     func font(_ skin: Skin) -> Font {
         let name: String, style: Font.TextStyle
         switch self {
@@ -38,7 +33,8 @@ enum SkinFont {
         case .mono: name = skin.fonts.mono; style = .caption
         }
         let font = Font.custom(name, size: size, relativeTo: style)
-        return Self.boldVariableFonts.contains(name) ? font.weight(.bold) : font
+        // A variable big face registers under its Regular instance; the skin says when the canvas draws it bold.
+        return isBig && skin.fonts.bigBold ? font.weight(.bold) : font
     }
 
     var isBig: Bool { if case .big = self { return true } else { return false } }
@@ -50,7 +46,10 @@ private struct SkinFontModifier: ViewModifier {
     @ViewBuilder func body(content: Content) -> some View {
         if role.isBig {
             // Big numerals grow at most to about 1.3× (spec 3.2); callers let them wrap or scale down past that.
-            content.font(role.font(skin)).dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            // Tracking, unlike padding, widens the text's own frame past the last glyph, so a face whose ink overhangs
+            // its advance (skin.fonts.bigOverhang, in em) is not cut off where a single line is drawn to its bounds.
+            content.font(role.font(skin)).tracking(skin.fonts.bigOverhang * role.size)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         } else {
             content.font(role.font(skin))
         }

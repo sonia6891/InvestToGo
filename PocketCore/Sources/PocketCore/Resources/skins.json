@@ -38,7 +38,7 @@
     "id": "sketch", "name": "手繪", "code": "SKN 004",
     "colors": { "page": "#FAF8F3", "ink": "#1F1F1F", "sub": "#6B6760", "dim": "#A8A39A", "card": "#FFFFFF", "line": "#DDD8CD",
                 "accent": "#F2D16B", "up": "#D32F2F", "down": "#1B7F45", "extra": [] },
-    "fonts": { "big": "Caveat-Regular", "title": "LXGWWenKaiTC-Medium", "body": "LXGWWenKaiTC-Medium", "mono": "LXGWWenKaiTC-Medium" },
+    "fonts": { "big": "Caveat-Regular", "title": "LXGWWenKaiTC-Medium", "body": "LXGWWenKaiTC-Medium", "mono": "LXGWWenKaiTC-Medium", "bigBold": true, "bigOverhang": 0.12 },
     "style": { "tag": "highlighter", "button": "sketchBox", "stage": "none", "check": "sketchCircle", "quick": "sketchDot", "chart": "pencil", "decor": "doodles" },
     "art": { "kind": "vector", "folder": "Skins/sketch" },
     "feedback": { "sound": "scribble", "haptic": "faint" },
