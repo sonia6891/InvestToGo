@@ -2,84 +2,99 @@ import SwiftUI
 import UniformTypeIdentifiers
 import UserNotifications
 
+/// 工具箱 (spec 5.9): two columns of cards, each with the skin's own object; the last, 會員・換膚, in the main colour.
+/// The older calculators follow in a plain list.
 struct ToolsView: View {
-    /// The 3D showcase opens full screen, like the new design: no navigation or tab bar around the hero.
+    @Environment(\.skin) private var skin
+    private let tiles: [(art: SkinArtName, title: String, subtitle: String, route: AppRoute, id: String)] = [
+        (.calc, "定期定額試算", "每月投多少，十年後多少", .calculator, "tool-dca"),
+        (.fees, "費用比較", "內扣、費用一次看", .comparison, "tool-fees"),
+        (.pocketIcon, "券商匯入", "CSV 帶進口袋", .broker, "tool-broker"),
+        (.reminder, "除息提醒", "入帳、除息前通知你", .reminders, "tool-reminders"),
+        (.goal, "存錢目標", "離目標還差多少", .goal, "tool-goal"),
+        (.crown, "會員・換膚", "四套世界任你換", .member, "tool-member"),
+    ]
+    private let more: [(title: String, subtitle: String, route: AppRoute, id: String)] = [
+        ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo"),
+        ("股息複利", "配息再投入試算", .plan, "tool-plan"),
+        ("持股透視", "成分與集中度", .exposure, "tool-exposure"),
+        ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices"),
+        ("備份資料", "匯出／匯入", .backup, "tool-backup"),
+    ]
+
     var body: some View {
-        Group {
         Page {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("工具中心").font(.title.bold()).foregroundStyle(Palette.ink)
-                    Text("各種實用工具，幫助你更聰明投資 ETF").font(.subheadline).foregroundStyle(Palette.muted)
-                }
-                Spacer()
-                Artwork(name: "misc-bulb", size: 56)
-            }.padding(.top, 6)
-            section("試算", icon: "function", color: Palette.blue) {
-                Button { SkinStore.shared.showcaseOpen = true } label: {
-                    HStack(spacing: 10) {
-                        Artwork(name: "div-coins", size: 44)
-                        VStack(alignment: .leading, spacing: 2) { Text("3D 元件展示").font(.subheadline.bold()).foregroundStyle(Palette.ink); Text("新版遊戲風格試玩").font(.caption2).foregroundStyle(Palette.muted) }
-                        Spacer(minLength: 0)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("TOOLS").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                Text("工具箱").skinFont(.title(34)).skinForeground(\.ink)
+            }
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                ForEach(tiles.indices, id: \.self) { i in tile(tiles[i], highlight: i == tiles.count - 1) }
+            }
+            Text("更多工具").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub).padding(.top, 6)
+            SkinCard {
+                VStack(spacing: 0) {
+                    ForEach(more.indices, id: \.self) { i in
+                        NavigationLink(value: more[i].route) {
+                            HStack(spacing: 10) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(more[i].title).skinFont(.title(15)).skinForeground(\.ink)
+                                    Text(more[i].subtitle).skinFont(.body(12)).skinForeground(\.sub)
+                                }
+                                Spacer(minLength: 0)
+                                Text("›").skinFont(.title(18)).skinForeground(\.sub).accessibilityHidden(true)
+                            }
+                            .padding(.vertical, 10).frame(minHeight: 44).contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier(more[i].id)
+                        if i < more.count - 1 { Rectangle().fill(skin.color(\.line)).frame(height: 1) }
                     }
-                    .padding(12).frame(maxWidth: .infinity)
-                    .background(Palette.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 18))
-                }.buttonStyle(.plain).accessibilityIdentifier("tool-design").padding(.bottom, 10)
-                wide("ETF 組合試算", "3、5、10 年資產預估", art: "tool-compound", route: .combo).accessibilityIdentifier("tool-combo").padding(.bottom, 10)
-                HStack(spacing: 10) {
-                    tile("股息複利", "複利試算", art: "cat-saving", route: .plan, tint: Palette.pink)
-                    tile("領息目標", "達成規劃", art: "tool-goal", route: .goal)
-                    tile("定期定額", "投資試算", art: "tool-dca", route: .calculator)
                 }
             }
-            section("分析", icon: "chart.line.uptrend.xyaxis", color: Palette.green) {
-                HStack(spacing: 10) {
-                    wide("三檔比較", "績效分析", art: "tool-compare", route: .comparison)
-                    wide("持股透視", "成分與集中度", art: "tool-exposure", route: .exposure)
-                }
-            }
-            section("管理", icon: "wrench.and.screwdriver.fill", color: Palette.orange) {
-                HStack(spacing: 10) {
-                    tile("提醒中心", "重要通知", art: "tool-alerts", route: .notices, tint: Palette.orange)
-                    tile("券商資料", "對帳匯入", art: "tool-broker", route: .broker).accessibilityIdentifier("tool-broker")
-                    tile("備份資料", "匯出／匯入", art: "tool-backup", route: .backup).accessibilityIdentifier("tool-backup")
-                }
-            }
-            Text("試算都是情境假設，不是預測或保證；比較與透視使用你取得的實際資料。").font(.caption).foregroundStyle(Palette.muted)
+            Text("試算都是情境假設，不是預測或保證；比較與透視使用你取得的實際資料。").skinFont(.body(12)).skinForeground(\.sub)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .toolbar(.hidden, for: .navigationBar)
-            }
     }
-    private func section<Content: View>(_ title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) -> some View {
-        Card(padding: 14) {
-            HStack(spacing: 8) {
-                Image(systemName: icon).font(.caption.bold()).foregroundStyle(.white).frame(width: 26, height: 26).background(color, in: RoundedRectangle(cornerRadius: 8))
-                Text(title).font(.headline).foregroundStyle(Palette.ink)
-            }.padding(.bottom, 10)
-            content()
-        }
-    }
-    private func tile(_ title: String, _ subtitle: String, art: String, route: AppRoute, tint: Color? = nil) -> some View {
-        NavigationLink(value: route) {
-            VStack(spacing: 3) {
-                Artwork(name: art, size: 50)
-                Text(title).font(.subheadline.bold()).foregroundStyle(Palette.ink).padding(.top, 4)
-                Text(subtitle).font(.caption2).foregroundStyle(Palette.muted)
-            }
-            .frame(maxWidth: .infinity).padding(.vertical, 12)
-            .background((tint ?? Palette.blue).opacity(tint == nil ? 0.06 : 0.14), in: RoundedRectangle(cornerRadius: 18))
-        }.buttonStyle(.plain)
-    }
-    private func wide(_ title: String, _ subtitle: String, art: String, route: AppRoute) -> some View {
-        NavigationLink(value: route) {
-            HStack(spacing: 10) {
-                Artwork(name: art, size: 44)
-                VStack(alignment: .leading, spacing: 2) { Text(title).font(.subheadline.bold()).foregroundStyle(Palette.ink); Text(subtitle).font(.caption2).foregroundStyle(Palette.muted) }
+
+    private func tile(_ item: (art: SkinArtName, title: String, subtitle: String, route: AppRoute, id: String), highlight: Bool) -> some View {
+        NavigationLink(value: item.route) {
+            VStack(alignment: .leading, spacing: 2) {
+                SkinImage(item.art).frame(width: 96, height: 96).padding(.leading, -8).accessibilityHidden(true)
+                Text(item.title).skinFont(.title(15)).lineLimit(2).minimumScaleFactor(0.8)
+                Text(item.subtitle).skinFont(.body(11)).opacity(0.8).fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
             }
-            .padding(12).frame(maxWidth: .infinity)
-            .background(Palette.blue.opacity(0.06), in: RoundedRectangle(cornerRadius: 18))
-        }.buttonStyle(.plain)
+            .foregroundStyle(highlight ? skin.onFill(skin.colors.accent) : skin.color(\.ink))
+            .padding(.horizontal, 14).padding(.top, 6).padding(.bottom, 14)
+            .frame(maxWidth: .infinity, minHeight: 172, alignment: .topLeading)
+            .background(ToolTileBackground(highlight: highlight))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(item.id)
+    }
+}
+
+/// A tool card in the skin's card shape: the card colour, or the main colour for the highlighted one.
+private struct ToolTileBackground: View {
+    @Environment(\.skin) private var skin
+    let highlight: Bool
+    var body: some View {
+        let fill = highlight ? skin.color(\.accent) : skin.color(\.card)
+        switch skin.style.button {
+        case .hex:
+            RoundedRectangle(cornerRadius: 22).fill(fill)
+        case .pixelBlock:
+            Rectangle().fill(fill).hardShadow(skin.extra(2, or: \.line))
+        case .paperStitch:
+            RoundedRectangle(cornerRadius: 14).fill(fill).paperShadow()
+                .overlay(StitchSeam(color: highlight ? skin.color(\.card) : skin.color(\.dim), cornerRadius: 14, inset: 6, lineWidth: 1.5))
+        case .sketchBox:
+            SketchBoxShape(seed: highlight ? 5 : 9, overshoot: false).fill(highlight ? skin.color(\.accent) : skin.color(\.page))
+                .overlay(SketchBoxShape(seed: highlight ? 5 : 9).stroke(skin.color(\.ink), style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)))
+        }
     }
 }
 enum ComparisonDefaults {

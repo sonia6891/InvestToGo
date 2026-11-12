@@ -37,9 +37,15 @@ struct RootView: View {
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
-        let start = Feature.launch(ProcessInfo.processInfo.arguments)
-        _feature = State(initialValue: start)
-        _path = State(initialValue: start.map { NavigationPath([AppRoute.feature($0)]) } ?? NavigationPath())
+        let arguments = ProcessInfo.processInfo.arguments
+        if let stack = AppRoute.launchStack(arguments) {
+            _feature = State(initialValue: .tools)
+            _path = State(initialValue: NavigationPath(stack))
+        } else {
+            let start = Feature.launch(arguments)
+            _feature = State(initialValue: start)
+            _path = State(initialValue: start.map { NavigationPath([AppRoute.feature($0)]) } ?? NavigationPath())
+        }
     }
 
     var body: some View {
@@ -58,10 +64,16 @@ struct RootView: View {
         }
         // 記一筆配息's coin drop and 「+20」, wherever the dividend was logged from (ruling R25).
         .overlay(alignment: .top) { RewardToast() }
+        // Holding a 換膚 card tries that skin on over everything, the bottom bar included, until the finger lifts.
+        .overlay {
+            ZStack { if let id = skins.tryOn { TryOnPreview(skin: Skins.named(id)).transition(.opacity) } }
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: skins.tryOn)
+        }
         .onChange(of: path) { _, value in if value.isEmpty { feature = nil } }
-        .fullScreenCover(isPresented: $skins.showcaseOpen) { DesignShowcase(close: { skins.showcaseOpen = false }) }
         .modifier(SkinKitLaunch())
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
+        // Membership unlocks skins; StoreKit's record of this Apple ID is read once at launch and followed after.
+        .task { await MembershipStore.shared.start() }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
         .task(id: phase) {

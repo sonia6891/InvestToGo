@@ -56,12 +56,17 @@ jobs:
         run: |
           set -euo pipefail
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
-          for SCREEN in lobby find dividends pocket tools achievements; do
+          for SCREEN in lobby find dividends pocket tools achievements member skins; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --demo-streak 12 --demo-level 7 --open "$SCREEN"
             sleep 5
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png"
           done
+          # 換膚 worn in the light sketch skin, to check the carousel's frame and badges on paper.
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --demo-level 7 --skin sketch --open skins
+          sleep 5
+          xcrun simctl io "$DEVICE" screenshot "build/screens/screen-skins-sketch.png"
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2
         continue-on-error: true

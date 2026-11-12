@@ -32,6 +32,18 @@ enum Feature: String, CaseIterable, Hashable {
     }
 }
 
+extension AppRoute {
+    /// `--open member` and `--open skins` (UI tests, screenshots): 工具 with 會員, and 換膚 above it.
+    static func launchStack(_ arguments: [String]) -> [AppRoute]? {
+        guard let i = arguments.firstIndex(of: "--open"), arguments.indices.contains(i + 1) else { return nil }
+        switch arguments[i + 1] {
+        case "member": return [.feature(.tools), .member]
+        case "skins": return [.feature(.tools), .member, .skins]
+        default: return nil
+        }
+    }
+}
+
 /// How screens move around the lobby. Set by the root view; the defaults do nothing (previews, renderers).
 struct LobbyNavigation {
     /// Back to the lobby from any depth.

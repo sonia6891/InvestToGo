@@ -9,7 +9,8 @@ enum AppRoute: Hashable {
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
     case watchlist, basis(String), dexCard(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
-    case designShowcase
+    /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
+    case member, skins
     #if DEBUG
     /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
     case skinKitPreview
@@ -49,7 +50,8 @@ struct RouteView: View {
         case .broker: BrokerView()
         case .connection: ConnectionView()
         case .reminders: ReminderCenterView()
-        case .designShowcase: DesignShowcase()
+        case .member: MemberView()
+        case .skins: SkinsView()
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
         case .comboSettings: ComboSettingsView()

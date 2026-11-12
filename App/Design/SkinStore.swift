@@ -16,9 +16,9 @@ extension Color {
     /// The skin the ordinary screens' Palette reads; set before any screen draws.
     nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "")
     @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
-    /// The 3D showcase is presented from the app root, outside the screens that redraw on a skin change, so trying
-    /// skins does not close it.
-    @Published var showcaseOpen = false
+    /// The skin being tried on while a carousel card is held. Only the root's full-screen preview reads it; the app's
+    /// own skin never changes.
+    @Published var tryOn: String?
 
     init() {
         // UI tests start from the default look, whatever an earlier test chose.
