@@ -447,7 +447,20 @@ final class ETFToGoUITests: XCTestCase {
         return UInt32(bytes[0]) << 16 | UInt32(bytes[1]) << 8 | UInt32(bytes[2])
     }
     private func sameColour(_ a: UInt32, _ b: UInt32) -> Bool {
-        [16, 8, 0].allSatisfy { abs(Int((a >> UInt32($0)) & 0xFF) - Int((b >> UInt32($0)) & 0xFF)) <= 3 }
+        for shift: UInt32 in [16, 8, 0] {
+            let x = Int((a >> shift) & 0xFF), y = Int((b >> shift) & 0xFF)
+            if abs(x - y) > 3 { return false }
+        }
+        return true
+    }
+
+    /// A label that is only a figure, such as 「12」 or 「1,280」; 「n / 4」 and 「LV.n」 are allowed.
+    private func isBareNumber(_ label: String) -> Bool {
+        let text = label.trimmingCharacters(in: .whitespaces)
+        if text.isEmpty || text.contains("/") || text.hasPrefix("LV") { return false }
+        let allowed = Set(",.+-−% ")
+        for character in text where !character.isNumber && !allowed.contains(character) { return false }
+        return true
     }
 
     func testSkinCarousel() {
@@ -485,10 +498,8 @@ final class ETFToGoUITests: XCTestCase {
         openSkins(app)
         for id in ["voxel", "blackgold", "stitch", "sketch"] {
             app.buttons["skin-badge-\(id)"].tap(); sleep(1)
-            let bare = app.staticTexts.allElementsBoundByIndex.map(\.label).filter { label in
-                let text = label.trimmingCharacters(in: .whitespaces)
-                return !text.isEmpty && !text.contains("/") && !text.hasPrefix("LV") && text.allSatisfy { $0.isNumber || ",.+-−% ".contains($0) }
-            }
+            let labels: [String] = app.staticTexts.allElementsBoundByIndex.map { $0.label }
+            let bare = labels.filter(isBareNumber)
             XCTAssertEqual(bare, [], "\(id): no bare numbers on the skin page")
         }
     }
