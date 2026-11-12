@@ -66,9 +66,9 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["元大台灣50"].exists)
         XCTAssertFalse(app.staticTexts["國泰永續高股息"].exists)
         quickPick(app, "pocket")
-        XCTAssertTrue(app.staticTexts["portfolio-value"].waitForExistence(timeout: 5)); capture(app,"screen-pocket")
+        XCTAssertTrue(app.buttons["pocket-add"].waitForExistence(timeout: 5)); capture(app,"screen-pocket")
         quickPick(app, "dividends")
-        XCTAssertTrue(app.buttons["新增配息紀錄"].waitForExistence(timeout: 5)); capture(app,"screen-dividends")
+        XCTAssertTrue(app.buttons["dividends-log"].waitForExistence(timeout: 5)); capture(app,"screen-dividends")
         quickPick(app, "tools")
         XCTAssertTrue(app.buttons["tool-backup"].waitForExistence(timeout: 5)); capture(app,"screen-tools")
     }
@@ -102,6 +102,8 @@ final class ETFToGoUITests: XCTestCase {
         app.buttons["showcase-tab-fees"].tap()
         XCTAssertTrue(app.buttons["fee-row-1"].waitForExistence(timeout: 5)); app.buttons["fee-row-1"].tap(); sleep(2); capture(app, "design-fees")
     }
+    /// The pocket's own search opens 找 ETF with the field focused, the watchlist is a tap away, and once there is a
+    /// holding the combined simulation opens from the pocket.
     func testPocketSearchWatchlistAndCombo() {
         let app = launch(["--open", "pocket"])
         XCTAssertTrue(app.buttons["home-search"].waitForExistence(timeout: 10)); capture(app, "home-empty")
@@ -113,35 +115,43 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(done.waitForExistence(timeout: 5), "The search focuses the field")
         done.tap()
         quickPick(app, "pocket")
-        XCTAssertTrue(app.buttons["home-add-favorite"].waitForExistence(timeout: 5))
-        app.swipeUp(); capture(app, "home-lower")
-        reveal(app, app.buttons["試算 10 年"]); capture(app, "home-combo-10y")
+        XCTAssertTrue(app.buttons["home-watchlist"].waitForExistence(timeout: 5))
+        app.buttons["home-watchlist"].tap()
+        XCTAssertTrue(app.navigationBars["我的自選"].waitForExistence(timeout: 5), "The watchlist opens from the pocket")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        addHolding(app)
         reveal(app, app.buttons["home-combo"])
         XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5), "The combined simulation opens from the pocket")
     }
-    func testHoldingSurvivesRelaunch() {
-        let app = launch(["--open", "pocket"])
-        XCTAssertTrue(app.buttons["home-add-holding"].waitForExistence(timeout: 10))
-        app.buttons["home-add-holding"].tap()
-        app.textFields["holding-symbol"].tap(); app.textFields["holding-symbol"].typeText("0050")
+    /// 「＋ 加一檔」 on the pocket page, filled in and saved; back on the pocket page afterwards.
+    private func addHolding(_ app: XCUIApplication, broker: String? = nil, file: StaticString = #filePath, line: UInt = #line) {
+        let add = app.buttons["pocket-add"]
+        XCTAssertTrue(add.waitForExistence(timeout: 10), "The pocket has 「＋ 加一檔」", file: file, line: line)
+        reveal(app, add, file: file, line: line)
+        let symbol = app.textFields["holding-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5), "「＋ 加一檔」 opens the holding form", file: file, line: line)
+        symbol.tap(); symbol.typeText("0050")
         let name = app.textFields["holding-name"]
         if (name.value as? String) == "名稱（清單沒有時填寫）" { name.tap(); name.typeText("Test ETF") }
         app.textFields["holding-shares"].tap(); app.textFields["holding-shares"].typeText("1000")
         app.textFields["holding-cost"].tap(); app.textFields["holding-cost"].typeText("50")
-        app.textFields["holding-broker"].tap(); app.textFields["holding-broker"].typeText("Test Broker")
+        if let broker { app.textFields["holding-broker"].tap(); app.textFields["holding-broker"].typeText(broker) }
         app.buttons["save-holding"].tap()
-        expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: app.buttons["save-holding"])
-        waitForExpectations(timeout: 5)
-        XCTAssertTrue(app.staticTexts["portfolio-value"].waitForExistence(timeout: 5))
-        XCTAssertNotEqual(app.staticTexts["portfolio-value"].label, "—", "The asset card shows the saved holding")
+        XCTAssertTrue(app.buttons["save-holding"].waitForNonExistence(timeout: 5), "The form closes after saving", file: file, line: line)
+    }
+    func testHoldingSurvivesRelaunch() {
+        let app = launch(["--open", "pocket"])
+        addHolding(app, broker: "Test Broker")
+        let total = app.staticTexts["portfolio-value"]
+        XCTAssertTrue(total.waitForExistence(timeout: 5), "The pocket shows its total once it holds an ETF")
+        XCTAssertTrue(total.label.hasPrefix("NT$ "), "The total is the saved holding's value: \(total.label)")
         app.terminate(); app.launchArguments = ["--ui-testing", "--open", "pocket"]; app.launch()
-        XCTAssertTrue(app.buttons["home-holdings"].waitForExistence(timeout: 10)); reveal(app, app.buttons["home-holdings"])
-        XCTAssertTrue(app.staticTexts["0050"].waitForExistence(timeout: 10))
-        app.buttons["holdings-trades"].tap()
+        XCTAssertTrue(app.staticTexts["portfolio-value"].waitForExistence(timeout: 10), "The holding is still in the pocket after a relaunch")
+        XCTAssertTrue(app.staticTexts["0050"].exists, "The pocket lists the holding")
+        reveal(app, app.buttons["holdings-trades"])
         XCTAssertTrue(app.staticTexts["買進"].waitForExistence(timeout: 5), "Saving a new holding is recorded in the trade log")
         app.navigationBars.buttons.element(boundBy: 0).tap()
-        XCTAssertTrue(app.buttons["holdings-allocation"].waitForExistence(timeout: 5))
-        app.buttons["holdings-allocation"].tap()
+        reveal(app, app.buttons["holdings-allocation"])
         XCTAssertTrue(app.staticTexts["券商帳戶"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Test Broker"].exists)
     }
@@ -165,8 +175,8 @@ final class ETFToGoUITests: XCTestCase {
         sleep(1); capture(app, "lobby-streak-12")
         let pages: [(String, XCUIElement, String)] = [
             ("lobby-find", app.textFields["fund-search"], "找 ETF"),
-            ("lobby-dividends", app.buttons["新增配息紀錄"], "配息"),
-            ("lobby-pocket", app.staticTexts["portfolio-value"], "口袋"),
+            ("lobby-dividends", app.buttons["dividends-log"], "配息"),
+            ("lobby-pocket", app.buttons["pocket-add"], "口袋"),
             ("lobby-tools", app.buttons["tool-backup"], "工具"),
             ("lobby-achievements", app.staticTexts["bar-title"], "成就"),
         ]
@@ -334,6 +344,84 @@ final class ETFToGoUITests: XCTestCase {
             app.buttons["lobby-find"].tap()
             XCTAssertTrue(app.buttons["bar-quick"].waitForExistence(timeout: 5)); app.buttons["bar-quick"].tap()
             XCTAssertTrue(app.buttons["quick-pocket"].waitForExistence(timeout: 5)); sleep(1); capture(app, "quickpick-\(id)")
+            app.terminate()
+        }
+    }
+
+    // MARK: 口袋 and 配息 (spec 5.7, 5.8)
+
+    /// Ruling R15: a newbie's pocket and dividends show the object, one sentence and one button, never NT$ 0.
+    func testNewbiePocketAndDividendsHaveNoZeroHero() {
+        let zero = NSPredicate(format: "label CONTAINS 'NT$ 0' OR value CONTAINS 'NT$ 0'")
+        let pocket = launch(["--open", "pocket"])
+        XCTAssertTrue(pocket.buttons["＋ 加一檔"].waitForExistence(timeout: 10), "The empty pocket offers 「＋ 加一檔」")
+        XCTAssertTrue(pocket.staticTexts["pocket-newbie"].exists, "The empty pocket explains itself in a sentence")
+        XCTAssertFalse(pocket.staticTexts["portfolio-value"].exists, "No total before there is anything to add up")
+        XCTAssertEqual(pocket.descendants(matching: .any).matching(zero).count, 0, "No NT$ 0 in the empty pocket")
+        sleep(1); capture(pocket, "pocket-newbie")
+        pocket.terminate()
+        let dividends = launch(["--open", "dividends"])
+        XCTAssertTrue(dividends.buttons["記一筆配息"].waitForExistence(timeout: 10), "Dividends offer 「記一筆配息」")
+        XCTAssertTrue(dividends.staticTexts["dividends-newbie"].exists, "Empty dividends explain themselves in a sentence")
+        XCTAssertFalse(dividends.staticTexts["dividends-total"].exists, "No total before anything was received")
+        XCTAssertEqual(dividends.descendants(matching: .any).matching(zero).count, 0, "No NT$ 0 on the empty dividends page")
+        sleep(1); capture(dividends, "dividends-newbie")
+    }
+
+    /// Logging a dividend earns the flat 記一筆配息 experience (+20), whatever its amount, and plays the coin drop.
+    func testLogDividendGivesXP() {
+        let app = launch([])
+        let xp = app.descendants(matching: .any)["lobby-xp"]
+        XCTAssertTrue(xp.waitForExistence(timeout: 10))
+        // A first visit settles any quest that viewing dividends finishes, so the difference below is the log alone.
+        app.buttons["lobby-dividends"].tap()
+        let log = app.buttons["dividends-log"]
+        XCTAssertTrue(log.waitForExistence(timeout: 5))
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(xp.waitForExistence(timeout: 5))
+        let before = Int((xp.value as? String ?? "").split(separator: " ").first ?? "") ?? -1
+        XCTAssertGreaterThanOrEqual(before, 0, "The XP bar reads \(String(describing: xp.value))")
+        app.buttons["lobby-dividends"].tap()
+        XCTAssertTrue(log.waitForExistence(timeout: 5)); log.tap()
+        let symbol = app.textFields["dividend-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5), "「記一筆配息」 opens the dividend form")
+        symbol.tap(); symbol.typeText("0050")
+        app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
+        app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
+        reveal(app, app.buttons["save-dividend"])
+        XCTAssertTrue(app.buttons["save-dividend"].waitForNonExistence(timeout: 5), "The form closes after saving")
+        let toast = app.staticTexts["dividend-xp-toast"]
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "Back on 配息, the reward is shown")
+        XCTAssertEqual(toast.label, "記一筆配息 +20 經驗")
+        capture(app, "dividend-logged")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(xp.waitForExistence(timeout: 5))
+        let after = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", "\(before + 20) 經驗"), object: xp)
+        XCTAssertEqual(XCTWaiter().wait(for: [after], timeout: 5), .completed, "XP went from \(before) to \(String(describing: xp.value))")
+    }
+
+    /// 口袋 and 配息 with sample holdings in each skin, to compare with the canvas. A loss is shown honestly: ▼ and
+    /// its size, spoken as 下跌.
+    func testPocketAndDividendsInEverySkin() {
+        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+            let app = launch(["--demo-pocket", "--skin", id, "--open", "pocket"])
+            let total = app.staticTexts["portfolio-value"]
+            XCTAssertTrue(total.waitForExistence(timeout: 10), "\(id): the pocket shows its total")
+            XCTAssertTrue(total.label.hasPrefix("NT$ "), "\(id): the total is in NT$: \(total.label)")
+            XCTAssertTrue(app.staticTexts["我的口袋 · 4 檔"].exists, "\(id): the pocket counts its ETFs")
+            let loss = app.descendants(matching: .any)["pocket-change-00679B"]
+            XCTAssertTrue(loss.waitForExistence(timeout: 5), "\(id): the losing holding is listed")
+            XCTAssertTrue((loss.value as? String ?? "").hasPrefix("▼ "), "\(id): a loss shows ▼: \(String(describing: loss.value))")
+            XCTAssertTrue(loss.label.hasPrefix("下跌 "), "\(id): a loss is spoken as 下跌: \(loss.label)")
+            sleep(1); capture(app, "pocket-\(id)")
+            app.swipeUp(); sleep(1); capture(app, "pocket-lower-\(id)")
+            quickPick(app, "dividends")
+            let received = app.staticTexts["dividends-total"]
+            XCTAssertTrue(received.waitForExistence(timeout: 5), "\(id): dividends show this year's total")
+            XCTAssertTrue(received.label.hasPrefix("NT$ "), "\(id): \(received.label)")
+            XCTAssertEqual(app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'dividend-month-'")).count, 12, "\(id): twelve month checks")
+            sleep(1); capture(app, "dividends-\(id)")
+            app.swipeUp(); sleep(1); capture(app, "dividends-lower-\(id)")
             app.terminate()
         }
     }
