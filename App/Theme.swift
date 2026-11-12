@@ -498,7 +498,7 @@ extension View {
     func accentRow(_ color: Color) -> some View { modifier(AccentRow(color: color)) }
     /// Room for the game bottom bar, which floats over every screen above the lobby. An inset on the navigation stack
     /// does not reach pushed screens, so every destination adds it.
-    func gameBarSpace() -> some View { safeAreaInset(edge: .bottom) { Color.clear.frame(height: GameBottomBar.height) } }
+    func gameBarSpace() -> some View { safeAreaInset(edge: .bottom) { Color.clear.frame(height: GameBottomBar.height + GameBottomBar.fade) } }
 }
 /// Rising bars drawn on the blue hero cards.
 struct HeroDeco: View {

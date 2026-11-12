@@ -13,6 +13,8 @@ struct GameBottomBar: View {
     @State private var open = false
 
     static let height: CGFloat = 76
+    /// The fade above the bar's solid backing; screens keep it clear too (`gameBarSpace()`).
+    static let fade: CGFloat = 14
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -54,11 +56,17 @@ struct GameBottomBar: View {
         .padding(.horizontal, 24)
         .frame(height: Self.height)
         .background(alignment: .bottom) {
-            // Content scrolls under the bar's soft top edge; the background never takes taps meant for it.
-            LinearGradient(stops: [.init(color: skin.color(\.page).opacity(0), location: 0), .init(color: skin.color(\.page), location: 0.4)],
-                           startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea(edges: .bottom)
-                .allowsHitTesting(false)
+            // A solid page-coloured backing behind the whole bar, so list rows scrolling past never show under
+            // 「‹ 大廳」 or the page name (spec 3.3), with a short fade just above it. Never takes taps.
+            VStack(spacing: 0) {
+                LinearGradient(colors: [skin.color(\.page).opacity(0), skin.color(\.page)], startPoint: .top, endPoint: .bottom)
+                    .frame(height: Self.fade)
+                skin.color(\.page)
+            }
+            .padding(.top, -Self.fade)
+            .ignoresSafeArea(edges: .bottom)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
         }
     }
 }
