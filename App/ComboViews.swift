@@ -86,8 +86,8 @@ struct ComboView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("組合試算").font(.headline).foregroundStyle(Palette.ink); Text("ETF 組合一起試算").font(.caption2).foregroundStyle(Palette.muted) } } }
         .onAppear { if let addSymbol, !added { added = true; add(addSymbol) } }
-        .sheet(item: $editing) { item in ComboItemSheet(existing: item) }
-        .sheet(isPresented: $adding) { ComboItemSheet(existing: nil) }
+        .sheet(item: $editing) { item in ComboItemSheet(existing: item).silencesScrollTop() }
+        .sheet(isPresented: $adding) { ComboItemSheet(existing: nil).silencesScrollTop() }
     }
     private func heroCard(_ c: ComboSettings) -> some View {
         let at = c.snapshotAt ?? Date()
@@ -252,7 +252,7 @@ struct ComboSettingsView: View {
         }
         .navigationTitle("試算設定").navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: load)
-        .navigationDestination(isPresented: $showResult) { ComboResultView(fromSettings: true).gameBarSpace() }
+        .navigationDestination(isPresented: $showResult) { ComboResultView(fromSettings: true).gameBarSpace().silencesScrollTop() }
     }
     private var draft: ComboSettings {
         var c = store.combo

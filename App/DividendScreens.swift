@@ -234,7 +234,7 @@ struct DividendDetailView: View {
             }
         }
         .navigationTitle("配息明細").navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(item: $doneID) { DividendDoneView(id: $0) }
+        .navigationDestination(item: $doneID) { DividendDoneView(id: $0).silencesScrollTop() }
     }
     private func line(_ title: String, _ value: String) -> some View {
         HStack { Text(title).font(.subheadline).foregroundStyle(Palette.muted); Spacer(); Text(value).font(.subheadline.bold()).monospacedDigit().foregroundStyle(Palette.ink) }.padding(.vertical, 8)

@@ -13,7 +13,7 @@ struct LiveQuoteButton: View {
         if !store.liveStatus.hasKey, DataChecks.code(symbol) {
             Button { showing = true } label: { Text("看即時價").font(.caption.bold()) }
                 .accessibilityLabel("看即時價")
-                .sheet(isPresented: $showing) { SafariSheet(url: Self.url(symbol, market: market)).ignoresSafeArea() }
+                .sheet(isPresented: $showing) { SafariSheet(url: Self.url(symbol, market: market)).ignoresSafeArea().silencesScrollTop() }
         }
     }
     static func url(_ symbol: String, market: String?) -> URL {

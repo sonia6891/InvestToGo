@@ -30,7 +30,7 @@ struct HomeView: View {
             let symbols = store.data.holdings.map(\.symbol) + store.data.favorites.sorted()
             if !symbols.isEmpty { await store.refresh(symbols: symbols) }
         }
-        .navigationDestination(isPresented: $overview) { OverviewView().gameBarSpace() }
+        .navigationDestination(isPresented: $overview) { OverviewView().gameBarSpace().silencesScrollTop() }
     }
 
     /* ---------- poster: the 3D pocket, the total in huge type, two hex actions ---------- */

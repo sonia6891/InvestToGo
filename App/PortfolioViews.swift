@@ -207,7 +207,7 @@ struct TradeLogSection: View {
             }
             Text("交易紀錄是你在這裡的操作與手動輸入，不是券商成交回報。新增買進／賣出會同步調整持有股數。").font(.caption).foregroundStyle(Palette.muted)
         }
-        .sheet(item: $selected) { TradeDetailSheet(trade: $0) }
+        .sheet(item: $selected) { TradeDetailSheet(trade: $0).silencesScrollTop() }
     }
     private func tradeLine(_ a: String, _ b: String, _ c: String, _ d: String, _ e: String, header: Bool) -> some View {
         HStack(spacing: 6) {

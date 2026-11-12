@@ -236,6 +236,18 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertEqual(app.tabBars.count, 0)
     }
 
+    /// Ruling R21: scrolling a feature's list back up never leaves for the lobby; only a pull from the very top does.
+    func testScrollUpDoesNotLeaveFeature() {
+        let app = launch(["--open", "find"])
+        XCTAssertTrue(app.textFields["fund-search"].waitForExistence(timeout: 10))
+        for _ in 0..<4 { app.swipeUp() }
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.22))
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: 220)))
+        sleep(1)
+        XCTAssertTrue(app.buttons["bar-lobby"].exists, "Still in 找 ETF: the bottom bar is there")
+        XCTAssertFalse(app.buttons["lobby-find"].exists, "Scrolling up did not return to the lobby")
+    }
+
     /// The lobby and the quick pick in each skin, to compare with the canvas.
     func testLobbyAndQuickPickInEverySkin() {
         for id in ["blackgold", "voxel", "stitch", "sketch"] {

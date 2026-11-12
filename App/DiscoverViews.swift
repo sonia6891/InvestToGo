@@ -131,7 +131,7 @@ struct DiscoverView: View {
             ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("探索 ETF").font(.headline).foregroundStyle(Palette.ink); Text("台灣上市・上櫃 ETF").font(.caption2).foregroundStyle(Palette.muted) } }
             ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } }
         }
-        .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter) }
+        .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter).silencesScrollTop() }
         .onAppear(perform: applyRequest)
         .onChange(of: store.discoverRequest) { _, _ in applyRequest() }
     }
@@ -382,7 +382,7 @@ struct WatchlistView: View {
         }
         .navigationTitle("我的自選").navigationBarTitleDisplayMode(.inline)
         .toolbar { if !favorites.isEmpty { ToolbarItem(placement: .topBarTrailing) { Button(editing ? "完成" : "編輯") { if !editing && selection.isEmpty { selection = Array(favorites.prefix(3).map(\.id)) }; editing.toggle() } } } }
-        .navigationDestination(isPresented: $compare) { ComparisonView().gameBarSpace() }
+        .navigationDestination(isPresented: $compare) { ComparisonView().gameBarSpace().silencesScrollTop() }
     }
     private func toggle(_ code: String, chosen: [String]) {
         var next = chosen

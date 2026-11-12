@@ -216,7 +216,7 @@ struct FeesContent: View {
             Card { Text("三種費用不能混用").font(.headline).foregroundStyle(Palette.ink); Text("經理費與保管費可能依基金規模分級距；年度總費用率還包含其他實際支出。不要把兩項契約費率相加，當成完整年度總費用率。").font(.subheadline).padding(.top, 12) }
             Link("前往官方 ETF 資料專區", destination: URL(string: fund.market == "TPEx" ? "https://info.tpex.org.tw/ETF/zh/" : "https://www.twse.com.tw/zh/ETFortune/etfInfo/\(fund.id)")!)
         }
-        .sheet(isPresented: $editing) { FeeEditor(symbol: fund.id) }
+        .sheet(isPresented: $editing) { FeeEditor(symbol: fund.id).silencesScrollTop() }
     }
     private func feeLine(_ title: String, _ value: Double) -> some View { LabeledContent(title, value: "\(decimal(value))%").font(.subheadline).padding(.vertical, 6) }
 }

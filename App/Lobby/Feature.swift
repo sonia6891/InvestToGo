@@ -65,21 +65,28 @@ struct FeatureScreen: View {
     @Environment(\.lobbyNavigation) private var navigation
     @Environment(\.lobbyNamespace) private var namespace
     @State private var height: CGFloat = 0
+    /// Whether this screen's own list is at the top. Only its root scroller reports here: pushed pages and sheets
+    /// get a silent `scrollAtTop`, and reports that arrive while the screen is covered are ignored, so the value is
+    /// still the root list's own when the screen comes back.
     @State private var atTop = true
-    /// Whether the list was at the top when the current drag began; nil between drags.
-    @State private var startedAtTop: Bool?
+    @State private var visible = false
+    /// The drag being tracked, keyed by where it started, with whether the list was at the top when it began. A new
+    /// start location latches afresh, so a drag the scroll view cancelled (no `onEnded`) never leaves a stale value.
+    @State private var drag: (start: CGPoint, atTop: Bool)?
 
     var body: some View {
         content
-            .environment(\.scrollAtTop) { value in if atTop != value { atTop = value } }
+            .environment(\.scrollAtTop) { value in if visible, atTop != value { atTop = value } }
             .simultaneousGesture(DragGesture(minimumDistance: 24)
-                .onChanged { _ in if startedAtTop == nil { startedAtTop = atTop } }
+                .onChanged { value in if drag?.start != value.startLocation { drag = (start: value.startLocation, atTop: atTop) } }
                 .onEnded { value in
-                    let wasAtTop = startedAtTop ?? atTop
-                    startedAtTop = nil
+                    let wasAtTop = drag?.start == value.startLocation ? drag?.atTop ?? atTop : atTop
+                    drag = nil
                     guard feature.pullsToLobby, wasAtTop else { return }
                     if Self.isPullToLobby(start: value.startLocation, translation: value.translation, height: height) { navigation.toLobby() }
                 })
+            .onAppear { visible = true; drag = nil }
+            .onDisappear { visible = false; drag = nil }
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height = $0 }
             .modifier(ZoomFromLobby(feature: feature, namespace: namespace))
     }
@@ -116,15 +123,15 @@ private struct ZoomFromLobby: ViewModifier {
     }
 }
 
-/// With Reduce Motion, screens the root view switches without animation fade in instead (spec 3.5).
+/// With Reduce Motion, screens the root view switches without animation fade in instead (spec 3.5). Only the first
+/// appearance fades: coming back from a pushed page or a sheet shows the screen at once.
 struct FadeInWithReducedMotion: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown = false
     func body(content: Content) -> some View {
         content
             .opacity(reduceMotion && !shown ? 0 : 1)
-            .onAppear { withAnimation(.easeOut(duration: 0.25)) { shown = true } }
-            .onDisappear { shown = false }
+            .onAppear { if !shown { withAnimation(.easeOut(duration: 0.25)) { shown = true } } }
     }
 }
 
@@ -136,6 +143,11 @@ extension EnvironmentValues {
         get { self[ScrollAtTopKey.self] }
         set { self[ScrollAtTopKey.self] = newValue }
     }
+}
+
+extension View {
+    /// Pushed pages and sheets keep their scroll position to themselves; only a feature's root list reports.
+    func silencesScrollTop() -> some View { environment(\.scrollAtTop) { _ in } }
 }
 
 /// Reports to `scrollAtTop` whether the scroll view's content is at (or pulled past) its top.
