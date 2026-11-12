@@ -17,11 +17,11 @@ struct GameTabBar: View {
                     Haptics.tick(); SoundFX.tick(enabled: skins.soundOn)
                 } label: {
                     VStack(spacing: 4) {
-                        Rectangle().fill(selected ? Color(rgb: skin.accent) : .clear).frame(width: 26, height: 4)
+                        Rectangle().fill(selected ? Color(rgb: skin.colors.accent) : .clear).frame(width: 26, height: 4)
                         Image(systemName: item.icon).font(.system(size: 19, weight: selected ? .black : .regular))
                         Text(item.title).font(.system(size: 10, weight: selected ? .bold : .regular, design: .monospaced))
                     }
-                    .foregroundStyle(Color(rgb: selected ? skin.accent : skin.muted))
+                    .foregroundStyle(Color(rgb: selected ? skin.colors.accent : skin.colors.sub))
                     .frame(maxWidth: .infinity, minHeight: 52)
                     .contentShape(Rectangle())
                 }
@@ -33,8 +33,8 @@ struct GameTabBar: View {
         }
         .padding(.top, 2)
         .background(alignment: .top) {
-            Color(rgb: skin.background)
-                .overlay(alignment: .top) { Rectangle().fill(Color(rgb: skin.line)).frame(height: 1) }
+            Color(rgb: skin.colors.page)
+                .overlay(alignment: .top) { Rectangle().fill(Color(rgb: skin.colors.line)).frame(height: 1) }
                 .ignoresSafeArea(edges: .bottom)
         }
     }

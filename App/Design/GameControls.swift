@@ -19,10 +19,10 @@ struct HexButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 18, weight: .black)).tracking(4)
-            .foregroundStyle(configuration.isPressed ? Color(rgb: skin.background) : Color(rgb: skin.foreground))
+            .foregroundStyle(configuration.isPressed ? Color(rgb: skin.colors.page) : Color(rgb: skin.colors.ink))
             .padding(.horizontal, horizontal).frame(minHeight: 52)
-            .background(HexShape().fill(configuration.isPressed ? Color(rgb: skin.foreground) : .clear))
-            .overlay(HexShape().stroke(Color(rgb: skin.foreground), lineWidth: 2))
+            .background(HexShape().fill(configuration.isPressed ? Color(rgb: skin.colors.ink) : .clear))
+            .overlay(HexShape().stroke(Color(rgb: skin.colors.ink), lineWidth: 2))
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
     }
@@ -36,30 +36,34 @@ struct HUDRow: View {
     var skin: Skin
     var body: some View {
         HStack(spacing: 10) {
-            Text("▶").font(.system(size: 12, design: .monospaced)).foregroundStyle(Color(rgb: skin.accent)).opacity(selected ? 1 : 0).accessibilityHidden(true)
+            Text("▶").font(.system(size: 12, design: .monospaced)).foregroundStyle(Color(rgb: skin.colors.accent)).opacity(selected ? 1 : 0).accessibilityHidden(true)
             Text(title).font(.system(size: 15, weight: .medium)).frame(maxWidth: .infinity, alignment: .leading)
             Text(value).font(.system(size: 15, weight: .bold, design: .monospaced)).monospacedDigit()
         }
-        .foregroundStyle(selected ? Color(rgb: skin.accent) : Color(rgb: skin.foreground))
+        .foregroundStyle(selected ? Color(rgb: skin.colors.accent) : Color(rgb: skin.colors.ink))
         .padding(.vertical, 11).padding(.horizontal, 4).frame(minHeight: 44)
-        .overlay(alignment: .bottom) { Rectangle().fill(Color(rgb: skin.line)).frame(height: 1) }
+        .overlay(alignment: .bottom) { Rectangle().fill(Color(rgb: skin.colors.line)).frame(height: 1) }
         .contentShape(Rectangle())
     }
 }
 
-/// The skin pill: name and rarity, tapping cycles to the next skin.
+/// The skin pill: name and code, tapping moves on to the next skin of the carousel order.
 struct SkinPicker: View {
     @ObservedObject var skins: SkinStore
+    private static func following(_ skin: Skin) -> Skin {
+        let order = Skins.carouselOrder
+        return Skins.named(order[((order.firstIndex(of: skin.id) ?? -1) + 1) % order.count])
+    }
     var body: some View {
-        Button { skins.next(); Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
+        Button { skins.skin = Self.following(skins.skin); Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
             HStack(spacing: 6) {
                 Text("皮膚 \(skins.skin.name)")
-                Text(skins.skin.rarity).bold().foregroundStyle(Color(rgb: skins.skin.accent == skins.skin.foreground ? skins.skin.foreground : skins.skin.accent))
+                Text(skins.skin.code).bold().foregroundStyle(Color(rgb: skins.skin.colors.accent == skins.skin.colors.ink ? skins.skin.colors.ink : skins.skin.colors.accent))
             }
             .font(.system(size: 12, design: .monospaced))
-            .foregroundStyle(Color(rgb: skins.skin.foreground))
+            .foregroundStyle(Color(rgb: skins.skin.colors.ink))
             .padding(.horizontal, 12).frame(minHeight: 36)
-            .overlay(Capsule().stroke(Color(rgb: skins.skin.foreground), lineWidth: 1.5))
+            .overlay(Capsule().stroke(Color(rgb: skins.skin.colors.ink), lineWidth: 1.5))
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("skin-picker")

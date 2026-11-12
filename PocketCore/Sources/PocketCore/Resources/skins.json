@@ -1,0 +1,48 @@
+[
+  {
+    "id": "blackgold", "name": "黑金", "code": "SKN 001",
+    "colors": { "page": "#1A1A1D", "ink": "#F4F1E8", "sub": "#A9A397", "dim": "#6E6A63", "card": "#232328", "line": "#2C2C32",
+                "accent": "#F2B632", "up": "#F25C54", "down": "#3BB273", "extra": ["#F2777A", "#3D7BF2", "#000000"] },
+    "fonts": { "big": "Anton-Regular", "title": "NotoSansTC-Black", "body": "NotoSansTC-Medium", "mono": "JetBrainsMono-Regular" },
+    "style": { "tag": "hexOutline", "button": "hex", "stage": "discRing", "check": "disc", "quick": "goldHex", "chart": "smooth", "decor": "rays" },
+    "art": { "kind": "render3D", "folder": "Skins/blackgold" },
+    "feedback": { "sound": "thud", "haptic": "heavy" },
+    "unlock": { "kind": "free" },
+    "metal": { "color": "#F4C24E", "metalness": 0.2, "roughness": 0.62 },
+    "burst": ["#FFFFFF", "#F2B632", "#FF6F91", "#3D7BFF"]
+  },
+  {
+    "id": "voxel", "name": "像素", "code": "SKN 002",
+    "colors": { "page": "#1B1F4B", "ink": "#FFFFFF", "sub": "#9AA3E8", "dim": "#5A62B0", "card": "#262B66", "line": "#2E3478",
+                "accent": "#FF3D8B", "up": "#FF5C6C", "down": "#3BD99F", "extra": ["#FFD23F", "#3DE0FF", "#0E1030"] },
+    "fonts": { "big": "PressStart2P-Regular", "title": "DotGothic16-Regular", "body": "DotGothic16-Regular", "mono": "PressStart2P-Regular" },
+    "style": { "tag": "pixelBlock", "button": "pixelBlock", "stage": "pixelFrame", "check": "square", "quick": "pinkBlock", "chart": "stepped", "decor": "pixelStars" },
+    "art": { "kind": "voxel3D", "folder": "Skins/voxel" },
+    "feedback": { "sound": "chip", "haptic": "triple" },
+    "unlock": { "kind": "level", "level": 10 },
+    "metal": { "color": "#FFD23F", "metalness": 0.1, "roughness": 0.7 },
+    "burst": ["#FFD23F", "#FF3D8B", "#3DE0FF", "#FFFFFF"]
+  },
+  {
+    "id": "stitch", "name": "縫線", "code": "SKN 003",
+    "colors": { "page": "#E9DCC3", "ink": "#3B2A1A", "sub": "#7A5A36", "dim": "#A88E6A", "card": "#F7F0E1", "line": "#D2BE98",
+                "accent": "#C9573F", "up": "#B3261E", "down": "#2E7D4F", "extra": ["#2F4A6D", "#E3A82B", "#F7F0E1"] },
+    "fonts": { "big": "BreeSerif-Regular", "title": "NotoSerifTC-Black", "body": "NotoSerifTC-Black", "mono": "BreeSerif-Regular" },
+    "style": { "tag": "paperStrip", "button": "paperStitch", "stage": "paperDisc", "check": "stitchDisc", "quick": "stitchDisc", "chart": "plain", "decor": "seams" },
+    "art": { "kind": "vector", "folder": "Skins/stitch" },
+    "feedback": { "sound": "snip", "haptic": "tap" },
+    "unlock": { "kind": "member" },
+    "burst": ["#C9573F", "#2F4A6D", "#E3A82B", "#F7F0E1"]
+  },
+  {
+    "id": "sketch", "name": "手繪", "code": "SKN 004",
+    "colors": { "page": "#FAF8F3", "ink": "#1F1F1F", "sub": "#6B6760", "dim": "#A8A39A", "card": "#FFFFFF", "line": "#DDD8CD",
+                "accent": "#F2D16B", "up": "#D32F2F", "down": "#1B7F45", "extra": [] },
+    "fonts": { "big": "Caveat-Bold", "title": "LXGWWenKaiTC-Bold", "body": "LXGWWenKaiTC-Bold", "mono": "LXGWWenKaiTC-Bold" },
+    "style": { "tag": "highlighter", "button": "sketchBox", "stage": "none", "check": "sketchCircle", "quick": "sketchDot", "chart": "pencil", "decor": "doodles" },
+    "art": { "kind": "vector", "folder": "Skins/sketch" },
+    "feedback": { "sound": "scribble", "haptic": "faint" },
+    "unlock": { "kind": "level", "level": 5 },
+    "burst": ["#1F1F1F", "#F2D16B", "#FFFFFF"]
+  }
+]

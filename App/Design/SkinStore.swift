@@ -14,7 +14,7 @@ extension Color {
     static let skinKey = "pocket.skin", soundKey = "pocket.sound"
     @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey); Self.current = skin } }
     /// The skin the ordinary screens' Palette reads; set before any screen draws.
-    nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "") ?? Skins.default
+    nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "")
     @Published var soundOn: Bool { didSet { UserDefaults.standard.set(soundOn, forKey: Self.soundKey) } }
     /// The 3D showcase is presented from the app root, outside the screens that redraw on a skin change, so trying
     /// skins does not close it.
@@ -23,18 +23,19 @@ extension Color {
     init() {
         // UI tests start from the default look, whatever an earlier test chose.
         if ProcessInfo.processInfo.arguments.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
-        skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "") ?? Skins.default
+        skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "")
         soundOn = (UserDefaults.standard.object(forKey: Self.soundKey) as? Bool) ?? true
         Self.current = skin
     }
     /// Text on the skin is light (dark skins) or dark (light skins).
     var colorScheme: ColorScheme { skin.lightText ? .dark : .light }
-    func next() {
-        let all = Skins.all
-        skin = all[((all.firstIndex(of: skin) ?? 0) + 1) % all.count]
-    }
 }
 
 extension Skin {
-    var lightText: Bool { contrastRatio(foreground, 0x000000) > contrastRatio(foreground, 0xFFFFFF) }
+    var lightText: Bool { contrastRatio(colors.ink, 0x000000) > contrastRatio(colors.ink, 0xFFFFFF) }
+    /// The hero panel's body colours: a dark panel on every skin, so light hero text keeps its contrast.
+    var matte: UInt32 { lightText ? colors.card : colors.ink }
+    var matte2: UInt32 { lightText ? colors.line : colors.ink }
+    /// The 3D metal, or a plain matte stand-in for the paper and sketch skins that have none.
+    var metalOrDefault: Skin.Metal { metal ?? Skin.Metal(color: colors.card, metalness: 0, roughness: 0.6) }
 }

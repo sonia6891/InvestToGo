@@ -5,14 +5,14 @@ import UIKit
 enum Palette {
     // Text, surfaces, actions and gains/losses follow the chosen skin (SkinStore), so every screen shares its look.
     private static var skin: Skin { SkinStore.current }
-    static var blue: Color { skin.lightText ? Color(rgb: skin.accent) : Color(rgb: skin.foreground) }
+    static var blue: Color { skin.lightText ? Color(rgb: skin.colors.accent) : Color(rgb: skin.colors.ink) }
     static var deepBlue: Color { blue }
-    static var ink: Color { Color(rgb: skin.foreground) }
-    static var muted: Color { Color(rgb: skin.muted) }
-    static var background: Color { Color(rgb: skin.background) }
-    static var card: Color { Color(rgb: skin.surface) }
-    static var cardSoft: Color { Color(rgb: skin.surface2) }
-    static var line: Color { Color(rgb: skin.line) }
+    static var ink: Color { Color(rgb: skin.colors.ink) }
+    static var muted: Color { Color(rgb: skin.colors.sub) }
+    static var background: Color { Color(rgb: skin.colors.page) }
+    static var card: Color { Color(rgb: skin.colors.card) }
+    static var cardSoft: Color { Color(rgb: skin.colors.line) }
+    static var line: Color { Color(rgb: skin.colors.line) }
     static let teal = Color(red: 0.07, green: 0.70, blue: 0.77)
     static let red = Color(red: 0.90, green: 0.22, blue: 0.27)
     static let green = Color(red: 0.05, green: 0.62, blue: 0.42)
@@ -20,8 +20,8 @@ enum Palette {
     static let pink = Color(red: 0.93, green: 0.33, blue: 0.52)
     static let purple = Color(red: 0.49, green: 0.33, blue: 0.96)
     // Taiwan convention: gains red, losses green (TrendRole).
-    static var up: Color { Color(rgb: skin.up) }
-    static var down: Color { Color(rgb: skin.down) }
+    static var up: Color { Color(rgb: skin.colors.up) }
+    static var down: Color { Color(rgb: skin.colors.down) }
     /// Lighter versions for text on the dark hero panel.
     static let heroUp = Color(red: 1.0, green: 0.82, blue: 0.83)
     static let heroDown = Color(red: 0.77, green: 0.97, blue: 0.83)

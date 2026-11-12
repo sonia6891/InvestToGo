@@ -93,7 +93,7 @@ struct PocketHero: View {
         scene.builtKey = key
         scene.showsPocket = showsPocket
         let matte = Self.material(skin.matte, metalness: 0, roughness: 0.85)
-        let metal = Self.material(skin.metal.color, metalness: skin.metal.metalness, roughness: skin.metal.roughness)
+        let metal = Self.material(skin.metalOrDefault.color, metalness: skin.metalOrDefault.metalness, roughness: skin.metalOrDefault.roughness)
 
         numeral.children.removeAll()
         let layout = BlockGlyphs.layout(value)

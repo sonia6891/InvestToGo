@@ -20,16 +20,16 @@ struct DesignShowcase: View {
         VStack(spacing: 0) {
             HStack {
                 Button(action: close) {
-                    Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(Color(rgb: skin.foreground))
-                        .frame(width: 36, height: 36).overlay(Circle().stroke(Color(rgb: skin.foreground), lineWidth: 1.5))
+                    Image(systemName: "xmark").font(.system(size: 14, weight: .black)).foregroundStyle(Color(rgb: skin.colors.ink))
+                        .frame(width: 36, height: 36).overlay(Circle().stroke(Color(rgb: skin.colors.ink), lineWidth: 1.5))
                 }.buttonStyle(.plain).accessibilityLabel("關閉").accessibilityIdentifier("showcase-close")
                 VStack(alignment: .leading, spacing: 2) {
                     Text("PKT×\(String(format: "%03d", streak))").font(.system(size: 11, design: .monospaced))
-                    Text("連續領息 \(streak) 個月").font(.system(size: 11, weight: .bold, design: .monospaced)).foregroundStyle(Color(rgb: skin.foreground))
-                }.foregroundStyle(Color(rgb: skin.muted))
+                    Text("連續領息 \(streak) 個月").font(.system(size: 11, weight: .bold, design: .monospaced)).foregroundStyle(Color(rgb: skin.colors.ink))
+                }.foregroundStyle(Color(rgb: skin.colors.sub))
                 Spacer()
                 Toggle(isOn: $skins.soundOn) { Text("音效").font(.system(size: 12, design: .monospaced)) }
-                    .toggleStyle(.button).tint(Color(rgb: skin.accent)).foregroundStyle(Color(rgb: skin.foreground))
+                    .toggleStyle(.button).tint(Color(rgb: skin.colors.accent)).foregroundStyle(Color(rgb: skin.colors.ink))
                 SkinPicker(skins: skins)
             }
             HStack(spacing: 8) {
@@ -51,22 +51,22 @@ struct DesignShowcase: View {
             .frame(maxHeight: screen == 0 ? .infinity : 230)
 
             if screen == 0 { homeCaption(skin) } else { feeList(skin) }
-            Text("示範數據・拖曳可轉動・點「皮膚」換整套材質").font(.system(size: 10, design: .monospaced)).foregroundStyle(Color(rgb: skin.muted)).padding(.vertical, 8)
+            Text("示範數據・拖曳可轉動・點「皮膚」換整套材質").font(.system(size: 10, design: .monospaced)).foregroundStyle(Color(rgb: skin.colors.sub)).padding(.vertical, 8)
         }
         .padding(.horizontal, 16)
-        .background(Color(rgb: skin.background).ignoresSafeArea())
+        .background(Color(rgb: skin.colors.page).ignoresSafeArea())
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.4), value: skin.id)
         .statusBarHidden(false)
-        .preferredColorScheme(contrastRatio(skin.foreground, 0x000000) > contrastRatio(skin.foreground, 0xFFFFFF) ? .dark : .light)
+        .preferredColorScheme(contrastRatio(skin.colors.ink, 0x000000) > contrastRatio(skin.colors.ink, 0xFFFFFF) ? .dark : .light)
     }
 
     private func tab(_ title: String, _ index: Int, id: String, skin: Skin) -> some View {
         Button { screen = index; Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
             Text(title).font(.system(size: 13, weight: .bold))
-                .foregroundStyle(Color(rgb: screen == index ? skin.background : skin.muted))
+                .foregroundStyle(Color(rgb: screen == index ? skin.colors.page : skin.colors.sub))
                 .padding(.horizontal, 16).frame(minHeight: 36)
-                .background(Capsule().fill(screen == index ? Color(rgb: skin.foreground) : .clear))
-                .overlay(Capsule().stroke(Color(rgb: screen == index ? skin.foreground : skin.line), lineWidth: 1.5))
+                .background(Capsule().fill(screen == index ? Color(rgb: skin.colors.ink) : .clear))
+                .overlay(Capsule().stroke(Color(rgb: screen == index ? skin.colors.ink : skin.colors.line), lineWidth: 1.5))
         }
         .buttonStyle(.plain).accessibilityIdentifier(id)
         .accessibilityAddTraits(screen == index ? .isSelected : [])
@@ -74,13 +74,13 @@ struct DesignShowcase: View {
 
     private func homeCaption(_ skin: Skin) -> some View {
         VStack(spacing: 6) {
-            Text("PKT×\(String(format: "%03d", streak))").font(.system(size: 11, design: .monospaced)).tracking(1).foregroundStyle(Color(rgb: skin.muted))
-            Text("+$\(amount.formatted())").font(.system(size: 60, weight: .black).width(.condensed)).foregroundStyle(Color(rgb: skin.foreground))
+            Text("PKT×\(String(format: "%03d", streak))").font(.system(size: 11, design: .monospaced)).tracking(1).foregroundStyle(Color(rgb: skin.colors.sub))
+            Text("+$\(amount.formatted())").font(.system(size: 60, weight: .black).width(.condensed)).foregroundStyle(Color(rgb: skin.colors.ink))
                 .minimumScaleFactor(0.6).lineLimit(1)
                 .accessibilityIdentifier("showcase-amount").accessibilityLabel("這個月口袋 +$\(amount.formatted())")
-            Text("本月入袋").font(.system(size: 11, weight: .bold)).tracking(2).foregroundStyle(Color(rgb: skin.foreground))
-                .padding(.horizontal, 8).padding(.vertical, 2).overlay(RoundedRectangle(cornerRadius: 3).stroke(Color(rgb: skin.foreground), lineWidth: 1))
-            Text("連續領息 \(streak) 個月・今年 \(paidThisMonth ? 11 : 10)／12 個月已入袋").font(.system(size: 12)).foregroundStyle(Color(rgb: skin.muted)).padding(.top, 2)
+            Text("本月入袋").font(.system(size: 11, weight: .bold)).tracking(2).foregroundStyle(Color(rgb: skin.colors.ink))
+                .padding(.horizontal, 8).padding(.vertical, 2).overlay(RoundedRectangle(cornerRadius: 3).stroke(Color(rgb: skin.colors.ink), lineWidth: 1))
+            Text("連續領息 \(streak) 個月・今年 \(paidThisMonth ? 11 : 10)／12 個月已入袋").font(.system(size: 12)).foregroundStyle(Color(rgb: skin.colors.sub)).padding(.top, 2)
             Button("記錄配息") { drops += 1 }
                 .buttonStyle(HexButtonStyle(skin: skin)).padding(.top, 8)
                 .accessibilityIdentifier("showcase-record")
@@ -88,17 +88,17 @@ struct DesignShowcase: View {
                 ForEach(Skins.all) { item in
                     Button { skins.skin = item; Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
                         ZStack(alignment: .topLeading) {
-                            RoundedRectangle(cornerRadius: 12).fill(Color(rgb: item.metal.color))
+                            RoundedRectangle(cornerRadius: 12).fill(Color(rgb: item.metalOrDefault.color))
                                 .overlay(RoundedRectangle(cornerRadius: 12).inset(by: 9).fill(Color(rgb: item.matte)))
                                 .frame(width: 52, height: 52)
                                 .shadow(color: .black.opacity(0.35), radius: 6, y: 4)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(rgb: skin.foreground), lineWidth: item.id == skin.id ? 2.5 : 0))
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(rgb: skin.colors.ink), lineWidth: item.id == skin.id ? 2.5 : 0))
                             if item.id != skin.id {
                                 Text("新").font(.system(size: 9, weight: .black)).foregroundStyle(Color(rgb: 0x17130E))
                                     .padding(.horizontal, 4).padding(.vertical, 1).background(Color(rgb: 0xF2B632), in: RoundedRectangle(cornerRadius: 3)).offset(x: -6, y: -6)
                             }
                         }
-                    }.buttonStyle(.plain).accessibilityLabel("皮膚 \(item.name) \(item.rarity)")
+                    }.buttonStyle(.plain).accessibilityLabel("皮膚 \(item.name) \(item.code)")
                 }
             }.padding(.top, 12)
         }
@@ -107,9 +107,9 @@ struct DesignShowcase: View {
     private func feeList(_ skin: Skin) -> some View {
         ScrollView {
             VStack(spacing: 0) {
-                Text("FEE×2025 · 市值型示範 ETF").font(.system(size: 11, design: .monospaced)).tracking(1.5).foregroundStyle(Color(rgb: skin.muted))
-                Text("一年總共吃掉多少").font(.system(size: 20, weight: .black)).foregroundStyle(Color(rgb: skin.foreground)).padding(.bottom, 10)
-                Rectangle().fill(Color(rgb: skin.foreground)).frame(height: 2)
+                Text("FEE×2025 · 市值型示範 ETF").font(.system(size: 11, design: .monospaced)).tracking(1.5).foregroundStyle(Color(rgb: skin.colors.sub))
+                Text("一年總共吃掉多少").font(.system(size: 20, weight: .black)).foregroundStyle(Color(rgb: skin.colors.ink)).padding(.bottom, 10)
+                Rectangle().fill(Color(rgb: skin.colors.ink)).frame(height: 2)
                 ForEach(fees.indices, id: \.self) { i in
                     Button { feeIndex = i; Haptics.tick(); SoundFX.tick(enabled: skins.soundOn) } label: {
                         HUDRow(title: fees[i].0, value: fees[i].1, selected: i == feeIndex, skin: skin)

@@ -22,24 +22,54 @@ final class PocketShapeTests: XCTestCase {
 }
 
 final class SkinsTests: XCTestCase {
-    func testThreeSkinsWithUniqueIDs() {
-        XCTAssertEqual(Skins.all.map(\.name), ["橘焰", "黑金", "冰藍"])
-        XCTAssertEqual(Set(Skins.all.map(\.id)).count, 3)
-        XCTAssertEqual(Skins.default.id, "ember")
-        XCTAssertEqual(Skins.named("ice")?.rarity, "普通"); XCTAssertNil(Skins.named("nope"))
+    func testFourSkinsInOrder() {
+        XCTAssertEqual(Skins.all.map(\.id), ["blackgold", "voxel", "stitch", "sketch"])
+        XCTAssertEqual(Skins.all.map(\.name), ["黑金", "像素", "縫線", "手繪"])
+        XCTAssertEqual(Skins.default.id, "blackgold")
+        XCTAssertEqual(Skins.carouselOrder, ["voxel", "blackgold", "stitch", "sketch"])
+    }
+    func testColorsMatchSpec() {
+        let gold = Skins.named("blackgold").colors
+        XCTAssertEqual(gold.page, 0x1A1A1D); XCTAssertEqual(gold.ink, 0xF4F1E8); XCTAssertEqual(gold.accent, 0xF2B632)
+        XCTAssertEqual(gold.up, 0xF25C54); XCTAssertEqual(gold.down, 0x3BB273)
+        XCTAssertEqual(Skins.named("voxel").colors.page, 0x1B1F4B); XCTAssertEqual(Skins.named("voxel").colors.accent, 0xFF3D8B)
+        let stitch = Skins.named("stitch").colors
+        XCTAssertEqual(stitch.page, 0xE9DCC3); XCTAssertEqual(stitch.ink, 0x3B2A1A); XCTAssertEqual(stitch.accent, 0xC9573F)
+        XCTAssertEqual(stitch.extra, [0x2F4A6D, 0xE3A82B, 0xF7F0E1])
+        let sketch = Skins.named("sketch").colors
+        XCTAssertEqual(sketch.page, 0xFAF8F3); XCTAssertEqual(sketch.ink, 0x1F1F1F); XCTAssertEqual(sketch.accent, 0xF2D16B)
     }
     func testSkinTextContrast() {
         for skin in Skins.all {
-            XCTAssertGreaterThanOrEqual(contrastRatio(skin.foreground, skin.background), 4.5, skin.name)
-            XCTAssertGreaterThanOrEqual(contrastRatio(skin.muted, skin.background), 4.5, "\(skin.name) small labels")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.colors.ink, skin.colors.page), 4.5, "\(skin.id) ink")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.colors.sub, skin.colors.page), 4.5, "\(skin.id) sub")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.colors.up, skin.colors.page), 3, "\(skin.id) up")
+            XCTAssertGreaterThanOrEqual(contrastRatio(skin.colors.down, skin.colors.page), 3, "\(skin.id) down")
         }
         XCTAssertEqual(contrastRatio(0xFFFFFF, 0x000000), 21, accuracy: 0.01)
     }
-    func testTrendColoursAndSurfacesReadOnEverySkin() {
-        for skin in Skins.all {
-            XCTAssertGreaterThanOrEqual(contrastRatio(skin.up, skin.background), 3, "\(skin.id) up")
-            XCTAssertGreaterThanOrEqual(contrastRatio(skin.down, skin.background), 3, "\(skin.id) down")
-            XCTAssertGreaterThanOrEqual(contrastRatio(skin.foreground, skin.surface), 4.5, "\(skin.id) text on cards")
+    func testUnknownOrRetiredSkinFallsBackToBlackGold() {
+        for id in ["ember", "ice", "", "nope"] { XCTAssertEqual(Skins.named(id).id, "blackgold", id) }
+        XCTAssertEqual(Skins.named("stitch").id, "stitch")
+    }
+    func testUnlockRules() {
+        XCTAssertEqual(Skins.named("blackgold").unlock, .free)
+        XCTAssertEqual(Skins.named("sketch").unlock, .level(5))
+        XCTAssertEqual(Skins.named("voxel").unlock, .level(10))
+        XCTAssertEqual(Skins.named("stitch").unlock, .member)
+    }
+    func testOnlyVectorSkinsHaveNoMetal() {
+        for id in ["stitch", "sketch"] {
+            XCTAssertEqual(Skins.named(id).art.kind, .vector, id); XCTAssertNil(Skins.named(id).metal, id)
         }
+        for id in ["blackgold", "voxel"] { XCTAssertNotNil(Skins.named(id).metal, id) }
+        XCTAssertEqual(Skins.named("blackgold").art.kind, .render3D); XCTAssertEqual(Skins.named("voxel").art.kind, .voxel3D)
+    }
+    func testFontsAndFeedback() {
+        XCTAssertEqual(Skins.named("blackgold").fonts, SkinFonts(big: "Anton-Regular", title: "NotoSansTC-Black", body: "NotoSansTC-Medium", mono: "JetBrainsMono-Regular"))
+        XCTAssertEqual(Skins.named("sketch").fonts.big, "Caveat-Bold")
+        XCTAssertEqual(Skins.all.map(\.feedback.sound), ["thud", "chip", "snip", "scribble"])
+        XCTAssertEqual(Skins.named("sketch").feedback.haptic, .faint)
+        XCTAssertEqual(Skins.named("stitch").art.folder, "Skins/stitch")
     }
 }
