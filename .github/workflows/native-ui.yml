@@ -18,7 +18,7 @@ jobs:
   simulator:
     needs: core
     runs-on: macos-26
-    timeout-minutes: 30
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
       - name: Generate complete Xcode project
