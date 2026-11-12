@@ -94,8 +94,8 @@ struct DesignShowcase: View {
                                 .shadow(color: .black.opacity(0.35), radius: 6, y: 4)
                                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(rgb: skin.colors.ink), lineWidth: item.id == skin.id ? 2.5 : 0))
                             if item.id != skin.id {
-                                Text("新").font(.system(size: 9, weight: .black)).foregroundStyle(Color(rgb: 0x17130E))
-                                    .padding(.horizontal, 4).padding(.vertical, 1).background(Color(rgb: 0xF2B632), in: RoundedRectangle(cornerRadius: 3)).offset(x: -6, y: -6)
+                                Text("新").font(.system(size: 9, weight: .black)).foregroundStyle(skin.onFill(skin.colors.accent))
+                                    .padding(.horizontal, 4).padding(.vertical, 1).background(skin.color(\.accent), in: RoundedRectangle(cornerRadius: 3)).offset(x: -6, y: -6)
                             }
                         }
                     }.buttonStyle(.plain).accessibilityLabel("皮膚 \(item.name) \(item.code)")

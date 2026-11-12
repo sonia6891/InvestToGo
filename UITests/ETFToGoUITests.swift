@@ -125,4 +125,14 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["券商帳戶"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Test Broker"].exists)
     }
+    /// The skin kit's component sheet in each skin, to compare with the four-skin canvas.
+    func testSkinKitSheet() {
+        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+            let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skin", id, "--open", "skinKit"]; app.launch()
+            XCTAssertTrue(app.descendants(matching: .any)["skinkit-root"].waitForExistence(timeout: 10), "\(id): the skin kit sheet opens")
+            sleep(1)
+            capture(app, "skinkit-\(id)")
+            app.terminate()
+        }
+    }
 }

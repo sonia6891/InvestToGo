@@ -62,6 +62,19 @@ jobs:
             sleep 4
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$TAB.png"
           done
+      - name: Capture the skin kit sheet in every skin
+        timeout-minutes: 2
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -euo pipefail
+          for SKIN in blackgold voxel stitch sketch; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skin "$SKIN" --open skinKit
+            sleep 4
+            xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
+          done
       - name: Publish screenshots immediately for inspection
         if: always()
         uses: actions/upload-artifact@v4

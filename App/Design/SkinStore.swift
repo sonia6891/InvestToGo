@@ -22,11 +22,17 @@ extension Color {
 
     init() {
         // UI tests start from the default look, whatever an earlier test chose.
-        if ProcessInfo.processInfo.arguments.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
-        skin = Skins.named(UserDefaults.standard.string(forKey: Self.skinKey) ?? "")
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
+        var id = UserDefaults.standard.string(forKey: Self.skinKey) ?? ""
+        // UI tests pick a skin with `--skin <id>` (only honoured with `--ui-testing`), after any reset.
+        if args.contains("--ui-testing"), let i = args.firstIndex(of: "--skin"), args.indices.contains(i + 1) { id = args[i + 1] }
+        skin = Skins.named(id)
         soundOn = (UserDefaults.standard.object(forKey: Self.soundKey) as? Bool) ?? true
         Self.current = skin
     }
+    /// Switches to the skin with this id; unknown ids fall back to black-gold.
+    func select(_ id: String) { skin = Skins.named(id) }
     /// Text on the skin is light (dark skins) or dark (light skins).
     var colorScheme: ColorScheme { skin.lightText ? .dark : .light }
 }

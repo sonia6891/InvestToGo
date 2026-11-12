@@ -13,6 +13,8 @@ import SwiftUI
     var body: some Scene {
         WindowGroup {
             RootView().environmentObject(store)
+                // The skin kit's components read the current skin from here.
+                .environment(\.skin, skins.skin)
                 .preferredColorScheme(skins.colorScheme)
         }
     }
@@ -36,6 +38,7 @@ struct RootView: View {
         .tint(Palette.blue)
         .id(skins.skin.id)
         .fullScreenCover(isPresented: $skins.showcaseOpen) { DesignShowcase(close: { skins.showcaseOpen = false }) }
+        .modifier(SkinKitLaunch())
         .overlay(alignment: .bottom) {
             GameTabBar(selection: $tab, reselect: { resets[$0] += 1 }).ignoresSafeArea(.keyboard)
         }

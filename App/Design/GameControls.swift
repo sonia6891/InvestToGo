@@ -1,30 +1,15 @@
 import SwiftUI
 
-/// The elongated hexagon used for the main action, outlined in the skin's foreground colour.
-struct HexShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        let inset = min(16, rect.height / 2)
-        var p = Path()
-        p.move(to: CGPoint(x: rect.minX + inset, y: rect.minY)); p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.minY))
-        p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY)); p.addLine(to: CGPoint(x: rect.maxX - inset, y: rect.maxY))
-        p.addLine(to: CGPoint(x: rect.minX + inset, y: rect.maxY)); p.addLine(to: CGPoint(x: rect.minX, y: rect.midY))
-        p.closeSubpath(); return p
-    }
-}
-
+/// The older button style, now drawn by the skin kit (`SkinButtonChrome`) so its existing callers take each skin's
+/// own button. It stays the secondary (outlined) button it always was, filling in while pressed.
 struct HexButtonStyle: ButtonStyle {
     var skin: Skin
     /// Side padding; smaller when two buttons share a row.
     var horizontal: CGFloat = 40
+    var primary = false
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 18, weight: .black)).tracking(4)
-            .foregroundStyle(configuration.isPressed ? Color(rgb: skin.colors.page) : Color(rgb: skin.colors.ink))
-            .padding(.horizontal, horizontal).frame(minHeight: 52)
-            .background(HexShape().fill(configuration.isPressed ? Color(rgb: skin.colors.ink) : .clear))
-            .overlay(HexShape().stroke(Color(rgb: skin.colors.ink), lineWidth: 2))
-            .scaleEffect(configuration.isPressed ? 0.95 : 1)
-            .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+        SkinButtonChrome(primary: primary, pressed: configuration.isPressed, horizontal: horizontal) { configuration.label }
+            .environment(\.skin, skin)
     }
 }
 

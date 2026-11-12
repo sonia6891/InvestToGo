@@ -9,6 +9,10 @@ enum AppRoute: Hashable {
     case watchlist, basis(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     case designShowcase
+    #if DEBUG
+    /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
+    case skinKitPreview
+    #endif
     case combo, comboAdding(String), comboSettings, comboResult, trades, allocation
 }
 struct RouteView: View {
@@ -48,7 +52,19 @@ struct RouteView: View {
         case .comboResult: ComboResultView()
         case .trades: Page { TradeLogSection() }.navigationTitle("交易紀錄").navigationBarTitleDisplayMode(.inline)
         case .allocation: Page { AllocationSection() }.navigationTitle("資產配置").navigationBarTitleDisplayMode(.inline)
+        default: debugRoute
         }
+    }
+}
+extension RouteView {
+    /// Routes that exist only in debug builds; the release enum has none, so `default` never runs there.
+    @ViewBuilder fileprivate var debugRoute: some View {
+        #if DEBUG
+        switch route {
+        case .skinKitPreview: SkinKitPreview()
+        default: EmptyView()
+        }
+        #endif
     }
 }
 extension View {
