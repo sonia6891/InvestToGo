@@ -388,6 +388,7 @@ final class ETFToGoUITests: XCTestCase {
         symbol.tap(); symbol.typeText("0050")
         app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
         app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
+        app.navigationBars.firstMatch.tap() // put the number pad away so the save button can be reached
         reveal(app, app.buttons["save-dividend"])
         XCTAssertTrue(app.buttons["save-dividend"].waitForNonExistence(timeout: 5), "The form closes after saving")
         let toast = app.staticTexts["dividend-xp-toast"]
@@ -409,7 +410,7 @@ final class ETFToGoUITests: XCTestCase {
             XCTAssertTrue(total.waitForExistence(timeout: 10), "\(id): the pocket shows its total")
             XCTAssertTrue(total.label.hasPrefix("NT$ "), "\(id): the total is in NT$: \(total.label)")
             XCTAssertTrue(app.staticTexts["我的口袋 · 4 檔"].exists, "\(id): the pocket counts its ETFs")
-            let loss = app.descendants(matching: .any)["pocket-change-00679B"]
+            let loss = app.staticTexts["pocket-change-00679B"]
             XCTAssertTrue(loss.waitForExistence(timeout: 5), "\(id): the losing holding is listed")
             XCTAssertTrue((loss.value as? String ?? "").hasPrefix("▼ "), "\(id): a loss shows ▼: \(String(describing: loss.value))")
             XCTAssertTrue(loss.label.hasPrefix("下跌 "), "\(id): a loss is spoken as 下跌: \(loss.label)")
