@@ -49,7 +49,7 @@ jobs:
           xcodebuild build-for-testing -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only simulator app')"
       - name: Capture the lobby and every feature screen
-        timeout-minutes: 3
+        timeout-minutes: 8
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
