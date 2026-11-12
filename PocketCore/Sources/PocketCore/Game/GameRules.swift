@@ -75,8 +75,14 @@ extension GameState {
         return level > celebratedLevel ? level : nil
     }
 
-    /// Records that LEVEL×UP for `level` was shown; it never goes back down.
+    /// Coins earned since the last LEVEL×UP was accepted.
+    var coinsSinceCelebration: Int { max(0, coins - celebratedCoins) }
+
+    /// Records that LEVEL×UP for `level` was accepted (the level never goes back down), with the coins and
+    /// achievements it showed.
     mutating func celebrate(_ level: Int) {
         celebratedLevel = max(celebratedLevel, level)
+        celebratedCoins = coins
+        celebratedAchievements = Set(unlocked.keys)
     }
 }

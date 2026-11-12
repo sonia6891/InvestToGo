@@ -127,7 +127,7 @@ struct RootView: View {
 
     /// Waits for the action's own feedback first: 記一筆配息's toast appears 0.6 s after the save and the coin drops
     /// (ruling R25); LEVEL×UP follows about two seconds later, so neither is lost. Achievements reached with the
-    /// level are recorded here and listed among the rewards.
+    /// level are recorded here; the rewards are read from the saved game, so a replay after a relaunch lists them too.
     private func celebrateWhenDue() async {
         guard store.data.game?.levelUpDue != nil, levelUp == nil else { return }
         try? await Task.sleep(for: .milliseconds(150))
@@ -138,9 +138,8 @@ struct RootView: View {
         }
         if hadReward { try? await Task.sleep(for: .seconds(2)) }
         guard !Task.isCancelled, levelUp == nil, let level = store.data.game?.levelUpDue else { return }
-        var fresh: [String] = []
-        try? store.updateGame { fresh = $0.refreshAchievements(store.data, now: Date()) }
-        levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, fresh: fresh, now: Date())
+        try? store.updateGame { _ = $0.refreshAchievements(store.data, now: Date()) }
+        levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, now: Date())
     }
 
     /// 收下: saved as celebrated, so it is never shown again (not after leaving a screen, nor after a relaunch).

@@ -21,10 +21,11 @@ enum LevelUp {
         }
     }
 
-    /// The rewards list (spec 5.12): coins, achievements unlocked with this level, and the next skin a level opens.
-    static func rewards(_ game: GameState, level: Int, fresh: [String]) -> [String] {
-        var list = ["金幣 \(game.coins.formatted())"]
-        for id in fresh { if let item = Achievements.all.first(where: { $0.id == id }) { list.append("新成就「\(item.title)」") } }
+    /// The rewards list (spec 5.12): coins earned and achievements unlocked since the last LEVEL×UP, and the next
+    /// skin a level opens. Read from the saved game, so a celebration replayed after a relaunch lists the same.
+    static func rewards(_ game: GameState, level: Int) -> [String] {
+        var list = ["金幣 +\(game.coinsSinceCelebration.formatted())"]
+        for id in game.achievementsSinceCelebration { if let item = Achievements.all.first(where: { $0.id == id }) { list.append("新成就「\(item.title)」") } }
         let levelSkins = Skins.all.compactMap { skin -> (Int, String)? in
             if case .level(let needed) = skin.unlock { return (needed, skin.name) }
             return nil
@@ -37,8 +38,8 @@ enum LevelUp {
         return list
     }
 
-    static func moment(_ game: GameState, level: Int, fresh: [String], now: Date) -> LevelUpMoment {
-        LevelUpMoment(level: level, reason: reason(game, now: now), rewards: rewards(game, level: level, fresh: fresh))
+    static func moment(_ game: GameState, level: Int, now: Date) -> LevelUpMoment {
+        LevelUpMoment(level: level, reason: reason(game, now: now), rewards: rewards(game, level: level))
     }
 }
 
@@ -72,6 +73,7 @@ struct LevelUpView: View {
     let onAccept: () -> Void
     @Environment(\.skin) private var skin
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.displayScale) private var displayScale
     @State private var appeared = false
     @State private var drops = 0
     @State private var shareImage: Image?
@@ -91,32 +93,54 @@ struct LevelUpView: View {
                         }
                     }
                 }
-                VStack(spacing: 12) {
-                    SkinButton("收下", action: onAccept)
-                        .accessibilityIdentifier("levelup-accept")
-                    if let shareImage {
-                        ShareLink(item: shareImage, preview: SharePreview("升到 LV.\(moment.level)", image: shareImage)) {
-                            Text("分享這一刻")
-                        }
-                        .buttonStyle(SkinButtonStyle(primary: false))
-                        .accessibilityIdentifier("levelup-share")
-                    }
-                }
             }
-            .padding(.horizontal, 20).padding(.top, 36).padding(.bottom, 24)
+            .padding(.horizontal, 20).padding(.top, 36).padding(.bottom, 16)
             .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
+        // 收下 and 分享這一刻 stay on screen, even on small phones where the rest scrolls.
+        .safeAreaInset(edge: .bottom) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) { actions }
+                VStack(spacing: 10) { actions }
+            }
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity)
+            .background(skin.color(\.page).ignoresSafeArea())
+        }
         .background(skin.color(\.page).ignoresSafeArea())
         .overlay(alignment: .top) {
             CoinDrop(trigger: drops).frame(width: 200, height: 160).padding(.top, 60)
                 .allowsHitTesting(false).accessibilityHidden(true)
         }
-        .onAppear {
+        // Drawn once the entrance has settled, so rendering never stalls the animation.
+        .task {
+            try? await Task.sleep(for: .milliseconds(800))
+            guard !Task.isCancelled else { return }
             render()
+        }
+        .onAppear {
             withAnimation(reduceMotion ? .easeOut(duration: 0.25) : .spring(response: 0.45, dampingFraction: 0.6)) { appeared = true }
             drops += 1
             AccessibilityNotification.Announcement("升到等級 \(moment.level)，\(moment.reason)").post()
+        }
+    }
+
+    @ViewBuilder private var actions: some View {
+        SkinButton("收下", action: onAccept)
+            .accessibilityIdentifier("levelup-accept")
+        if let shareImage {
+            ShareLink(item: shareImage, preview: SharePreview("升到 LV.\(moment.level)", image: shareImage)) {
+                Text("分享這一刻")
+            }
+            .buttonStyle(SkinButtonStyle(primary: false))
+            .accessibilityIdentifier("levelup-share")
+        } else {
+            // The picture is drawn after the entrance; until then the button waits.
+            Button {} label: { Text("分享這一刻") }
+                .buttonStyle(SkinButtonStyle(primary: false))
+                .disabled(true)
+                .accessibilityIdentifier("levelup-share")
         }
     }
 
@@ -131,7 +155,7 @@ struct LevelUpView: View {
         .background(skin.color(\.page))
         .environment(\.skin, skin)
         let renderer = ImageRenderer(content: card)
-        renderer.scale = 3
+        renderer.scale = displayScale
         if let image = renderer.uiImage { shareImage = Image(uiImage: image) }
     }
 }

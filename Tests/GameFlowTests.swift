@@ -74,6 +74,45 @@ final class GameFlowTests: XCTestCase {
         XCTAssertEqual(LevelUp.reason(game, now: now), "連續定投 1 個月")
     }
 
+    func testRewardsListCoinsEarnedSinceTheLastCelebration() {
+        var game = GameState()
+        game.xp = 290; game.coins = 290
+        game.celebrate(1)
+        game.award(.dividendLogged)
+        XCTAssertEqual(game.coinsSinceCelebration, 20)
+        XCTAssertEqual(LevelUp.rewards(game, level: 2).first, "金幣 +20", "The coins this level brought, not the balance")
+        game.celebrate(2)
+        XCTAssertEqual(game.coinsSinceCelebration, 0)
+    }
+
+    func testReplayedCelebrationStillListsItsAchievements() throws {
+        var game = GameState()
+        for i in 0..<12 { _ = game.recordDCA(on: GameRules.taipei.date(byAdding: .month, value: -i, to: now)!) }
+        XCTAssertEqual(game.levelUpDue, 5)
+        XCTAssertEqual(game.refreshAchievements(Portfolio(), now: now), ["dcaPunchCard"])
+        XCTAssertTrue(LevelUp.rewards(game, level: 5).contains("新成就「定期定額打卡」"))
+        // Closed before 收下: the saved game, read again, lists the same achievement although it is already stamped.
+        var replay = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(game))
+        XCTAssertEqual(replay.refreshAchievements(Portfolio(), now: now), [], "Already unlocked")
+        XCTAssertEqual(replay.levelUpDue, 5)
+        XCTAssertTrue(LevelUp.rewards(replay, level: 5).contains("新成就「定期定額打卡」"), "\(LevelUp.rewards(replay, level: 5))")
+        replay.celebrate(5)
+        XCTAssertEqual(replay.achievementsSinceCelebration, [], "Once accepted, not listed again")
+    }
+
+    func testOlderSaveHasNothingPendingToList() throws {
+        let json = #"{"xp":1800,"coins":1800,"unlocked":{"dcaPunchCard":0}}"#
+        let old = try JSONDecoder().decode(GameState.self, from: Data(json.utf8))
+        XCTAssertEqual(old.coinsSinceCelebration, 0)
+        XCTAssertEqual(old.achievementsSinceCelebration, [])
+    }
+
+    func testOpenLevelUpListsThisMonthsCoins() {
+        var game = GameState()
+        DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7", "--open", "levelup"], now: now)
+        XCTAssertEqual(game.coinsSinceCelebration, 100)
+    }
+
     // MARK: First launch (spec 5.1, 5.2)
 
     func testFirstLaunchStartsOnTheSplash() {

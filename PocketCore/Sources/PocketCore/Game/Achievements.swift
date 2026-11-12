@@ -74,6 +74,11 @@ enum Achievements {
 }
 
 extension GameState {
+    /// Achievements unlocked since the last LEVEL×UP was accepted, in catalog order.
+    var achievementsSinceCelebration: [String] {
+        Achievements.all.map(\.id).filter { unlocked[$0] != nil && !celebratedAchievements.contains($0) }
+    }
+
     /// Unlocks every achievement whose goal is met and returns the newly unlocked ids (catalog order).
     mutating func refreshAchievements(_ p: Portfolio, now: Date) -> [String] {
         var fresh: [String] = []

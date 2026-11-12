@@ -36,6 +36,11 @@ struct GameState: Codable, Equatable {
     var celebratedLevel = 1
     /// The experience event that came last; the LEVEL×UP screen names it as the reason.
     var lastAward: XPEvent? = nil
+    /// Coins held when the last LEVEL×UP was accepted; the next one lists the coins earned since.
+    var celebratedCoins = 0
+    /// Achievements already shown, or held, at the last LEVEL×UP; the next one lists the others. Kept until 收下, so
+    /// a celebration replayed after the app was closed still lists them.
+    var celebratedAchievements: Set<String> = []
 
     mutating func count(_ key: CounterKey) { counts[key.rawValue, default: 0] += 1 }
     func counter(_ key: CounterKey) -> Int { counts[key.rawValue, default: 0] }
@@ -62,5 +67,7 @@ extension GameState {
         celebratedLevel = try c.decodeIfPresent(Int.self, forKey: .celebratedLevel) ?? GameRules.level(xp: xp)
         // An event a later build added reads as unknown rather than failing the whole file.
         lastAward = (try? c.decodeIfPresent(XPEvent.self, forKey: .lastAward)) ?? nil
+        celebratedCoins = try c.decodeIfPresent(Int.self, forKey: .celebratedCoins) ?? coins
+        celebratedAchievements = try c.decodeIfPresent(Set<String>.self, forKey: .celebratedAchievements) ?? Set(unlocked.keys)
     }
 }

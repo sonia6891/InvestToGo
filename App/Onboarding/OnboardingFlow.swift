@@ -276,7 +276,9 @@ struct OnboardingFlow: View {
                         Text("扣款日提醒").skinFont(.title(15))
                     }
                     .tint(skin.color(\.accent))
+                    .disabled(day == nil)
                     .accessibilityIdentifier("remind-toggle")
+                    if day == nil { Text("先選扣款日，才能開提醒。").skinFont(.body(12)).foregroundStyle(skin.color(\.sub)) }
                     DatePicker(selection: $remindTime, displayedComponents: .hourAndMinute) {
                         Text("提醒時間").skinFont(.body(14))
                     }
@@ -309,7 +311,7 @@ struct OnboardingFlow: View {
 
     /// The same permission flow as 配息提醒 (`DividendReminders.requestAccess`).
     private func setRemind(_ value: Bool) async {
-        guard value else { remind = false; note = nil; return }
+        guard value, day != nil else { remind = false; note = nil; return }
         if await DividendReminders.requestAccess() {
             remind = true; note = nil
         } else {
@@ -360,11 +362,13 @@ struct OnboardingFlow: View {
         if let day { defaults.set(day, forKey: Onboarding.dayKey) }
         let parts = Calendar.current.dateComponents([.hour, .minute], from: remindTime)
         let minutes = (parts.hour ?? 9) * 60 + (parts.minute ?? 0)
-        defaults.set(remind, forKey: Onboarding.remindKey)
+        defaults.set(remind && day != nil, forKey: Onboarding.remindKey)
         defaults.set(minutes, forKey: Onboarding.remindMinutesKey)
         defaults.set(remindEve, forKey: Onboarding.remindEveKey)
         if let habit { try? store.updateGame { $0.habit = habit } }
+        // Off, or no day: no debit-day reminder is left over from an earlier choice.
         if remind, let day { Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: remindEve) } }
+        else { DCAReminders.clear() }
         onFinish()
     }
 }
@@ -372,9 +376,10 @@ struct OnboardingFlow: View {
 /// The monthly debit-day reminder chosen in onboarding, repeating every month at the chosen time.
 enum DCAReminders {
     static let ids = ["dca-reminder", "dca-reminder-eve"]
+    static func clear() { UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids) }
     static func schedule(day: Int, minutes: Int, dayBefore: Bool) async {
         let center = UNUserNotificationCenter.current()
-        center.removePendingNotificationRequests(withIdentifiers: ids)
+        clear()
         var requests = [(ids[0], day, "今天是每月 \(day) 日的扣款日，記得確認定期定額。")]
         if dayBefore { requests.append((ids[1], day - 1, "明天是每月 \(day) 日的扣款日。")) }
         for (id, fireDay, body) in requests {
