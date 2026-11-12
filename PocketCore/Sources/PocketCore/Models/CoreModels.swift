@@ -152,6 +152,8 @@ struct Portfolio: Codable {
     var fees: [String: FeeRecord]? = nil
     /// Absent in files written before the trade log existed.
     var trades: [Trade]? = nil
+    /// Absent in files written before the game layer; start from `game ?? GameState()`.
+    var game: GameState? = nil
     /// 個股＋ETF 組合試算 settings and simulated mix; absent in older files.
     var combo: ComboSettings? = nil
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }

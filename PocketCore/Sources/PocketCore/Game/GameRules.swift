@@ -1,0 +1,49 @@
+import Foundation
+
+enum XPEvent: Hashable { case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled }
+
+enum GameRules {
+    /// Months are always counted in Taipei time so a debit near midnight lands in the month the user sees.
+    static let taipei: Calendar = {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "Asia/Taipei") ?? .current
+        return c
+    }()
+    static let xpPerLevel = 300
+    static let xp: [XPEvent: Int] = [.monthlyDCA: 100, .questDone: 40, .firstDexCard: 30, .dividendLogged: 20, .reconciled: 20]
+
+    /// Starts at 1, no cap.
+    static func level(xp: Int) -> Int { max(0, xp) / xpPerLevel + 1 }
+    static func progress(xp: Int) -> (into: Int, needed: Int) { (max(0, xp) % xpPerLevel, xpPerLevel) }
+}
+
+extension GameState {
+    /// Consecutive recorded months ending this month, or last month when this month's debit hasn't happened yet
+    /// (a missing current month is not a break). Neither recorded -> 0.
+    func streak(now: Date) -> Int {
+        let this = YearMonth(now)
+        var m = dcaMonths.contains(this) ? this : this.previous()
+        var n = 0
+        while dcaMonths.contains(m) { n += 1; m = m.previous() }
+        return n
+    }
+
+    /// One monthly DCA per calendar month; a repeat in the same month earns nothing.
+    mutating func recordDCA(on date: Date) -> [XPEvent] {
+        let month = YearMonth(date)
+        guard dcaMonths.insert(month).inserted else { return [] }
+        // The run that contains this month (a backfilled month can join two runs).
+        var run = 1
+        var m = month.previous(); while dcaMonths.contains(m) { run += 1; m = m.previous() }
+        m = month.next(); while dcaMonths.contains(m) { run += 1; m = m.next() }
+        longestStreak = max(longestStreak, run)
+        award(.monthlyDCA)
+        return [.monthlyDCA]
+    }
+
+    /// One coin per XP point; coins only accumulate for now.
+    mutating func award(_ e: XPEvent) {
+        let gain = GameRules.xp[e] ?? 0
+        xp += gain; coins += gain
+    }
+}
