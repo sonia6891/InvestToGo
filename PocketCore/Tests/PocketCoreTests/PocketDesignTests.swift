@@ -58,6 +58,17 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.named("voxel").unlock, .level(10))
         XCTAssertEqual(Skins.named("stitch").unlock, .member)
     }
+    /// Black-gold is free, sketch opens at LV.5, pixel at LV.10, stitch only for members; members get all four.
+    func testIsUnlocked() {
+        func open(_ level: Int, member: Bool) -> [String] { Skins.all.filter { Skins.isUnlocked($0, level: level, member: member) }.map(\.id) }
+        XCTAssertEqual(open(1, member: false), ["blackgold"])
+        XCTAssertEqual(open(4, member: false), ["blackgold"])
+        XCTAssertEqual(open(5, member: false), ["blackgold", "sketch"])
+        XCTAssertEqual(open(9, member: false), ["blackgold", "sketch"])
+        XCTAssertEqual(open(10, member: false), ["blackgold", "voxel", "sketch"])
+        XCTAssertEqual(open(40, member: false), ["blackgold", "voxel", "sketch"], "Stitch never opens by level")
+        XCTAssertEqual(open(1, member: true), ["blackgold", "voxel", "stitch", "sketch"])
+    }
     func testOnlyVectorSkinsHaveNoMetal() {
         for id in ["stitch", "sketch"] {
             XCTAssertEqual(Skins.named(id).art.kind, .vector, id); XCTAssertNil(Skins.named(id).metal, id)

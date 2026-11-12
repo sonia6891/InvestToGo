@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 
 final class ETFToGoUITests: XCTestCase {
     func testOTCCatalogAndRestoredResearchNavigation() {
@@ -79,28 +80,13 @@ final class ETFToGoUITests: XCTestCase {
         search.tap(); search.typeText("2317\n")
         XCTAssertFalse(app.staticTexts["鴻海"].waitForExistence(timeout: 3), "Stocks are not searchable"); capture(app, "etf-only-search")
         quickPick(app, "tools")
-        XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 5)); app.buttons["tool-combo"].tap()
+        XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 5)); reveal(app, app.buttons["tool-combo"])
         XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5)); capture(app, "combo")
         reveal(app, app.buttons["combo-settings"])
         XCTAssertTrue(app.textFields["combo-monthly"].waitForExistence(timeout: 5)); capture(app, "combo-settings")
         // 開始試算 sits at the end of the page: it must scroll clear of the bottom bar and run.
         reveal(app, app.buttons["combo-run"])
         XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5)); capture(app, "combo-result")
-    }
-    func testDesignShowcase() {
-        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--open", "tools"]; app.launch()
-        XCTAssertTrue(app.buttons["tool-design"].waitForExistence(timeout: 10)); app.buttons["tool-design"].tap()
-        let record = app.buttons["showcase-record"]
-        XCTAssertTrue(record.waitForExistence(timeout: 10)); sleep(2); capture(app, "design-home-blackgold")
-        record.tap(); sleep(2); record.tap()
-        sleep(3); capture(app, "design-home-after-record")
-        XCTAssertTrue(app.staticTexts["showcase-amount"].label.contains("1,880"), "Two records add 2 × 320 once each: \(app.staticTexts["showcase-amount"].label)")
-        XCTAssertTrue(record.isHittable, "Tapping twice does not leave the screen stuck")
-        app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-stitch")
-        app.buttons["skin-picker"].tap(); sleep(2); capture(app, "design-home-sketch")
-        app.buttons["skin-picker"].tap()
-        app.buttons["showcase-tab-fees"].tap()
-        XCTAssertTrue(app.buttons["fee-row-1"].waitForExistence(timeout: 5)); app.buttons["fee-row-1"].tap(); sleep(2); capture(app, "design-fees")
     }
     /// The pocket's own search opens 找 ETF with the field focused, the watchlist is a tap away, and once there is a
     /// holding the combined simulation opens from the pocket.
@@ -427,6 +413,83 @@ final class ETFToGoUITests: XCTestCase {
             sleep(1); capture(app, "dividends-\(id)")
             app.swipeUp(); sleep(1); capture(app, "dividends-lower-\(id)")
             app.terminate()
+        }
+    }
+
+    // MARK: Tools, membership and skins (spec 5.9, 5.10, 5.13)
+
+    /// 工具 → 會員・換膚 → 換膚.
+    private func openSkins(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        let member = app.buttons["tool-member"]
+        XCTAssertTrue(member.waitForExistence(timeout: 10), "工具 has 會員・換膚", file: file, line: line)
+        reveal(app, member, file: file, line: line)
+        let skins = app.buttons["member-skins"]
+        XCTAssertTrue(skins.waitForExistence(timeout: 5), "會員 opens with a way to 換膚", file: file, line: line)
+        sleep(1); capture(app, "member")
+        reveal(app, skins, file: file, line: line)
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 5), "換膚 opens the carousel", file: file, line: line)
+    }
+    private func waitForLabel(_ element: XCUIElement, containing text: String, file: StaticString = #filePath, line: UInt = #line) {
+        let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS %@", text), object: element)
+        XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected …\(text)…, got \(element.exists ? element.label : "nothing")", file: file, line: line)
+    }
+    /// The screenshot's colour at a point given as fractions of the screen, as 0xRRGGBB.
+    private func pixel(_ app: XCUIApplication, _ at: CGVector) -> UInt32 {
+        guard let image = app.screenshot().image.cgImage, let space = CGColorSpace(name: CGColorSpace.sRGB) else { return 0 }
+        let x = min(image.width - 1, Int(CGFloat(image.width) * at.dx)), y = min(image.height - 1, Int(CGFloat(image.height) * at.dy))
+        let bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: 4)
+        defer { bytes.deallocate() }
+        bytes.initialize(repeating: 0, count: 4)
+        guard let context = CGContext(data: bytes, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4, space: space,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return 0 }
+        // Core Graphics counts y from the bottom: move the wanted pixel onto the 1×1 canvas.
+        context.draw(image, in: CGRect(x: -x, y: -(image.height - 1 - y), width: image.width, height: image.height))
+        return UInt32(bytes[0]) << 16 | UInt32(bytes[1]) << 8 | UInt32(bytes[2])
+    }
+    private func sameColour(_ a: UInt32, _ b: UInt32) -> Bool {
+        [16, 8, 0].allSatisfy { abs(Int((a >> UInt32($0)) & 0xFF) - Int((b >> UInt32($0)) & 0xFF)) <= 3 }
+    }
+
+    func testSkinCarousel() {
+        let app = launch(["--demo-level", "7", "--open", "tools"])
+        sleep(1); capture(app, "tools")
+        openSkins(app)
+        let status = app.descendants(matching: .any)["skin-status"], apply = app.buttons["skin-apply"]
+        XCTAssertTrue(app.descendants(matching: .any)["skin-card-blackgold"].exists, "The carousel has the black-gold card")
+        waitForLabel(status, containing: "使用中")
+        waitForLabel(apply, "← 滑動試穿 →")
+        sleep(1); capture(app, "skins-blackgold")
+        for id in ["voxel", "blackgold", "stitch", "sketch"] { XCTAssertTrue(app.buttons["skin-badge-\(id)"].exists, "\(id) has a style badge") }
+        app.buttons["skin-badge-stitch"].tap()
+        waitForLabel(status, containing: "會員")
+        waitForLabel(apply, "看會員")
+        app.buttons["skin-badge-voxel"].tap()
+        waitForLabel(status, containing: "LV.10")
+        waitForLabel(apply, "去升級")
+        app.buttons["skin-badge-sketch"].tap()
+        waitForLabel(status, containing: "已解鎖")
+        waitForLabel(apply, "換上這套")
+        sleep(1); capture(app, "skins-sketch")
+        apply.tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "換上這套 goes back to the lobby")
+        sleep(2); capture(app, "lobby-after-sketch")
+        let points = [CGVector(dx: 0.5, dy: 0.035), CGVector(dx: 0.5, dy: 0.15), CGVector(dx: 0.5, dy: 0.25)]
+        let colours = points.map { pixel(app, $0) }
+        XCTAssertGreaterThanOrEqual(colours.filter { sameColour($0, 0xFAF8F3) }.count, 2,
+                                    "The lobby is on sketch paper: \(colours.map { String(format: "%06X", $0) })")
+    }
+
+    /// The carousel cards show no figures (spec 5.13): no label on the page is a bare number.
+    func testCarouselShowsNoNumbers() {
+        let app = launch(["--demo-level", "7", "--demo-streak", "12", "--open", "tools"])
+        openSkins(app)
+        for id in ["voxel", "blackgold", "stitch", "sketch"] {
+            app.buttons["skin-badge-\(id)"].tap(); sleep(1)
+            let bare = app.staticTexts.allElementsBoundByIndex.map(\.label).filter { label in
+                let text = label.trimmingCharacters(in: .whitespaces)
+                return !text.isEmpty && !text.contains("/") && !text.hasPrefix("LV") && text.allSatisfy { $0.isNumber || ",.+-−% ".contains($0) }
+            }
+            XCTAssertEqual(bare, [], "\(id): no bare numbers on the skin page")
         }
     }
 }
