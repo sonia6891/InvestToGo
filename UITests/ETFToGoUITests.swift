@@ -3,7 +3,7 @@ import UIKit
 
 final class ETFToGoUITests: XCTestCase {
     func testOTCCatalogAndRestoredResearchNavigation() {
-        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--open", "find"]; app.launch()
+        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--open", "find"]; app.launch()
         let search = app.textFields["fund-search"]
         XCTAssertTrue(search.waitForExistence(timeout: 10)); search.tap(); search.typeText("00679B\n")
         let fund = app.staticTexts["元大美債20年"]; XCTAssertTrue(fund.waitForExistence(timeout: 5)); fund.tap()
@@ -22,7 +22,7 @@ final class ETFToGoUITests: XCTestCase {
         let attachment = XCTAttachment(screenshot: app.screenshot()); attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
     }
     private func launch(_ arguments: [String]) -> XCUIApplication {
-        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset"] + arguments; app.launch(); return app
+        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding"] + arguments; app.launch(); return app
     }
     /// Switches feature with the bottom bar's quick pick.
     private func quickPick(_ app: XCUIApplication, _ feature: String, file: StaticString = #filePath, line: UInt = #line) {
@@ -44,7 +44,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(label), got \(element.exists ? element.label : "nothing")", file: file, line: line)
     }
     func testAnnualFeesAndHistoryNavigation() {
-        let app=XCUIApplication(); app.launchArguments=["--ui-testing","--reset","--open","find"]; app.launch()
+        let app=XCUIApplication(); app.launchArguments=["--ui-testing","--reset","--skip-onboarding","--open","find"]; app.launch()
         let search=app.textFields["fund-search"]; XCTAssertTrue(search.waitForExistence(timeout:10))
         search.tap(); search.typeText("0050\n"); app.staticTexts["元大台灣50"].tap()
         XCTAssertTrue(app.buttons["資訊"].waitForExistence(timeout:5))
@@ -132,7 +132,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(total.waitForExistence(timeout: 5), "The pocket shows its total once it holds an ETF")
         XCTAssertTrue(total.label.hasPrefix("NT$ "), "The total is the saved holding's value: \(total.label)")
         XCTAssertNotEqual(total.label, "NT$ —", "The holding is priced")
-        app.terminate(); app.launchArguments = ["--ui-testing", "--open", "pocket"]; app.launch()
+        app.terminate(); app.launchArguments = ["--ui-testing", "--skip-onboarding", "--open", "pocket"]; app.launch()
         XCTAssertTrue(app.staticTexts["portfolio-value"].waitForExistence(timeout: 10), "The holding is still in the pocket after a relaunch")
         XCTAssertTrue(app.staticTexts["0050"].exists, "The pocket lists the holding")
         reveal(app, app.buttons["holdings-trades"])
@@ -145,7 +145,7 @@ final class ETFToGoUITests: XCTestCase {
     /// The skin kit's component sheet in each skin, to compare with the four-skin canvas.
     func testSkinKitSheet() {
         for id in ["blackgold", "voxel", "stitch", "sketch"] {
-            let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skin", id, "--open", "skinKit"]; app.launch()
+            let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--skin", id, "--open", "skinKit"]; app.launch()
             XCTAssertTrue(app.descendants(matching: .any)["skinkit-root"].waitForExistence(timeout: 10), "\(id): the skin kit sheet opens")
             sleep(1)
             capture(app, "skinkit-\(id)")
@@ -548,5 +548,133 @@ final class ETFToGoUITests: XCTestCase {
         let colours = points.map { pixel(app, $0) }
         let dark = colours.filter(isDark)
         XCTAssertGreaterThanOrEqual(dark.count, 2, "The lobby is still black-gold: \(colours.map { String(format: "%06X", $0) })")
+    }
+
+    // MARK: Splash, onboarding, achievements and level-up (spec 5.1, 5.2, 5.11, 5.12)
+
+    /// A launch with the first-launch flow: a fresh install, no `--skip-onboarding`.
+    private func launchFirstTime() -> XCUIApplication {
+        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset"]; app.launch(); return app
+    }
+    private func waitSelected(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        let selected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "selected == true"), object: element)
+        XCTAssertEqual(XCTWaiter().wait(for: [selected], timeout: 5), .completed, "\(element) is selected", file: file, line: line)
+    }
+    private func onboardingNext(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        let next = app.buttons["onboarding-next"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5), "The page has 下一步", file: file, line: line)
+        next.tap()
+    }
+    /// Splash → 定期定額 → 下一步 → 3,000 and 0050 → 下一步: on page 3.
+    private func onboardToReminders(_ app: XCUIApplication, capturing: Bool = false, file: StaticString = #filePath, line: UInt = #line) {
+        let splash = app.buttons["splash"]
+        XCTAssertTrue(splash.waitForExistence(timeout: 10), "A first launch opens on the splash", file: file, line: line)
+        if capturing {
+            XCTAssertTrue(app.staticTexts["SKN×001"].exists, "The splash shows the worn skin's code", file: file, line: line)
+            XCTAssertTrue(app.staticTexts["存 ETF，也存下好習慣。"].exists, file: file, line: line)
+            XCTAssertFalse(app.buttons["lobby-find"].exists, "Not the lobby yet", file: file, line: line)
+            sleep(1); capture(app, "splash")
+        }
+        splash.tap()
+        let dca = app.buttons["habit-dca"]
+        XCTAssertTrue(dca.waitForExistence(timeout: 5), "Page 1 asks for a habit", file: file, line: line)
+        dca.tap()
+        waitSelected(dca, file: file, line: line)
+        if capturing { sleep(1); capture(app, "onboarding-1") }
+        onboardingNext(app, file: file, line: line)
+        let amount = app.buttons["amount-3000"], etf = app.buttons["etf-0050"]
+        XCTAssertTrue(amount.waitForExistence(timeout: 5), "Page 2 asks for an amount", file: file, line: line)
+        amount.tap(); etf.tap()
+        waitSelected(amount, file: file, line: line); waitSelected(etf, file: file, line: line)
+        if capturing { sleep(1); capture(app, "onboarding-2") }
+        onboardingNext(app, file: file, line: line)
+        XCTAssertTrue(app.buttons["day-6"].waitForExistence(timeout: 5), "Page 3 asks for the debit day", file: file, line: line)
+    }
+
+    func testFirstLaunchOnboarding() {
+        let app = launchFirstTime()
+        onboardToReminders(app, capturing: true)
+        let day = app.buttons["day-6"]
+        day.tap()
+        waitSelected(day)
+        sleep(1); capture(app, "onboarding-3")
+        onboardingNext(app)
+        let later = app.buttons["login-later"]
+        XCTAssertTrue(later.waitForExistence(timeout: 5), "Page 4 offers 稍後再說")
+        for button in ["login-apple", "login-google", "login-email"] { XCTAssertTrue(app.buttons[button].exists, "\(button) is on the login page") }
+        sleep(1); capture(app, "onboarding-4")
+        later.tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "稍後再說 goes to the lobby")
+        XCTAssertFalse(app.buttons["splash"].exists)
+        app.terminate(); app.launchArguments = ["--ui-testing"]; app.launch()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "The next launch goes straight to the lobby")
+        XCTAssertFalse(app.buttons["splash"].exists, "No splash once onboarded")
+        XCTAssertFalse(app.buttons["habit-dca"].exists, "No onboarding once onboarded")
+    }
+
+    func testBackInOnboarding() {
+        let app = launchFirstTime()
+        onboardToReminders(app)
+        let back = app.buttons["onboarding-back"]
+        XCTAssertTrue(back.exists, "Page 3 can go back")
+        back.tap()
+        let amount = app.buttons["amount-3000"]
+        XCTAssertTrue(amount.waitForExistence(timeout: 5), "返回 goes back to page 2")
+        XCTAssertFalse(app.buttons["day-6"].exists, "Page 3 is gone")
+        waitSelected(amount)
+        waitSelected(app.buttons["etf-0050"])
+    }
+
+    func testAchievementWall() {
+        let app = launch(["--demo-streak", "12", "--open", "achievements"])
+        let punch = app.descendants(matching: .any)["achievement-dcaPunchCard"]
+        XCTAssertTrue(punch.waitForExistence(timeout: 10), "定期定額打卡 is on the wall")
+        waitForLabel(app.staticTexts["bar-title"], "成就")
+        let unlocked = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value BEGINSWITH '已解鎖 '"), object: punch)
+        XCTAssertEqual(XCTWaiter().wait(for: [unlocked], timeout: 5), .completed, "Twelve months unlock 定期定額打卡: \(String(describing: punch.value))")
+        let value = punch.value as? String ?? ""
+        XCTAssertNotNil(value.range(of: "[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}", options: .regularExpression), "With its date: \(value)")
+        let locked = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'achievement-' AND value MATCHES %@", "^[0-9]+ / [0-9]+$"))
+        XCTAssertGreaterThan(locked.count, 0, "A locked achievement shows its progress as numbers")
+        sleep(1); capture(app, "achievements")
+    }
+
+    func testLevelUpShowsOnce() {
+        let app = launch(["--demo-xp", "290"])
+        let xp = app.descendants(matching: .any)["lobby-xp"]
+        XCTAssertTrue(xp.waitForExistence(timeout: 10))
+        XCTAssertEqual(xp.value as? String, "290 經驗")
+        let level = app.staticTexts["levelup-level"]
+        XCTAssertFalse(level.exists, "No celebration at launch")
+        app.buttons["lobby-dividends"].tap()
+        let log = app.buttons["dividends-log"]
+        XCTAssertTrue(log.waitForExistence(timeout: 5)); log.tap()
+        let symbol = app.textFields["dividend-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5), "「記一筆配息」 opens the dividend form")
+        symbol.tap(); symbol.typeText("0050")
+        app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
+        app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
+        app.buttons["save-dividend"].tap()
+        // The +20 toast comes first, then the celebration over it.
+        XCTAssertTrue(app.staticTexts["dividend-xp-toast"].waitForExistence(timeout: 5), "The +20 toast is not lost")
+        XCTAssertTrue(level.waitForExistence(timeout: 10), "Crossing 300 experience celebrates level 2")
+        XCTAssertEqual(level.label, "LV.2")
+        XCTAssertTrue(app.staticTexts["LEVEL×UP"].exists)
+        XCTAssertTrue(app.buttons["levelup-share"].exists, "分享這一刻")
+        sleep(1); capture(app, "level-up")
+        app.buttons["levelup-accept"].tap()
+        XCTAssertTrue(level.waitForNonExistence(timeout: 5), "收下 closes it")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5))
+        XCTAssertEqual(xp.value as? String, "310 經驗")
+        app.buttons["lobby-dividends"].tap()
+        XCTAssertTrue(log.waitForExistence(timeout: 5))
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5))
+        XCTAssertFalse(level.waitForExistence(timeout: 4), "Shown once: not again after going in and out")
+        app.terminate(); app.launchArguments = ["--ui-testing", "--skip-onboarding"]; app.launch()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10))
+        XCTAssertFalse(level.waitForExistence(timeout: 4), "Shown once: not again after a relaunch")
     }
 }

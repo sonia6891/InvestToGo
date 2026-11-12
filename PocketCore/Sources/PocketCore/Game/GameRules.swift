@@ -1,6 +1,6 @@
 import Foundation
 
-enum XPEvent: Hashable { case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled }
+enum XPEvent: String, Hashable, Codable { case monthlyDCA, questDone, firstDexCard, dividendLogged, reconciled }
 
 /// Keys of `GameState.counts`; shared by `award`, later feature code (`count(_:)`) and the achievements.
 enum CounterKey: String {
@@ -65,5 +65,16 @@ extension GameState {
         let gain = GameRules.xp[e] ?? 0
         xp += gain; coins += gain
         count(e.counterKey)
+    }
+
+    /// The level to celebrate with LEVEL×UP, or nil: the current level once experience has crossed a whole level
+    /// above the last one celebrated. Several levels crossed at once are celebrated together, as the highest.
+    var levelUpDue: Int? {
+        nil // RED: not implemented yet
+    }
+
+    /// Records that LEVEL×UP for `level` was shown; it never goes back down.
+    mutating func celebrate(_ level: Int) {
+        // RED: not implemented yet
     }
 }

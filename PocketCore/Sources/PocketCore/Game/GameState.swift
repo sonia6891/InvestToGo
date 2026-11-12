@@ -32,6 +32,10 @@ struct GameState: Codable, Equatable {
     var habit: Habit? = nil
     /// Event counters for achievements whose data source has no record of its own (see `count(_:)`).
     var counts: [String: Int] = [:]
+    /// The highest level whose LEVEL×UP has been shown (spec 5.12). Saved, so each level is celebrated once.
+    var celebratedLevel = 1
+    /// The experience event that came last; the LEVEL×UP screen names it as the reason.
+    var lastAward: XPEvent? = nil
 
     mutating func count(_ key: CounterKey) { counts[key.rawValue, default: 0] += 1 }
     func counter(_ key: CounterKey) -> Int { counts[key.rawValue, default: 0] }
@@ -54,5 +58,9 @@ extension GameState {
         questsDone = try c.decodeIfPresent([String: Set<String>].self, forKey: .questsDone) ?? [:]
         habit = try c.decodeIfPresent(Habit.self, forKey: .habit)
         counts = try c.decodeIfPresent([String: Int].self, forKey: .counts) ?? [:]
+        // Progress saved before celebrations were recorded: the levels already held are not new.
+        celebratedLevel = try c.decodeIfPresent(Int.self, forKey: .celebratedLevel) ?? GameRules.level(xp: xp)
+        // An event a later build added reads as unknown rather than failing the whole file.
+        lastAward = (try? c.decodeIfPresent(XPEvent.self, forKey: .lastAward)) ?? nil
     }
 }
