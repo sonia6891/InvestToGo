@@ -34,7 +34,7 @@ enum Palette {
     static var hero: LinearGradient { LinearGradient(colors: [Color(rgb: skin.matte2), Color(rgb: skin.matte)], startPoint: .topLeading, endPoint: .bottomTrailing) }
     static var page: LinearGradient { LinearGradient(colors: [background, background], startPoint: .top, endPoint: .bottom) }
     /// Allocation groups shown in the design's legends.
-    static func theme(_ value: String) -> Color { switch value { case "市值型": return blue; case "高股息": return purple; case "產業主題": return teal; case "個股": return pink; default: return orange } }
+    static func theme(_ value: String) -> Color { switch value { case "市值型": return blue; case "高股息": return purple; case "產業主題": return teal; default: return orange } }
     static var series: [Color] { [Color(red: 0.12, green: 0.42, blue: 1.0), pink, teal, orange, purple, green, Color(red: 0.54, green: 0.63, blue: 0.77)] }
 }
 extension Color {
@@ -144,7 +144,7 @@ extension Quote {
 }
 extension PortfolioStore {
     func name(for symbol: String) -> String {
-        funds.first { $0.id == symbol }?.name ?? stock(symbol)?.name ?? data.holdings.first { $0.symbol == symbol }?.name ?? symbol
+        funds.first { $0.id == symbol }?.name ?? data.holdings.first { $0.symbol == symbol }?.name ?? symbol
     }
 }
 

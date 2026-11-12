@@ -35,7 +35,7 @@ struct BrokerView: View {
         if reading { Section { HStack(spacing: 10) { ProgressView(); Text(progress.isEmpty ? "正在辨識截圖文字…" : progress) } } }
         if let table {
             Section("對應欄位 · \(table.rows.count) 筆") {
-                column("股票／ETF 代號", selection: $mapping.symbol, table: table)
+                column("ETF 代號", selection: $mapping.symbol, table: table)
                 column("名稱（選填）", selection: $mapping.name, table: table)
                 column("持有數量", selection: $mapping.shares, table: table)
                 column("成本", selection: $mapping.cost, table: table)
@@ -110,7 +110,7 @@ struct BrokerView: View {
             let number = (drafts.firstIndex { $0.id == draft.id } ?? 0) + 1
             Section {
                 if draft.symbol.isEmpty && !draft.seen.isEmpty {
-                    Text(draft.choices.isEmpty ? "截圖上的「\(draft.seen)」對不到股票或 ETF 名單，請填代號。" : "截圖上的「\(draft.seen)」有 \(draft.choices.count) 個可能，請選擇代號。")
+                    Text(draft.choices.isEmpty ? "截圖上的「\(draft.seen)」對不到 ETF 名單，請填代號。" : "截圖上的「\(draft.seen)」有 \(draft.choices.count) 個可能，請選擇代號。")
                         .font(.caption).foregroundStyle(Palette.red)
                 }
                 if !draft.choices.isEmpty && (draft.symbol.isEmpty || draft.choices.contains(draft.symbol)) {
@@ -223,7 +223,7 @@ struct BrokerView: View {
         if unresolved > 0 { notes.append("其中 \(unresolved) 批只辨識出名稱，請選擇或填入代號。") }
         if !skipped.isEmpty { notes.append("另有 \(skipped.count) 筆融券不匯入。") }
         if failed > 0 { notes.append("有 \(failed) 張圖片無法辨識。") }
-        if drafts.isEmpty && skipped.isEmpty && !pages.isEmpty { notes.append("截圖裡沒有找到股票或 ETF 名單中的代號或名稱。請確認截圖有顯示庫存清單，或到「持有 › 新增持有」逐筆輸入。") }
+        if drafts.isEmpty && skipped.isEmpty && !pages.isEmpty { notes.append("截圖裡沒有找到 ETF 名單中的代號或名稱。請確認截圖有顯示庫存清單，或到「持有 › 新增持有」逐筆輸入。") }
         message = notes.isEmpty ? nil : notes.joined(separator: "\n")
         reading = false; progress = ""; shots = []
     }

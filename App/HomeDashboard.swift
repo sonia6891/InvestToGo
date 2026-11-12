@@ -1,10 +1,8 @@
 import SwiftUI
 
 /* ---------- home: assets, market, watchlist, dividends and the combined simulation ---------- */
-/// Opens 探索 on a segment (stocks, ETFs, or nil for ETFs with matching stocks listed too), optionally with the
-/// search field focused. Sent by the home page.
+/// Opens 探索, optionally with the search field focused. Sent by the home page.
 struct DiscoverRequest: Equatable {
-    var stocks: Bool?
     var search: Bool
     let id = UUID()
 }
@@ -14,9 +12,6 @@ struct HomeView: View {
     @Binding var tab: Int
     /// Returns the 探索 tab to its first screen, so a request is not hidden behind a pushed page.
     var resetDiscover: () -> Void = {}
-    /// 總覽, 個股 or ETF: which part of the portfolio the asset card and the market card show.
-    @State private var scope = 0
-    @State private var watchKind = 1  // ETF only
     @State private var overview = false
     @AppStorage("hideAmounts") private var hidden = false
     @AppStorage("readNotices") private var readNotices = ""
@@ -38,14 +33,11 @@ struct HomeView: View {
             if !symbols.isEmpty { await store.refresh(symbols: symbols) }
         }
         .navigationDestination(isPresented: $overview) { OverviewView().tabBarSpace() }
-        .onAppear(perform: pickWatchKind)
-        .onChange(of: store.data.favorites) { _, _ in pickWatchKind() }
-        .onChange(of: scope) { _, value in if value > 0 { watchKind = value == 1 ? 0 : 1 } else { pickWatchKind() } }
     }
 
     /* ---------- poster: the 3D pocket, the total in huge type, two hex actions ---------- */
     private var poster: some View {
-        let skin = skins.skin, t = totals(0)
+        let skin = skins.skin, t = totals()
         let unread = AppNotice.all(store).filter { !readNotices.split(separator: ",").map(String.init).contains($0.id) }.count
         let unrealized = t.value.map { $0 - t.cost }
         let percent: Double? = unrealized.flatMap { t.cost > 0 ? $0 / t.cost * 100 : nil }
@@ -110,135 +102,27 @@ struct HomeView: View {
             HStack(spacing: 12) {
                 NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) { Text("新增持有") }
                     .buttonStyle(HexButtonStyle(skin: skin, horizontal: 22)).accessibilityIdentifier("home-add-holding")
-                Button { openDiscover(stocks: false, search: true) } label: { Text("搜尋 ETF") }
+                Button { openDiscover(search: true) } label: { Text("搜尋 ETF") }
                     .buttonStyle(HexButtonStyle(skin: skin, horizontal: 22)).accessibilityIdentifier("home-search").accessibilityLabel("搜尋 ETF")
             }
             .padding(.top, 10).padding(.bottom, 8)
         }
     }
 
-    /* ---------- header and search ---------- */
-    private var header: some View {
-        let unread = AppNotice.all(store).filter { !readNotices.split(separator: ",").map(String.init).contains($0.id) }.count
-        return HStack(spacing: 10) {
-            // The pocket on its own (cut out of the icon), lifted off the white card by a soft shadow.
-            Image("PocketArt").resizable().interpolation(.high).scaledToFit().frame(width: 50, height: 50)
-                .shadow(color: Color(red: 0.08, green: 0.2, blue: 0.47).opacity(0.25), radius: 6, x: 0, y: 4)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                (Text("投資").font(.system(size: 30, weight: .black)).foregroundStyle(Palette.blue)
-                 + Text("袋著走").font(.system(size: 26, weight: .heavy)).foregroundStyle(Palette.ink))
-                    .lineLimit(1).minimumScaleFactor(0.7)
-                Text("台股・ETF・資產規劃，一手掌握").font(.system(size: 12, weight: .medium)).tracking(0.3)
-                    .foregroundStyle(Palette.muted).lineLimit(1).minimumScaleFactor(0.7)
-            }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("投資袋著走，台股・ETF・資產規劃，一手掌握")
-            Spacer(minLength: 4)
-            NavigationLink(value: AppRoute.notices) {
-                Image(systemName: "bell").font(.title3).foregroundStyle(Palette.ink).frame(width: 40, height: 40)
-                    .overlay(alignment: .topTrailing) { if unread > 0 { Circle().fill(Palette.red).frame(width: 9, height: 9).offset(x: -8, y: 8) } }
-            }.accessibilityLabel(unread > 0 ? "通知中心，\(unread) 則未讀" : "通知中心")
-            NavigationLink(value: AppRoute.settings) { Image(systemName: "gearshape").font(.title3).foregroundStyle(Palette.ink).frame(width: 40, height: 40) }.accessibilityLabel("設定")
-        }
-        .padding(.leading, 14).padding(.trailing, 8).padding(.vertical, 12)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 22))
-        .shadow(color: Palette.blue.opacity(0.07), radius: 10, y: 3)
-        .padding(.top, 4)
-    }
-    private var searchBar: some View {
-        Button { openDiscover(stocks: scope == 0 ? nil : scope == 1, search: true) } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "magnifyingglass").font(.headline).foregroundStyle(Palette.ink)
-                Text("搜尋股票、ETF").foregroundStyle(Palette.muted)
-                Spacer()
-            }
-            .padding(.horizontal, 16).frame(height: 46)
-            .background(Palette.card, in: Capsule())
-            .shadow(color: Palette.blue.opacity(0.07), radius: 10, y: 3)
-        }
-        .buttonStyle(.plain).accessibilityIdentifier("home-search").accessibilityLabel("搜尋股票、ETF")
-    }
-    private func openDiscover(stocks: Bool?, search: Bool) {
-        store.discoverRequest = DiscoverRequest(stocks: stocks, search: search)
+    private func openDiscover(search: Bool) {
+        store.discoverRequest = DiscoverRequest(search: search)
         resetDiscover()
         tab = 1
     }
 
     /* ---------- assets ---------- */
     private struct Totals { var value: Double?; var cost: Double; var paid: Double; var count: Int; var missing: Int }
-    private func totals(_ scope: Int) -> Totals {
-        let holdings = store.data.holdings.filter { scope == 0 || store.isStock($0.symbol) == (scope == 1) }
-        let paid = store.data.dividends.filter { $0.status == .paid && (scope == 0 || store.isStock($0.symbol) == (scope == 1)) }.reduce(0) { $0 + $1.amount }
-        let cost = holdings.reduce(0) { $0 + $1.cost }
-        let values = holdings.map { store.marketValue(of: $0) }
-        let missing = values.filter { $0 == nil }.count
-        var value: Double?
-        if scope == 0 { value = store.summary.marketValue }
-        else if !holdings.isEmpty && missing == 0 { value = values.reduce(0) { $0 + ($1 ?? 0) } }
-        return Totals(value: holdings.isEmpty ? nil : value, cost: cost, paid: paid, count: holdings.count, missing: missing)
+    private func totals() -> Totals {
+        let holdings = store.data.holdings
+        let paid = store.data.dividends.filter { $0.status == .paid }.reduce(0) { $0 + $1.amount }
+        let missing = holdings.filter { store.marketValue(of: $0) == nil }.count
+        return Totals(value: holdings.isEmpty ? nil : store.summary.marketValue, cost: holdings.reduce(0) { $0 + $1.cost }, paid: paid, count: holdings.count, missing: missing)
     }
-    private var assetCard: some View {
-        let t = totals(scope)
-        let unrealized = t.value.map { $0 - t.cost }
-        let percent: Double? = unrealized.flatMap { t.cost > 0 ? $0 / t.cost * 100 : nil }
-        let title = ["我的總資產", "我的個股資產", "我的 ETF 資產"][scope]
-        let gainText = unrealized.map { shown(signed($0), hidden: hidden) } ?? "—"
-        let gainDetail: String? = percent.map { shown("(\(percentText($0)))", hidden: hidden) }
-        let gainTint: Color = unrealized.map { $0 > 0 ? Palette.heroUp : ($0 < 0 ? Palette.heroDown : Color.white) } ?? Color.white
-        let costText = t.count == 0 ? "—" : shown(money(t.cost), hidden: hidden)
-        let paidText = t.paid > 0 ? shown(money(t.paid), hidden: hidden) : "—"
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 8) {
-                Text(title).font(.title3.bold()).lineLimit(1).minimumScaleFactor(0.7).layoutPriority(1)
-                Text("(TWD)").font(.subheadline).opacity(0.85).lineLimit(1).fixedSize()
-                Button { hidden.toggle() } label: { Image(systemName: hidden ? "eye.slash" : "eye").font(.headline) }
-                    .buttonStyle(.plain).accessibilityLabel(hidden ? "顯示金額" : "隱藏金額")
-                Spacer(minLength: 4)
-                NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) {
-                    Label("新增持有", systemImage: "plus.circle.fill").font(.subheadline.bold()).lineLimit(1).fixedSize()
-                        .padding(.horizontal, 12).padding(.vertical, 7)
-                        .background(Capsule().fill(Color.white.opacity(0.15)))
-                        .overlay(Capsule().stroke(Color.white.opacity(0.85), lineWidth: 1.2))
-                }.buttonStyle(.plain).accessibilityIdentifier("home-add-holding")
-            }
-            Text(shown(t.value.map(money) ?? "—", hidden: hidden))
-                .font(.system(size: 34, weight: .heavy, design: .rounded)).monospacedDigit()
-                .minimumScaleFactor(0.6).lineLimit(1)
-                .contentTransition(.numericText(value: t.value ?? 0)).animation(.snappy, value: t.value)
-                .accessibilityIdentifier("portfolio-value")
-            if t.count > 0 && t.value == nil {
-                Text("\(t.missing) 檔持有還沒有台幣報價（外幣級別不計入），暫時無法估算市值").font(.caption).opacity(0.9).lineLimit(2).padding(.trailing, 96)
-            }
-            HStack(alignment: .bottom, spacing: 0) {
-                heroStat("投入成本", costText, tint: .white)
-                Rectangle().fill(Color.white.opacity(0.35)).frame(width: 1, height: 34)
-                heroStat("未實現損益", gainText, detail: gainDetail, tint: gainTint)
-                Rectangle().fill(Color.white.opacity(0.35)).frame(width: 1, height: 34)
-                heroStat("累積配息", paidText, tint: .white)
-                Spacer(minLength: 88)
-            }.padding(.top, 4)
-        }
-        .padding(18)
-        .foregroundStyle(.white)
-        .background(alignment: .bottomTrailing) { GlassBars().padding(.trailing, 12).padding(.bottom, 12) }
-        .background { HeroWave().fill(Color.white.opacity(0.12)).padding(.top, 70) }
-        .background(Palette.hero, in: RoundedRectangle(cornerRadius: 24))
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.35), lineWidth: 1))
-        .shadow(color: Palette.blue.opacity(0.28), radius: 14, y: 6)
-        .contentShape(Rectangle())
-        .onTapGesture { overview = true }
-        .accessibilityAction(named: "看資產總覽") { overview = true }
-    }
-    private func heroStat(_ title: String, _ value: String, detail: String? = nil, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title).font(.caption).opacity(0.9).lineLimit(1).minimumScaleFactor(0.8)
-            Text(value).font(.subheadline.bold()).monospacedDigit().foregroundStyle(tint).lineLimit(1).minimumScaleFactor(0.55)
-            if let detail { Text(detail).font(.caption2.bold()).monospacedDigit().foregroundStyle(tint).lineLimit(1).minimumScaleFactor(0.7) }
-        }.frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 5)
-    }
-
     /* ---------- Taiwan market ---------- */
     private var marketCard: some View {
         let note = store.liveStatus.note
@@ -249,19 +133,16 @@ struct HomeView: View {
                 Spacer()
                 NavigationLink(value: AppRoute.sources) { ConnectionPill() }.buttonStyle(.plain)
             }
-            if scope == 0 {
-                HStack(spacing: 10) {
-                    HomeIndexTile(key: "taiex", title: "加權指數", tint: Palette.blue)
-                    HomeIndexTile(key: "tpex", title: "櫃買指數", tint: Palette.purple)
-                }
-            } else {
-                let pool = scope == 1 ? (store.stockSnapshot?.stocks.map(\.id) ?? []) : store.funds.map(\.id)
-                let symbols = store.stockSnapshot?.mostTraded(pool, count: 5) ?? []
-                Text(scope == 1 ? "熱門個股（依成交值）" : "熱門 ETF（依成交值）").font(.caption).foregroundStyle(Palette.muted)
-                if symbols.isEmpty { Text("尚無收盤資料。").font(.subheadline).foregroundStyle(Palette.muted) }
-                ForEach(symbols, id: \.self) { symbol in
+            HStack(spacing: 10) {
+                HomeIndexTile(key: "taiex", title: "加權指數", tint: Palette.blue)
+                HomeIndexTile(key: "tpex", title: "櫃買指數", tint: Palette.purple)
+            }
+            let hot = store.marketSnapshot?.mostTraded(store.funds.map(\.id), count: 3) ?? []
+            if !hot.isEmpty {
+                Text("熱門 ETF（依成交值）").font(.caption.bold()).foregroundStyle(Palette.muted).padding(.top, 4)
+                ForEach(hot, id: \.self) { symbol in
                     SymbolRow(symbol: symbol)
-                    if symbol != symbols.last { Divider() }
+                    if symbol != hot.last { Divider() }
                 }
             }
             if !note.isEmpty { Text(note).font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true) }
@@ -272,17 +153,9 @@ struct HomeView: View {
     }
 
     /* ---------- watchlist ---------- */
-    /// On 總覽, show the half of the watchlist that has something in it.
-    private func pickWatchKind() {
-        guard scope == 0 else { return }
-        let hasStock = store.data.favorites.contains { store.isStock($0) }
-        let hasETF = store.data.favorites.contains { !store.isStock($0) }
-    }
     private var watchCard: some View {
-        let favorites = store.data.favorites.filter { store.isStock($0) == (watchKind == 0) }.sorted()
-        let others = store.data.favorites.count - favorites.count
+        let favorites = store.data.favorites.filter { store.isETF($0) }.sorted()
         let shownSymbols = Array(favorites.prefix(5))
-        let kind = watchKind == 0 ? "股票" : "ETF"
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "star.fill").font(.title3).foregroundStyle(Palette.orange)
@@ -297,12 +170,12 @@ struct HomeView: View {
                         .foregroundStyle(LinearGradient(colors: [Color(red: 1, green: 0.85, blue: 0.35), Palette.orange], startPoint: .top, endPoint: .bottom))
                         .shadow(color: Palette.orange.opacity(0.3), radius: 6, y: 3)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(others > 0 ? "尚未加入自選\(kind)" : "尚未加入自選").font(.subheadline.bold()).foregroundStyle(Palette.ink)
-                        Text(others > 0 ? "另一個分頁有 \(others) 檔自選；也可以追蹤你關注的\(kind)。" : "追蹤你關注的股票或 ETF，掌握即時動態。")
+                        Text("尚未加入自選 ETF").font(.subheadline.bold()).foregroundStyle(Palette.ink)
+                        Text("在探索頁點星號，追蹤你關注的 ETF。")
                             .font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer(minLength: 4)
-                    Button { openDiscover(stocks: watchKind == 0, search: false) } label: {
+                    Button { openDiscover(search: false) } label: {
                         HStack(spacing: 3) { Text("新增自選"); Image(systemName: "chevron.right") }.font(.subheadline.bold()).foregroundStyle(Palette.blue).fixedSize()
                     }.buttonStyle(.plain).accessibilityIdentifier("home-add-favorite")
                 }
@@ -426,29 +299,6 @@ struct ConnectionPill: View {
     }
 }
 
-/// 總覽 / 個股 / ETF as underlined text tabs.
-struct ScopeTabs: View {
-    let items: [String]
-    @Binding var selection: Int
-    var body: some View {
-        HStack(spacing: 26) {
-            ForEach(items.indices, id: \.self) { index in
-                let active = selection == index
-                Button { withAnimation(.snappy) { selection = index } } label: {
-                    VStack(spacing: 6) {
-                        Text(items[index]).font(.headline.weight(active ? .heavy : .semibold)).foregroundStyle(active ? Palette.blue : Palette.ink.opacity(0.75))
-                        Capsule().fill(active ? Palette.blue : Color.clear).frame(width: 44, height: 3)
-                    }.contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(items[index])
-                .accessibilityAddTraits(active ? .isSelected : [])
-            }
-            Spacer()
-        }.padding(.leading, 12)
-    }
-}
-
 /// An index with its last month as a sparkline and when it was updated.
 struct HomeIndexTile: View {
     @EnvironmentObject var store: PortfolioStore
@@ -456,7 +306,7 @@ struct HomeIndexTile: View {
     let title: String
     let tint: Color
     var body: some View {
-        let snapshot = store.stockSnapshot?.indices[key]
+        let snapshot = store.marketSnapshot?.indices[key]
         let live = store.indices[key]
         let value = live?.price ?? snapshot?.close
         let change = live?.change ?? snapshot?.change
@@ -482,7 +332,7 @@ struct HomeIndexTile: View {
         .accessibilityElement(children: .combine)
     }
     /// The time during today's session; otherwise the trading day the figure closed on.
-    private func updated(live: Quote?, snapshot: StockSnapshot.MarketIndex?) -> String {
+    private func updated(live: Quote?, snapshot: MarketSnapshot.MarketIndex?) -> String {
         if let live {
             if TaiwanMarket.isOpen() && live.date == DataChecks.day() { return "更新時間：" + live.fetchedAt.formatted(date: .omitted, time: .shortened) }
             return "更新時間：\(String(live.date.suffix(5)).replacingOccurrences(of: "-", with: "/")) 收盤"
@@ -495,8 +345,8 @@ struct HomeIndexTile: View {
 struct ComboTeaser: View {
     @EnvironmentObject var store: PortfolioStore
     var body: some View {
-        let c = store.combo, starts = store.comboStarts(c)
-        let ready = starts.stock + starts.etf > 0
+        let c = store.combo, start = store.comboStart(c)
+        let ready = start > 0
         VStack(alignment: .leading, spacing: 8) {
             NavigationLink(value: AppRoute.combo) {
                 HStack(alignment: .top) {
@@ -551,26 +401,6 @@ struct ComboArt: View {
     }
 }
 
-/// Glassy rising bars with an arrow, the asset card's illustration.
-struct GlassBars: View {
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            HStack(alignment: .bottom, spacing: 5) {
-                ForEach(Array([0.36, 0.55, 0.76, 1.0].enumerated()), id: \.offset) { index, height in
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(LinearGradient(colors: [Color.white.opacity(0.9), Color(red: 0.62, green: 0.78, blue: 1).opacity(0.55 + Double(index) * 0.08)], startPoint: .top, endPoint: .bottom))
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.white.opacity(0.95), lineWidth: 1))
-                        .frame(width: 17, height: 72 * height)
-                        .shadow(color: Color(red: 0.1, green: 0.2, blue: 0.7).opacity(0.25), radius: 5, y: 3)
-                }
-            }
-            RisingArrow().stroke(LinearGradient(colors: [Color.white.opacity(0.4), .white], startPoint: .leading, endPoint: .trailing), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                .frame(width: 74, height: 50).offset(x: -8, y: -36)
-        }
-        .frame(width: 88, height: 100, alignment: .bottom)
-        .accessibilityHidden(true)
-    }
-}
 struct RisingArrow: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -581,20 +411,6 @@ struct RisingArrow: Shape {
         path.move(to: CGPoint(x: end.x - head, y: end.y - 1))
         path.addLine(to: end)
         path.addLine(to: CGPoint(x: end.x - 3, y: end.y + head - 1))
-        return path
-    }
-}
-/// A soft wave across the lower half of the asset card.
-struct HeroWave: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY + rect.height * 0.45))
-        path.addCurve(to: CGPoint(x: rect.maxX, y: rect.minY + rect.height * 0.2),
-                      control1: CGPoint(x: rect.width * 0.35, y: rect.minY + rect.height * 0.05),
-                      control2: CGPoint(x: rect.width * 0.62, y: rect.minY + rect.height * 0.7))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
         return path
     }
 }

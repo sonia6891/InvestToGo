@@ -27,8 +27,9 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
 target = Path(__file__).resolve().parent / "stock-data.json"
-native_target = root / "App/Resources/stock-data.json"
-catalog = json.loads((root / "App/Resources/catalog.json").read_text(encoding="utf-8"))
+# The app is ETF only: it gets the ETF closes and the two indices, nothing about companies.
+native_target = root / "App/Resources/market-data.json"
+catalog = json.loads((root / "PocketCore/Sources/PocketCore/Resources/catalog.json").read_text(encoding="utf-8"))
 etf_ids = {f["id"] for f in catalog["funds"]}
 previous = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {}
 since = dict(previous.get("since") or {})
@@ -289,7 +290,8 @@ out = {
 }
 text = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
 target.write_text(text, encoding="utf-8")
-native_target.write_text(text, encoding="utf-8")
+native = {"fetchedDay": out["fetchedDay"], "closeDate": close_date, "close": {k: v for k, v in close.items() if k in etf_ids}, "index": index}
+native_target.write_text(json.dumps(native, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 print(f"{len(stocks)} stocks in {len(industries)} industries, {len(close)} closes {close_date}, TAIEX {len(index.get('taiex', {}).get('hist', []))} days, "
       f"TPEx {len(index.get('tpex', {}).get('hist', []))} days, {len(revenue)} revenue, {len(eps)} EPS, {len(policy)} policies, "
       f"{len(ex_hist)} ex histories, {len(ex_next)} upcoming -> {target.name} ({target.stat().st_size // 1024} KB)")

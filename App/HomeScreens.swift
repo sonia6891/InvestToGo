@@ -9,7 +9,7 @@ enum AppRoute: Hashable {
     case watchlist, basis(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     case designShowcase
-    case stock(String), combo, comboAdding(String), comboSettings, comboResult, trades, allocation
+    case combo, comboAdding(String), comboSettings, comboResult, trades, allocation
 }
 struct RouteView: View {
     let route: AppRoute
@@ -41,7 +41,6 @@ struct RouteView: View {
         case .broker: BrokerView()
         case .connection: ConnectionView()
         case .reminders: ReminderCenterView()
-        case .stock(let symbol): StockDetailView(symbol: symbol)
         case .designShowcase: DesignShowcase()
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
@@ -291,7 +290,7 @@ struct SettingsView: View {
                         feeRow(broker)
                     }
                 }
-                Text(netValue ? "市值＝股數 × 收盤價 − 預估賣出手續費（0.1425% × 折扣，無條件捨去，不低於最低手續費）− 證交稅（股票 0.3%、ETF 0.1%、債券 ETF 免稅）。國泰、永豐金、元大、富邦、凱基、群益先帶入常見的電子下單優惠，其他券商用原價（不打折、最低 20 元）；每個帳戶的優惠不同，請改成你自己的折扣。融資部位用同一家券商的折扣。"
+                Text(netValue ? "市值＝股數 × 收盤價 − 預估賣出手續費（0.1425% × 折扣，無條件捨去，不低於最低手續費）− 證交稅（ETF 0.1%、債券 ETF 免稅）。國泰、永豐金、元大、富邦、凱基、群益先帶入常見的電子下單優惠，其他券商用原價（不打折、最低 20 元）；每個帳戶的優惠不同，請改成你自己的折扣。融資部位用同一家券商的折扣。"
                      : "市值＝股數 × 收盤價，不扣賣出手續費與證交稅。")
                     .font(.caption).foregroundStyle(Palette.muted).padding(.top, 6)
             }
@@ -435,7 +434,7 @@ struct AboutView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("每日開盤、收盤價與指數衍生自臺灣證券交易所「上市個股日成交資訊」「每日收盤行情－大盤統計資訊」及證券櫃檯買賣中心「上櫃股票收盤行情」「櫃買指數歷史資料」，該資料係依據政府資料開放授權條款（Open Government Data License）進行公眾釋出，使用者於遵守本條款各項規定之前提下，得利用之。")
                     Link("政府資料開放授權條款：data.gov.tw/license", destination: URL(string: "https://data.gov.tw/license")!).font(.subheadline.bold())
-                    Text("公司基本資料、ETF 名單（臺灣證券交易所「基金基本資料彙總表」）與配息公告（「上市股票除權除息預告表」「上櫃股票除權除息預告表」）同樣取自兩所的開放資料。使用你自己的富果金鑰時，盤中行情由富果提供；資訊來源：臺灣證券交易所、證券櫃檯買賣中心。")
+                    Text("ETF 名單（臺灣證券交易所「基金基本資料彙總表」）與配息公告（「上市股票除權除息預告表」「上櫃股票除權除息預告表」）同樣取自兩所的開放資料。使用你自己的富果金鑰時，盤中行情由富果提供；資訊來源：臺灣證券交易所、證券櫃檯買賣中心。")
                     Text("本 App 與上述機構沒有合作或背書關係；資料僅供參考，交易請以券商與交易所公告為準。")
                 }.font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6)
             }

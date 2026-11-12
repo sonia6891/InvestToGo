@@ -12,18 +12,15 @@ extension PortfolioStore {
         guard let quote = quote(holding.symbol), quote.isTWD else { return nil }
         let gross = quote.price * holding.shares
         guard SellCosts.enabled else { return gross }
-        return SellCosts.net(gross, stock: isStock(holding.symbol), bond: fund(for: holding).assetKind == "債券", rate: SellCosts.rate(for: holding.broker))
+        return SellCosts.net(gross, stock: !isETF(holding.symbol), bond: fund(for: holding).assetKind == "債券", rate: SellCosts.rate(for: holding.broker))
     }
 }
 struct HoldingsView: View {
     @EnvironmentObject var store: PortfolioStore
-    @State private var kind = 0
     @AppStorage("hideAmounts") private var hidden = false
     var body: some View {
         let holdings = store.data.holdings
-        let stocks = sorted(holdings.filter { store.isStock($0.symbol) })
-        let etfs = sorted(holdings.filter { !store.isStock($0.symbol) })
-        let stockValue = stocks.reduce(0.0) { $0 + (store.marketValue(of: $1) ?? 0) }
+        let etfs = sorted(holdings)
         let etfValue = etfs.reduce(0.0) { $0 + (store.marketValue(of: $1) ?? 0) }
         let missing = holdings.filter { store.marketValue(of: $0) == nil }.count
         Page {
@@ -34,19 +31,15 @@ struct HoldingsView: View {
                     Label("新增持有", systemImage: "plus").font(.subheadline.bold()).foregroundStyle(.white).padding(.horizontal, 14).padding(.vertical, 8).background(Palette.hero, in: Capsule())
                 }.accessibilityIdentifier("add-holding")
             }.padding(.top, 6)
-            hero(stockValue: stockValue, etfValue: etfValue)
+            hero(total: etfValue)
             if holdings.isEmpty {
                 Card {
-                    ContentUnavailableView("把股票與 ETF 放進口袋", systemImage: "bag", description: Text("選擇股票或 ETF，填入股數與總成本，之後就能持續追蹤。"))
+                    ContentUnavailableView("把 ETF 放進口袋", systemImage: "bag", description: Text("選擇 ETF，填入股數與總成本，之後就能持續追蹤。"))
                     NavigationLink(value: AppRoute.holdingForm(id: nil, symbol: nil)) { PrimaryButtonLabel(title: "新增持有") }.buttonStyle(.plain)
                 }
             } else {
                 dataRow(holdings)
-                if kind != 2 && !stocks.isEmpty { table(title: "個股持有", items: stocks, tint: Palette.pink) }
-                if kind != 1 && !etfs.isEmpty { table(title: "ETF 持有", items: etfs, tint: Palette.blue) }
-                if (kind == 1 && stocks.isEmpty) || (kind == 2 && etfs.isEmpty) {
-                    Card { Text(kind == 1 ? "還沒有個股持有，按右上角「新增持有」加入。" : "還沒有 ETF 持有，按右上角「新增持有」加入。").font(.subheadline).foregroundStyle(Palette.muted) }
-                }
+                table(title: "ETF 持有", items: etfs, tint: Palette.blue)
                 if missing > 0 { Text("\(missing) 筆持有尚缺報價，未計入總市值。").font(.caption).foregroundStyle(Palette.muted) }
                 if SellCosts.enabled, holdings.contains(where: { !SellCosts.isSet(for: $0.broker) }) {
                     NavigationLink(value: AppRoute.settings) {
@@ -69,9 +62,8 @@ struct HoldingsView: View {
     private func sorted(_ items: [Holding]) -> [Holding] {
         items.sorted { (store.marketValue(of: $0) ?? -1) > (store.marketValue(of: $1) ?? -1) }
     }
-    private func hero(stockValue: Double, etfValue: Double) -> some View {
-        let total = stockValue + etfValue
-        return VStack(alignment: .leading, spacing: 12) {
+    private func hero(total: Double) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
                 Image(systemName: "wallet.pass").font(.title3).frame(width: 40, height: 40).background(Color.white.opacity(0.22), in: RoundedRectangle(cornerRadius: 12))
                 Text("總市值").font(.subheadline.weight(.semibold))
@@ -80,25 +72,12 @@ struct HoldingsView: View {
                 Button { hidden.toggle() } label: { Image(systemName: hidden ? "eye.slash" : "eye") }.accessibilityLabel(hidden ? "顯示金額" : "隱藏金額")
             }
             Text(shown(total > 0 ? money(total) : "—", hidden: hidden)).font(.system(size: 36, weight: .heavy, design: .rounded)).monospacedDigit().minimumScaleFactor(0.6).lineLimit(1).accessibilityIdentifier("holdings-total")
-            HStack(spacing: 10) {
-                splitTile(title: "ETF", value: etfValue, total: total, tint: Palette.blue)
-            }
         }
         .padding(18)
         .foregroundStyle(.white)
         .background(alignment: .topTrailing) { HeroDeco().padding(.top, 54).padding(.trailing, 16) }
         .background(Palette.hero, in: RoundedRectangle(cornerRadius: 22))
         .shadow(color: Palette.blue.opacity(0.25), radius: 12, y: 5)
-    }
-    private func splitTile(title: String, value: Double, total: Double, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Label(title, systemImage: "chart.bar.fill").font(.subheadline.bold()).foregroundStyle(Palette.ink).labelStyle(TintedIconLabel(tint: tint))
-            Text(shown(money(value), hidden: hidden)).font(.title3.bold()).monospacedDigit().foregroundStyle(Palette.ink).minimumScaleFactor(0.6).lineLimit(1)
-            Text(total > 0 ? "\(decimal(value / total * 100))%" : "—").font(.subheadline.bold()).foregroundStyle(tint)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background { RoundedRectangle(cornerRadius: 16).fill(Palette.card).overlay(RoundedRectangle(cornerRadius: 16).fill(tint.opacity(0.12))) }
     }
     private func dataRow(_ holdings: [Holding]) -> some View {
         let dates = holdings.compactMap { store.quote($0.symbol)?.date }.sorted()
@@ -294,7 +273,7 @@ struct AllocationSection: View {
             Card {
                 switch tab {
                 case 0:
-                    let rows = makeSlices(store.data.holdings, key: { store.isStock($0.symbol) ? "個股" : store.fund(for: $0).theme }, value: value).map { Slice(label: $0.label, amount: $0.amount, color: Palette.theme($0.label)) }
+                    let rows = makeSlices(store.data.holdings, key: { store.fund(for: $0).theme }, value: value).map { Slice(label: $0.label, amount: $0.amount, color: Palette.theme($0.label)) }
                     if rows.isEmpty { Text("還沒有持有紀錄。").foregroundStyle(Palette.muted) } else { DonutChart(slices: rows, center: (useValue ? "總市值" : "總成本", shown(wanText(total), hidden: hidden)), showAmounts: true, hidden: hidden) }
                 case 1:
                     let rows = makeSlices(store.data.holdings, key: { industryKey($0) }, value: value)
@@ -331,9 +310,8 @@ struct AllocationSection: View {
 }
 
 extension AllocationSection {
-    /// Stocks use the company's industry; ETFs the theme from their name.
+    /// The theme from the ETF's name; bonds and commodities by asset kind.
     func industryKey(_ holding: Holding) -> String {
-        if store.isStock(holding.symbol) { return store.stock(holding.symbol)?.industry ?? "個股" }
         let fund = store.fund(for: holding)
         return fund.industry ?? fund.assetKind
     }
@@ -357,8 +335,8 @@ struct HoldingDetailView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(spacing: 8) { Text(h.symbol).font(.title3.bold()); Text(h.name).font(.headline).lineLimit(1) }.foregroundStyle(Palette.ink)
                             HStack(spacing: 6) {
-                                if let market = fund.market ?? store.stock(h.symbol)?.market { TintPill(title: market == "TPEx" ? "台灣上櫃" : "台灣上市", color: Palette.muted) }
-                                TintPill(title: store.isStock(h.symbol) ? "個股" : fund.theme, color: Palette.blue)
+                                if let market = fund.market { TintPill(title: market == "TPEx" ? "台灣上櫃" : "台灣上市", color: Palette.muted) }
+                                TintPill(title: store.isETF(h.symbol) ? fund.theme : "非 ETF（舊紀錄）", color: Palette.blue)
                                 if !h.broker.isEmpty { TintPill(title: h.broker, color: Palette.muted) }
                             }
                         }
@@ -443,7 +421,7 @@ struct HoldingFormView: View {
         Page {
             Card {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("搜尋股票或 ETF 代號、名稱").font(.caption.bold()).foregroundStyle(Palette.muted)
+                    Text("搜尋 ETF 代號、名稱").font(.caption.bold()).foregroundStyle(Palette.muted)
                     HStack {
                         Image(systemName: "magnifyingglass").foregroundStyle(Palette.muted)
                         TextField("例如 2330 或 0050", text: $symbol).textInputAutocapitalization(.characters).autocorrectionDisabled().accessibilityIdentifier("holding-symbol")
@@ -515,7 +493,7 @@ struct TradeFormView: View {
             SegmentBar(items: ["買進", "賣出"], selection: $kind, pill: true, filled: true)
             Card {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("股票／ETF 代號").font(.caption.bold()).foregroundStyle(Palette.muted)
+                    Text("ETF 代號").font(.caption.bold()).foregroundStyle(Palette.muted)
                     HStack { Image(systemName: "magnifyingglass").foregroundStyle(Palette.muted); TextField("例如 00878", text: $symbol).textInputAutocapitalization(.characters).autocorrectionDisabled() }
                         .padding(11).background(Palette.cardSoft, in: RoundedRectangle(cornerRadius: 12))
                     let code = symbol.trimmingCharacters(in: .whitespaces).uppercased()

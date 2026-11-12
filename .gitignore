@@ -13,3 +13,7 @@ Screens/
 .superpowers/
 PocketCore/.build/
 PocketCore/.swiftpm/
+
+# Design scratch: Blender backups and the preview copies of rendered art
+*.blend1
+design/3d/preview/img/

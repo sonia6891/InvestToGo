@@ -1,0 +1,227 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>功能頁</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@500;700&amp;family=Noto+Sans+TC:wght@500;700;900&amp;display=swap"><style>
+body{margin:0}
+.ph{width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;background:#1A1A1D;color:#F4F1E8;font-family:'Noto Sans TC',sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.28);flex:none}
+.mono{font-family:'JetBrains Mono',monospace}
+.anton{font-family:Anton,'Noto Sans TC',sans-serif;letter-spacing:.03em}
+.col{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.bar{position:absolute;left:24px;right:24px;top:56px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#6E6A63}
+.k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#A9A397}
+.ttl{font-weight:900;font-size:34px;line-height:1.1}
+.hexo{display:inline-block;padding:2px;background:#F4F1E8;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)}
+.hexo span{display:block;background:#1A1A1D;color:#F4F1E8;clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 50%,calc(100% - 13px) 100%,13px 100%,0 50%);padding:13px 36px;font-size:16px;font-weight:900;letter-spacing:.12em}
+.hexo.fill span{background:#F4F1E8;color:#111114}
+.hexo.tag{padding:1.5px}
+.hexo.tag span{padding:3px 16px;font-size:11px;font-weight:700;letter-spacing:.1em}
+.chip{padding:2px;background:#4A4A52;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);flex:none}
+.chip span{display:block;background:#1A1A1D;padding:7px 15px;font-size:12px;font-weight:700;color:#C9C3B8;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%)}
+.chip.on{background:#F2B632}
+.chip.on span{color:#F2B632}
+.chip.full span{background:#F4F1E8;color:#111114}
+.chip.full{background:#F4F1E8}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #2C2C32}
+.code{font-family:Anton,sans-serif;font-size:20px;letter-spacing:.03em;line-height:1}
+.nm{font-size:12px;color:#A9A397}
+.num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;text-align:right}
+.chg{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right}
+.disc{border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 6px #F2B632;display:flex;align-items:center;justify-content:center;flex:none}
+.tb{position:absolute;left:0;right:0;bottom:0;height:78px;padding-bottom:18px;box-sizing:border-box;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #26262C;background:#1A1A1D}
+.ti{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6E6A63;font-size:10px;font-weight:700;background:none;border:0;font-family:inherit;min-width:48px;min-height:44px;justify-content:center}
+.ti.on{color:#F2B632}
+.tile{border-radius:26px;background:#232328;padding:10px 14px 16px;display:flex;flex-direction:column;gap:2px;position:relative;min-height:176px;box-sizing:border-box}
+.tile img{width:112px;height:112px;margin:-4px 0 0 -10px}
+.tile .tt{font-weight:900;font-size:16px}
+.tile .ts{font-size:11px;color:#A9A397}
+.tile.gold{background:#F2B632;color:#111114}
+.tile.gold .ts{color:#5A4510}
+.tile .go{position:absolute;right:14px;top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E6A63;letter-spacing:.1em}
+.tile.gold .go{color:#5A4510}
+.plan{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:20px;background:#232327}
+.plan.on{background:#F4F1E8;color:#111114}
+.plan .pt{font-weight:900;font-size:16px}
+.plan .ps{font-size:11px;color:#A9A397}
+.plan.on .ps{color:#5A564F}
+.plan .pp{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:#A9A397;text-align:right}
+.plan.on .pp{color:#5A564F}
+.radio{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px #4A4A52;flex:none;display:flex;align-items:center;justify-content:center}
+.plan.on .radio{background:#111114;box-shadow:none}
+.mo{display:flex;flex-direction:column;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#6E6A63}
+.ck{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #3A3A40}
+.ck.paid{background:#F2B632;box-shadow:none}
+.ck.soon{box-shadow:inset 0 0 0 2px #F2B632}
+.stat{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-top:1px solid #2C2C32}
+.stat .sv{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px}
+.stat .sl{font-size:11px;color:#A9A397}
+.qk{position:absolute;left:0;right:0;bottom:0;height:104px;padding:0 28px 22px;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(rgba(26,26,29,0),#1A1A1D 55%)}
+.qk span{width:70px;padding-bottom:20px}
+.qk span:last-child{text-align:right}
+.qhex{width:66px;height:60px;background:#F2B632;clip-path:polygon(25% 2%,75% 2%,100% 50%,75% 98%,25% 98%,0 50%);display:flex;align-items:center;justify-content:center}
+.demo{position:absolute;right:20px;bottom:86px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#4A4A52;letter-spacing:.1em}
+</style></head><body><div style="width: 2600px; height: 924px; box-sizing: border-box; padding: 40px 30px; display: flex; gap: 40px; background: #E9E6DF;">
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true">
+    <polygon points="250,0 300,0 274,150" fill="#F2B632"></polygon><polygon points="390,40 390,70 286,150" fill="#F4F1E8"></polygon>
+  </svg>
+  <div class="bar"><span>ETF×245</span><span>排序 ▾</span></div>
+  <img src="./img/icon_magnifier.png" alt="" style="position:absolute; right:6px; top:60px; width:170px; height:170px; filter:drop-shadow(8px 12px 8px rgba(0,0,0,.3));">
+  <div style="position:absolute; left:24px; top:96px; display:flex; flex-direction:column; gap:6px;">
+    <span class="k">FIND×ETF</span><span class="ttl">找 ETF</span><span style="font-size:12px; color:#C9C3B8;">台股上市 ETF，代號、名稱都能搜。</span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:208px;">
+    <span class="hexo" style="display:block;"><span style="padding:12px 26px; font-size:14px; font-weight:500; letter-spacing:.04em; color:#6E6A63;">⌕　輸入代號或名稱，例如 0050</span></span>
+  </div>
+  <div style="position:absolute; left:24px; right:0; top:266px; display:flex; gap:8px; overflow:hidden;">
+    <span class="chip full"><span>全部</span></span><span class="chip"><span>市值型</span></span><span class="chip"><span>高股息</span></span><span class="chip"><span>債券</span></span><span class="chip"><span>主題</span></span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:316px;">
+    <div style="display:flex; justify-content:space-between;" class="k"><span>熱門</span><span>價格 / 今日</span></div>
+    <div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">0050</span><span class="nm">元大台灣50 · 市值型</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">168.35</span><span class="chg" style="color:#F25C54;">▲ 0.75%</span></div></div>
+<div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">006208</span><span class="nm">富邦台50 · 市值型</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">98.20</span><span class="chg" style="color:#F25C54;">▲ 0.82%</span></div></div>
+<div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">00878</span><span class="nm">國泰永續高股息 · 高股息</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">21.86</span><span class="chg" style="color:#3BB273;">▼ 0.27%</span></div></div>
+<div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">0056</span><span class="nm">元大高股息 · 高股息</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">36.42</span><span class="chg" style="color:#3BB273;">▼ 0.41%</span></div></div>
+<div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">00919</span><span class="nm">群益台灣精選高息 · 高股息</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">22.95</span><span class="chg" style="color:#F25C54;">▲ 0.35%</span></div></div>
+<div class="row"><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code">00679B</span><span class="nm">元大美債20年 · 債券</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">27.10</span><span class="chg" style="color:#3BB273;">▼ 0.18%</span></div></div>
+  </div>
+  <span class="demo">示意資料</span>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">找 ETF</span>
+  </div>
+</div>
+
+<div class="ph">
+  <div class="bar"><span style="font-size:20px; letter-spacing:0; color:#A9A397;">‹</span><span>☆ 收藏</span></div>
+  <div style="position:absolute; left:24px; right:24px; top:92px; display:flex; flex-direction:column; gap:6px;">
+    <span class="k">ETF×0050</span>
+    <span class="anton" style="font-size:84px; line-height:.95;">0050</span>
+    <div style="display:flex; align-items:center; gap:10px;"><span style="font-weight:900; font-size:18px;">元大台灣50</span><span class="hexo tag"><span>市值型</span></span></div>
+    <div style="display:flex; align-items:baseline; gap:10px; margin-top:6px;"><span class="mono" style="font-size:26px; font-weight:700;">168.35</span><span class="mono" style="font-size:13px; color:#F25C54;">▲ 1.25 (+0.75%)</span></div>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:306px; display:flex; gap:6px;">
+    <span class="chip full"><span>走勢</span></span><span class="chip"><span>持股</span></span><span class="chip"><span>配息</span></span><span class="chip"><span>資訊</span></span>
+  </div>
+  <svg viewBox="0 0 342 150" width="342" height="150" style="position:absolute; left:24px; top:360px;" aria-hidden="true">
+    <line x1="0" y1="40" x2="342" y2="40" stroke="#2C2C32" stroke-dasharray="3 5"></line><line x1="0" y1="90" x2="342" y2="90" stroke="#2C2C32" stroke-dasharray="3 5"></line>
+    <polygon points="0,140 0.0,118 18.0,112 36.0,116 54.0,104 72.0,108 90.0,96 108.0,100 126.0,88 144.0,92 162.0,80 180.0,86 198.0,72 216.0,76 234.0,64 252.0,70 270.0,58 288.0,50 306.0,56 324.0,44 342.0,40 342,140" fill="#F2B632" opacity=".12"></polygon>
+    <polyline points="0.0,118 18.0,112 36.0,116 54.0,104 72.0,108 90.0,96 108.0,100 126.0,88 144.0,92 162.0,80 180.0,86 198.0,72 216.0,76 234.0,64 252.0,70 270.0,58 288.0,50 306.0,56 324.0,44 342.0,40" fill="none" stroke="#F2B632" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    <circle cx="342" cy="40" r="6" fill="#F4F1E8" stroke="#F2B632" stroke-width="3"></circle>
+  </svg>
+  <div style="position:absolute; left:24px; right:24px; top:518px; display:flex; justify-content:space-between;" class="mono">
+    <span style="font-size:11px; color:#6E6A63;">1 月</span><span style="font-size:11px; color:#F2B632; border-bottom:2px solid #F2B632;">3 月</span><span style="font-size:11px; color:#6E6A63;">1 年</span><span style="font-size:11px; color:#6E6A63;">5 年</span><span style="font-size:11px; color:#6E6A63;">全部</span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:552px; display:grid; grid-template-columns:1fr 1fr; column-gap:24px;">
+    <div class="stat"><span class="sv">0.43%</span><span class="sl">內扣費用 / 年</span></div>
+    <div class="stat"><span class="sv">2.9%</span><span class="sl">近一年殖利率</span></div>
+    <div class="stat"><span class="sv">半年配</span><span class="sl">配息頻率</span></div>
+    <div class="stat"><span class="sv">50 檔</span><span class="sl">成分股</span></div>
+  </div>
+  <div class="col" style="bottom:46px; gap:12px;">
+    <span class="hexo fill"><span style="padding:13px 64px;">加入口袋</span></span>
+    <span class="mono" style="font-size:12px; color:#C9C3B8;">→ 用 0050 試算定期定額 ←</span>
+  </div>
+  <span class="demo" style="bottom:20px;">示意資料</span>
+</div>
+
+<div class="ph">
+  <div class="bar"><span>PKT×004</span><span>報酬率 ▾</span></div>
+  <img src="./img/pocket.png" alt="" style="position:absolute; left:70px; top:58px; width:250px; height:250px;">
+  <div class="col" style="top:300px; gap:7px;">
+    <span class="k">我的口袋 · 4 檔</span>
+    <span class="anton" style="font-size:46px; line-height:1;">NT$ 286,450</span>
+    <span class="hexo tag"><span style="color:#F25C54;">▲ 31,620　+12.4%</span></span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:416px; height:10px; border-radius:5px; overflow:hidden; display:flex; gap:3px;"><div style="flex:49.8; background:#F2B632;"></div><div style="flex:23.9; background:#F4F1E8;"></div><div style="flex:17.9; background:#F2777A;"></div><div style="flex:8.4; background:#3D7BF2;"></div></div>
+  <div style="position:absolute; left:24px; right:24px; top:434px;">
+    <div class="row"><span style="width:10px; height:10px; border-radius:50%; background:#F2B632; flex:none;"></span><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:18px;">0050</span><span class="nm">元大台灣50 · 49.8%</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">142,680</span><span class="chg" style="color:#F25C54;">▲ 18.20%</span></div></div>
+<div class="row"><span style="width:10px; height:10px; border-radius:50%; background:#F4F1E8; flex:none;"></span><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:18px;">00878</span><span class="nm">國泰永續高股息 · 23.9%</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">68,420</span><span class="chg" style="color:#F25C54;">▲ 6.10%</span></div></div>
+<div class="row"><span style="width:10px; height:10px; border-radius:50%; background:#F2777A; flex:none;"></span><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:18px;">006208</span><span class="nm">富邦台50 · 17.9%</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">51,350</span><span class="chg" style="color:#F25C54;">▲ 15.40%</span></div></div>
+<div class="row"><span style="width:10px; height:10px; border-radius:50%; background:#3D7BF2; flex:none;"></span><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:18px;">00679B</span><span class="nm">元大美債20年 · 8.4%</span></div><div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;"><span class="num">24,000</span><span class="chg" style="color:#3BB273;">▼ 3.60%</span></div></div>
+  </div>
+  <div class="col" style="top:704px;"><span class="hexo"><span style="padding:11px 34px; font-size:15px;">＋ 加一檔</span></span></div>
+  <span class="demo">示意資料</span>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">口袋</span>
+  </div>
+</div>
+
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true">
+    <polygon points="70,0 110,0 96,170" fill="#F4F1E8"></polygon><polygon points="0,150 0,180 120,168" fill="#F2B632"></polygon><polygon points="330,0 350,0 300,140" fill="#F2B632"></polygon>
+  </svg>
+  <div class="bar"><span>DIV×2026</span><span>今年 ▾</span></div>
+  <img src="./img/icon_stack.png" alt="" style="position:absolute; left:85px; top:70px; width:220px; height:220px; filter:drop-shadow(8px 12px 8px rgba(0,0,0,.3));">
+  <div class="col" style="top:290px; gap:7px;">
+    <span class="k">今年已領股息</span>
+    <span class="anton" style="font-size:46px; line-height:1;">NT$ 8,640</span>
+    <span class="hexo tag"><span>領了 7 次 · 比去年多 1,920</span></span>
+  </div>
+  <div style="position:absolute; left:22px; right:22px; top:410px; display:flex; justify-content:space-between;"><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>1</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>2</div><div class="mo"><div class="ck "></div>3</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>4</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>5</div><div class="mo"><div class="ck "></div>6</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>7</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>8</div><div class="mo"><div class="ck "></div>9</div><div class="mo"><div class="ck paid"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>10</div><div class="mo"><div class="ck soon"></div><span style="color:#F4F1E8; border-bottom:2px solid #F2B632;">11</span></div><div class="mo"><div class="ck "></div>12</div></div>
+  <div style="position:absolute; left:24px; right:24px; top:476px;">
+    <div style="display:flex; justify-content:space-between;" class="k"><span>即將除息</span><span>預估入帳</span></div>
+    <div class="row"><div style="width:52px; display:flex; flex-direction:column; align-items:center; gap:1px;"><span class="mono" style="font-size:9px; color:#6E6A63;">除息</span><span class="anton" style="font-size:18px; color:#F2B632;">11/18</span></div><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:17px;">00878</span><span class="nm">國泰永續高股息 · 每股 0.50 元</span></div><span class="num" style="color:#C9C3B8;">≈ 1,500</span></div>
+<div class="row"><div style="width:52px; display:flex; flex-direction:column; align-items:center; gap:1px;"><span class="mono" style="font-size:9px; color:#6E6A63;">除息</span><span class="anton" style="font-size:18px; color:#F2B632;">12/19</span></div><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:17px;">0056</span><span class="nm">元大高股息 · 每股 1.07 元</span></div><span class="num" style="color:#C9C3B8;">≈ 1,070</span></div>
+<div class="row"><div style="width:52px; display:flex; flex-direction:column; align-items:center; gap:1px;"><span class="mono" style="font-size:9px; color:#6E6A63;">除息</span><span class="anton" style="font-size:18px; color:#F2B632;">12/16</span></div><div style="flex:1; display:flex; flex-direction:column; gap:4px;"><span class="code" style="font-size:17px;">00919</span><span class="nm">群益台灣精選高息 · 每股 0.54 元</span></div><span class="num" style="color:#C9C3B8;">≈ 810</span></div>
+  </div>
+  <div class="col" style="top:690px;"><span class="hexo"><span style="padding:11px 30px; font-size:15px;">記一筆配息</span></span></div>
+  <span class="demo">示意資料</span>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">配息</span>
+  </div>
+</div>
+
+<div class="ph">
+  <div class="bar"><span>TLS×006</span><span>⚙ 設定</span></div>
+  <div style="position:absolute; left:24px; top:92px; display:flex; flex-direction:column; gap:6px;">
+    <span class="k">TOOLS</span><span class="ttl">工具箱</span>
+  </div>
+  <div style="position:absolute; left:18px; right:18px; top:180px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+    <div class="tile "><span class="go">01</span><img src="./img/icon_calc.png" alt=""><span class="tt">定期定額試算</span><span class="ts">每月投多少，十年後多少</span></div>
+<div class="tile "><span class="go">02</span><img src="./img/icon_bars.png" alt=""><span class="tt">費用比較</span><span class="ts">內扣、手續費一次看</span></div>
+<div class="tile "><span class="go">03</span><img src="./img/pocket_icon.png" alt=""><span class="tt">券商匯入</span><span class="ts">截圖或 CSV 帶進口袋</span></div>
+<div class="tile "><span class="go">04</span><img src="./img/icon_bell.png" alt=""><span class="tt">除息提醒</span><span class="ts">扣款、除息前通知你</span></div>
+<div class="tile "><span class="go">05</span><img src="./img/icon_target.png" alt=""><span class="tt">存錢目標</span><span class="ts">離目標還差多少</span></div>
+<div class="tile gold"><span class="go">06</span><img src="./img/icon_crown.png" alt=""><span class="tt">會員・換膚</span><span class="ts">換一套口袋的顏色</span></div>
+  </div>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">工具</span>
+  </div>
+</div>
+
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true"><g transform="translate(0,-112)">
+      <polygon points="195.0,180.0 140.1,-367.8 249.9,-367.8" fill="#F4F1E8"></polygon>
+      <polygon points="260.1,183.8 461.7,-317.2 497.5,-301.3" fill="#F2B632"></polygon>
+      <polygon points="354.9,258.8 824.2,23.1 844.0,67.8" fill="#000000"></polygon>
+      <polygon points="96.0,429.0 -236.0,881.6 -356.6,761.0" fill="#F2B632"></polygon>
+      <polygon points="44.9,409.8 -416.0,671.5 -429.8,645.6" fill="#000000"></polygon>
+      <polygon points="35.1,335.6 -224.2,355.6 -225.0,333.7" fill="#F2777A"></polygon>
+      <polygon points="351.9,381.0 597.1,451.4 591.6,468.1" fill="#3D7BF2"></polygon>
+      <path d="M42.4,289.1 A86.6 86.6 0 0 1 154.1,177.4 A158.0 158.0 0 0 0 42.4,289.1 Z" fill="#F4F1E8"></path>
+      <path d="M296.6,209.0 A86.6 86.6 0 0 1 350.6,357.4 A158.0 158.0 0 0 0 296.6,209.0 Z" fill="#F4F1E8"></path>
+      <path d="M37.9,313.5 A75.0 75.0 0 0 1 106.6,199.0 A158.0 158.0 0 0 0 37.9,313.5 Z" fill="#F4F1E8"></path>
+      <circle cx="195" cy="330" r="118.67999999999999" fill="#F2B632"></circle>
+      <circle cx="195" cy="330" r="101.48" fill="#F4F1E8"></circle>
+    </g></svg>
+  <div class="bar" style="z-index:2;"><span>MBR×001</span><span style="font-size:18px; color:#F4F1E8; letter-spacing:0;">✕</span></div>
+  <img src="./img/icon_crown.png" alt="" style="position:absolute; left:85px; top:108px; width:220px; height:220px; filter:drop-shadow(8px 12px 8px rgba(0,0,0,.25));">
+  <div class="col" style="top:368px; gap:8px;">
+    <span class="ttl" style="font-size:32px;">口袋會員</span>
+    <span class="hexo tag"><span>解鎖全部功能</span></span>
+  </div>
+  <div style="position:absolute; left:20px; right:20px; top:462px; display:flex; flex-direction:column; gap:10px;">
+    <div class="plan"><div class="radio"></div><div style="display:flex; flex-direction:column; gap:3px;"><span class="pt">免費</span><span class="ps">記帳、1 個習慣、基本提醒</span></div><span class="pp">NT$ 0</span></div>
+<div class="plan on"><div class="radio"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#F4F1E8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><div style="display:flex; flex-direction:column; gap:3px;"><span class="pt">口袋會員</span><span class="ps">無限持股・全部換膚・券商匯入</span></div><span class="pp">價格待定</span></div>
+<div class="plan"><div class="radio"></div><div style="display:flex; flex-direction:column; gap:3px;"><span class="pt">會員＋AI</span><span class="ps">再加 AI 問答與月報</span></div><span class="pp">價格待定</span></div>
+  </div>
+  <div class="col" style="bottom:46px; gap:14px;">
+    <span class="hexo fill"><span style="padding:13px 60px;">選這個方案</span></span>
+    <span class="mono" style="font-size:11px; color:#A9A397;">恢復購買 · 條款 · 隨時可取消</span>
+  </div>
+</div>
+</div></body></html>

@@ -126,41 +126,32 @@ final class PortfolioTests: XCTestCase {
         XCTAssertEqual(ComboMath.project(stockStart: 120000, etfStart: 180000, settings: cash, stockShare: 0.4, years: 5, scenario: .base).end, 1049649.13, accuracy: 1)  // ETF only: all money earns the ETF yield
         XCTAssertEqual(ComboScenario.conservative.rate(5), -2); XCTAssertEqual(ComboScenario.optimistic.rate(5), 8)
     }
-    func testBundledStocksAndCloses() throws {
-        let snapshot = try XCTUnwrap(StockSnapshot.bundled, "stock-data.json is bundled")
-        XCTAssertEqual(snapshot.byID["2330"]?.market, "TWSE")
-        XCTAssertEqual(snapshot.byID["6488"]?.market, "TPEx")
-        XCTAssertGreaterThan(snapshot.stocks.count, 1500)
-        let quote = try XCTUnwrap(snapshot.close("2330"))
+    func testBundledETFClosesAndIndices() throws {
+        let snapshot = try XCTUnwrap(MarketSnapshot.bundled, "market-data.json is bundled")
+        let quote = try XCTUnwrap(snapshot.close("0050", market: "TWSE"))
         XCTAssertGreaterThan(quote.price, 0); XCTAssertEqual(quote.currency, "TWD"); XCTAssertTrue(quote.isValid)
+        XCTAssertNotNil(snapshot.close("00679B", market: "TPEx"), "OTC ETFs have closes too")
+        XCTAssertNil(snapshot.close("2330", market: "TWSE"), "ETF only: no company closes are bundled")
         XCTAssertNotNil(snapshot.indices["taiex"]?.close)
         XCTAssertNotNil(snapshot.indices["tpex"]?.close)
-        XCTAssertNotNil(snapshot.exHistorySince, "The bundled ex-date history says where it starts")
-        // No trailing cash until the ex-date history covers a year.
-        let day = DataChecks.day(Calendar.current.date(byAdding: .month, value: -2, to: Date())!)
-        func made(since: String) throws -> StockSnapshot {
-            try XCTUnwrap(StockSnapshot(Data(#"{"stocks":[],"industries":[],"exHist":{"2330":[["\#(day)",5.0,"息"],["\#(day)",1.0,"權"]]},"since":{"exHist":"\#(since)"}}"#.utf8)))
-        }
-        XCTAssertNil(try made(since: DataChecks.day()).trailingCash("2330"))
-        XCTAssertEqual(try made(since: "2024-01-01").trailingCash("2330"), 5)
+        XCTAssertEqual(snapshot.mostTraded(["0050", "2330"], count: 5), ["0050"])
     }
-    @MainActor func testStockHoldingStaysReadableAndComboIsETFOnly() throws {
+    @MainActor func testOldStockHoldingStaysReadableAndComboIsETFOnly() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let url = directory.appendingPathComponent("data.json")
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = PortfolioStore(url: url)
         let holding = Holding(symbol: "2330", name: "台積電", shares: 10, unitCost: 100, broker: "", strategy: .unclassified)
         try store.save(holding)
-        XCTAssertTrue(store.isStock("2330")); XCTAssertFalse(store.isStock("0050")); XCTAssertFalse(store.isStock("00878"))
-        XCTAssertNotNil(store.marketValue(of: holding), "A stock without a Fugle quote is valued at the bundled close")
-        XCTAssertNotNil(store.summary.marketValue)
+        XCTAssertFalse(store.isETF("2330")); XCTAssertTrue(store.isETF("0050")); XCTAssertTrue(store.isETF("00878"))
+        XCTAssertTrue(PortfolioStore(url: url).data.holdings.contains { $0.symbol == "2330" }, "A record from an older version stays readable")
+        XCTAssertNil(store.marketValue(of: holding), "No company prices are bundled any more")
         var combo = store.combo
         combo.source = 1; combo.simulated = [ComboItem(symbol: "2330", amount: 50000), ComboItem(symbol: "0050", amount: 30000)]; combo.years = 10
         store.saveCombo(combo)
         let reopened = PortfolioStore(url: url)
         XCTAssertEqual(reopened.combo, combo)
-        XCTAssertEqual(reopened.comboStarts(reopened.combo).stock, 0, accuracy: 0.001, "ETF only: a stock in the combo is not counted")
-        XCTAssertEqual(reopened.comboStarts(reopened.combo).etf, 30000, accuracy: 0.001)
+        XCTAssertEqual(reopened.comboStart(reopened.combo), 30000, accuracy: 0.001, "ETF only: a stock in the combo is not counted")
     }
     func testQuoteValidation() throws {
         let bytes = Data(#"{"symbol":"0050","date":"2026-10-15","closePrice":55.0,"changePercent":0.4}"#.utf8)
@@ -373,17 +364,17 @@ final class PortfolioTests: XCTestCase {
         let url = directory.appendingPathComponent("data.json")
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = PortfolioStore(url: url)
-        try store.save(Holding(symbol: "2330", name: "台積電", shares: 10, unitCost: 100, broker: "", strategy: .unclassified))
-        let close = try XCTUnwrap(StockSnapshot.bundled?.close("2330"))
-        XCTAssertEqual(store.quote("2330")?.price, close.price)
-        store.liveQuotes["2330"] = Quote(symbol: "2330", price: close.price + 5, changePercent: 0.3, date: DataChecks.day(), fetchedAt: Date(), currency: "TWD")
-        XCTAssertEqual(store.quote("2330")?.price, close.price + 5, "A pushed price newer than the bundled close is shown")
+        try store.save(Holding(symbol: "006208", name: "富邦台50", shares: 10, unitCost: 100, broker: "", strategy: .unclassified))
+        let close = try XCTUnwrap(MarketSnapshot.bundled?.close("006208", market: "TWSE"))
+        XCTAssertEqual(store.quote("006208")?.price, close.price)
+        store.liveQuotes["006208"] = Quote(symbol: "006208", price: close.price + 5, changePercent: 0.3, date: DataChecks.day(), fetchedAt: Date(), currency: "TWD")
+        XCTAssertEqual(store.quote("006208")?.price, close.price + 5, "A pushed price newer than the bundled close is shown")
         store.favorite("0050")
         store.liveQuotes["0050"] = Quote(symbol: "0050", price: 99, changePercent: 0.1, date: DataChecks.day(), fetchedAt: Date(), currency: "TWD", trial: true)
         store.liveQuotes["9999"] = Quote(symbol: "9999", price: 1, changePercent: nil, date: "2020-01-02", fetchedAt: .distantPast)
         store.live.stop()
         let reopened = PortfolioStore(url: url)
-        let kept = try XCTUnwrap(reopened.data.quotes["2330"], "Holdings keep their last live price")
+        let kept = try XCTUnwrap(reopened.data.quotes["006208"], "Holdings keep their last live price")
         XCTAssertEqual(kept.price, close.price + 5); XCTAssertNil(kept.trial)
         XCTAssertNil(reopened.data.quotes["0050"], "A trial-match price is not saved as the day's price")
         XCTAssertNil(store.liveQuotes["0050"], "Nor shown once the feed stops")

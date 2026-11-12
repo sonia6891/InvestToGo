@@ -1,0 +1,180 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>導航</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@500;700&amp;family=Noto+Sans+TC:wght@500;700;900&amp;display=swap"><style>
+body{margin:0}
+.ph{width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;background:#1A1A1D;color:#F4F1E8;font-family:'Noto Sans TC',sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.28);flex:none}
+.mono{font-family:'JetBrains Mono',monospace}
+.anton{font-family:Anton,'Noto Sans TC',sans-serif;letter-spacing:.03em}
+.col{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.bar{position:absolute;left:24px;right:24px;top:56px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#6E6A63}
+.k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#A9A397}
+.ttl{font-weight:900;font-size:34px;line-height:1.1}
+.hexo{display:inline-block;padding:2px;background:#F4F1E8;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)}
+.hexo span{display:block;background:#1A1A1D;color:#F4F1E8;clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 50%,calc(100% - 13px) 100%,13px 100%,0 50%);padding:13px 36px;font-size:16px;font-weight:900;letter-spacing:.12em}
+.hexo.fill span{background:#F4F1E8;color:#111114}
+.hexo.tag{padding:1.5px}
+.hexo.tag span{padding:3px 16px;font-size:11px;font-weight:700;letter-spacing:.1em}
+.chip{padding:2px;background:#4A4A52;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);flex:none}
+.chip span{display:block;background:#1A1A1D;padding:7px 15px;font-size:12px;font-weight:700;color:#C9C3B8;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%)}
+.chip.on{background:#F2B632}
+.chip.on span{color:#F2B632}
+.chip.full span{background:#F4F1E8;color:#111114}
+.chip.full{background:#F4F1E8}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #2C2C32}
+.code{font-family:Anton,sans-serif;font-size:20px;letter-spacing:.03em;line-height:1}
+.nm{font-size:12px;color:#A9A397}
+.num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;text-align:right}
+.chg{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right}
+.disc{border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 6px #F2B632;display:flex;align-items:center;justify-content:center;flex:none}
+.tb{position:absolute;left:0;right:0;bottom:0;height:78px;padding-bottom:18px;box-sizing:border-box;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #26262C;background:#1A1A1D}
+.ti{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6E6A63;font-size:10px;font-weight:700;background:none;border:0;font-family:inherit;min-width:48px;min-height:44px;justify-content:center}
+.ti.on{color:#F2B632}
+.tile{border-radius:26px;background:#232328;padding:10px 14px 16px;display:flex;flex-direction:column;gap:2px;position:relative;min-height:176px;box-sizing:border-box}
+.tile img{width:112px;height:112px;margin:-4px 0 0 -10px}
+.tile .tt{font-weight:900;font-size:16px}
+.tile .ts{font-size:11px;color:#A9A397}
+.tile.gold{background:#F2B632;color:#111114}
+.tile.gold .ts{color:#5A4510}
+.tile .go{position:absolute;right:14px;top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E6A63;letter-spacing:.1em}
+.tile.gold .go{color:#5A4510}
+.plan{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:20px;background:#232327}
+.plan.on{background:#F4F1E8;color:#111114}
+.plan .pt{font-weight:900;font-size:16px}
+.plan .ps{font-size:11px;color:#A9A397}
+.plan.on .ps{color:#5A564F}
+.plan .pp{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:#A9A397;text-align:right}
+.plan.on .pp{color:#5A564F}
+.radio{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px #4A4A52;flex:none;display:flex;align-items:center;justify-content:center}
+.plan.on .radio{background:#111114;box-shadow:none}
+.mo{display:flex;flex-direction:column;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#6E6A63}
+.ck{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #3A3A40}
+.ck.paid{background:#F2B632;box-shadow:none}
+.ck.soon{box-shadow:inset 0 0 0 2px #F2B632}
+.stat{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-top:1px solid #2C2C32}
+.stat .sv{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px}
+.stat .sl{font-size:11px;color:#A9A397}
+.qk{position:absolute;left:0;right:0;bottom:0;height:104px;padding:0 28px 22px;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(rgba(26,26,29,0),#1A1A1D 55%)}
+.qk span{width:70px;padding-bottom:20px}
+.qk span:last-child{text-align:right}
+.qhex{width:66px;height:60px;background:#F2B632;clip-path:polygon(25% 2%,75% 2%,100% 50%,75% 98%,25% 98%,0 50%);display:flex;align-items:center;justify-content:center}
+.demo{position:absolute;right:20px;bottom:86px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#4A4A52;letter-spacing:.1em}
+
+.hud{position:absolute;left:20px;right:20px;top:52px;display:flex;align-items:center;gap:8px;z-index:3}
+.lv{padding:1.5px;background:#F2B632;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%)}
+.lv span{display:block;background:#F2B632;color:#111114;font-family:Anton,sans-serif;font-size:13px;padding:3px 12px;letter-spacing:.06em}
+.xp{width:96px;height:6px;border-radius:3px;background:#34343A;overflow:hidden}
+.xp i{display:block;height:100%;width:62%;background:#F4F1E8}
+.coin{width:16px;height:16px;border-radius:50%;background:#F2B632;box-shadow:inset 0 0 0 3px #C98E12}
+.obj{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0}
+.obj img{width:118px;height:118px;filter:drop-shadow(6px 10px 7px rgba(0,0,0,.35))}
+.quest{position:absolute;left:18px;right:18px;border-radius:22px;background:#232328;padding:12px 16px;box-sizing:border-box}
+.qr{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
+.qd{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #4A4A52;flex:none}
+.qd.ok{background:#F4F1E8;box-shadow:none}
+.mi{display:flex;align-items:baseline;gap:10px;font-weight:900;color:#4A4A52;font-size:24px;line-height:1.5}
+.mi .n{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;width:18px}
+.mi.on{color:#F4F1E8;font-size:50px;line-height:1.15}
+.mi.on .n{color:#F2B632}
+.fan{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
+.card{position:absolute;left:24px;right:24px;border-radius:28px;background:#F4F1E8;color:#111114;padding:18px 20px;box-sizing:border-box;box-shadow:0 0 0 4px #F2B632}
+.sb{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;padding:4px 0}
+.sb .l{width:52px}
+.sb .bk{display:flex;gap:3px;flex:1}
+.sb .bk i{flex:1;height:12px;border-radius:3px;background:#DDD8CC}
+.sb .bk i.f{background:#111114}
+.sb .bk i.g{background:#F2B632}
+.sb .v{font-family:'JetBrains Mono',monospace;font-size:11px;width:44px;text-align:right}
+</style></head><body><div style="width: 1740px; height: 924px; box-sizing: border-box; padding: 40px 30px; display: flex; gap: 40px; background: #E9E6DF;">
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true"><g transform="translate(0,40)">
+      <polygon points="195.0,180.0 140.1,-367.8 249.9,-367.8" fill="#F4F1E8"></polygon>
+      <polygon points="260.1,183.8 461.7,-317.2 497.5,-301.3" fill="#F2B632"></polygon>
+      <polygon points="354.9,258.8 824.2,23.1 844.0,67.8" fill="#000000"></polygon>
+      <polygon points="96.0,429.0 -236.0,881.6 -356.6,761.0" fill="#F2B632"></polygon>
+      <polygon points="44.9,409.8 -416.0,671.5 -429.8,645.6" fill="#000000"></polygon>
+      <polygon points="35.1,335.6 -224.2,355.6 -225.0,333.7" fill="#F2777A"></polygon>
+      <polygon points="351.9,381.0 597.1,451.4 591.6,468.1" fill="#3D7BF2"></polygon>
+      <path d="M42.4,289.1 A86.6 86.6 0 0 1 154.1,177.4 A158.0 158.0 0 0 0 42.4,289.1 Z" fill="#F4F1E8"></path>
+      <path d="M296.6,209.0 A86.6 86.6 0 0 1 350.6,357.4 A158.0 158.0 0 0 0 296.6,209.0 Z" fill="#F4F1E8"></path>
+      <path d="M37.9,313.5 A75.0 75.0 0 0 1 106.6,199.0 A158.0 158.0 0 0 0 37.9,313.5 Z" fill="#F4F1E8"></path>
+      
+      
+    </g></svg>
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span><img src="./img/icon_target.png" alt="成就" style="width:40px; height:40px; margin:-8px -6px -8px 2px;"></div>
+  <div style="position:absolute; left:24px; top:92px;" class="k">LOBBY×012</div>
+  <img src="./img/blocks_12_cut.png" alt="12 個月" style="position:absolute; left:60px; top:222px; width:270px; height:270px;">
+  <div class="col" style="top:494px; gap:8px;"><span class="anton" style="font-size:44px; line-height:1;">12 個月</span><span class="hexo tag" style=""><span>連續定期定額</span></span></div>
+  <div class="obj" style="left:8px; top:150px; width:140px;"><img src="./img/icon_magnifier.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>找 ETF</span></span></div>
+  <div class="obj" style="left:242px; top:150px; width:140px;"><img src="./img/icon_stack.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>配息</span></span></div>
+  <div class="obj" style="left:8px; top:532px; width:140px;"><img src="./img/pocket_icon.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>口袋</span></span></div>
+  <div class="obj" style="left:242px; top:532px; width:140px;"><img src="./img/icon_calc.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>工具</span></span></div>
+  <div class="quest" style="top:676px;">
+    <div style="display:flex; justify-content:space-between;" class="k"><span>本月任務 2/3</span><span style="color:#F2B632;">+120 XP</span></div>
+    <div style="display:flex; gap:14px; margin-top:6px;"><div class="qr"><span class="qd ok"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>定投一次</div><div class="qr"><span class="qd ok"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>看配息</div><div class="qr"><span class="qd"></span>研究 1 檔新 ETF</div></div>
+  </div>
+  <div class="col" style="bottom:28px;"><span class="mono" style="font-size:11px; color:#A9A397;">→ 點物件進入 · 下滑回大廳 ←</span></div>
+</div>
+
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true"><g transform="translate(0,40)">
+      <polygon points="195.0,180.0 140.1,-367.8 249.9,-367.8" fill="#F4F1E8"></polygon>
+      <polygon points="260.1,183.8 461.7,-317.2 497.5,-301.3" fill="#F2B632"></polygon>
+      <polygon points="354.9,258.8 824.2,23.1 844.0,67.8" fill="#000000"></polygon>
+      <polygon points="96.0,429.0 -236.0,881.6 -356.6,761.0" fill="#F2B632"></polygon>
+      <polygon points="44.9,409.8 -416.0,671.5 -429.8,645.6" fill="#000000"></polygon>
+      <polygon points="35.1,335.6 -224.2,355.6 -225.0,333.7" fill="#F2777A"></polygon>
+      <polygon points="351.9,381.0 597.1,451.4 591.6,468.1" fill="#3D7BF2"></polygon>
+      <path d="M42.4,289.1 A86.6 86.6 0 0 1 154.1,177.4 A158.0 158.0 0 0 0 42.4,289.1 Z" fill="#F4F1E8"></path>
+      <path d="M296.6,209.0 A86.6 86.6 0 0 1 350.6,357.4 A158.0 158.0 0 0 0 296.6,209.0 Z" fill="#F4F1E8"></path>
+      <path d="M37.9,313.5 A75.0 75.0 0 0 1 106.6,199.0 A158.0 158.0 0 0 0 37.9,313.5 Z" fill="#F4F1E8"></path>
+      
+      
+    </g></svg>
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span><img src="./img/icon_target.png" alt="成就" style="width:40px; height:40px; margin:-8px -6px -8px 2px;"></div>
+  <div style="position:absolute; left:24px; top:92px;" class="k">LOBBY×001 · 新手</div>
+  <img src="./img/blocks_1_cut.png" alt="第 1 個月" style="position:absolute; left:60px; top:222px; width:270px; height:270px;">
+  <div class="col" style="top:494px; gap:8px;"><span class="anton" style="font-size:44px; line-height:1;">第 1 個月</span><span class="hexo tag" style=""><span>今天開始</span></span></div>
+  <div class="obj" style="left:8px; top:150px; width:140px;"><img src="./img/icon_magnifier.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>找 ETF</span></span></div>
+  <div class="obj" style="left:242px; top:150px; width:140px;"><img src="./img/icon_stack.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>配息</span></span></div>
+  <div class="obj" style="left:8px; top:532px; width:140px;"><img src="./img/pocket_icon.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>口袋</span></span></div>
+  <div class="obj" style="left:242px; top:532px; width:140px;"><img src="./img/icon_calc.png" alt=""><span class="hexo tag" style="margin-top:-6px;"><span>工具</span></span></div>
+  <div class="quest" style="top:676px;">
+    <div style="display:flex; justify-content:space-between;" class="k"><span>本月任務 0/2</span><span style="color:#F2B632;">+120 XP</span></div>
+    <div style="display:flex; gap:14px; margin-top:6px;"><div class="qr"><span class="qd"></span>設定第一筆定投</div><div class="qr"><span class="qd"></span>收集第 1 張圖鑑卡</div></div>
+  </div>
+  <div class="col" style="bottom:28px;"><span class="mono" style="font-size:11px; color:#A9A397;">→ 點物件進入 · 下滑回大廳 ←</span></div>
+</div>
+
+<div class="ph">
+  <img src="./img/blocks_12_cut.png" alt="" style="position:absolute; left:35px; top:92px; width:320px; height:320px; opacity:.22;">
+  <div class="col" style="top:420px; opacity:.22;"><span class="anton" style="font-size:40px;">12 個月</span></div>
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span></div>
+  <div class="col" style="top:110px; gap:6px;"><span class="k">QUICK×MENU</span><span style="font-size:12px; color:#C9C3B8;">任何畫面，點底部金色六角叫出選單</span></div>
+  <div class="fan" style="left:9px; top:604px; width:92px;"><div class="disc" style="width:92px; height:92px; box-shadow:inset 0 0 0 5px #F2B632;"><img src="./img/icon_magnifier.png" alt="" style="width:104px; height:104px;"></div><span style="font-size:12px; font-weight:900;">找 ETF</span></div><div class="fan" style="left:59px; top:459px; width:92px;"><div class="disc" style="width:92px; height:92px; box-shadow:inset 0 0 0 5px #F2B632;"><img src="./img/icon_stack.png" alt="" style="width:104px; height:104px;"></div><span style="font-size:12px; font-weight:900;">配息</span></div><div class="fan" style="left:149px; top:399px; width:92px;"><div class="disc" style="width:92px; height:92px; box-shadow:inset 0 0 0 5px #F2B632;"><img src="./img/pocket_icon.png" alt="" style="width:104px; height:104px;"></div><span style="font-size:12px; font-weight:900;">口袋</span></div><div class="fan" style="left:239px; top:459px; width:92px;"><div class="disc" style="width:92px; height:92px; box-shadow:inset 0 0 0 5px #F2B632;"><img src="./img/icon_calc.png" alt="" style="width:104px; height:104px;"></div><span style="font-size:12px; font-weight:900;">工具</span></div><div class="fan" style="left:289px; top:604px; width:92px;"><div class="disc" style="width:92px; height:92px; box-shadow:inset 0 0 0 5px #F2B632;"><img src="./img/icon_target.png" alt="" style="width:104px; height:104px;"></div><span style="font-size:12px; font-weight:900;">成就</span></div>
+  <div style="position:absolute; left:155px; top:702px; width:80px; height:80px; background:#F2B632; clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%); display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; color:#111114;">✕</div>
+</div>
+
+<div class="ph">
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="mono" style="font-size:11px; font-weight:700;">圖鑑 23/245</span></div>
+  <div class="card" style="top:104px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;"><span class="mono" style="font-size:10px; letter-spacing:.14em;">No.001 · 市值型</span><span style="color:#C98E12; font-size:14px;">★★★★</span></div>
+    <div style="display:flex; align-items:flex-end; justify-content:space-between;">
+      <div style="display:flex; flex-direction:column; gap:2px; padding-bottom:10px;"><span class="anton" style="font-size:72px; line-height:1;">0050</span><span style="font-weight:900; font-size:16px;">元大台灣50</span></div>
+      <img src="./img/icon_bars.png" alt="" style="width:150px; height:150px; margin:-10px -14px -6px 0;">
+    </div>
+    <div style="border-top:2px solid #111114; padding-top:8px; display:flex; flex-direction:column;">
+      <div class="sb"><span class="l">費用</span><div class="bk"><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=g></i><i class=></i></div><span class="v">0.43%</span></div>
+      <div class="sb"><span class="l">規模</span><div class="bk"><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i></div><span class="v">大</span></div>
+      <div class="sb"><span class="l">殖利率</span><div class="bk"><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=></i><i class=></i><i class=></i><i class=></i><i class=></i><i class=></i></div><span class="v">2.9%</span></div>
+      <div class="sb"><span class="l">波動</span><div class="bk"><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=></i><i class=></i><i class=></i><i class=></i></div><span class="v">中</span></div>
+      <div class="sb"><span class="l">歷史</span><div class="bk"><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i><i class=f></i></div><span class="v">22 年</span></div>
+    </div>
+    <div style="margin-top:10px; padding:10px 12px; border-radius:14px; background:#111114; color:#F4F1E8; font-size:12px; line-height:1.5;"><b style="color:#F2B632;">特技｜一次買下台灣前 50 大</b><br>適合想「買整個市場」、不想挑個股的人。</div>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:596px; display:flex; flex-direction:column; gap:10px;"><div style="display:flex; justify-content:space-between;" class="k"><span>市值型系列 3/5</span><span style="color:#F2B632;">✦ 新收集！+30 XP</span></div><div style="display:flex; gap:6px;"><span class="chip full"><span>0050</span></span><span class="chip full"><span>006208</span></span><span class="chip full"><span>00692</span></span><span class="chip"><span>？？？</span></span><span class="chip"><span>＋2</span></span></div></div>
+  <div style="position:absolute; left:0; right:0; bottom:80px; display:flex; justify-content:center; gap:12px;">
+    <span class="hexo"><span style="padding:12px 26px; font-size:15px;">PK 比一比</span></span>
+    <span class="hexo fill"><span style="padding:12px 26px; font-size:15px;">加入口袋</span></span>
+  </div>
+  <div class="col" style="bottom:36px;"><span class="mono" style="font-size:11px; color:#A9A397;">← 左右滑看下一張 →</span></div>
+  <span class="demo" style="bottom:14px;">示意資料</span>
+</div>
+</div></body></html>

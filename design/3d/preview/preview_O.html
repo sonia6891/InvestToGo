@@ -1,0 +1,134 @@
+<!doctype html><html><head><meta charset='utf-8'>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@500;700&amp;family=Noto+Sans+TC:wght@500;700;900&amp;display=swap">
+<style>
+body{margin:0}
+.ph{width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;background:#1A1A1D;color:#F4F1E8;font-family:'Noto Sans TC',sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.28);flex:none}
+.mono{font-family:'JetBrains Mono',monospace}
+.top{position:absolute;left:24px;right:24px;top:58px;display:flex;align-items:center;gap:10px}
+.seg{flex:1;height:4px;border-radius:2px;background:#34343A}
+.seg.on{background:#F2B632}
+.back{font-size:20px;color:#A9A397;width:28px}
+.h{position:absolute;left:24px;right:24px;display:flex;flex-direction:column;gap:6px}
+.h .k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#A9A397}
+.h .t{font-weight:900;font-size:28px;line-height:1.25}
+.h .s{font-size:13px;color:#C9C3B8}
+.hexo{display:inline-block;padding:2px;background:#F4F1E8;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)}
+.hexo span{display:block;background:#1A1A1D;color:#F4F1E8;clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 50%,calc(100% - 13px) 100%,13px 100%,0 50%);padding:13px 46px;font-size:16px;font-weight:900;letter-spacing:.14em}
+.hexo.fill span{background:#F4F1E8;color:#111114}
+.cta{position:absolute;left:0;right:0;bottom:56px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.opt{display:flex;align-items:center;gap:12px;padding:10px 14px 10px 6px;border-radius:20px;background:#232327}
+.opt.on{background:#F4F1E8;color:#111114}
+.ic{width:70px;height:70px;border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 5px #F2B632;flex:none;display:flex;align-items:center;justify-content:center;margin-left:6px}
+.ic img{width:84px;height:84px}
+.opt{min-height:96px;box-sizing:border-box}
+.opt .ot{font-weight:900;font-size:17px}
+.opt .os{font-size:12px;color:#A9A397}
+.opt.on .os{color:#5A564F}
+.radio{width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 2px #4A4A52;margin-left:auto;flex:none;display:flex;align-items:center;justify-content:center}
+.opt.on .radio{background:#111114;box-shadow:none}
+.chip{padding:3px;background:#4A4A52;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}
+.chip span{display:block;background:#1A1A1D;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#C9C3B8;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%)}
+.chip.on{background:#F2B632}
+.chip.on span{color:#F2B632}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #2C2C32}
+.code{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;width:64px}
+.day{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:14px;color:#6E6A63;flex:none}
+.day.on{background:#F4F1E8;color:#111114;font-weight:700;width:56px;height:56px;font-size:22px;font-family:Anton,sans-serif}
+.tog{width:46px;height:28px;border-radius:14px;background:#F2B632;position:relative;flex:none}
+.tog::after{content:"";position:absolute;right:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#111114}
+</style>
+</head><body>
+<div style="width: 1740px; height: 924px; box-sizing: border-box; padding: 40px 30px; display: flex; gap: 40px; background: #E9E6DF;">
+
+<!-- 1. pick a habit -->
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true">
+    <polygon points="300,0 340,0 318,120" fill="#F4F1E8"></polygon>
+    <polygon points="350,0 362,0 334,96" fill="#F2B632"></polygon>
+    <polygon points="390,90 390,120 300,130" fill="#F4F1E8"></polygon>
+  </svg>
+  <div class="top"><span class="back">‹</span><div class="seg on"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
+  <div class="h" style="top:110px;"><span class="k">STEP 1/4</span><span class="t">你想養成<br>哪一個習慣？</span><span class="s">之後在首頁可以隨時切換，三個都能開。</span></div>
+  <div style="position:absolute; left:20px; right:20px; top:282px; display:flex; flex-direction:column; gap:12px;">
+    <div class="opt on"><span class="ic"><img src="./img/icon_stack.png" alt=""></span><div><div class="ot">定期定額</div><div class="os">每個月固定買進，連續幾個月一目了然</div></div><div class="radio"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#F4F1E8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+    <div class="opt"><span class="ic"><img src="./img/dollar.png" alt=""></span><div><div class="ot">領息</div><div class="os">每次配息記一筆，看口袋自己長大</div></div><div class="radio"></div></div>
+    <div class="opt"><span class="ic"><img src="./img/icon_target.png" alt=""></span><div><div class="ot">存錢目標</div><div class="os">設一個數字，例如 100 萬，一路存過去</div></div><div class="radio"></div></div>
+  </div>
+  <div class="cta"><span class="hexo"><span>下一步</span></span></div>
+</div>
+
+<!-- 2. amount + first ETF -->
+<div class="ph">
+  <div class="top"><span class="back">‹</span><div class="seg on"></div><div class="seg on"></div><div class="seg"></div><div class="seg"></div></div>
+  <img src="./img/icon_stack.png" alt="" style="position:absolute; right:10px; top:84px; width:130px; height:130px;">
+  <div class="h" style="top:110px;"><span class="k">STEP 2/4</span><span class="t">每個月<br>存多少？</span></div>
+  <div style="position:absolute; left:24px; right:24px; top:222px; display:flex; align-items:baseline; gap:10px;">
+    <span class="mono" style="font-size:14px; color:#A9A397;">NT$</span>
+    <span style="font-family:Anton,sans-serif; font-size:76px; line-height:1; letter-spacing:.02em;">3,000</span>
+  </div>
+  <div style="position:absolute; left:20px; right:20px; top:318px; display:flex; gap:6px; flex-wrap:wrap;">
+    <span class="chip"><span>1,000</span></span><span class="chip on"><span>3,000</span></span><span class="chip"><span>5,000</span></span><span class="chip"><span>10,000</span></span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:390px;">
+    <div class="mono" style="font-size:11px; letter-spacing:.18em; color:#A9A397; margin-bottom:4px;">第一支 ETF</div>
+    <div class="row"><span class="code">0050</span><span style="flex:1;">元大台灣50</span><div class="radio" style="background:#F4F1E8; box-shadow:none;"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10" fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>
+    <div class="row"><span class="code">006208</span><span style="flex:1;">富邦台50</span><div class="radio"></div></div>
+    <div class="row"><span class="code">00878</span><span style="flex:1;">國泰永續高股息</span><div class="radio"></div></div>
+    <div class="row" style="border:0; color:#A9A397;"><span class="code">⌕</span><span style="flex:1;">搜尋其他 ETF</span></div>
+  </div>
+  <div class="cta"><span class="hexo"><span>下一步</span></span><span class="mono" style="font-size:11px; color:#6E6A63;">之後都可以改</span></div>
+</div>
+
+<!-- 3. reminder -->
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true">
+    <g transform="translate(195 300)">
+      <polygon points="-14,-104 14,-104 26,-300 -2,-300" fill="#F4F1E8"></polygon>
+      <polygon points="80,-70 92,-56 260,-190 236,-214" fill="#F2B632"></polygon>
+      <polygon points="-84,60 -98,44 -300,170 -280,200" fill="#F2B632"></polygon>
+      <polygon points="104,20 102,36 300,90 304,60" fill="#F4F1E8"></polygon>
+      <polygon points="-104,-18 -106,-2 -300,-30 -300,-60" fill="#F4F1E8"></polygon>
+      <circle r="104" fill="#F2B632"></circle>
+      <circle r="88" fill="#F4F1E8"></circle>
+    </g>
+  </svg>
+  <img src="./img/icon_bell.png" alt="" style="position:absolute; left:110px; top:215px; width:170px; height:170px; filter:drop-shadow(6px 10px 8px rgba(0,0,0,.25));">
+  <div class="top"><span class="back">‹</span><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg"></div></div>
+  <div class="h" style="top:430px; align-items:center; text-align:center;"><span class="k">STEP 3/4</span><span class="t">每個月幾號提醒你？</span></div>
+  <div style="position:absolute; left:0; right:0; top:520px; display:flex; align-items:center; justify-content:center; gap:4px;">
+    <span class="day">3</span><span class="day">4</span><span class="day">5</span><span class="day on">6</span><span class="day">7</span><span class="day">8</span><span class="day">9</span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:600px;">
+    <div class="row"><span style="flex:1;">提醒時間</span><span class="mono" style="font-weight:700;">09:00</span></div>
+    <div class="row" style="border:0;"><span style="flex:1;">扣款前一天也提醒</span><span class="tog"></span></div>
+  </div>
+  <div class="cta"><span class="hexo"><span>下一步</span></span></div>
+</div>
+
+<!-- 4. sign in -->
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true">
+    <g transform="translate(195 290)">
+      <polygon points="-18,-118 18,-118 30,-330 -6,-330" fill="#F4F1E8"></polygon>
+      <polygon points="48,-112 60,-104 170,-330 144,-334" fill="#F2B632"></polygon>
+      <polygon points="-70,104 -92,90 -300,320 -250,340" fill="#F2B632"></polygon>
+      <polygon points="116,10 114,30 330,80 334,40" fill="#F4F1E8"></polygon>
+      <polygon points="-116,-20 -118,4 -330,-10 -330,-50" fill="#F4F1E8"></polygon>
+      <polygon points="96,-64 108,-46 300,-170 280,-200" fill="#3D7BF2"></polygon>
+      <circle r="120" fill="#F2B632"></circle>
+      <circle r="102" fill="#F4F1E8"></circle>
+    </g>
+  </svg>
+  <img src="./img/dollar.png" alt="" style="position:absolute; left:80px; top:175px; width:230px; height:230px; filter:drop-shadow(8px 12px 8px rgba(0,0,0,.25));">
+  <div class="top"><span class="back">‹</span><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div><div class="seg on"></div></div>
+  <div class="h" style="top:440px; align-items:center; text-align:center;"><span class="k">STEP 4/4</span><span class="t">登入，口袋才不會掉</span><span class="s">剛剛設好的目標，會跟著帳號存起來。</span></div>
+  <div class="cta" style="bottom:70px; gap:14px;">
+    <span class="hexo fill"><span style="padding:13px 40px;"> 用 Apple 登入</span></span>
+    <span class="hexo"><span style="padding:13px 38px;">用 Google 登入</span></span>
+    <span style="font-size:14px; color:#C9C3B8; text-decoration:underline; text-underline-offset:4px;">用 Email 登入</span>
+    <span class="mono" style="font-size:10px; color:#6E6A63; margin-top:6px;">登入即同意服務條款與隱私權政策</span>
+  </div>
+</div>
+
+</div>
+</body></html>

@@ -62,10 +62,12 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 5)); app.buttons["tool-combo"].tap()
         XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5)); capture(app, "combo")
         app.buttons["combo-settings"].tap()
-        XCTAssertTrue(app.buttons["combo-run"].waitForExistence(timeout: 5)); capture(app, "combo-settings")
-        // The run button sits below the totals; scroll it clear of the tab bar first.
-        for _ in 0..<3 where !app.buttons["combo-run"].isHittable { app.swipeUp() }
-        app.buttons["combo-run"].tap()
+        XCTAssertTrue(app.textFields["combo-monthly"].waitForExistence(timeout: 5)); capture(app, "combo-settings")
+        // The run button sits at the end of a lazy page: it only exists once scrolled near, clear of the tab bar.
+        let run = app.buttons["combo-run"]
+        for _ in 0..<5 where !(run.exists && run.isHittable) { app.swipeUp() }
+        XCTAssertTrue(run.isHittable, "開始試算 can be reached")
+        run.tap()
         XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5)); capture(app, "combo-result")
     }
     func testDesignShowcase() {

@@ -50,10 +50,9 @@ struct ExposureView: View {
     @State private var busy = false
     @State private var error: String?
     private var rows: [ExposureRow] { store.exposures }
-    private var covered: [Holding] { store.data.holdings.filter { store.quote($0.symbol)?.isTWD == true && (store.data.components?[$0.symbol] != nil || store.isStock($0.symbol)) } }
+    private var covered: [Holding] { store.data.holdings.filter { store.quote($0.symbol)?.isTWD == true && store.data.components?[$0.symbol] != nil } }
     var body: some View {
-        // Directly held stocks have no ETF components to fetch.
-        let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil && !store.isStock($0) }
+        let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil && store.isETF($0) }
         Page {
             SegmentBar(items: ["持股集中度", "重疊成分"], selection: $tab, pill: true, filled: true)
             if tab == 0 { concentration } else { overlaps }

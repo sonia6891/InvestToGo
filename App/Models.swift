@@ -128,12 +128,12 @@ import SwiftUI
     /// a sell reduces it at its average cost, records the realised result and removes it at zero.
     func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String) throws {
         guard action == .buy || action == .sell else { return }
-        guard DataChecks.code(symbol) else { throw AppDataError("請輸入正確的股票或 ETF 代號。") }
+        guard DataChecks.code(symbol) else { throw AppDataError("請輸入正確的 ETF 代號。") }
         guard shares.isFinite, shares > 0, shares <= 1e10, amount.isFinite, amount >= 0, amount <= 1e12 else { throw AppDataError("請填寫股數與成交金額。") }
         var next = data
         let same = next.holdings.indices.filter { next.holdings[$0].symbol == symbol }
         let target = broker.isEmpty ? (same.count == 1 ? same.first : same.first(where: { next.holdings[$0].broker.isEmpty })) : same.first(where: { next.holdings[$0].broker == broker })
-        let fundName = funds.first { $0.id == symbol }?.name ?? stock(symbol)?.name
+        let fundName = funds.first { $0.id == symbol }?.name
         var realized: Double? = nil
         if action == .buy {
             if let i = target {

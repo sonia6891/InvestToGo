@@ -1,6 +1,6 @@
 import Foundation
 
-/* ---------- 個股＋ETF 組合試算 ----------
+/* ---------- ETF 組合試算 (the stock half is kept at zero so older files still open) ----------
    Monthly compounding of an assumed annual total return (dividends included, never added twice), new money at month
    end (or start), split between stocks and ETFs by the chosen mix. Without reinvestment a cash yield is paid out each
    month and kept as cash. Scenarios shift both assumptions: 保守 −7 points, 樂觀 +3 points; the stress test applies
@@ -46,7 +46,7 @@ struct ComboSettings: Codable, Equatable {
         simulated = try c.decodeIfPresent([ComboItem].self, forKey: .simulated) ?? []
         excluded = try c.decodeIfPresent([String].self, forKey: .excluded) ?? []
         includeStocks = false
-        includeETFs = try c.decodeIfPresent(Bool.self, forKey: .includeETFs) ?? true
+        includeETFs = true  // ETF only: the ETF group can no longer be left out
         snapshotAt = try c.decodeIfPresent(Date.self, forKey: .snapshotAt)
         monthly = try c.decodeIfPresent(Double.self, forKey: .monthly) ?? base.monthly
         stockPercent = try c.decodeIfPresent(Double.self, forKey: .stockPercent)

@@ -113,7 +113,6 @@ struct DiscoverView: View {
     @State private var query = ""
     @State private var filter = FundFilter()
     @State private var showFilter = false
-    @State private var mode = 0
     @FocusState private var searchFocused: Bool
     private var funds: [Fund] {
         let text = query.trimmingCharacters(in: .whitespaces)
@@ -125,15 +124,11 @@ struct DiscoverView: View {
         let items = funds
         Page {
             searchField
-            if mode == 1 {
-                StockDiscoverContent(query: $query)
-            } else {
-                etfContent(items)
-            }
+            etfContent(items)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text(mode == 1 ? "探索個股" : "探索 ETF").font(.headline).foregroundStyle(Palette.ink); Text(mode == 1 ? "台灣上市・上櫃股票" : "台灣上市・上櫃 ETF").font(.caption2).foregroundStyle(Palette.muted) } }
+            ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("探索 ETF").font(.headline).foregroundStyle(Palette.ink); Text("台灣上市・上櫃 ETF").font(.caption2).foregroundStyle(Palette.muted) } }
             ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } }
         }
         .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter) }
@@ -143,29 +138,10 @@ struct DiscoverView: View {
     private func applyRequest() {
         guard let request = store.discoverRequest else { return }
         store.discoverRequest = nil
-        mode = 0
         if request.search {
             // A search from the home page starts clean, so an earlier ETF filter cannot hide its results.
             filter = FundFilter(); query = ""
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { searchFocused = true }
-        }
-    }
-    /// While searching ETFs, companies whose code or name match are listed too, with a way to the full stock results.
-    @ViewBuilder private var stockMatches: some View {
-        let text = query.trimmingCharacters(in: .whitespaces)
-        let matches: [String] = text.isEmpty ? [] : Array((store.stockSnapshot?.stocks ?? []).filter { $0.id.hasPrefix(text) || $0.name.localizedCaseInsensitiveContains(text) }.prefix(5).map(\.id))
-        if !matches.isEmpty {
-            Card(padding: 12) {
-                HStack {
-                    Text("個股").font(.headline).foregroundStyle(Palette.ink)
-                    Spacer()
-                    Button("看全部個股結果") { mode = 1 }.font(.caption.bold())
-                }
-                ForEach(matches, id: \.self) { symbol in
-                    SymbolRow(symbol: symbol)
-                    if symbol != matches.last { Divider() }
-                }
-            }
         }
     }
     @ViewBuilder private func etfContent(_ items: [Fund]) -> some View {
@@ -214,7 +190,7 @@ struct DiscoverView: View {
     private var searchField: some View {
         HStack {
             Image(systemName: "magnifyingglass").foregroundStyle(Palette.muted)
-            TextField(mode == 1 ? "搜尋股票代號或名稱（例：2330）" : "搜尋代號或名稱（例：0050）", text: $query)
+            TextField("搜尋代號或名稱（例：0050）", text: $query)
                 .autocorrectionDisabled().textInputAutocapitalization(.never)
                 .focused($searchFocused).submitLabel(.search).onSubmit { searchFocused = false }
                 .accessibilityIdentifier("fund-search")
@@ -360,13 +336,13 @@ struct WatchlistView: View {
     @State private var selection: [String] = []
     @State private var compare = false
     var body: some View {
-        let favorites = store.data.favorites.sorted().map { code in store.funds.first { $0.id == code } ?? Fund(id: code, name: store.name(for: code), strategy: .unclassified, market: store.stock(code)?.market) }
+        let favorites = store.data.favorites.sorted().map { code in store.funds.first { $0.id == code } ?? Fund(id: code, name: store.name(for: code), strategy: .unclassified) }
         let groups = [favorites, favorites.filter { $0.market == "TWSE" }, favorites.filter { $0.market == "TPEx" }]
         let chosen = selection.isEmpty ? Array(favorites.prefix(3).map(\.id)) : selection
         Page {
             SegmentBar(items: ["全部 (\(groups[0].count))", "台灣上市 (\(groups[1].count))", "台灣上櫃 (\(groups[2].count))"], selection: $tab, pill: true, filled: true)
             Card(padding: 12) {
-                if groups[tab].isEmpty { ContentUnavailableView("還沒有自選", systemImage: "star", description: Text("在探索清單或詳情頁點星號，就能把股票與 ETF 加入自選。")) }
+                if groups[tab].isEmpty { ContentUnavailableView("還沒有自選", systemImage: "star", description: Text("在探索清單或詳情頁點星號，就能把 ETF 加入自選。")) }
                 VStack(spacing: 0) {
                     if !groups[tab].isEmpty {
                         HStack(spacing: 8) { if editing { Spacer().frame(width: 22) }; Text("代號／名稱"); Spacer(); Text("最新價").frame(width: 64, alignment: .trailing); Text("漲跌").frame(width: 58, alignment: .trailing); Text("自選").frame(width: 30) }
