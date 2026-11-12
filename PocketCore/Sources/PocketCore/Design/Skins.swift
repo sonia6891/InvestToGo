@@ -50,6 +50,18 @@ struct SkinArt: Equatable, Decodable {
     var kind: ArtKind
     /// Asset Catalog folder, e.g. "Skins/stitch".
     var folder: String
+    /// The Asset Catalog name of one of this skin's images, e.g. "Skins/stitch/find".
+    func image(_ name: SkinArtName) -> String { image(named: name.rawValue) }
+    /// Names outside `SkinArtName`, such as the vector skins' "digit_0"…"digit_9".
+    func image(named name: String) -> String { "\(folder)/\(name)" }
+}
+
+/// The images every skin provides, each drawn in that skin's own style (spec 8.2). Vector skins also carry
+/// numerals "digit_0"…"digit_9"; stitch adds a mustard set "digit_N_b" and the cloth "patch", sketch adds
+/// tally marks "tally_1"…"tally_5".
+enum SkinArtName: String, CaseIterable {
+    case heroDollar = "hero_dollar", pocket, pocketIcon = "pocket_icon", find, dividends, tools, achievements, crown
+    case calc, fees, reminder, goal, badge
 }
 
 struct SkinFeedback: Equatable, Decodable {

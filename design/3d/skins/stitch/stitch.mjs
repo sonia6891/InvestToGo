@@ -107,7 +107,41 @@ const I = {
   // first dividend / splash → coin patch with an embroidered $
   dollar: () => icon(disc(100, 100, 82, C.mustard, C.navy, 9) + disc(100, 100, 58, C.cream, C.mustard, 5) +
     thread('M120 74 C110 64 82 66 82 84 C82 104 120 96 120 118 C120 138 88 138 78 126', C.navy, 9) + thread('M100 56 L100 146', C.navy, 6)),
+  // lobby backing: the cream cloth patch the numerals are sewn onto (same as blocks_12's backing)
+  patch: () => svg(260, 210, rect(10, 16, 240, 180, C.cream, C.navy, 8), 26),
 };
+
+// ---- numerals 0–9: paper cut-outs on the same 86×116 grid as the 1, 2 and 3 above.
+// Each glyph is a list of rings: the outline first, then any holes. Two colourways alternate in the lobby:
+// digit_N = navy paper, cream thread; digit_N_b = mustard paper, navy thread.
+const flip = pts => pts.map(([x, y]) => [86 - x, 116 - y]);
+const DIGITS = [
+  [[[12, 0], [74, 0], [86, 12], [86, 104], [74, 116], [12, 116], [0, 104], [0, 12]], [[26, 24], [60, 24], [60, 92], [26, 92]]],
+  [[[37, 0], [69, 0], [69, 116], [37, 116], [37, 34], [19, 40], [17, 16]]],
+  [[[0, 0], [86, 0], [86, 52], [32, 90], [86, 90], [86, 116], [0, 116], [0, 92], [58, 52], [58, 26], [0, 26]]],
+  [[[0, 0], [86, 0], [86, 116], [0, 116], [0, 90], [58, 90], [58, 70], [18, 70], [18, 46], [58, 46], [58, 26], [0, 26]]],
+  [[[0, 0], [26, 0], [26, 62], [52, 62], [52, 0], [78, 0], [78, 62], [86, 62], [86, 86], [78, 86], [78, 116], [52, 116], [52, 86], [0, 86]]],
+  [[[0, 0], [86, 0], [86, 26], [26, 26], [26, 46], [86, 46], [86, 116], [0, 116], [0, 90], [60, 90], [60, 70], [0, 70]]],
+  [[[0, 0], [86, 0], [86, 24], [26, 24], [26, 44], [86, 44], [86, 116], [0, 116]], [[26, 68], [60, 68], [60, 92], [26, 92]]],
+  [[[0, 0], [86, 0], [86, 26], [50, 116], [22, 116], [56, 26], [0, 26]]],
+  [[[10, 0], [76, 0], [86, 10], [86, 48], [80, 58], [86, 68], [86, 106], [76, 116], [10, 116], [0, 106], [0, 68], [6, 58], [0, 48], [0, 10]],
+    [[26, 22], [60, 22], [60, 46], [26, 46]], [[26, 70], [60, 70], [60, 94], [26, 94]]],
+];
+DIGITS.push([flip(DIGITS[6][0]), flip(DIGITS[6][1])]);
+
+// A cut-out with holes: one shadow and one paper path, both even-odd, then a stitch inside every edge.
+function holed(rings, fill, th, d = 5) {
+  const all = rings.map(P).join(' ');
+  const paper = rings.map(r => gen.toPaths(gen.path(P(r), { fill, fillStyle: 'solid', stroke: 'none', roughness: 0.55, seed: seed++ }))
+    .filter(p => p.fill !== 'none').map(p => p.d).join(' ')).join(' ');
+  return `<path d="${all}" fill="${SHADOW}" fill-rule="evenodd" transform="translate(3 4)"/>` +
+    `<path d="${paper}" fill="${fill}" fill-rule="evenodd" stroke="none"/>` +
+    rings.map((r, i) => stitch(P(inset(r, i ? -d : d)), th)).join('');
+}
+DIGITS.forEach((rings, n) => {
+  I[`digit_${n}`] = () => svg(86, 116, holed(rings, C.navy, C.cream), 22);
+  I[`digit_${n}_b`] = () => svg(86, 116, holed(rings, C.mustard, C.navy), 22);
+});
 
 const OUT = process.argv.slice(2);
 for (const dir of OUT) fs.mkdirSync(dir, { recursive: true });

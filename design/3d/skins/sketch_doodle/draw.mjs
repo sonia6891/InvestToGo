@@ -12,7 +12,7 @@ const hatch = (o = {}) => base({ fill: MARK, fillStyle: 'hachure', hachureGap: 5
 const paper = (o = {}) => base({ fill: PAPER, fillStyle: 'solid', ...o });
 const solidMark = (o = {}) => base({ fill: MARK, fillStyle: 'solid', ...o });
 
-function svg(w, h, shapes) {
+function svg(w, h, shapes, pad = w === 200 ? 26 : 0) {
   const g = gen();
   const parts = [];
   for (const s of shapes) {
@@ -21,7 +21,6 @@ function svg(w, h, shapes) {
       parts.push(`<path d="${p.d}" stroke="${p.stroke}" stroke-width="${p.strokeWidth}" fill="${fill}" stroke-linecap="round" stroke-linejoin="round"/>`);
     }
   }
-  const pad = w === 200 ? 26 : 0;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${w + pad * 2} ${h + pad * 2}" width="${w * 2}" height="${h * 2}">${parts.join('')}</svg>`;
 }
 const G = gen();
@@ -132,6 +131,35 @@ icons.dollar = () => svg(200, 200, [
   L(36, 86, 100, 132), L(100, 132, 164, 86),
   L(46, 186, 70, 180, { strokeWidth: 1.6 }), L(130, 182, 158, 186, { strokeWidth: 1.6 }),
 ]);
+
+// ---- lobby tally tiles: tally_1…tally_4 upright strokes, tally_5 four strokes and the diagonal.
+// Same pen and highlighter swipe as blocks_12; the swipe spans the tile so tiles set side by side read as one band.
+for (let n = 1; n <= 5; n++) icons[`tally_${n}`] = () => {
+  const s = [G.rectangle(0, 92, 88, 40, base({ stroke: 'none', fill: MARK, fillStyle: 'solid', roughness: 2.2 }))];
+  const T = { strokeWidth: 5, roughness: 1.6 }, k = Math.min(n, 4), x0 = 44 - (k - 1) * 7.25;
+  for (let i = 0; i < k; i++) s.push(L(x0 + i * 14, 58 + (i % 2) * 4, x0 - 2 + i * 15, 160 - (i % 3) * 3, T));
+  if (n === 5) s.push(L(8, 140, 80, 76, T));
+  return svg(88, 210, s, 14);
+};
+// ---- hand-written numerals 0–9 for large numbers, a hachure highlighter swipe under the lower half
+const NUM = { strokeWidth: 5, roughness: 1.4, bowing: 1 };
+const C2 = (pts, o) => G.curve(pts, base({ ...NUM, ...o }));
+const L2 = (x1, y1, x2, y2) => L(x1, y1, x2, y2, NUM);
+const NUMERALS = [
+  () => [G.ellipse(43, 58, 66, 106, base(NUM))],
+  () => [L2(26, 28, 48, 8), L2(48, 8, 46, 108), L2(26, 108, 66, 108)],
+  () => [C2([[12, 32], [28, 10], [58, 10], [68, 34], [52, 64], [16, 104]]), L2(16, 104, 76, 102)],
+  () => [C2([[12, 22], [40, 6], [66, 22], [60, 46], [36, 56]]), C2([[36, 56], [68, 66], [70, 94], [44, 110], [12, 98]])],
+  () => [L2(54, 8, 8, 78), L2(8, 78, 80, 76), L2(58, 42, 56, 110)],
+  () => [L2(70, 10, 24, 10), L2(24, 10, 18, 52), C2([[18, 52], [46, 40], [72, 58], [70, 92], [42, 110], [12, 98]])],
+  () => [C2([[64, 12], [34, 20], [14, 62], [20, 98], [44, 110], [68, 94], [64, 66], [40, 58], [18, 74]])],
+  () => [L2(10, 12, 76, 10), L2(76, 10, 32, 110), L2(34, 60, 66, 58)],
+  () => [G.ellipse(43, 32, 46, 46, base(NUM)), G.ellipse(43, 82, 60, 54, base(NUM))],
+  () => [G.ellipse(42, 36, 52, 52, base(NUM)), C2([[68, 30], [66, 72], [54, 110]])],
+];
+NUMERALS.forEach((draw, n) => {
+  icons[`digit_${n}`] = () => svg(86, 116, [G.rectangle(2, 62, 82, 42, hatch({ stroke: 'none' })), ...draw()], 22);
+});
 
 for (const dir of OUT) fs.mkdirSync(dir, { recursive: true });
 for (const [name, fn] of Object.entries(icons)) {

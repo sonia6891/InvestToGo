@@ -19,6 +19,23 @@ targets:
     sources:
       - App
       - PocketCore/Sources/PocketCore
+    # Skin fonts (App/Resources/Fonts, OFL licences beside them). XcodeGen writes this plist; Xcode merges it with
+    # the generated Info.plist keys below.
+    info:
+      path: Support/ETFToGo-Info.plist
+      properties:
+        UIAppFonts:
+          - Anton-Regular.ttf
+          - PressStart2P-Regular.ttf
+          - DotGothic16-Regular.ttf
+          - BreeSerif-Regular.ttf
+          - Caveat-Variable.ttf
+          - NotoSansTC-Bold.ttf
+          - NotoSansTC-Medium.ttf
+          - NotoSerifTC-Bold.otf
+          - NotoSerifTC-Medium.otf
+          - LXGWWenKaiTC-Medium.ttf
+          - JetBrainsMono-Regular.ttf
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview

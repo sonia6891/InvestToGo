@@ -66,10 +66,19 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.named("blackgold").art.kind, .render3D); XCTAssertEqual(Skins.named("voxel").art.kind, .voxel3D)
     }
     func testFontsAndFeedback() {
-        XCTAssertEqual(Skins.named("blackgold").fonts, SkinFonts(big: "Anton-Regular", title: "NotoSansTC-Black", body: "NotoSansTC-Medium", mono: "JetBrainsMono-Regular"))
-        XCTAssertEqual(Skins.named("sketch").fonts.big, "Caveat-Bold")
+        XCTAssertEqual(Skins.named("blackgold").fonts, SkinFonts(big: "Anton-Regular", title: "NotoSansTC-Bold", body: "NotoSansTC-Medium", mono: "JetBrainsMono-Regular"))
+        XCTAssertEqual(Skins.named("voxel").fonts, SkinFonts(big: "PressStart2P-Regular", title: "DotGothic16-Regular", body: "DotGothic16-Regular", mono: "PressStart2P-Regular"))
+        XCTAssertEqual(Skins.named("stitch").fonts, SkinFonts(big: "BreeSerif-Regular", title: "NotoSerifTC-Bold", body: "NotoSerifTC-Medium", mono: "BreeSerif-Regular"))
+        XCTAssertEqual(Skins.named("sketch").fonts, SkinFonts(big: "Caveat-Regular", title: "LXGWWenKaiTC-Medium", body: "LXGWWenKaiTC-Medium", mono: "LXGWWenKaiTC-Medium"))
         XCTAssertEqual(Skins.all.map(\.feedback.sound), ["thud", "chip", "snip", "scribble"])
         XCTAssertEqual(Skins.named("sketch").feedback.haptic, .faint)
         XCTAssertEqual(Skins.named("stitch").art.folder, "Skins/stitch")
+    }
+    func testArtNamesAndFolders() {
+        XCTAssertEqual(SkinArtName.allCases.map(\.rawValue), ["hero_dollar", "pocket", "pocket_icon", "find", "dividends", "tools", "achievements",
+                                                             "crown", "calc", "fees", "reminder", "goal", "badge"])
+        XCTAssertEqual(Skins.all.map(\.art.folder), ["Skins/blackgold", "Skins/voxel", "Skins/stitch", "Skins/sketch"])
+        XCTAssertEqual(Skins.named("stitch").art.image(.find), "Skins/stitch/find")
+        XCTAssertEqual(Skins.named("sketch").art.image(named: "tally_5"), "Skins/sketch/tally_5")
     }
 }

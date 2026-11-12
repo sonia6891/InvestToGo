@@ -1,0 +1,12 @@
+{
+  "images": [
+    {
+      "filename": "reminder.png",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}
