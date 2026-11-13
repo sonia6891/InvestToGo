@@ -59,6 +59,13 @@ enum DemoArguments {
 
     /// `--demo-pocket` (with `--ui-testing`): fills an empty pocket with `pocketSample` and `dividendSample`. Seeding
     /// is not logging, so it earns no experience.
+    /// `--demo-held` with `--ui-testing`: one 0050 holding, saved without playing, so a UI test can log a dividend that
+    /// earns (only a held code pays, re-review N1).
+    @MainActor static func seedHeld(_ store: PortfolioStore, args: [String]) {
+        guard args.contains("--ui-testing"), args.contains("--demo-held"), !store.data.holdings.contains(where: { $0.symbol == "0050" }) else { return }
+        try? store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
+    }
+
     @MainActor static func seedPocket(_ store: PortfolioStore, args: [String], now: Date, calendar: Calendar = .current) {
         guard args.contains("--ui-testing"), args.contains("--demo-pocket"), store.data.holdings.isEmpty else { return }
         for item in pocketSample {

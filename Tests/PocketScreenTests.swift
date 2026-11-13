@@ -95,6 +95,9 @@ final class PocketScreenTests: XCTestCase {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = PortfolioStore(url: directory.appendingPathComponent("p.json"))
+        // Only a held code pays (re-review N1).
+        try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
+        try store.save(Holding(symbol: "00878", name: "國泰永續高股息", shares: 1000, unitCost: 20, broker: "", strategy: .income))
         var small = Dividend(symbol: "0050", date: Date(), amount: 1, status: .paid)
         try store.saveDividend(small, rewardNew: true)
         XCTAssertEqual(store.data.game?.xp, 20)

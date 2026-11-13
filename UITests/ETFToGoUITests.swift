@@ -357,7 +357,8 @@ final class ETFToGoUITests: XCTestCase {
 
     /// Logging a dividend earns the flat 記一筆配息 experience (+20), whatever its amount, and plays the coin drop.
     func testLogDividendGivesXP() {
-        let app = launch([])
+        // 0050 is held: only a held code's dividend pays (re-review N1).
+        let app = launch(["--demo-held"])
         let xp = app.descendants(matching: .any)["lobby-xp"]
         XCTAssertTrue(xp.waitForExistence(timeout: 10))
         // A first visit settles any quest that viewing dividends finishes, so the difference below is the log alone.
@@ -661,7 +662,7 @@ final class ETFToGoUITests: XCTestCase {
     }
 
     func testLevelUpShowsOnce() {
-        let app = launch(["--demo-xp", "290"])
+        let app = launch(["--demo-xp", "290", "--demo-held"])
         let xp = app.descendants(matching: .any)["lobby-xp"]
         XCTAssertTrue(xp.waitForExistence(timeout: 10))
         XCTAssertEqual(xp.value as? String, "290 經驗")
@@ -718,12 +719,12 @@ final class ETFToGoUITests: XCTestCase {
     /// it shows the burst first, so the check below can see one when it is there.
     func testReduceMotionStillWorks() {
         let burst = { (app: XCUIApplication) in app.descendants(matching: .any)["burst"] }
-        let moving = launch([])
+        let moving = launch(["--demo-held"])
         logDividendFromLobby(moving)
         XCTAssertTrue(burst(moving).waitForExistence(timeout: 5), "Without Reduce Motion the coin lands with a burst")
         moving.terminate()
 
-        let app = launch(["--reduce-motion"])
+        let app = launch(["--reduce-motion", "--demo-held"])
         logDividendFromLobby(app)
         let toast = app.staticTexts["dividend-xp-toast"]
         XCTAssertTrue(toast.waitForExistence(timeout: 5), "The reward still shows with Reduce Motion")

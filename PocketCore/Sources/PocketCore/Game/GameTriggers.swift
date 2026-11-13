@@ -19,15 +19,25 @@ struct FundVisit: Equatable {
 
 extension GameState {
     /// Runs the migrations this progress has not had yet. Safe to call at every launch.
-    mutating func migrate(_ p: Portfolio) {
+    mutating func migrate(_ p: Portfolio, now: Date = Date()) {
         if migration < 1 { backfillDCA(from: p) }
+        if migratedAt == nil { migratedAt = now }
         migration = max(migration, GameMigration.current)
     }
 
     /// Every month with a buy in the records (the trade log's buys and the holdings' purchase dates) becomes a DCA
     /// month. Months only: no experience, coins, counters or quests, so an upgrade or a backfill earns nothing.
+    /// A holding saved without a purchase date logged its first buy on the day it was typed in, not the day it was
+    /// bought, so that entry is not a DCA month (re-review N6); later buys of the code still are.
     mutating func backfillDCA(from p: Portfolio) {
-        let dates = (p.trades ?? []).filter { $0.action == .buy }.map(\.date) + p.holdings.compactMap(\.purchaseDate)
+        let undated = Set(p.holdings.filter { $0.purchaseDate == nil }.map(\.symbol))
+        var skipped: Set<String> = []
+        let buys = (p.trades ?? []).filter { $0.action == .buy }.sorted { $0.date < $1.date }.filter { trade in
+            guard undated.contains(trade.symbol), !skipped.contains(trade.symbol) else { return true }
+            skipped.insert(trade.symbol)
+            return false
+        }
+        let dates = buys.map(\.date) + p.holdings.compactMap(\.purchaseDate)
         for date in dates { insertMonth(YearMonth(date)) }
     }
 
@@ -54,16 +64,28 @@ extension GameState {
         return FundVisit(new: true, cardXP: card.isEmpty ? 0 : (GameRules.xp[.firstDexCard] ?? 0))
     }
 
-    /// 記一筆配息: +20 once per code and payment month, whatever the amount; the key stays after the record is deleted,
-    /// so deleting and adding it again earns nothing (ruling R34).
-    mutating func logDividend(symbol: String, paid date: Date) -> [XPEvent] {
-        awardOnce(.dividendLogged, key: "dividend|\(symbol)|\(YearMonth(date).key)")
+    /// 記一筆配息: +20, whatever the amount (ruling R34), only for a dividend that could be this month's news
+    /// (re-review N1):
+    /// - the code is one the user holds;
+    /// - it was paid this or last Taipei month, not in the future, and not before the game started on this phone
+    ///   (`migratedAt`), so typing in history records it and pays nothing, like `logBuy`;
+    /// - once per code and payment month: the key stays after the record is deleted, so adding it again earns nothing;
+    /// - at most `GameRules.dividendXPPerMonth` paid in one Taipei month, like the dex cards.
+    mutating func logDividend(symbol: String, paid date: Date, held: Bool, now: Date) -> [XPEvent] {
+        let month = YearMonth(date), current = YearMonth(now)
+        guard held, date <= now, month == current || month == current.previous() else { return [] }
+        if let migratedAt, date < GameRules.taipei.startOfDay(for: migratedAt) { return [] }
+        let paidIn = "dividendPaidIn|\(current.key)|"
+        guard rewardKeys.filter({ $0.hasPrefix(paidIn) }).count < GameRules.dividendXPPerMonth else { return [] }
+        let events = awardOnce(.dividendLogged, key: "dividend|\(symbol)|\(month.key)")
+        if !events.isEmpty { rewardKeys.insert(paidIn + "\(symbol)|\(month.key)") }
+        return events
     }
 
-    /// A broker statement imported over the holdings: 對帳 experience and its counter once per Taipei day, and the
-    /// 完成一次對帳 quest when it is this month's.
+    /// A broker statement imported over the holdings: 對帳 experience and its counter once per Taipei month, the
+    /// quest's cadence (re-review N2), and the 完成一次對帳 quest when it is this month's.
     mutating func reconcile(now: Date) -> [XPEvent] {
-        awardOnce(.reconciled, key: "reconciled|\(Self.day(now))") + complete(.reconciled, now: now)
+        awardOnce(.reconciled, key: "reconciled|\(YearMonth(now).key)") + complete(.reconciled, now: now)
     }
 
     /// 費用比較 opened with at least two funds: counts toward 省費達人 once per Taipei day.
@@ -80,7 +102,7 @@ extension GameState {
         return [event]
     }
 
-    /// 「2026-11-13」 in Taipei time.
+    /// 「2026-11-12」 in Taipei time.
     static func day(_ date: Date) -> String {
         let c = GameRules.taipei.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", c.year ?? 1970, c.month ?? 1, c.day ?? 1)

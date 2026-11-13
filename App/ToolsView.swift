@@ -98,6 +98,10 @@ private struct ToolTileBackground: View {
     }
 }
 enum ComparisonDefaults {
+    /// The user chose two or more funds themselves; the padded defaults do not count (re-review N3).
+    static func picked(_ saved: [String]?) -> Bool {
+        Set((saved ?? []).filter { DataChecks.code($0) }).count >= 2
+    }
     static func symbols(_ saved: [String]?) -> [String] {
         var result: [String] = []
         for code in (saved ?? []) where result.count < 3 && !result.contains(code) { result.append(code) }
@@ -165,8 +169,8 @@ struct ComparisonView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("三檔比較").font(.headline).foregroundStyle(Palette.ink); Text("選擇最多三檔 ETF 進行績效與指標比較").font(.caption2).foregroundStyle(Palette.muted) } } }
-        // 費用比較 with at least two funds counts toward 省費達人, once a day.
-        .onAppear { if ComparisonDefaults.symbols(store.data.comparison).count >= 2 { try? store.updateGame { _ = $0.compareFees(now: Date()) } } }
+        // 費用比較 with at least two funds the user picked counts toward 省費達人, once a day.
+        .onAppear { if ComparisonDefaults.picked(store.data.comparison) { try? store.updateGame { _ = $0.compareFees(now: Date()) } } }
     }
     private func chip(_ index: Int, symbols: [String]) -> some View {
         let code = symbols.indices.contains(index) ? symbols[index] : nil
@@ -397,6 +401,7 @@ struct ReminderCenterView: View {
                 ForEach(Onboarding.days, id: \.self) { Text("每月 \($0) 日").tag($0) }
             }
             .padding(.top, 8)
+            .disabled(!dcaOn)
             .accessibilityIdentifier("reminder-dca-day")
             DatePicker("提醒時間", selection: Binding(get: { DCAReminders.time(dcaMinutes) }, set: { dcaMinutes = DCAReminders.minutes($0); reschedule() }), displayedComponents: .hourAndMinute)
                 .disabled(!dcaOn)

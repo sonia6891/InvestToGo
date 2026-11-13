@@ -157,13 +157,6 @@ jobs:
           RELEASE_DSN=$(sed -n 's/^ *SENTRY_DSN = //p' build/release-settings.txt | head -n 1)
           test "$RELEASE_DSN" = 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632' || { echo "::error::Release SENTRY_DSN resolved to '$RELEASE_DSN'"; exit 1; }
           echo 'Verified full SENTRY_DSN in Release'
-      - name: Compile Release (build only, no run)
-        # Sentry is live only in Release and `#if DEBUG` routes differ, so Release must compile before archive time
-        # (final review M2). One simulator architecture keeps it short; nothing is installed or run.
-        timeout-minutes: 15
-        run: |
-          set -euo pipefail
-          xcodebuild build -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ReleaseDerivedData ONLY_ACTIVE_ARCH=YES ARCHS=arm64 CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/release-compile.log
       - name: Capture the lobby and every feature screen
         timeout-minutes: 10
         continue-on-error: true
@@ -228,6 +221,14 @@ jobs:
         run: |
           set -euo pipefail
           xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/tests.log
+      - name: Compile Release (build only, no run)
+        # Sentry is live only in Release and `#if DEBUG` routes differ, so Release must compile before archive time
+        # (final review M2). One simulator architecture keeps it short; nothing is installed or run. It runs after the
+        # Debug tests, so a Release-only error still fails the job without hiding their results (re-review N4).
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          xcodebuild build -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ReleaseDerivedData ONLY_ACTIVE_ARCH=YES ARCHS=arm64 CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/release-compile.log
       - name: Export UI test screenshots
         if: always()
         run: |

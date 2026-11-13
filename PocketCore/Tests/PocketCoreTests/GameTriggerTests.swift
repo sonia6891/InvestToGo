@@ -6,7 +6,7 @@ final class GameTriggerTests: XCTestCase {
     private func date(_ y: Int, _ m: Int, _ d: Int, hour: Int = 12) -> Date {
         GameRules.taipei.date(from: DateComponents(year: y, month: m, day: d, hour: hour))!
     }
-    private let now = GameRules.taipei.date(from: DateComponents(year: 2026, month: 11, day: 13, hour: 12))!
+    private let now = GameRules.taipei.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 12))!
 
     // MARK: Migration
 
@@ -143,15 +143,55 @@ final class GameTriggerTests: XCTestCase {
 
     func testDividendExperienceOncePerCodeAndPaymentMonth() {
         var g = GameState()
-        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 18)), [.dividendLogged])
-        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 20)), [], "Deleted and logged again: nothing")
-        XCTAssertEqual(g.logDividend(symbol: "0056", paid: date(2026, 11, 18)), [.dividendLogged])
-        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2027, 2, 18)), [.dividendLogged])
-        XCTAssertEqual(g.xp, 60)
-        XCTAssertEqual(g.counter(.dividendLogged), 3)
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 6), held: true, now: now), [.dividendLogged])
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 10), held: true, now: now), [], "Deleted and logged again: nothing")
+        XCTAssertEqual(g.logDividend(symbol: "0056", paid: date(2026, 10, 18), held: true, now: now), [.dividendLogged], "Last month still counts")
+        XCTAssertEqual(g.xp, 40)
+        XCTAssertEqual(g.counter(.dividendLogged), 2)
     }
 
-    func testReconcileOncePerDayAndFinishesTheQuest() {
+    /// Re-review N1: changing the code or the month no longer farms experience.
+    func testDividendExperienceNeedsAHeldCodeARecentPaymentAndACap() {
+        var g = GameState()
+        XCTAssertEqual(g.logDividend(symbol: "9999", paid: date(2026, 11, 6), held: false, now: now), [], "A code not held")
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 20), held: true, now: now), [], "Not paid yet")
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2027, 2, 18), held: true, now: now), [], "A future month")
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 9, 18), held: true, now: now), [], "Two months back is history")
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2024, 11, 6), held: true, now: now), [])
+        XCTAssertEqual(g.xp, 0)
+        XCTAssertTrue(g.rewardKeys.isEmpty, "Nothing paid, nothing spent: a later real log can still earn")
+        // Three a month, like the dex cards.
+        for code in ["0050", "0056", "00878"] { XCTAssertEqual(g.logDividend(symbol: code, paid: date(2026, 11, 6), held: true, now: now), [.dividendLogged]) }
+        XCTAssertEqual(g.logDividend(symbol: "00919", paid: date(2026, 11, 6), held: true, now: now), [], "The fourth this month earns nothing")
+        XCTAssertEqual(g.xp, 60)
+        XCTAssertEqual(g.logDividend(symbol: "00919", paid: date(2026, 12, 2), held: true, now: date(2026, 12, 3)), [.dividendLogged], "A new Taipei month starts again")
+    }
+
+    func testDividendsPaidBeforeTheGameStartedEarnNothing() {
+        var g = GameState()
+        g.migrate(Portfolio(), now: now)
+        XCTAssertEqual(g.migratedAt, now)
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 6), held: true, now: now), [], "Typed in after upgrading: history")
+        XCTAssertEqual(g.logDividend(symbol: "00878", paid: date(2026, 11, 12, hour: 1), held: true, now: now), [.dividendLogged], "Paid the day the game started")
+        g.migrate(Portfolio(), now: date(2026, 12, 1))
+        XCTAssertEqual(g.migratedAt, now, "Set once")
+        XCTAssertNoThrow(try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(g)))
+        XCTAssertEqual(try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(g)).migratedAt, now)
+    }
+
+    /// Re-review N6: a holding saved without a purchase date logged its buy on the day it was typed in.
+    func testBackfillSkipsTheEntryDayOfAnUndatedHolding() {
+        var p = Portfolio()
+        let undated = Holding(symbol: "0056", name: "元大高股息", shares: 1000, unitCost: 30, broker: "", strategy: .income)
+        p.holdings = [undated]
+        p.log(.buy, undated, date: date(2026, 7, 2))
+        p.log(.buy, undated, date: date(2026, 9, 6))
+        var g = GameState()
+        g.backfillDCA(from: p)
+        XCTAssertEqual(g.dcaMonths, [YearMonth(year: 2026, month: 9)], "The entry day is not a debit; a later buy is")
+    }
+
+    func testReconcileOncePerMonthAndFinishesTheQuest() {
         var g = GameState()
         g.dcaMonths = [YearMonth(now)]
         g.habit = .dca
@@ -163,9 +203,11 @@ final class GameTriggerTests: XCTestCase {
         g.dcaMonths = [YearMonth(month)]
         XCTAssertEqual(g.reconcile(now: month), [.reconciled, .questDone])
         XCTAssertEqual(g.reconcile(now: month), [], "A second import the same day earns nothing")
+        let ym = YearMonth(month), laterThisMonth = date(ym.year, ym.month, 25)
+        XCTAssertEqual(g.reconcile(now: laterThisMonth), [], "Nor another day the same Taipei month (re-review N2)")
         XCTAssertEqual(g.counter(.reconciled), 1)
-        let tomorrow = GameRules.taipei.date(byAdding: .day, value: 1, to: month)!
-        XCTAssertEqual(g.reconcile(now: tomorrow), [.reconciled])
+        let nextMonth = GameRules.taipei.date(byAdding: .month, value: 1, to: month)!
+        XCTAssertEqual(g.reconcile(now: nextMonth).first, .reconciled)
         XCTAssertEqual(g.counter(.reconciled), 2)
     }
 

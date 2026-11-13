@@ -64,7 +64,7 @@ final class GameTriggerStoreTests: XCTestCase {
         XCTAssertEqual(FundDetail.toastText(fourth), "收進圖鑑", "Past this month's three, no experience is promised")
     }
 
-    @MainActor func testBrokerImportReconcilesOncePerDay() throws {
+    @MainActor func testBrokerImportReconcilesOncePerMonth() throws {
         let s = store()
         let holding = Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "A", strategy: .saving)
         let preview = BrokerPreview(holdings: [holding], sourceAccount: "主", broker: "A")
@@ -72,13 +72,14 @@ final class GameTriggerStoreTests: XCTestCase {
         XCTAssertEqual(game(s).counter(.reconciled), 1)
         XCTAssertEqual(game(s).lastAward, .reconciled)
         try s.importBroker(preview, replaceAccount: true)
-        XCTAssertEqual(game(s).counter(.reconciled), 1, "The same day again earns nothing")
+        XCTAssertEqual(game(s).counter(.reconciled), 1, "The same month again earns nothing")
         try s.importBroker(BrokerPreview(holdings: [], sourceAccount: "空", broker: "B"), replaceAccount: false)
         XCTAssertEqual(game(s).counter(.reconciled), 1)
     }
 
     @MainActor func testDeletingAndLoggingADividendAgainEarnsNothing() throws {
         let s = store()
+        try s.save(Holding(symbol: "00878", name: "國泰永續高股息", shares: 1000, unitCost: 20, broker: "", strategy: .income))
         let record = Dividend(symbol: "00878", date: Date(), amount: 1500, status: .paid)
         try s.saveDividend(record, rewardNew: true)
         XCTAssertEqual(game(s).xp, 20)
@@ -86,7 +87,15 @@ final class GameTriggerStoreTests: XCTestCase {
         try s.saveDividend(Dividend(symbol: "00878", date: Date(), amount: 1500, status: .paid), rewardNew: true)
         XCTAssertEqual(game(s).xp, 20, "Same code, same payment month: the key was already paid")
         XCTAssertEqual(s.pendingReward, 20, "Nothing earned, no second toast")
-        XCTAssertEqual(store().data.game?.rewardKeys.count, 1, "The awarded key is saved with the game")
+        XCTAssertEqual(store().data.game?.rewardKeys.contains("dividend|00878|\(YearMonth(Date()).key)"), true, "The awarded key is saved with the game")
+    }
+
+    @MainActor func testADividendOfACodeNotHeldEarnsNothing() throws {
+        let s = store()
+        try s.saveDividend(Dividend(symbol: "0056", date: Date(), amount: 900, status: .paid), rewardNew: true)
+        XCTAssertEqual(s.data.dividends.count, 1, "Still recorded")
+        XCTAssertEqual(game(s).xp, 0, "Re-review N1: only a held code pays")
+        XCTAssertEqual(s.pendingReward, 0)
     }
 
     // MARK: Launch

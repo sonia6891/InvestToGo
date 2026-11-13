@@ -9,7 +9,7 @@ extension PortfolioStore {
             if let i = next.holdings.firstIndex(where: { $0.id == holding.id }) { next.holdings[i] = holding } else { next.holdings.append(holding) }
             next.log(.brokerImport, holding)
         }
-        // A statement imported over the holdings is a reconciliation: 對帳 experience once a day, and the quest.
+        // A statement imported over the holdings is a reconciliation: 對帳 experience once a Taipei month, and the quest.
         if !preview.holdings.isEmpty {
             var game = next.game ?? GameState()
             _ = game.reconcile(now: now)

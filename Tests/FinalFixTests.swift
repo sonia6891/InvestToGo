@@ -55,6 +55,15 @@ final class FinalFixTests: XCTestCase {
         XCTAssertLessThan(inSeries, 3, "The chip narrows the count")
     }
 
+    /// Re-review N3: 省費達人 counts only a comparison the user chose, not the padded defaults.
+    func testFeeComparisonNeedsTwoPickedFunds() {
+        XCTAssertFalse(ComparisonDefaults.picked(nil))
+        XCTAssertFalse(ComparisonDefaults.picked(["0050"]))
+        XCTAssertGreaterThanOrEqual(ComparisonDefaults.symbols(["0050"]).count, 2, "The screen still pads to two")
+        XCTAssertFalse(ComparisonDefaults.picked(["0050", "0050"]))
+        XCTAssertTrue(ComparisonDefaults.picked(["0050", "00878"]))
+    }
+
     func testResetNeedsUITesting() {
         // `--reset` alone (a stale scheme argument) never wipes anything: Onboarding.reset is gated the same way as the
         // records and the skin (final review M7).

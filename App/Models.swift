@@ -132,9 +132,9 @@ import SwiftUI
     }
     func removeDividend(_ dividend: Dividend) throws { var next = data; next.dividends.removeAll { $0.id == dividend.id }; try commit(next) }
     /// Saves a dividend record. With `rewardNew` (「記一筆配息」), a new record also earns the flat 記一筆配息 experience
-    /// in the same write — the same +20 for any amount (spec 6), once per code and payment month (ruling R34);
-    /// editing a record earns nothing.
-    func saveDividend(_ dividend: Dividend, rewardNew: Bool = false) throws {
+    /// in the same write — the same +20 for any amount (spec 6), within the limits of `GameState.logDividend` (a held
+    /// code, paid recently, once per code and payment month, three a month); editing a record earns nothing.
+    func saveDividend(_ dividend: Dividend, rewardNew: Bool = false, now: Date = Date()) throws {
         guard !dividend.symbol.isEmpty, dividend.amount.isFinite, dividend.amount > 0, dividend.detailsValid else { throw AppDataError("請填寫代碼、股數與每股配息；扣繳後的入帳金額必須大於 0。") }
         var next = data
         var earned = 0
@@ -145,7 +145,8 @@ import SwiftUI
             if rewardNew {
                 var game = next.game ?? GameState()
                 let before = game.xp
-                _ = game.logDividend(symbol: dividend.symbol, paid: dividend.date); next.game = game
+                let held = next.holdings.contains { $0.symbol == dividend.symbol }
+                _ = game.logDividend(symbol: dividend.symbol, paid: dividend.date, held: held, now: now); next.game = game
                 earned = game.xp - before
             }
         }

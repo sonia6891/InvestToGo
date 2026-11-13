@@ -32,6 +32,8 @@ enum GameRules {
     static let xp: [XPEvent: Int] = [.monthlyDCA: 100, .questDone: 40, .firstDexCard: 30, .dividendLogged: 20, .reconciled: 20]
     /// New dex cards that earn experience in one Taipei calendar month; later ones are collected for nothing (R34).
     static let dexXPPerMonth = 3
+    /// 記一筆配息 experience paid at most this many times in one Taipei month (re-review N1), like the dex cards.
+    static let dividendXPPerMonth = 3
 
     /// Starts at 1, no cap.
     static func level(xp: Int) -> Int { max(0, xp) / xpPerLevel + 1 }
