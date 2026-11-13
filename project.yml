@@ -74,6 +74,9 @@ targets:
       - target: ETFToGo
     settings:
       base:
+        # `@testable import ETFToGo` loads Sentry's module; the test bundle finds it beside the app instead of linking
+        # a second copy of the SDK.
+        FRAMEWORK_SEARCH_PATHS: '$(inherited) $(BUILT_PRODUCTS_DIR) $(BUILT_PRODUCTS_DIR)/PackageFrameworks'
         GENERATE_INFOPLIST_FILE: YES
         TARGETED_DEVICE_FAMILY: '1'
   ETFToGoUITests:

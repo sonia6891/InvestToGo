@@ -151,7 +151,8 @@ jobs:
           # Sentry (Task 14): the Debug app CI runs carries an empty SentryDSN, so it sends nothing; the Release
           # setting resolves to the whole DSN (`//` and `@` intact).
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p.get('SentryDSN', None) == '', repr(p.get('SentryDSN', None)); print('Verified empty SentryDSN in Debug')"
-          xcodebuild -showBuildSettings -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData > build/release-settings.txt
+          # -target, not -scheme (the two are exclusive): one target, so the first SENTRY_DSN line is the app's.
+          xcodebuild -showBuildSettings -project ETFToGo.xcodeproj -target ETFToGo -configuration Release -sdk iphonesimulator > build/release-settings.txt
           RELEASE_DSN=$(sed -n 's/^ *SENTRY_DSN = //p' build/release-settings.txt | head -n 1)
           test "$RELEASE_DSN" = 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632' || { echo "::error::Release SENTRY_DSN resolved to '$RELEASE_DSN'"; exit 1; }
           echo 'Verified full SENTRY_DSN in Release'

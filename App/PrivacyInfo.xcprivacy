@@ -17,5 +17,20 @@
 <key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string></array>
 </dict>
 </array>
-<key>NSPrivacyAccessedAPITypes</key><array/>
+<!-- The app's own @AppStorage/UserDefaults, and Sentry's required-reason APIs: it is linked statically, so its own
+     privacy manifest is not shipped and its reasons are declared here. -->
+<key>NSPrivacyAccessedAPITypes</key><array>
+<dict>
+<key>NSPrivacyAccessedAPIType</key><string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+<key>NSPrivacyAccessedAPITypeReasons</key><array><string>CA92.1</string></array>
+</dict>
+<dict>
+<key>NSPrivacyAccessedAPIType</key><string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+<key>NSPrivacyAccessedAPITypeReasons</key><array><string>35F9.1</string></array>
+</dict>
+<dict>
+<key>NSPrivacyAccessedAPIType</key><string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+<key>NSPrivacyAccessedAPITypeReasons</key><array><string>C617.1</string></array>
+</dict>
+</array>
 </dict></plist>

@@ -26,10 +26,11 @@ enum CrashReporting {
     }
 
     /// A load failure the user was shown (`context`: "catalog", "dividends", "market"). At most one event per context
-    /// per launch; offline, timed-out and cancelled requests are never sent. Does nothing when Sentry is off.
-    static func capture(_ error: Error, context: String) {
+    /// per launch. Nothing is sent while `offline` (the phone has no network, and errors then are often URLErrors
+    /// wrapped in AppDataError text), nor for offline, timed-out and cancelled requests. Does nothing when Sentry is off.
+    static func capture(_ error: Error, context: String, offline: Bool) {
         lock.lock()
-        let send = started && gate.admit(error, context: context)
+        let send = started && gate.admit(error, context: context, offline: offline)
         lock.unlock()
         guard send else { return }
         SentrySDK.capture(error: error) { scope in scope.setTag(value: context, key: "load") }
@@ -96,18 +97,29 @@ struct CrashReportingConfig: Equatable {
 }
 
 /// Money never leaves the phone: every number with a comma or decimal point, and every plain number of six or
-/// more digits, becomes `<n>`. Four- and five-digit codes (0050, 00878) stay.
+/// more digits, becomes `<n>`; the full-width comma counts. Four- and five-digit codes (0050, 00878) stay.
 enum CrashScrub {
-    private static let pattern = try! NSRegularExpression(pattern: #"\d+(?:[.,]\d+)+|\d{6,}"#)
+    private static let pattern = try! NSRegularExpression(pattern: #"\d+(?:[.,，]\d+)+|\d{6,}"#)
 
     static func scrub(_ text: String) -> String {
         pattern.stringByReplacingMatches(in: text, range: NSRange(text.startIndex..., in: text), withTemplate: "<n>")
     }
 
-    /// The event message, exception values and breadcrumb messages.
+    /// The event message, exception values, mechanism descriptions and breadcrumb messages. The NSError user info
+    /// (context "user info", mechanism data) is dropped whole: it can hold any text.
     static func scrub(_ event: Event) -> Event {
+        // No user at all: the SDK fills user.userId with its installation UUID in prepareEvent, before beforeSend runs,
+        // so sendDefaultPii = false alone does not keep it off the event.
+        event.user = nil
         if let message = event.message { event.message = SentryMessage(formatted: scrub(message.formatted)) }
-        event.exceptions?.forEach { $0.value = scrub($0.value) }
+        event.exceptions?.forEach { exception in
+            exception.value = scrub(exception.value)
+            if let mechanism = exception.mechanism {
+                if let desc = mechanism.desc { mechanism.desc = scrub(desc) }
+                mechanism.data = nil
+            }
+        }
+        event.context?.removeValue(forKey: "user info")
         event.breadcrumbs?.forEach { crumb in if let message = crumb.message { crumb.message = scrub(message) } }
         return event
     }
@@ -118,8 +130,10 @@ struct CrashReportGate {
     private var sent: Set<String> = []
 
     /// True when this failure should be sent; a sent context is closed for the rest of the launch.
-    mutating func admit(_ error: Error, context: String) -> Bool {
-        guard Self.isReportable(error), !sent.contains(context) else { return false }
+    /// `offline`: the phone has no network, so the failure is the connection whatever error carries it; it does not
+    /// use up the context's event.
+    mutating func admit(_ error: Error, context: String, offline: Bool = false) -> Bool {
+        guard !offline, Self.isReportable(error), !sent.contains(context) else { return false }
         sent.insert(context)
         return true
     }

@@ -60,6 +60,43 @@ final class CrashReportingTests: XCTestCase {
         XCTAssertEqual(CrashScrub.scrub("0050"), "0050")
         XCTAssertEqual(CrashScrub.scrub("00878"), "00878")
         XCTAssertEqual(CrashScrub.scrub("0050 成本 NT$ 1,200,000 配息 12.5"), "0050 成本 NT$ <n> 配息 <n>")
+        XCTAssertEqual(CrashScrub.scrub("NT$255,277"), "NT$<n>")
+        XCTAssertEqual(CrashScrub.scrub("-1,234"), "-<n>")
+        XCTAssertEqual(CrashScrub.scrub("17.91%"), "<n>%")
+        XCTAssertEqual(CrashScrub.scrub("255，277"), "<n>", "the full-width comma counts")
+        XCTAssertEqual(CrashScrub.scrub("📈 元大台灣50（0050）持有 1,000 股，市值 NT$ 123,456.78 元；00878 漲 1.2%🎉"),
+                       "📈 元大台灣50（0050）持有 <n> 股，市值 NT$ <n> 元；00878 漲 <n>%🎉")
+    }
+
+    func testOptionsCarryEveryField() throws {
+        // Building Options does not start the SDK.
+        let config = try XCTUnwrap(make(Self.dsn))
+        let options = config.options()
+        XCTAssertEqual(options.dsn, Self.dsn)
+        XCTAssertEqual(options.environment, "production")
+        XCTAssertFalse(options.sendDefaultPii)
+        XCTAssertNil(options.tracesSampleRate)
+        XCTAssertFalse(options.enableAutoPerformanceTracing)
+        XCTAssertEqual(options.sessionReplay.sessionSampleRate, 0)
+        XCTAssertEqual(options.sessionReplay.onErrorSampleRate, 0)
+        XCTAssertTrue(options.enableAutoBreadcrumbTracking)
+        XCTAssertFalse(options.enableUserInteractionTracing)
+        XCTAssertFalse(options.enableNetworkBreadcrumbs)
+        XCTAssertFalse(options.enableCaptureFailedRequests)
+        XCTAssertFalse(options.attachScreenshot)
+        XCTAssertFalse(options.attachViewHierarchy)
+        XCTAssertTrue(options.enableAppHangTracking)
+        XCTAssertFalse(options.enableAutoSessionTracking)
+        XCTAssertFalse(options.sendClientReports)
+        XCTAssertNotNil(options.beforeSend)
+    }
+
+    func testNothingIsAdmittedWhileOffline() {
+        var gate = CrashReportGate()
+        // Offline, the sources' URLErrors arrive wrapped in AppDataError text.
+        XCTAssertFalse(gate.admit(AppDataError("無法更新官方配息資料，保留原本資料。上市：連線中斷"), context: "dividends", offline: true))
+        XCTAssertTrue(gate.admit(AppDataError("名單數量異常減少，保留原有清單。"), context: "dividends", offline: false),
+                      "an offline failure does not use up the context's event")
     }
 
     func testOneEventPerContextPerLaunch() {

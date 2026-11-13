@@ -8,14 +8,20 @@ extension OfficialDividends {
         // A record without its start day holds data read from the TWSE website: start over from the notices.
         if next.since == nil { next = OfficialDividends(sources: ["since": DataChecks.day()]) }
         var errors: [String] = []
+        // Both sources offline, timed out or cancelled: the URLError itself is thrown, so crash reporting skips it.
+        var unreachable: [URLError] = []
         for (market, url, label) in [("TWSE", twseURL, "上市"), ("TPEx", tpexURL, "上櫃")] {
             do {
                 let bytes = try await PublicHTTP.get(url)
                 let fresh = try decode(bytes, market: market, markets: markets)
                 next = next.merging(fresh, frequency: market == "TWSE")
                 next.sources[market.lowercased()] = DataChecks.day()
-            } catch { errors.append("\(label)：\(error.localizedDescription)") }
+            } catch {
+                errors.append("\(label)：\(error.localizedDescription)")
+                if let url = error as? URLError, !CrashReportGate.isReportable(url) { unreachable.append(url) }
+            }
         }
+        if unreachable.count == 2 { throw unreachable[0] }
         if errors.count == 2 { throw AppDataError("無法更新官方配息資料，保留原本資料。\(errors.joined(separator: "；"))") }
         return next
     }
