@@ -8,6 +8,8 @@ enum AppRoute: Hashable {
     case recentDividends, yearDividends, dividendDetail(UUID), dividendForm(id: UUID?, symbol: String?, officialEx: String?, holding: UUID? = nil), dividendDone(UUID)
     case holdingDetail(UUID), holdingForm(id: UUID?, symbol: String?), tradeForm
     case watchlist, basis(String), dexCard(String)
+    /// A fund's 詳情 by code. The app pushes `Fund` values; this route is only for `--open detail` (UI tests).
+    case fundDetail(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
     case member, skins
@@ -41,6 +43,7 @@ struct RouteView: View {
         case .watchlist: WatchlistView()
         case .basis(let symbol): BasisView(symbol: symbol)
         case .dexCard(let symbol): DexCardView(symbol: symbol)
+        case .fundDetail(let symbol): FundDetailBySymbol(symbol: symbol)
         case .plan: PlanView()
         case .goal: GoalView()
         case .calculator: CalculatorView()
@@ -63,6 +66,12 @@ struct RouteView: View {
         #endif
         }
     }
+}
+/// 詳情 for a fund code, looked up in the catalogue when the screen is built (`AppRoute.fundDetail`, UI tests only).
+private struct FundDetailBySymbol: View {
+    let symbol: String
+    @EnvironmentObject private var store: PortfolioStore
+    var body: some View { FundDetail(fund: store.dexFund(symbol)) }
 }
 extension View {
     func appRoutes() -> some View {

@@ -33,12 +33,18 @@ enum Feature: String, CaseIterable, Hashable {
 }
 
 extension AppRoute {
-    /// `--open member` and `--open skins` (UI tests, screenshots): 工具 with 會員, and 換膚 above it.
+    /// `--open member` and `--open skins` (UI tests, screenshots): 工具 with 會員, and 換膚 above it. With
+    /// `--ui-testing` only, `--open detail --symbol <code>` and `--open dex --symbol <code>`: 找 ETF with that fund's
+    /// 詳情, or its 圖鑑卡, above it (the CI four-skin screenshot matrix). The code defaults to 0050.
     static func launchStack(_ arguments: [String]) -> [AppRoute]? {
         guard let i = arguments.firstIndex(of: "--open"), arguments.indices.contains(i + 1) else { return nil }
+        let testing = arguments.contains("--ui-testing")
+        let symbol = arguments.firstIndex(of: "--symbol").flatMap { arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil } ?? "0050"
         switch arguments[i + 1] {
         case "member": return [.feature(.tools), .member]
         case "skins": return [.feature(.tools), .member, .skins]
+        case "detail" where testing: return [.feature(.find), .fundDetail(symbol)]
+        case "dex" where testing: return [.feature(.find), .dexCard(symbol)]
         default: return nil
         }
     }

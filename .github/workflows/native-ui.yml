@@ -15,6 +15,82 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test PocketCore
         run: swift test --package-path PocketCore
+  skin-matrix:
+    # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
+    # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the
+    # 44 launches never push that job past its limit.
+    needs: core
+    runs-on: macos-26
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate complete Xcode project
+        run: |
+          set -euo pipefail
+          sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+          test "$(xcodebuild -version | head -n 1)" = 'Xcode 26.6'
+          brew install xcodegen
+          xcodegen generate
+      - name: Boot an available iPhone simulator
+        id: device
+        run: |
+          set -euo pipefail
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin); print(next(x["udid"] for runtime,items in d["devices"].items() if "iOS" in runtime for x in items if "iPhone" in x["name"]))')
+          echo "udid=$DEVICE" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl status_bar "$DEVICE" override --time 9:41 --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100
+          xcrun simctl ui "$DEVICE" appearance light
+      - name: Compile native app
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/matrix
+          xcodebuild build -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
+      - name: Capture four skins × eleven screens
+        timeout-minutes: 20
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -euo pipefail
+          xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+          # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就).
+          SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements"
+          for SKIN in blackgold sketch stitch voxel; do
+            for SCREEN in $SCREENS; do
+              case "$SCREEN" in
+                onboarding) OPEN="onboarding --page 1"; NAME=onboarding1 ;;
+                detail|dex) OPEN="$SCREEN --symbol 0050"; NAME=$SCREEN ;;
+                *) OPEN="$SCREEN"; NAME=$SCREEN ;;
+              esac
+              xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+              # --reset each time: every shot starts from the same seeded state (the first 詳情 visit collects a
+              # card, which would otherwise show its toast in the first skin only).
+              # shellcheck disable=SC2086
+              xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --skin "$SKIN" --open $OPEN
+              sleep 5
+              xcrun simctl io "$DEVICE" screenshot "build/matrix/$SKIN-$NAME.png"
+            done
+          done
+          ls build/matrix | wc -l
+      - name: Lay out the contact sheet
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python3 -m venv build/venv
+          build/venv/bin/pip install --quiet pillow
+          build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
+      - name: Publish the skin matrix
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETFToGo-skin-matrix
+          path: |
+            build/matrix/
+            build/compile.log
+          retention-days: 14
   simulator:
     needs: core
     runs-on: macos-26

@@ -71,7 +71,7 @@ struct RootView: View {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
         let arguments = ProcessInfo.processInfo.arguments
         if let stack = AppRoute.launchStack(arguments) {
-            _feature = State(initialValue: .tools)
+            if case .feature(let first) = stack.first { _feature = State(initialValue: first) } else { _feature = State(initialValue: nil) }
             _path = State(initialValue: NavigationPath(stack))
         } else {
             let start = Feature.launch(arguments)
