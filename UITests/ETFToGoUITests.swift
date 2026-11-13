@@ -677,4 +677,132 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10))
         XCTAssertFalse(level.waitForExistence(timeout: 4), "Shown once: not again after a relaunch")
     }
+
+    // MARK: Feel, states and accessibility (spec 3.5, 7.1, 9; Task 12)
+
+    /// 大廳 → 配息 → 記一筆 (saved). The form closes onto 配息.
+    private func logDividendFromLobby(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(app.buttons["lobby-dividends"].waitForExistence(timeout: 10), "The lobby opens", file: file, line: line)
+        app.buttons["lobby-dividends"].tap()
+        let log = app.buttons["dividends-log"]
+        XCTAssertTrue(log.waitForExistence(timeout: 5), "配息 opens", file: file, line: line); log.tap()
+        let symbol = app.textFields["dividend-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5), "「記一筆配息」 opens the dividend form", file: file, line: line)
+        symbol.tap(); symbol.typeText("0050")
+        app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
+        app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
+        app.buttons["save-dividend"].tap()
+    }
+
+    /// With `--reduce-motion` the whole loop still works and no burst of shards is ever drawn. The same loop without
+    /// it shows the burst first, so the check below can see one when it is there.
+    func testReduceMotionStillWorks() {
+        let burst = { (app: XCUIApplication) in app.descendants(matching: .any)["burst"] }
+        let moving = launch([])
+        logDividendFromLobby(moving)
+        XCTAssertTrue(burst(moving).waitForExistence(timeout: 5), "Without Reduce Motion the coin lands with a burst")
+        moving.terminate()
+
+        let app = launch(["--reduce-motion"])
+        logDividendFromLobby(app)
+        let toast = app.staticTexts["dividend-xp-toast"]
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "The reward still shows with Reduce Motion")
+        XCTAssertFalse(burst(app).waitForExistence(timeout: 3), "Reduce Motion: no shards")
+        capture(app, "reduce-motion-dividend")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "Back in the lobby")
+        XCTAssertFalse(burst(app).exists, "Reduce Motion: no shards in the lobby either")
+    }
+
+    /// Scrolls until the element is on screen and can be tapped, without tapping it.
+    private func assertReachable(_ app: XCUIApplication, _ element: XCUIElement, _ name: String, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(element.waitForExistence(timeout: 5), "\(name) exists", file: file, line: line)
+        for _ in 0..<6 where !(element.exists && element.isHittable) { app.swipeUp() }
+        XCTAssertTrue(element.isHittable, "\(name) can be tapped at the largest text size", file: file, line: line)
+    }
+
+    /// At the largest accessibility text size the main buttons of 大廳 → 找 ETF → 詳情 can all be tapped.
+    func testLargestTextMainFlow() {
+        let app = launch(["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
+        let find = app.buttons["lobby-find"]
+        XCTAssertTrue(find.waitForExistence(timeout: 10), "The lobby opens")
+        sleep(1); capture(app, "largest-text-lobby")
+        for entry in ["lobby-find", "lobby-dividends", "lobby-pocket", "lobby-tools"] { XCTAssertTrue(app.buttons[entry].isHittable, "\(entry) can be tapped") }
+        find.tap()
+        let search = app.textFields["fund-search"]
+        assertReachable(app, search, "The search field")
+        XCTAssertTrue(app.buttons["bar-lobby"].isHittable, "‹ 大廳 can be tapped")
+        XCTAssertTrue(app.buttons["bar-quick"].isHittable, "The quick pick can be tapped")
+        sleep(1); capture(app, "largest-text-find")
+        search.tap(); search.typeText("0050\n")
+        let row = app.staticTexts["元大台灣50"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "0050 is listed")
+        XCTAssertTrue(row.isHittable, "The row can be tapped"); row.tap()
+        assertReachable(app, app.buttons["圖鑑卡"], "圖鑑卡")
+        sleep(1); capture(app, "largest-text-detail")
+        assertReachable(app, app.buttons["走勢"], "走勢")
+        assertReachable(app, app.buttons["資訊"], "資訊")
+        XCTAssertTrue(app.buttons["bar-lobby"].isHittable, "‹ 大廳 can be tapped on the detail")
+    }
+
+    /// Whether any pixel of the screenshot is within ±6 of the colour on every channel.
+    private func screenshotContains(_ shot: XCUIScreenshot, _ colour: UInt32) -> Bool {
+        guard let image = shot.image.cgImage, let space = CGColorSpace(name: CGColorSpace.sRGB) else { return false }
+        let width = image.width, height = image.height
+        var bytes = [UInt8](repeating: 0, count: width * height * 4)
+        let drawn: Bool = bytes.withUnsafeMutableBytes { buffer in
+            guard let context = CGContext(data: buffer.baseAddress, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4,
+                                          space: space, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+            context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height)); return true
+        }
+        guard drawn else { return false }
+        let r = Int((colour >> 16) & 0xFF), g = Int((colour >> 8) & 0xFF), b = Int(colour & 0xFF)
+        var i = 0
+        while i < bytes.count {
+            if abs(Int(bytes[i]) - r) <= 6, abs(Int(bytes[i + 1]) - g) <= 6, abs(Int(bytes[i + 2]) - b) <= 6 { return true }
+            i += 4
+        }
+        return false
+    }
+
+    /// Black-gold → 手繪 in the carousel, then every main screen: on sketch paper, with no black-gold gold left anywhere.
+    func testSkinSwitchLeavesNoOldColor() {
+        let app = launch(["--skin", "blackgold", "--demo-level", "7", "--demo-streak", "12", "--open", "tools"])
+        openSkins(app)
+        app.buttons["skin-badge-sketch"].tap()
+        waitForLabel(app.buttons["skin-apply"], "換上這套")
+        app.buttons["skin-apply"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "換上這套 goes back to the lobby")
+        let screens: [(String, XCUIElement)] = [
+            ("lobby", app.buttons["lobby-find"]),
+            ("find", app.textFields["fund-search"]),
+            ("pocket", app.buttons["pocket-add"]),
+            ("dividends", app.buttons["dividends-log"]),
+            ("tools", app.buttons["tool-backup"]),
+        ]
+        for (name, marker) in screens {
+            if name == "find" { app.buttons["lobby-find"].tap() } else if name != "lobby" { quickPick(app, name) }
+            XCTAssertTrue(marker.waitForExistence(timeout: 5), "\(name) opens")
+            sleep(2)
+            let shot = app.screenshot()
+            let attachment = XCTAttachment(screenshot: shot); attachment.name = "after-switch-\(name)"; attachment.lifetime = .keepAlways; add(attachment)
+            let points = [CGVector(dx: 0.015, dy: 0.3), CGVector(dx: 0.015, dy: 0.5), CGVector(dx: 0.015, dy: 0.7)]
+            let colours = points.map { pixel(app, $0) }
+            XCTAssertGreaterThanOrEqual(colours.filter { sameColour($0, 0xFAF8F3) }.count, 2,
+                                        "\(name) is on sketch paper: \(colours.map { String(format: "%06X", $0) })")
+            XCTAssertFalse(screenshotContains(shot, 0xF2B632), "\(name) has no black-gold gold left")
+        }
+    }
+
+    /// `--offline`: the thin bar at the top, and 找 ETF still lists the last data with 「再試一次」.
+    func testOfflineBar() {
+        let app = launch(["--offline", "--open", "find"])
+        let bar = app.staticTexts["offline-bar"]
+        XCTAssertTrue(bar.waitForExistence(timeout: 10), "The offline bar shows")
+        XCTAssertTrue(bar.label.hasPrefix("離線中"), "It says 離線中: \(bar.label)")
+        XCTAssertTrue(app.buttons["再試一次"].waitForExistence(timeout: 5), "找 ETF offers 「再試一次」")
+        XCTAssertTrue(app.descendants(matching: .any)["load-failed-last"].exists, "The time of the last good data is shown")
+        XCTAssertTrue(app.staticTexts["0050"].waitForExistence(timeout: 5), "The list still shows the last data")
+        sleep(1); capture(app, "offline-find")
+    }
 }
