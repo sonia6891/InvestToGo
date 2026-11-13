@@ -14,12 +14,13 @@ struct ToolsView: View {
         (.goal, "存錢目標", "離目標還差多少", .goal, "tool-goal"),
         (.crown, "會員・換膚", "四套世界任你換", .member, "tool-member"),
     ]
-    private let more: [(title: String, subtitle: String, route: AppRoute, id: String)] = [
-        ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo"),
-        ("股息複利", "配息再投入試算", .plan, "tool-plan"),
-        ("持股透視", "成分與集中度", .exposure, "tool-exposure"),
-        ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices"),
-        ("備份資料", "匯出／匯入", .backup, "tool-backup"),
+    private let more: [(title: String, subtitle: String, route: AppRoute, id: String, member: Bool)] = [
+        ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo", false),
+        ("股息複利", "配息再投入試算", .plan, "tool-plan", false),
+        ("持股透視", "成分與集中度", .exposure, "tool-exposure", false),
+        ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices", false),
+        ("存錢目標反推", "目標金額換算每月投入", .goalPlanner, "tool-goal-planner", true),
+        ("備份資料", "匯出／匯入", .backup, "tool-backup", false),
     ]
 
     var body: some View {
@@ -38,7 +39,10 @@ struct ToolsView: View {
                         NavigationLink(value: more[i].route) {
                             HStack(spacing: 10) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(more[i].title).skinFont(.title(15)).skinForeground(\.ink)
+                                    HStack(spacing: 6) {
+                                        Text(more[i].title).skinFont(.title(15)).skinForeground(\.ink)
+                                        if more[i].member { MemberCrown().frame(width: 18, height: 18) }
+                                    }
                                     Text(more[i].subtitle).skinFont(.body(12)).skinForeground(\.sub)
                                 }
                                 Spacer(minLength: 0)

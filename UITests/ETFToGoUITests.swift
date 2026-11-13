@@ -841,4 +841,13 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(member.staticTexts["至少需要兩檔持有 ETF 的成分資料才能比較重疊。"].waitForExistence(timeout: 5), "A member sees the overlap list")
         XCTAssertFalse(member.descendants(matching: .any)["member-lock-overlap"].exists, "A member sees no lock")
     }
+    /// 存錢目標反推 is a member feature: a non-member sees the lock, a member sees the monthly amount.
+    func testGoalPlannerLockAndMember() {
+        let app = launch(["--open", "goalPlanner"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-goalPlanner"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "goalPlanner"])
+        XCTAssertTrue(member.staticTexts["goal-planner-monthly"].waitForExistence(timeout: 10), "A member sees 每月需投入")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-goalPlanner"].exists)
+    }
 }
