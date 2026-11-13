@@ -43,22 +43,59 @@ enum OfficialHistory {
         return obj
     }
 
-    private static func rows(_ any: Any?) -> [[String]] {
-        (any as? [[Any]] ?? []).map { $0.map { ($0 as? String) ?? "\($0)" } }
+    private static func rows(_ any: [[Any]]) -> [[String]] {
+        any.map { $0.map { ($0 as? String) ?? "\($0)" } }
     }
 
+    /// Field name -> column index; all whitespace is removed from names ("日 期" -> "日期").
     private static func fieldIndexes(_ any: Any?) -> [String: Int] {
         var map: [String: Int] = [:]
         for (i, f) in (any as? [String] ?? []).enumerated() {
-            let key = f.trimmingCharacters(in: .whitespaces)
+            let key = f.components(separatedBy: .whitespacesAndNewlines).joined()
             if map[key] == nil { map[key] = i }
         }
         return map
     }
 
-    private static func bars(_ rows: [[String]]) -> [DailyBar] {
-        rows.compactMap { r in
-            guard r.count > 6, let date = rocDate(r[0]), let close = number(r[6]), close > 0 else { return nil }
+    /// TWSE bodies: `stat` must be OK; the 「沒有符合條件」 message means a genuinely empty result (nil).
+    private static func twseTable(_ data: Data, what: String) throws -> [String: Any]? {
+        let obj = try object(data)
+        let stat = (obj["stat"] as? String) ?? ""
+        if stat.contains("沒有符合條件") { return nil }
+        guard stat.lowercased() == "ok" else {
+            throw AppDataError("\(what)回應異常：\(stat.isEmpty ? "缺少 stat" : stat)")
+        }
+        return obj
+    }
+
+    private static func tpexTable(_ data: Data, what: String) throws -> [String: Any] {
+        let obj = try object(data)
+        guard let table = (obj["tables"] as? [[String: Any]])?.first else {
+            throw AppDataError("\(what)資料格式不符（缺少 tables）")
+        }
+        return table
+    }
+
+    /// Shared row parsing: `data` must be an array; non-empty data needs every required field and at least one parsable row.
+    private static func parseTable<T>(_ table: [String: Any], what: String, required: [String],
+                                      row: ([String: Int], [String]) -> T?) throws -> [T] {
+        guard let raw = table["data"] as? [[Any]] else {
+            throw AppDataError("\(what)資料格式不符（缺少 data）")
+        }
+        if raw.isEmpty { return [] }
+        let idx = fieldIndexes(table["fields"])
+        if let missing = required.first(where: { idx[$0] == nil }) {
+            throw AppDataError("\(what)資料欄位不符（缺少「\(missing)」）")
+        }
+        let out = rows(raw).compactMap { row(idx, $0) }
+        if out.isEmpty { throw AppDataError("\(what)資料無法解析（\(raw.count) 列皆無效）") }
+        return out
+    }
+
+    private static func barRow(_ dateKey: String, _ closeKey: String) -> ([String: Int], [String]) -> DailyBar? {
+        { idx, r in
+            guard let di = idx[dateKey], let ci = idx[closeKey], r.count > max(di, ci),
+                  let date = rocDate(r[di]), let close = number(r[ci]), close > 0 else { return nil }
             return DailyBar(date: date, close: close)
         }
     }
@@ -66,49 +103,35 @@ enum OfficialHistory {
     // MARK: Prices
 
     static func twseMonth(_ data: Data) throws -> [DailyBar] {
-        let obj = try object(data)
-        // 「很抱歉，沒有符合條件的資料!」 comes back without a data array.
-        guard obj["data"] != nil else { return [] }
-        return bars(rows(obj["data"]))
+        guard let obj = try twseTable(data, what: "證交所日成交") else { return [] }
+        return try parseTable(obj, what: "證交所日成交", required: ["日期", "收盤價"], row: barRow("日期", "收盤價"))
     }
 
     static func tpexMonth(_ data: Data) throws -> [DailyBar] {
-        let obj = try object(data)
-        guard let table = (obj["tables"] as? [[String: Any]])?.first else {
-            throw AppDataError("櫃買資料格式不符（缺少 tables）")
-        }
-        return bars(rows(table["data"]))
+        let table = try tpexTable(data, what: "櫃買日成交")
+        return try parseTable(table, what: "櫃買日成交", required: ["日期", "收盤"], row: barRow("日期", "收盤"))
     }
 
     // MARK: Dividends
 
     static func twseDividends(_ data: Data) throws -> [DividendEvent] {
-        let obj = try object(data)
-        let idx = fieldIndexes(obj["fields"])
-        guard let di = idx["資料日期"], let si = idx["股票代號"], let ci = idx["權值+息值"], let ki = idx["權/息"] else {
-            if obj["data"] == nil { return [] }
-            throw AppDataError("證交所除權息資料欄位不符")
+        guard let obj = try twseTable(data, what: "證交所除權息") else { return [] }
+        let req = ["資料日期", "股票代號", "權值+息值", "權/息"]
+        let all: [DividendEvent?] = try parseTable(obj, what: "證交所除權息", required: req) { idx, r in
+            let di = idx["資料日期"]!, si = idx["股票代號"]!, ci = idx["權值+息值"]!, ki = idx["權/息"]!
+            guard r.count > max(di, si, ci, ki), let date = rocDate(r[di]), let cash = number(r[ci]) else { return nil }
+            // 權 rows parse fine but are not cash dividends; keep a nil marker so they don't count as unparsable.
+            guard r[ki].trimmingCharacters(in: .whitespaces) == "息" else { return .some(nil) }
+            return .some(DividendEvent(symbol: r[si].trimmingCharacters(in: .whitespaces), exDate: date, cash: cash))
         }
-        return rows(obj["data"]).compactMap { r in
-            guard r.count > max(di, si, ci, ki),
-                  r[ki].trimmingCharacters(in: .whitespaces) == "息",
-                  let date = rocDate(r[di]), let cash = number(r[ci]) else { return nil }
-            return DividendEvent(symbol: r[si].trimmingCharacters(in: .whitespaces), exDate: date, cash: cash)
-        }
+        return all.compactMap { $0 }
     }
 
     static func tpexDividends(_ data: Data) throws -> [DividendEvent] {
-        let obj = try object(data)
-        guard let table = (obj["tables"] as? [[String: Any]])?.first else {
-            throw AppDataError("櫃買除權息資料格式不符（缺少 tables）")
-        }
-        let idx = fieldIndexes(table["fields"])
+        let table = try tpexTable(data, what: "櫃買除權息")
         let count = (table["fields"] as? [Any])?.count ?? 0
-        guard let di = idx["除權息日期"], let si = idx["代號"], let ci = idx["現金股利"] else {
-            if table["data"] == nil { return [] }
-            throw AppDataError("櫃買除權息資料欄位不符")
-        }
-        return rows(table["data"]).compactMap { r in
+        return try parseTable(table, what: "櫃買除權息", required: ["除權息日期", "代號", "現金股利"]) { idx, r in
+            let di = idx["除權息日期"]!, si = idx["代號"]!, ci = idx["現金股利"]!
             guard r.count == count, let date = rocDate(r[di]), let cash = number(r[ci]) else { return nil }
             return DividendEvent(symbol: r[si].trimmingCharacters(in: .whitespaces), exDate: date, cash: cash)
         }
@@ -117,14 +140,10 @@ enum OfficialHistory {
     // MARK: Splits
 
     static func splits(_ data: Data) throws -> [SplitEvent] {
-        let obj = try object(data)
-        let idx = fieldIndexes(obj["fields"])
-        guard let di = idx["恢復買賣日期"], let si = idx["ETF代號"],
-              let bi = idx["停止買賣前收盤價格"], let ai = idx["恢復買賣參考價"] else {
-            if obj["data"] == nil { return [] }
-            throw AppDataError("ETF 分割資料欄位不符")
-        }
-        return rows(obj["data"]).compactMap { r in
+        guard let obj = try twseTable(data, what: "ETF 分割") else { return [] }
+        let req = ["恢復買賣日期", "ETF代號", "停止買賣前收盤價格", "恢復買賣參考價"]
+        return try parseTable(obj, what: "ETF 分割", required: req) { idx, r in
+            let di = idx["恢復買賣日期"]!, si = idx["ETF代號"]!, bi = idx["停止買賣前收盤價格"]!, ai = idx["恢復買賣參考價"]!
             guard r.count > max(di, si, bi, ai), let date = rocDate(r[di]),
                   let before = number(r[bi]), let after = number(r[ai]), before > 0, after > 0 else { return nil }
             let x = before / after

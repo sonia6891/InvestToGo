@@ -61,4 +61,40 @@ final class OfficialHistoryTests: XCTestCase {
                        "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=20250601&stockNo=0050&response=json")
         XCTAssertTrue(OfficialHistory.tpexMonthURL(symbol: "00679B", month: m).absoluteString.contains("date=2025/06/01"))
     }
+
+    private func json(_ s: String) -> Data { Data(s.utf8) }
+
+    func testMalformedResponsesThrow() {
+        // stat error body
+        XCTAssertThrowsError(try OfficialHistory.twseMonth(json("{\"stat\":\"查詢日期錯誤\"}")))
+        XCTAssertThrowsError(try OfficialHistory.twseDividends(json("{\"stat\":\"error\"}")))
+        XCTAssertThrowsError(try OfficialHistory.splits(json("{\"stat\":\"error\"}")))
+        // TPEx body without tables / data
+        XCTAssertThrowsError(try OfficialHistory.tpexMonth(json("{\"stat\":\"ok\"}")))
+        XCTAssertThrowsError(try OfficialHistory.tpexDividends(json("{\"stat\":\"ok\"}")))
+        XCTAssertThrowsError(try OfficialHistory.tpexMonth(json("{\"tables\":[{\"fields\":[]}]}")))
+        // renamed fields
+        XCTAssertThrowsError(try OfficialHistory.twseMonth(json(
+            "{\"stat\":\"OK\",\"fields\":[\"Date\",\"Close\"],\"data\":[[\"114/06/02\",\"1\"]]}")))
+        XCTAssertThrowsError(try OfficialHistory.tpexMonth(json(
+            "{\"tables\":[{\"fields\":[\"d\",\"c\"],\"data\":[[\"114/06/02\",\"1\"]]}]}")))
+        XCTAssertThrowsError(try OfficialHistory.twseDividends(json(
+            "{\"stat\":\"OK\",\"fields\":[\"x\"],\"data\":[[\"1\"]]}")))
+        XCTAssertThrowsError(try OfficialHistory.splits(json(
+            "{\"stat\":\"OK\",\"fields\":[\"x\"],\"data\":[[\"1\"]]}")))
+        // rows present but all unparsable
+        XCTAssertThrowsError(try OfficialHistory.twseMonth(json(
+            "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"bad\",\"--\"]]}")))
+        XCTAssertThrowsError(try OfficialHistory.tpexMonth(json(
+            "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"bad\",\"--\"]]}]}")))
+        XCTAssertThrowsError(try OfficialHistory.tpexDividends(json(
+            "{\"tables\":[{\"fields\":[\"除權息日期\",\"代號\",\"現金股利\"],\"data\":[[\"bad\",\"1\",\"x\"]]}]}")))
+        XCTAssertThrowsError(try OfficialHistory.splits(json(
+            "{\"stat\":\"OK\",\"fields\":[\"恢復買賣日期\",\"ETF代號\",\"停止買賣前收盤價格\",\"恢復買賣參考價\"],\"data\":[[\"bad\",\"0050\",\"x\",\"y\"]]}")))
+    }
+
+    func testGenuineEmptyResponsesAreEmpty() throws {
+        XCTAssertEqual(try OfficialHistory.twseMonth(json("{\"stat\":\"很抱歉，沒有符合條件的資料!\"}")), [])
+        XCTAssertEqual(try OfficialHistory.tpexMonth(json("{\"stat\":\"ok\",\"tables\":[{\"data\":[]}]}")), [])
+    }
 }
