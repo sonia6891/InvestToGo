@@ -16,6 +16,9 @@ Character set kept (each font keeps only the glyphs it has of these):
   * Big5 level 1 (0xA440-0xC67E, 5,401 characters), the encoding's frequently-used set, built from the Ministry of
     Education's 常用國字標準字體表 (4,808) plus common extras; read from Python's own big5 codec, so no download;
   * the Big5 symbol rows (0xA140-0xA3BF);
+  * a supplement for names: every CJK character of the TWSE/TPEx listed company names in WebPreview/stock-data.json
+    (Big5 level 2 characters such as 碁 瑋 鈦 錸 鎧), plus a curated list of colloquial characters and characters common
+    in company and fund names (SUPPLEMENT);
   * every non-ASCII character in the app's sources and data: App/**, PocketCore/** (Swift, skins.json, the bundled
     catalogue with every ETF name, dividends, fees, market data), project.yml and Scripts/contact_sheet.py.
 
@@ -24,6 +27,7 @@ Needs fontTools (pyftsubset). `--check` needs only fontTools and the repo.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import subprocess
 import sys
@@ -38,16 +42,39 @@ FONTS = ROOT / "App" / "Resources" / "Fonts"
 # The commit that added the full fonts; `git show` reads them back from history.
 FULL_FONTS_COMMIT = "a5573d2"
 
+# The full fonts the subsets are made from: where they came from (ruling R7), their version string (name ID 5) and the
+# sha256 of the file in FULL_FONTS_COMMIT. Task 2 did not record the exact download URL of each file, so `source` is
+# the upstream project; the version and hash identify the file. A source file with another hash is refused.
+ORIGINALS = {
+    "NotoSansTC-Bold.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/notosanstc (static instance)",
+        "version": "Version 2.04;241114210131;non-release",
+        "sha256": "f946ba1299d235d160ea03fa781dc6cc96809701c6d000cc62a7523f077197d9"},
+    "NotoSansTC-Medium.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/notosanstc (static instance)",
+        "version": "Version 2.04;241114210131;non-release",
+        "sha256": "c00f82dc830efbe3e0571fc26053186e047b4d9c5d9023a3bd6f63c6ffd81aea"},
+    "NotoSerifTC-Bold.otf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/notoseriftc (Noto Serif CJK TC, static OTF)",
+        "version": "Version 2.003;hotconv 1.1.1;makeotfexe 2.6.0",
+        "sha256": "3ca2b3294ec84b795d0a45695e78e3612a44dce50f9fc776cd40206340a5768d"},
+    "NotoSerifTC-Medium.otf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/notoseriftc (Noto Serif CJK TC, static OTF)",
+        "version": "Version 2.003;hotconv 1.1.1;makeotfexe 2.6.0",
+        "sha256": "fd3936ff7cb87be3610d63a2d961ff06bd9ee2de9c0bb5a37890400487027e0f"},
+    "LXGWWenKaiTC-Medium.ttf": {
+        "source": "https://github.com/lxgw/LxgwWenkaiTC/releases/tag/v1.522",
+        "version": "Version 1.522; March 17, 2026",
+        "sha256": "94ca2870022fb8e4f90e2887524603690598142d17b620dfae318f1818ba8e17"},
+    "DotGothic16-Regular.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/dotgothic16",
+        "version": "Version 1.100",
+        "sha256": "3ad9af88726d42b40f7f365f0dcac785af73cf20ea6f1d5b44e57cc21150b8f1"},
+}
+
 # Fonts that are subset. DotGothic16 is a Japanese font: it keeps what it has of the same set, and the app's Chinese
 # characters it never had fall back to the system font exactly as before (CHECK_EXEMPT).
-SUBSET = [
-    "NotoSansTC-Bold.ttf",
-    "NotoSansTC-Medium.ttf",
-    "NotoSerifTC-Bold.otf",
-    "NotoSerifTC-Medium.otf",
-    "LXGWWenKaiTC-Medium.ttf",
-    "DotGothic16-Regular.ttf",
-]
+SUBSET = list(ORIGINALS)
 CHECK_EXEMPT = {"DotGothic16-Regular.ttf"}
 
 RANGES = [
@@ -68,6 +95,11 @@ RANGES = [
     (0xFF01, 0xFF65),  # fullwidth forms (－ ＋ ：), halfwidth punctuation
     (0xFFE0, 0xFFE6),  # fullwidth signs (￥)
 ]
+
+# Colloquial characters, and characters common in company and fund names, outside Big5 level 1.
+SUPPLEMENT = "欸啥碁滙晟瑋鈦鈀堃淼喆峯粧菓犇"
+# Listed company names (TWSE and TPEx) the repo already has; their characters are kept for names fetched at runtime.
+NAME_SOURCES = ["WebPreview/stock-data.json", "WebPreview/etf-data.json"]
 
 SCAN_ROOTS = ["App", "PocketCore"]
 SCAN_FILES = ["project.yml", "Scripts/contact_sheet.py"]
@@ -110,19 +142,48 @@ def common_traditional() -> set[str]:
     return {c for c in big5_rows(range(0xA4, 0xC7)) if is_cjk(c) and c.encode("big5") <= b"\xc6\x7e"}
 
 
+def name_characters() -> set[str]:
+    """The supplement: CJK characters of listed company and ETF names in the repo, plus SUPPLEMENT (all in NFC)."""
+    chars = set(SUPPLEMENT)
+    for name in NAME_SOURCES:
+        path = ROOT / name
+        if path.exists():
+            chars |= {unicodedata.normalize("NFC", c) for c in path.read_text(encoding="utf-8") if is_cjk(c)}
+    return chars
+
+
 def charset() -> set[str]:
     chars = {chr(cp) for lo, hi in RANGES for cp in range(lo, hi + 1)}
     chars |= big5_rows(range(0xA1, 0xA4))  # Big5 symbols
     chars |= common_traditional()
+    chars |= name_characters()
     chars |= app_characters()
     return chars
 
 
 def original(name: str, source: Path | None) -> bytes:
+    """The full font, from `--source` or git history, checked against its recorded sha256."""
     if source:
-        return (source / name).read_bytes()
-    return subprocess.run(["git", "show", f"{FULL_FONTS_COMMIT}:App/Resources/Fonts/{name}"], cwd=ROOT, check=True,
-                          capture_output=True).stdout
+        path = source / name
+        if not path.exists():
+            raise SystemExit(f"{path} is missing. Put the full fonts ({', '.join(SUBSET)}) in that folder.")
+        data = path.read_bytes()
+    else:
+        where = f"{FULL_FONTS_COMMIT}:App/Resources/Fonts/{name}"
+        try:
+            data = subprocess.run(["git", "show", where], cwd=ROOT, check=True, capture_output=True).stdout
+        except (OSError, subprocess.CalledProcessError) as error:
+            detail = getattr(error, "stderr", b"") or b""
+            raise SystemExit(
+                f"Could not read the full font {name} from git ({where}): "
+                f"{detail.decode(errors='replace').strip() or error}\n"
+                "The clone may be shallow (git fetch --unshallow) or the history rewritten. Get the original files "
+                f"(see ORIGINALS for sources and sha256) and run: python Scripts/subset_fonts.py --source <dir>")
+    digest = hashlib.sha256(data).hexdigest()
+    if digest != ORIGINALS[name]["sha256"]:
+        raise SystemExit(f"{name}: sha256 {digest} is not the recorded original {ORIGINALS[name]['sha256']} "
+                         f"({ORIGINALS[name]['version']}). Refusing to subset a different file.")
+    return data
 
 
 def names(font: TTFont) -> list[tuple[int, int, int, int, str]]:
@@ -135,6 +196,7 @@ def subset(source: Path | None) -> int:
     chars = charset()
     unicodes = sorted({ord(c) for c in chars})
     print(f"character set: {len(unicodes)} code points ({len(common_traditional())} Big5 level 1, "
+          f"{len(name_characters() - common_traditional())} more from names, "
           f"{len({c for c in app_characters() if is_cjk(c)})} CJK in the app)")
     total_before = total_after = 0
     for name in SUBSET:
@@ -174,6 +236,7 @@ def check() -> int:
     wanted = {unicodedata.normalize("NFC", c) for c in app_characters()
               if is_cjk(c) or 0x3000 <= ord(c) <= 0x303F or 0xFF01 <= ord(c) <= 0xFF5E}
     wanted |= set("▲▼－×・→←…「」『』")
+    wanted |= set(SUPPLEMENT)
     failed = False
     for name in SUBSET:
         if name in CHECK_EXEMPT:
