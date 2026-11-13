@@ -599,17 +599,32 @@ final class ETFToGoUITests: XCTestCase {
         waitSelected(day)
         sleep(1); capture(app, "onboarding-3")
         onboardingNext(app)
-        let later = app.buttons["login-later"]
-        XCTAssertTrue(later.waitForExistence(timeout: 5), "Page 4 offers 稍後再說")
-        for button in ["login-apple", "login-google", "login-email"] { XCTAssertTrue(app.buttons[button].exists, "\(button) is on the login page") }
-        sleep(1); capture(app, "onboarding-4")
-        later.tap()
-        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "稍後再說 goes to the lobby")
+        // Page 4: one 「開始」 and where the data lives; no sign-in buttons until sign-in exists (ruling R32).
+        let start = app.buttons["onboarding-start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5), "Page 4 offers 開始")
+        XCTAssertEqual(start.label, "開始")
+        XCTAssertTrue(app.buttons["login-later"].exists, "稍後再說 is still there, silent")
+        for button in ["login-apple", "login-google", "login-email"] { XCTAssertFalse(app.buttons[button].exists, "\(button) is gone") }
+        XCTAssertTrue(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS '資料先存在這支 iPhone，登入功能即將開放'")).firstMatch.exists, "Says where the data lives")
+        XCTAssertFalse(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS '同意服務條款'")).firstMatch.exists, "No terms line")
+        sleep(1); capture(app, "onboarding-4-start")
+        start.tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "開始 goes to the lobby")
         XCTAssertFalse(app.buttons["splash"].exists)
         app.terminate(); app.launchArguments = ["--ui-testing"]; app.launch()
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "The next launch goes straight to the lobby")
         XCTAssertFalse(app.buttons["splash"].exists, "No splash once onboarded")
         XCTAssertFalse(app.buttons["habit-dca"].exists, "No onboarding once onboarded")
+    }
+
+    /// 工具 › 提醒 has the debit-day reminder chosen in onboarding: on or off, the day and the time (final review I5).
+    func testReminderCenterHasTheDebitDayReminder() {
+        let app = launch(["--open", "reminders"])
+        let toggle = app.switches["reminder-dca-toggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "提醒 lists 定期定額扣款日提醒")
+        XCTAssertTrue(app.descendants(matching: .any)["reminder-dca-day"].exists, "with its day")
+        XCTAssertTrue(app.descendants(matching: .any)["reminder-dca-time"].exists, "and its time")
+        sleep(1); capture(app, "reminders-dca")
     }
 
     func testBackInOnboarding() {
@@ -637,6 +652,11 @@ final class ETFToGoUITests: XCTestCase {
         let locked = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'achievement-' AND value MATCHES %@", "^[0-9]+ / [0-9]+$"))
         XCTAssertGreaterThan(locked.count, 0, "A locked achievement shows its progress as numbers")
+        // No feature counts 體檢完成 yet: 「即將推出」, not 0 / 1 forever (ruling R31).
+        let soon = app.descendants(matching: .any)["achievement-checkupDone"]
+        if !soon.exists { app.swipeUp() }
+        XCTAssertTrue(soon.waitForExistence(timeout: 5))
+        XCTAssertEqual(soon.value as? String, "即將推出")
         sleep(1); capture(app, "achievements")
     }
 

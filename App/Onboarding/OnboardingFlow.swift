@@ -17,6 +17,11 @@ enum Onboarding {
     static let keys = [doneKey, monthlyKey, symbolKey, dayKey, remindKey, remindMinutesKey, remindEveKey]
 
     static let amounts = [1000, 3000, 5000, 10000]
+    /// The monthly amount picked on page 2, if any: 股息複利試算's default before a plan is saved.
+    static func monthlyDefault(_ defaults: UserDefaults = .standard) -> Int? {
+        let value = defaults.integer(forKey: monthlyKey)
+        return value > 0 ? value : nil
+    }
     static let starters = ["0050", "006208", "00878"]
     static let days = Array(3...9)
     static let pageCount = 4
@@ -41,6 +46,14 @@ enum Onboarding {
         if onboarded || (testing && arguments.contains("--skip-onboarding")) { return nil }
         return .splash
     }
+
+    /// Records already on the phone (an upgrade from a build before this flow existed) mean the user has started:
+    /// the flow is marked done so they go straight to the lobby (final review M3).
+    static func adoptExisting(_ p: Portfolio, defaults: UserDefaults = .standard) {
+        guard !defaults.bool(forKey: doneKey), hasRecords(p) else { return }
+        defaults.set(true, forKey: doneKey)
+    }
+    static func hasRecords(_ p: Portfolio) -> Bool { !p.holdings.isEmpty || !p.dividends.isEmpty || !(p.trades ?? []).isEmpty }
 
     /// `--ui-testing --reset` starts as a fresh install: the flow shows again and remembers nothing.
     static func reset(_ arguments: [String], defaults: UserDefaults = .standard) {
@@ -77,7 +90,7 @@ struct FirstLaunchView: View {
     }
 }
 
-/// The four onboarding pages (spec 5.2): habit, amount and ETF, reminders, login. A four-part progress bar on top;
+/// The four onboarding pages (spec 5.2): habit, amount and ETF, reminders, and 開始 (sign-in is not built yet). A four-part progress bar on top;
 /// 「‹ 返回」 goes back a page and keeps every choice made.
 struct OnboardingFlow: View {
     @Binding var page: Int
@@ -225,7 +238,9 @@ struct OnboardingFlow: View {
     private var amountPage: some View {
         let grid = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
         return VStack(alignment: .leading, spacing: 18) {
-            heading(2, "每月投入多少？", "之後隨時可以改。")
+            // The amount becomes 股息複利試算's monthly default; the ETF has no screen that reads it yet, so the page no
+            // longer promises 「之後隨時可以改」 (final review I5).
+            heading(2, "每月投入多少？")
             LazyVGrid(columns: grid, spacing: 8) {
                 ForEach(Onboarding.amounts, id: \.self) { value in
                     SkinChip(value.formatted(), selected: amount == value) { amount = value }
@@ -319,29 +334,19 @@ struct OnboardingFlow: View {
         }
     }
 
-    // MARK: 4 Login
+    // MARK: 4 Start
 
+    /// No sign-in exists yet, so there are no sign-in buttons (ruling R32): one 「開始」 and where the data lives.
     private var loginPage: some View {
         VStack(alignment: .leading, spacing: 18) {
-            heading(4, "登入，資料跟著你走", "登入即將開放；現在可以先開始，資料存在這支 iPhone。")
-            VStack(spacing: 12) {
-                Button(action: { finish(confirm: true) }) { Label("使用 Apple 登入", systemImage: "apple.logo") }
-                    .buttonStyle(SkinButtonStyle(primary: true))
-                    .accessibilityIdentifier("login-apple")
-                Button(action: { finish(confirm: true) }) { Text("使用 Google 登入") }
-                    .buttonStyle(SkinButtonStyle(primary: false))
-                    .accessibilityIdentifier("login-google")
-                Button(action: { finish(confirm: true) }) {
-                    Text("用 Email 連結登入").skinFont(.body(14)).underline().foregroundStyle(skin.color(\.ink))
-                        .frame(minWidth: 44, minHeight: 44)
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("login-email")
-            }
-            .frame(maxWidth: .infinity)
-            Text("繼續即表示你同意服務條款與隱私權政策。").skinFont(.mono(11)).foregroundStyle(skin.color(\.sub))
+            heading(4, "準備好了", "資料先存在這支 iPhone，登入功能即將開放")
+            SkinStage(size: 160) { SkinImage(.pocketIcon).padding(30) }
+                .accessibilityHidden(true)
                 .frame(maxWidth: .infinity)
-                .multilineTextAlignment(.center)
+            Button(action: { finish(confirm: true) }) { Text("開始") }
+                .buttonStyle(SkinButtonStyle(primary: true))
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("onboarding-start")
             // Skipping is not a confirmation: no sound or haptic (ruling R28).
             Button(action: { finish(confirm: false) }) {
                 Text("稍後再說").skinFont(.title(15)).foregroundStyle(skin.color(\.sub))
@@ -355,7 +360,8 @@ struct OnboardingFlow: View {
 
     // MARK: Finish
 
-    /// Every login button and 稍後再說 lead to the lobby for now (sign-in is planned separately, 2026-11-11 文件).
+    /// 開始 (with the skin's confirm sound and haptic) and 稍後再說 (silent) both lead to the lobby; sign-in is planned
+    /// separately (2026-11-11 文件).
     private func finish(confirm: Bool) {
         let defaults = UserDefaults.standard
         if let amount { defaults.set(amount, forKey: Onboarding.monthlyKey) }
@@ -375,9 +381,23 @@ struct OnboardingFlow: View {
     }
 }
 
-/// The monthly debit-day reminder chosen in onboarding, repeating every month at the chosen time.
+/// The monthly debit-day reminder chosen in onboarding (and changed in 工具 › 提醒), repeating every month at the
+/// chosen time.
 enum DCAReminders {
     static let ids = ["dca-reminder", "dca-reminder-eve"]
+    /// 「每月 6 日 09:00 通知，前一天也提醒」, or what turning it on does.
+    static func summary(on: Bool, day: Int, minutes: Int, dayBefore: Bool) -> String {
+        guard on else { return "每月扣款日通知你確認定期定額" }
+        return "每月 \(day) 日 " + String(format: "%02d:%02d", minutes / 60, minutes % 60) + " 通知" + (dayBefore ? "，前一天也提醒" : "")
+    }
+    /// Minutes after midnight as today's time, for a time picker.
+    static func time(_ minutes: Int) -> Date {
+        Calendar.current.date(from: DateComponents(hour: minutes / 60, minute: minutes % 60)) ?? Date()
+    }
+    static func minutes(_ date: Date) -> Int {
+        let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return (parts.hour ?? 9) * 60 + (parts.minute ?? 0)
+    }
     static func clear() { UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids) }
     static func schedule(day: Int, minutes: Int, dayBefore: Bool) async {
         let center = UNUserNotificationCenter.current()

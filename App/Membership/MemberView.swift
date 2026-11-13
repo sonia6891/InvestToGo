@@ -5,8 +5,13 @@ import StoreKit
 /// the plans and D10 leaves the yearly price open), so they live here, in one place, until App Store Connect has them.
 enum MembershipProducts {
     static let pocketMonthly = "tw.sonia.etftogo.member.pocket.monthly"
+    /// 會員＋AI: not sold in this build (its features are not in the app yet, ruling R33). Kept so a purchase already on
+    /// the Apple ID still counts, and so selling it again is adding it to `sold`.
     static let aiMonthly = "tw.sonia.etftogo.member.ai.monthly"
+    /// Every plan that makes a member.
     static let all = [pocketMonthly, aiMonthly]
+    /// The plans this build offers for sale; only their prices are asked of the App Store.
+    static let sold = [pocketMonthly]
 }
 
 /// Prices from the App Store and whether this Apple ID has a membership. Prices are never written into the app: until
@@ -24,6 +29,17 @@ enum MembershipProducts {
     private var updates: Task<Void, Never>?
     /// One App Store request at a time: a second caller waits for the first instead of clearing the spinner early.
     private var loadTask: Task<Void, Never>?
+    /// The player's level, for the level skins a non-member may still wear; set at launch.
+    var level: () -> Int = { 1 }
+    /// Where the 「會員已到期」 notice goes (the root toast); set at launch.
+    var onLapse: (String) -> Void = { _ in }
+    /// The skin store whose worn skin is checked; the app's own outside tests.
+    var skins: SkinStore?
+    /// Off in UI tests, which wear member skins with `--skin` and no purchase, and in the unit-test host (the tests
+    /// switch it on for their own store).
+    var checksWornSkin = !ProcessInfo.processInfo.arguments.contains("--ui-testing")
+        && ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
+    static let lapseNotice = "會員已到期，已換回黑金"
 
     /// Reads the prices and the membership, and follows purchases made elsewhere (renewals, Ask to Buy, refunds).
     func start() async {
@@ -51,9 +67,9 @@ enum MembershipProducts {
         loading = true; failed = false
         defer { loading = false }
         do {
-            let found = try await Product.products(for: MembershipProducts.all)
+            let found = try await Product.products(for: MembershipProducts.sold)
             products = Dictionary(found.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-            failed = products.count < MembershipProducts.all.count
+            failed = products.count < MembershipProducts.sold.count
         } catch {
             failed = true
         }
@@ -66,7 +82,16 @@ enum MembershipProducts {
                 held.insert(transaction.productID)
             }
         }
+        apply(held)
+    }
+
+    /// StoreKit's answer about this Apple ID. Only now, never before the first answer (members would flash to black-gold
+    /// at every launch), is the worn skin checked: one the player may no longer wear goes back to black-gold, with a
+    /// notice (final review I1).
+    func apply(_ held: Set<String>) {
         owned = held
+        guard checksWornSkin else { return }
+        if (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: isMember) { onLapse(Self.lapseNotice) }
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.
@@ -110,6 +135,9 @@ struct MemberView: View {
     @State private var plan: Plan = .pocket
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
     private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
+    /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
+    // TODO(user): confirm URL — the page must be published there before App Review.
+    static let privacy = URL(string: "https://sonia6891.github.io/etftogo/privacy")!
 
     enum Plan: String, CaseIterable, Identifiable {
         case free, pocket, ai
@@ -121,13 +149,17 @@ struct MemberView: View {
             case .ai: return "會員＋AI"
             }
         }
+        /// Only what this build delivers (ruling R33): the free card names no limit the app does not enforce, and
+        /// 口袋會員 only what membership really gates (`Skins.isUnlocked`).
         var detail: String {
             switch self {
-            case .free: return "記帳、1 個習慣、基本提醒"
-            case .pocket: return "無限持股・全部皮膚・券商匯入"
-            case .ai: return "再加 AI 問答與月報"
+            case .free: return "記帳、配息、提醒、圖鑑"
+            case .pocket: return "全部皮膚・等級皮膚搶先穿"
+            case .ai: return "AI 問答與月報"
             }
         }
+        /// Shown, but not for sale yet: no price, no buy button.
+        var comingSoon: Bool { self == .ai }
         var product: String? {
             switch self {
             case .free: return nil
@@ -145,7 +177,7 @@ struct MemberView: View {
                 .frame(maxWidth: .infinity)
             VStack(spacing: 8) {
                 Text("口袋會員").skinFont(.title(30)).skinForeground(\.ink)
-                SkinTag(membership.isMember ? "你是會員・全部解鎖" : "解鎖全部功能")
+                SkinTag(membership.isMember ? "你是會員・全部皮膚已解鎖" : "解鎖全部皮膚")
             }
             .frame(maxWidth: .infinity)
             skinsEntry
@@ -174,6 +206,9 @@ struct MemberView: View {
                     Text("·").accessibilityHidden(true)
                     Link(destination: Self.terms) { Text("條款").frame(minWidth: 44, minHeight: 44).contentShape(Rectangle()) }
                         .buttonStyle(.plain).accessibilityIdentifier("member-terms")
+                    Text("·").accessibilityHidden(true)
+                    Link(destination: Self.privacy) { Text("隱私權").frame(minWidth: 44, minHeight: 44).contentShape(Rectangle()) }
+                        .buttonStyle(.plain).accessibilityIdentifier("member-privacy")
                     Text("·").accessibilityHidden(true)
                     Text("隨時可取消")
                 }
@@ -224,6 +259,28 @@ struct MemberView: View {
     }
 
     private func planCard(_ item: Plan) -> some View {
+        if item.comingSoon { return AnyView(comingSoonCard(item)) }
+        return AnyView(sellableCard(item))
+    }
+
+    /// 會員＋AI: the plan as a plain card with 「即將推出」, never selectable and never sold.
+    private func comingSoonCard(_ item: Plan) -> some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.title).skinFont(.title(15)).skinForeground(\.sub)
+                Text(item.detail).skinFont(.body(11)).skinForeground(\.sub).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
+            SkinTag("即將推出")
+        }
+        .padding(.horizontal, 16).padding(.vertical, 12)
+        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+        .background(PlanBackground(selected: false).opacity(0.6))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("member-plan-\(item.rawValue)")
+    }
+
+    private func sellableCard(_ item: Plan) -> some View {
         let selected = plan == item
         // 選中的反白並打勾: the chosen card is filled with the main colour, its text in whichever of page or ink reads on it.
         let text = selected ? skin.onFill(skin.colors.accent) : skin.color(\.ink)

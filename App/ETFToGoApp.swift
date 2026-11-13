@@ -9,13 +9,26 @@ import SwiftUI
         // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
         CrashReporting.start()
         let args = ProcessInfo.processInfo.arguments
-        let testURL = args.contains("--ui-testing") ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
-        let store = PortfolioStore(url: testURL, reset: args.contains("--reset"))
+        let testing = args.contains("--ui-testing")
+        let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
+        // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
+        let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
         Onboarding.reset(args)
+        // Someone upgrading with records on the phone has started already: no first-launch flow for them.
+        Onboarding.adoptExisting(store.data)
+        // One-time migrations of the game progress: DCA months backfilled from the records, with no experience.
+        try? store.updateGame { $0.migrate(store.data) }
         // UI tests and screenshots set up game progress with `--demo-…` (only with `--ui-testing`).
         try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
         DemoArguments.seedPocket(store, args: args, now: Date())
         _store = StateObject(wrappedValue: store)
+        // StoreKit is followed from launch (Apple asks for the Transaction.updates listener then), so renewals and Ask
+        // to Buy answers that arrive during the splash or onboarding are not missed. Once StoreKit has answered, a skin
+        // the player may no longer wear is taken off, with a notice.
+        let membership = MembershipStore.shared
+        membership.level = { [weak store] in GameRules.level(xp: store?.data.game?.xp ?? 0) }
+        membership.onLapse = { [weak store] notice in store?.pendingNotice = notice }
+        Task { await membership.start() }
     }
     var body: some Scene {
         WindowGroup {
@@ -94,6 +107,9 @@ struct RootView: View {
             .environment(\.lobbyNamespace, lobby)
             .tint(Palette.blue)
             .id(skins.skin.id)
+            // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑
+            // +30 經驗」. On the stack, not the whole column, so while offline it sits below 「離線中」 and never hides it.
+            .overlay(alignment: .top) { RewardToast() }
         }
         .overlay(alignment: .bottom) {
             if !path.isEmpty, let feature {
@@ -101,8 +117,6 @@ struct RootView: View {
                     .ignoresSafeArea(.keyboard)
             }
         }
-        // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑 +30 經驗」.
-        .overlay(alignment: .top) { RewardToast() }
         // Holding a 換膚 card tries that skin on over everything, the bottom bar included, until the finger lifts.
         .overlay {
             ZStack { if let id = skins.tryOn { TryOnPreview(skin: Skins.named(id)).transition(.opacity) } }
@@ -119,8 +133,6 @@ struct RootView: View {
         .task(id: store.data.game?.levelUpDue) { await celebrateWhenDue() }
         .modifier(SkinKitLaunch())
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
-        // Membership unlocks skins; StoreKit's record of this Apple ID is read once at launch and followed after.
-        .task { await MembershipStore.shared.start() }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
         .task(id: phase) {

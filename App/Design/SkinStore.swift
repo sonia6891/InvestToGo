@@ -24,7 +24,7 @@ extension Color {
     init() {
         // UI tests start from the default look, whatever an earlier test chose.
         let args = ProcessInfo.processInfo.arguments
-        if args.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
+        if args.contains("--ui-testing"), args.contains("--reset") { UserDefaults.standard.removeObject(forKey: Self.skinKey) }
         var id = UserDefaults.standard.string(forKey: Self.skinKey) ?? ""
         // UI tests pick a skin with `--skin <id>` (only honoured with `--ui-testing`), after any reset.
         if args.contains("--ui-testing"), let i = args.firstIndex(of: "--skin"), args.indices.contains(i + 1) { id = args[i + 1] }
@@ -34,6 +34,13 @@ extension Color {
     }
     /// Switches to the skin with this id; unknown ids fall back to black-gold.
     func select(_ id: String) { skin = Skins.named(id) }
+    /// Takes off a skin this player may no longer wear (a membership that lapsed, was refunded or cancelled) and goes
+    /// back to black-gold; true when it did.
+    @discardableResult func takeOffLocked(level: Int, member: Bool) -> Bool {
+        guard !Skins.isUnlocked(skin, level: level, member: member) else { return false }
+        select("blackgold")
+        return true
+    }
     /// Text on the skin is light (dark skins) or dark (light skins).
     var colorScheme: ColorScheme { skin.lightText ? .dark : .light }
 }

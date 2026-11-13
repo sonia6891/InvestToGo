@@ -181,7 +181,7 @@ struct OverviewView: View {
             Card {
                 HStack {
                     SectionHeading(title: "資產歷史走勢")
-                    if points.count >= 2 { let change = (points.last!.value / max(points.first!.value, 0.000001) - 1) * 100; Text(percentText(change)).font(.caption.bold()).monospacedDigit().foregroundStyle(Palette.trend(change)) }
+                    if points.count >= 2 { let change = (points.last!.value / max(points.first!.value, 0.000001) - 1) * 100; TrendText(percent: change) }
                 }
                 if points.count >= 2 { ValueChart(points: points, showAxes: true, height: 160).padding(.top, 12) }
                 else { Text("每檔持有都取得報價與歷史走勢後才會顯示，不用試算資料代替。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8) }
@@ -436,9 +436,22 @@ struct SourcesView: View {
 struct PrivacyView: View {
     var body: some View {
         Page {
-            Card { Text("資料存放").font(.headline).foregroundStyle(Palette.ink); Text("持有、配息與交易紀錄只存在這支 iPhone 的 App 資料夾，可在「資料備份與還原」匯出。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
+            Card { Text("資料存放").font(.headline).foregroundStyle(Palette.ink); Text("持有、配息與交易紀錄只存在這支 iPhone 的 App 資料夾，可在「資料備份與還原」匯出；下方的當機回報不含這些紀錄。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
+            // Release builds report crashes and load failures to Sentry (Task 14); the privacy manifest declares
+            // CrashData and OtherDiagnosticData, and this card says the same in words (final review I4).
+            Card {
+                Text("當機回報").font(.headline).foregroundStyle(Palette.ink)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("App 當機、卡住或資料載入失敗時，會把診斷資料傳到 Sentry（當機回報服務），幫我們找出問題。")
+                    Text("會傳送：當機時的程式堆疊、裝置型號、iOS 版本、App 版本，以及哪一種資料載入失敗。")
+                    Text("不會傳送：持股、金額、名稱、配息與交易紀錄，也不傳送你的帳號或可識別你本人的資料；訊息裡的數字會先遮掉。")
+                    Text("這些資料不和你的身分連結，也不用來追蹤或投放廣告。")
+                }.font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6)
+            }
+            .accessibilityIdentifier("privacy-crash-reports")
             Card { Text("富果金鑰").font(.headline).foregroundStyle(Palette.ink); Text("使用 iOS Keychain 保存，只傳給富果官方 API，不寫入備份。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
             Card { Text("Face ID・應用程式鎖定").font(.headline).foregroundStyle(Palette.ink); Text("目前未提供 App 內上鎖；可用 iPhone 設定的「螢幕使用時間」限制，或使用 iOS 18 以上的「鎖定 App」。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
+            Link("隱私權政策", destination: MemberView.privacy).font(.subheadline.bold()).accessibilityIdentifier("privacy-policy")
         }
         .navigationTitle("隱私與安全").navigationBarTitleDisplayMode(.inline)
     }
