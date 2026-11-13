@@ -66,6 +66,45 @@ final class BacktestTests: XCTestCase {
         XCTAssertNil(Finance.xirr([(d1, -1000), (d2, -5)]))
     }
 
+    func testSingleDayRunHasNoXirr() {
+        let h = SymbolHistory(bars: bars([("2024-01-02", 10)]), dividends: [], splits: [], suspect: false)
+        let r = Backtest.run(input(jan, jan), history: ["X": h])
+        XCTAssertEqual(r.invested, 1000, accuracy: 1e-6)
+        XCTAssertNil(r.xirr)
+    }
+
+    func testRunXirrPositiveOnRisingPrices() {
+        let h = SymbolHistory(bars: base, dividends: [], splits: [], suspect: false)
+        let r = Backtest.run(input(jan, feb), history: ["X": h])
+        XCTAssertNotNil(r.xirr)
+        XCTAssertGreaterThan(r.xirr ?? -1, 0)
+    }
+
+    func testEndBeyondDataAddsNoCurvePoints() {
+        let h = SymbolHistory(bars: base, dividends: [], splits: [], suspect: false)
+        let r = Backtest.run(input(jan, YearMonth(year: 2024, month: 6)), history: ["X": h])
+        XCTAssertEqual(r.curve.count, 2)
+        XCTAssertEqual(r.curve.last?.month, feb)
+        XCTAssertEqual(r.invested, 2000, accuracy: 1e-6)
+    }
+
+    func testLegWithoutHistoryIsNoted() {
+        let h = SymbolHistory(bars: base, dividends: [], splits: [], suspect: false)
+        let inp = BacktestInput(legs: [("X", 0.5), ("Y", 0.5)], monthly: 1000, start: jan, end: feb, reinvest: true)
+        let r = Backtest.run(inp, history: ["X": h])
+        XCTAssertTrue(r.notes.contains("Y 沒有取得歷史資料，這次沒有計入"))
+        XCTAssertEqual(r.invested, 1000, accuracy: 1e-6)
+    }
+
+    func testDividendBeforeSplitUsesPreSplitShares() {
+        // 100 shares bought in Jan; next bar is Mar 1, after a Feb 10 dividend of 1.0 and a Feb 20 2x split.
+        let b = bars([("2024-01-02", 10), ("2024-03-01", 10)])
+        let h = SymbolHistory(bars: b, dividends: [DividendEvent(symbol: "X", exDate: "2024-02-10", cash: 1)],
+                              splits: [SplitEvent(symbol: "X", resumeDate: "2024-02-20", ratio: 2)], suspect: false)
+        let r = Backtest.run(input(jan, YearMonth(year: 2024, month: 3), reinvest: false), history: ["X": h])
+        XCTAssertEqual(r.dividends, 100, accuracy: 1e-6)
+    }
+
     func testMaxDrawdown() {
         XCTAssertEqual(Backtest.maxDrawdown([100, 120, 90, 130]), 0.25, accuracy: 1e-9)
     }

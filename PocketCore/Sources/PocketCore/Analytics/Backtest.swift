@@ -31,7 +31,8 @@ struct BacktestResult {
 enum Finance {
     /// Annualised internal rate of return, 365-day convention; bisection on -0.99…10; nil without a sign change.
     static func xirr(_ flows: [(date: Date, amount: Double)]) -> Double? {
-        guard let t0 = flows.map(\.date).min(),
+        guard let t0 = flows.map(\.date).min(), let t1 = flows.map(\.date).max(),
+              t1.timeIntervalSince(t0) >= 86_400,
               flows.contains(where: { $0.amount > 0 }), flows.contains(where: { $0.amount < 0 }) else { return nil }
         func f(_ r: Double) -> Double {
             flows.reduce(0) { sum, flow in
@@ -99,7 +100,10 @@ enum Backtest {
         while cursor <= input.end { months.append(cursor); cursor = cursor.next() }
 
         for leg in input.legs {
-            guard let h = history[leg.symbol] else { continue }
+            guard let h = history[leg.symbol] else {
+                notes.append("\(leg.symbol) 沒有取得歷史資料，這次沒有計入")
+                continue
+            }
             let bars = h.bars.sorted { $0.date < $1.date }
             let splits = h.splits.sorted { $0.resumeDate < $1.resumeDate }
             let dividends = h.dividends.sorted { $0.exDate < $1.exDate }
@@ -112,16 +116,19 @@ enum Backtest {
             for bar in bars {
                 guard let bm = month(of: bar.date), bm >= input.start, bm <= input.end else { continue }
                 if firstMonth == nil { firstMonth = bm }
-                // (1) split
-                while si < splits.count, splits[si].resumeDate <= bar.date {
-                    shares *= splits[si].ratio; si += 1
-                }
-                // (2) dividend on the shares held, reinvested at this close (the next bar when the ex-date has none)
-                while di < dividends.count, dividends[di].exDate <= bar.date {
-                    let amount = shares * dividends[di].cash
-                    totalDividends += amount
-                    if input.reinvest, bar.close > 0 { shares += amount / bar.close } else { legCash += amount }
-                    di += 1
+                // (1) splits and (2) dividends due by this bar, in date order (split first on a tie); a dividend is
+                // paid on the shares held at its date and reinvested at this close (next bar if its ex-date has none)
+                while true {
+                    let sd = si < splits.count && splits[si].resumeDate <= bar.date ? splits[si].resumeDate : nil
+                    let dd = di < dividends.count && dividends[di].exDate <= bar.date ? dividends[di].exDate : nil
+                    if let sdate = sd, dd == nil || sdate <= dd! {
+                        shares *= splits[si].ratio; si += 1
+                    } else if dd != nil {
+                        let amount = shares * dividends[di].cash
+                        totalDividends += amount
+                        if input.reinvest, bar.close > 0 { shares += amount / bar.close } else { legCash += amount }
+                        di += 1
+                    } else { break }
                 }
                 // (3) monthly buy on the leg's first bar of the month
                 if !boughtMonths.contains(bm), bar.close > 0 {
@@ -143,6 +150,9 @@ enum Backtest {
                 cash[mm, default: 0] += s.cash
                 active.insert(mm)
             }
+            if firstMonth == nil {
+                notes.append("\(leg.symbol) 沒有取得歷史資料，這次沒有計入")
+            }
             if let fm = firstMonth, fm > input.start {
                 notes.append("\(leg.symbol) 於 \(fm.key) 上市，之前的月份不投入")
             }
@@ -151,9 +161,11 @@ enum Backtest {
 
         var curve: [(month: YearMonth, invested: Double, value: Double)] = []
         var running = 0.0
+        // No points past the month of the latest bar: months beyond the data are not fabricated.
+        let lastMonth = lastBarDate.flatMap { month(of: $0) } ?? input.end
         for mm in months {
             running += contributed[mm] ?? 0
-            guard active.contains(mm) else { continue }
+            guard active.contains(mm), mm <= lastMonth else { continue }
             curve.append((mm, running, (holdings[mm] ?? 0) + (cash[mm] ?? 0)))
         }
         let endValue = curve.last?.value ?? 0
