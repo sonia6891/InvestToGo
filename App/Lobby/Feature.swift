@@ -129,7 +129,7 @@ extension Feature {
 private struct ZoomFromLobby: ViewModifier {
     let feature: Feature
     let namespace: Namespace.ID?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @ViewBuilder func body(content: Content) -> some View {
         if let namespace, !reduceMotion { content.navigationTransition(.zoom(sourceID: feature, in: namespace)) } else { content.modifier(FadeInWithReducedMotion()) }
     }
@@ -138,7 +138,7 @@ private struct ZoomFromLobby: ViewModifier {
 /// With Reduce Motion, screens the root view switches without animation fade in instead (spec 3.5). Only the first
 /// appearance fades: coming back from a pushed page or a sheet shows the screen at once.
 struct FadeInWithReducedMotion: ViewModifier {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @State private var shown = false
     func body(content: Content) -> some View {
         content

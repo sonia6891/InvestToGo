@@ -284,6 +284,8 @@ struct SettingsView: View {
     @AppStorage("appearance") private var appearance = "light"
     @AppStorage("hideAmounts") private var hidden = false
     @AppStorage(SellCosts.netKey) private var netValue = true
+    /// 音效 (`pocket.sound`): the skins' confirm sounds and the carousel tick.
+    @ObservedObject private var skins = SkinStore.shared
     @State private var feeRates: [String: FeeRate] = [:]
     var body: some View {
         Page {
@@ -293,6 +295,8 @@ struct SettingsView: View {
                 }
                 Divider()
                 row("eye.fill", Palette.blue, "隱藏金額") { Toggle("隱藏金額", isOn: $hidden).labelsHidden().tint(Palette.blue) }
+                Divider()
+                row("speaker.wave.2.fill", Palette.orange, "音效") { Toggle("音效", isOn: $skins.soundOn).labelsHidden().tint(Palette.blue).accessibilityIdentifier("settings-sound") }
             }
             Card(padding: 12) {
                 row("dollarsign.circle.fill", Palette.green, "市值扣除預估賣出費用") { Toggle("市值扣除預估賣出費用", isOn: $netValue).labelsHidden().tint(Palette.blue) }

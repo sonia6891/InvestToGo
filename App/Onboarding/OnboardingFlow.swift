@@ -54,7 +54,7 @@ struct FirstLaunchView: View {
     let onFinish: () -> Void
     /// 0 is the splash; 1–4 the onboarding pages.
     @State private var page: Int
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
 
     init(start: OnboardingStart, onFinish: @escaping () -> Void) {
         self.onFinish = onFinish
@@ -84,7 +84,7 @@ struct OnboardingFlow: View {
     let onFinish: () -> Void
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
 
     @State private var habit: Habit?
     @State private var amount: Int?

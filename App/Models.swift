@@ -12,9 +12,15 @@ import SwiftUI
     @Published private(set) var catalog = CatalogSnapshot.bundled()
     @Published var catalogMessage: String?
     @Published var catalogRefreshing = false
+    /// The last 更新上市櫃名單 failed; 找 ETF shows LoadFailed over the list it still has.
+    @Published var catalogFailed = false
+    /// The last quote refresh started from a detail page failed, in plain words; nil after a success.
+    @Published var quoteFailure: String?
     @Published private(set) var official = OfficialDividends.bundled()
     @Published var officialRefreshing = false
     @Published var officialMessage: String?
+    /// The last official dividend refresh failed; 配息 shows LoadFailed over the announcements it still has.
+    @Published var officialFailed = false
     /// 加權 / 櫃買 index quotes, keyed "taiex" and "tpex": live with the viewer's Fugle key, else the latest close.
     @Published var indices: [String: Quote] = [:]
     /// Prices pushed or polled during the trading session; kept in memory and saved for holdings and watchlist when the app leaves.
@@ -184,11 +190,12 @@ import SwiftUI
         officialRefreshing = true; defer { officialRefreshing = false }
         do {
             let markets = Dictionary(uniqueKeysWithValues: (catalog?.funds ?? Fund.starters).map { ($0.id, $0.market ?? "") })
+            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的配息資料。") }
             let fresh = try await OfficialDividends.fetch(merging: official, markets: markets)
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(fresh).write(to: url.appendingPathExtension("official"), options: .atomic)
-            official = fresh; officialMessage = "已更新官方配息資料。"
-        } catch { officialMessage = error.localizedDescription }
+            official = fresh; officialMessage = "已更新官方配息資料。"; officialFailed = false
+        } catch { officialMessage = error.localizedDescription; officialFailed = true }
     }
     func saveDaily() {
         guard let daily else { return }
@@ -245,6 +252,7 @@ import SwiftUI
         guard !catalogRefreshing, !(automatic && catalog?.fetchedDay == DataChecks.day()) else { return }
         catalogRefreshing = true; defer { catalogRefreshing = false }
         do {
+            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的 ETF 名單。") }
             let next = try await CatalogAPI.fetch(previous: catalog)
             if let old = catalog {
                 guard next.listedDate >= old.listedDate else { throw AppDataError("新取得的資料日期比目前舊，未覆寫。") }
@@ -254,18 +262,21 @@ import SwiftUI
             }
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(next).write(to: url.appendingPathExtension("catalog"), options: .atomic)
-            catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"
-        } catch { catalogMessage = error.localizedDescription }
+            catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
+        } catch { catalogMessage = error.localizedDescription; catalogFailed = true }
     }
     func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; try commit(next) }
     func saveHistory(_ value: PriceHistory) throws { try value.validate(); var next = data; if next.histories == nil { next.histories = [:] }; next.histories?[value.symbol] = value; try commit(next) }
     func saveFee(_ value: FeeRecord) throws { try value.validate(); var next = data; if next.fees == nil { next.fees = [:] }; next.fees?[value.symbol] = value; try commit(next) }
-    func refresh(symbols: [String]? = nil) async {
+    /// `inline`: a failure is kept in `quoteFailure` for the page's own LoadFailed instead of the app-wide alert.
+    func refresh(symbols: [String]? = nil, inline: Bool = false) async {
         guard !refreshing else { return }
         refreshing = true; defer { refreshing = false }
         message = nil
+        if inline { quoteFailure = nil }
         let started = Date()
         do {
+            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的報價。") }
             let key = try SecureKey.read()
             let targets = Array(Set(symbols ?? data.holdings.map(\.symbol))).sorted()
             guard !targets.isEmpty else { message = "請先新增持有，或到單檔 ETF 頁面更新報價。"; return }
@@ -289,7 +300,7 @@ import SwiftUI
                 }
             }
             try keepFetched(fetched, since: started)
-        } catch { message = error.localizedDescription }
+        } catch { if inline { quoteFailure = error.localizedDescription } else { message = error.localizedDescription } }
     }
     /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
     /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.

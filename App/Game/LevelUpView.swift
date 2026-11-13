@@ -48,7 +48,7 @@ struct LevelUpHeader: View {
     let moment: LevelUpMoment
     var appeared = true
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 10) {
@@ -72,7 +72,7 @@ struct LevelUpView: View {
     let moment: LevelUpMoment
     let onAccept: () -> Void
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @Environment(\.displayScale) private var displayScale
     @State private var appeared = false
     @State private var drops = 0

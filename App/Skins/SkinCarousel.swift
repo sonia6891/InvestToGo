@@ -58,7 +58,7 @@ struct SkinsView: View {
     @Environment(\.skin) private var skin
     @Environment(\.lobbyNavigation) private var navigation
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     /// The card in the middle; starts on the skin being worn.
     @State private var focus: String? = SkinStore.current.id
 
@@ -146,7 +146,8 @@ struct SkinsView: View {
                 .accessibilityIdentifier("skin-apply")
         case .unlocked:
             SkinButton("換上這套") {
-                Haptics.tick()
+                // The new skin answers with its own sound and haptic (spec 7.1).
+                ConfirmFeedback.confirm(focused)
                 skins.select(focused.id)
                 navigation.toLobby()
             }
@@ -173,7 +174,7 @@ struct SkinsView: View {
 struct SkinCarousel: View {
     @Binding var focus: String?
     @Binding var tryOn: String?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @ObservedObject private var skins = SkinStore.shared
     /// The card being held; reset by SwiftUI however the touch ends, even when the scroll view takes it over.
     @GestureState private var holding: String? = nil

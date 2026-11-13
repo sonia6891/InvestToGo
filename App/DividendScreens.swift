@@ -100,6 +100,7 @@ struct UpcomingDividend: Identifiable, Equatable {
 /// A newcomer sees the pile, one sentence and the button — never an NT$ 0 (ruling R15).
 struct DividendsView: View {
     @EnvironmentObject var store: PortfolioStore
+    @ObservedObject private var connectivity = Connectivity.shared
     @Environment(\.skin) private var skin
     @AppStorage("hideAmounts") private var hidden = false
 
@@ -122,6 +123,12 @@ struct DividendsView: View {
             } else {
                 received(year)
                 months(year, now: now)
+                if store.officialFailed || connectivity.offline {
+                    // The announcements below are still the last ones that came through (spec 9 讀取失敗).
+                    LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的配息公告。" : "配息公告這次沒有更新成功，先顯示上次的公告。",
+                               retry: { Task { await store.refreshOfficial() } },
+                               lastUpdated: store.official.sources["twse"].map(slashDay))
+                }
                 upcoming
                 logButton(primary: false).frame(maxWidth: .infinity)
                 more
@@ -263,7 +270,7 @@ struct DividendsView: View {
 struct RewardToast: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @State private var xp: Int?
     @State private var drops = 0
     @State private var hide: Task<Void, Never>?

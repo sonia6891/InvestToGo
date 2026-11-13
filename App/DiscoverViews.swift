@@ -113,6 +113,7 @@ struct OptionChip: View {
 struct DiscoverView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
+    @ObservedObject private var connectivity = Connectivity.shared
     @State private var query = ""
     /// The series chip; nil is 全部.
     @State private var series: DexSeries?
@@ -143,6 +144,13 @@ struct DiscoverView: View {
                 }
             }
             countRow(items.count)
+            if store.catalogRefreshing { LoadingFloat(art: .find) }
+            else if store.catalogFailed || connectivity.offline {
+                // The list below is still the last one that came through (spec 9 讀取失敗).
+                LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次取得的 ETF 名單。" : "ETF 名單這次沒有更新成功，先顯示上次的名單。",
+                           retry: { Task { await store.refreshCatalog() } },
+                           lastUpdated: store.catalog.map { slashDay($0.fetchedDay) })
+            }
             list(items)
             footer
         }
@@ -203,7 +211,7 @@ struct DiscoverView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("上市 \(store.funds.filter { $0.market == "TWSE" }.count) · 上櫃 \(store.funds.filter { $0.market == "TPEx" }.count) 個代碼。系列依名稱與基金類型歸類；配息頻率依近一年除息次數推算。")
             if let catalog = store.catalog { Text("上市資料日 \(catalog.listedDate) · 上櫃取得日 \(catalog.fetchedDay)") }
-            if let message = store.catalogMessage { Text(message) }
+            if let message = store.catalogMessage, !store.catalogFailed { Text(message) }
         }
         .skinFont(.body(11)).skinForeground(\.sub)
         Button(store.catalogRefreshing ? "更新中…" : "更新上市櫃名單") { Task { await store.refreshCatalog() } }
@@ -366,7 +374,8 @@ struct WatchlistView: View {
 struct FundDetail: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ObservedObject private var connectivity = Connectivity.shared
+    @Environment(\.motionReduced) private var reduceMotion
     let fund: Fund
     @State private var section = 0
     @State private var range = ChartRange.year
@@ -375,6 +384,12 @@ struct FundDetail: View {
     private var quote: Quote? { store.quote(fund.id) }
     var body: some View {
         Page {
+            if store.quoteFailure != nil || connectivity.offline {
+                // The price below is still the last one that came through (spec 9 讀取失敗).
+                LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的報價。" : "報價這次沒有更新成功：\(store.quoteFailure ?? "")",
+                           retry: { Task { await store.refresh(symbols: [fund.id], inline: true) } },
+                           lastUpdated: quote.map { slashDay($0.date) })
+            }
             header
             HStack(spacing: 6) {
                 ForEach(Self.tabs.indices, id: \.self) { i in SkinChip(Self.tabs[i], selected: section == i) { section = i } }
@@ -390,6 +405,7 @@ struct FundDetail: View {
         .overlay(alignment: .top) { if collected { toast } }
         .task { await store.refreshDaily() }
         .onAppear {
+            store.quoteFailure = nil
             store.liveFocus = fund.id; store.live.syncSoon()
             if store.collectDexCard(fund.id) { showToast() }
         }
@@ -432,7 +448,7 @@ struct FundDetail: View {
             HStack {
                 Text(updatedText).skinFont(.mono(10)).skinForeground(\.sub)
                 Spacer(minLength: 8)
-                Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh(symbols: [fund.id]) } }
+                Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh(symbols: [fund.id], inline: true) } }
                     .buttonStyle(.plain).skinFont(.mono(11)).skinForeground(\.ink).frame(minHeight: 44).disabled(store.refreshing)
             }
         }

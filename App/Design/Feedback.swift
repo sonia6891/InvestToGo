@@ -1,9 +1,32 @@
 import AVFoundation
 import CoreHaptics
+import SwiftUI
 import UIKit
 
-/// Short synthesised sounds, the same tones as the 3D concept page: a three-note coin chime and a soft tick.
+/// Short sounds: each skin's own confirm sound (spec 7.1: 黑金「咚」, 像素「叮」, 縫線「喀嚓」, 手繪「沙沙」), read from
+/// App/Resources/Sounds/<feedback.sound>.caf (made by Scripts/make_sounds.py), plus the synthesised coin chime and tick.
 @MainActor enum SoundFX {
+    private static var players: [String: AVAudioPlayer] = [:]
+
+    /// The skin's confirm sound in the app bundle.
+    nonisolated static func url(for skin: Skin) -> URL? { Bundle.main.url(forResource: skin.feedback.sound, withExtension: "caf") }
+
+    /// The skin's confirm sound; silent when 音效 is off in 設定 (`pocket.sound`).
+    static func confirm(_ skin: Skin, enabled: Bool) {
+        guard enabled, let url = url(for: skin) else { return }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+            let player: AVAudioPlayer
+            if let cached = players[skin.feedback.sound] { player = cached } else {
+                player = try AVAudioPlayer(contentsOf: url)
+                player.prepareToPlay()
+                players[skin.feedback.sound] = player
+            }
+            player.currentTime = 0
+            player.play()
+        } catch { /* Sound is decoration: a device that cannot play it stays silent. */ }
+    }
+
     private static let engine = AVAudioEngine()
     private static let player = AVAudioPlayerNode()
     private static var ready = false
@@ -44,8 +67,35 @@ import UIKit
     }
 }
 
+/// One impact of a skin's confirm haptic: when (seconds after the first), which generator and how hard.
+struct HapticPulse: Equatable {
+    var delay: Double
+    var style: UIImpactFeedbackGenerator.FeedbackStyle
+    var intensity: CGFloat
+}
+
 /// Custom haptics, with the standard impact generator where Core Haptics is unavailable.
 @MainActor enum Haptics {
+    /// Each skin's confirm haptic (spec 7.1 震動): heavy＝one heavy, triple＝three rigid 60 ms apart, tap＝one light,
+    /// faint＝one soft at 0.3.
+    nonisolated static func pulses(_ kind: SkinFeedback.HapticKind) -> [HapticPulse] {
+        switch kind {
+        case .heavy: return [HapticPulse(delay: 0, style: .heavy, intensity: 1)]
+        case .triple: return [0, 0.06, 0.12].map { HapticPulse(delay: $0, style: .rigid, intensity: 1) }
+        case .tap: return [HapticPulse(delay: 0, style: .light, intensity: 1)]
+        case .faint: return [HapticPulse(delay: 0, style: .soft, intensity: 0.3)]
+        }
+    }
+
+    static func confirm(_ kind: SkinFeedback.HapticKind) {
+        for pulse in pulses(kind) {
+            let generator = UIImpactFeedbackGenerator(style: pulse.style)
+            generator.prepare()
+            if pulse.delay == 0 { generator.impactOccurred(intensity: pulse.intensity) }
+            else { DispatchQueue.main.asyncAfter(deadline: .now() + pulse.delay) { generator.impactOccurred(intensity: pulse.intensity) } }
+        }
+    }
+
     private static var engine: CHHapticEngine? = {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return nil }
         let engine = try? CHHapticEngine(); engine?.isAutoShutdownEnabled = true
@@ -69,4 +119,25 @@ import UIKit
             try engine.makePlayer(with: CHHapticPattern(events: events, parameters: [])).start(atTime: 0)
         } catch { UIImpactFeedbackGenerator(style: fallback).impactOccurred() }
     }
+}
+
+/// A skin's confirm: its sound (when 音效 is on) and its haptic.
+@MainActor enum ConfirmFeedback {
+    static func confirm(_ skin: Skin) {
+        SoundFX.confirm(skin, enabled: SkinStore.shared.soundOn)
+        Haptics.confirm(skin.feedback.haptic)
+    }
+}
+
+/// Reduce Motion: the system setting, or `--reduce-motion` with `--ui-testing` (treated as the setting turned on).
+enum MotionPreference {
+    static let forced: Bool = {
+        let args = ProcessInfo.processInfo.arguments
+        return args.contains("--ui-testing") && args.contains("--reduce-motion")
+    }()
+}
+
+extension EnvironmentValues {
+    /// Read instead of `accessibilityReduceMotion` everywhere, so `--reduce-motion` reaches every screen.
+    var motionReduced: Bool { accessibilityReduceMotion || MotionPreference.forced }
 }

@@ -9,7 +9,7 @@ struct GameBottomBar: View {
     var onLobby: () -> Void
     var onPick: (Feature) -> Void
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @State private var open = false
 
     static let height: CGFloat = 76

@@ -32,7 +32,7 @@ struct BrokerView: View {
             PhotosPicker(selection: $shots, maxSelectionCount: 20, matching: .images) { Text("從截圖匯入") }.disabled(reading).accessibilityIdentifier("broker-import-screenshots")
             Text("庫存很長時可捲動分段截圖，一次選多張（最多 20 張）；截圖重疊處完全相同的列只算一次，同一檔分批買進的會分列顯示。只有名稱沒有代號也可以。文字只在這支手機上辨識，不會上傳。").font(.caption).foregroundStyle(.secondary)
         }
-        if reading { Section { HStack(spacing: 10) { ProgressView(); Text(progress.isEmpty ? "正在辨識截圖文字…" : progress) } } }
+        if reading { Section { LoadingFloat(art: .tools, text: progress.isEmpty ? "讀取中・正在辨識截圖文字" : "讀取中・" + progress) } }
         if let table {
             Section("對應欄位 · \(table.rows.count) 筆") {
                 column("ETF 代號", selection: $mapping.symbol, table: table)

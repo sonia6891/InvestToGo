@@ -13,7 +13,7 @@ import SwiftUI
 /// red paper with a sewn seam (stitch), wobbly hand-drawn box (sketch). Primary is the filled call to action.
 struct SkinButtonChrome<Label: View>: View {
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     var primary: Bool
     var pressed: Bool
     /// Side padding; nil uses the skin's own. Smaller when two buttons share a row.

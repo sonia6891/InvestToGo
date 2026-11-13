@@ -74,6 +74,18 @@ jobs:
             sleep 4
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-onboarding-$PAGE.png"
           done
+          # 離線中 (spec 9): the offline bar, and 找 ETF keeping its last list with 「再試一次」.
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --offline --open find
+          sleep 5
+          xcrun simctl io "$DEVICE" screenshot "build/screens/screen-find-offline.png"
+          # 減少動態效果 (spec 3.5): 配息 and the lobby as they look with --reduce-motion.
+          for SCREEN in lobby dividends; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --reduce-motion --demo-pocket --demo-streak 12 --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-reduce-motion.png"
+          done
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2
         continue-on-error: true

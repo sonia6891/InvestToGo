@@ -31,7 +31,7 @@ struct PocketHero: View {
     /// Called when the coin passes the lip: the caller updates its numbers, plays the burst, sound and haptics.
     var onLanded: () -> Void = {}
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @State private var scene = HeroScene()
     private var root: Entity { scene.root }
     private var numeral: Entity { scene.numeral }

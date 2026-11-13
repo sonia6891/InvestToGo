@@ -7,7 +7,7 @@ struct QuickPick: View {
     @Binding var open: Bool
     var pick: (Feature) -> Void
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @State private var shown = false
 
     /// Disc diameter.

@@ -27,7 +27,7 @@ import SwiftUI
 /// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby.
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
 
@@ -57,7 +57,7 @@ struct LaunchGate: View {
 struct RootView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.scenePhase) private var phase
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @Namespace private var lobby
     @State private var path: NavigationPath
     /// The feature at the bottom of the stack; nil in the lobby and on screens pushed straight from it.
@@ -65,6 +65,7 @@ struct RootView: View {
     @ObservedObject private var skins = SkinStore.shared
     /// The LEVEL×UP on screen (spec 5.12); the level is saved as celebrated when it is accepted.
     @State private var levelUp: LevelUpMoment?
+    @ObservedObject private var connectivity = Connectivity.shared
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
@@ -87,6 +88,8 @@ struct RootView: View {
         .environment(\.lobbyNamespace, lobby)
         .tint(Palette.blue)
         .id(skins.skin.id)
+        // 離線中: a thin strip above every screen; the screens move down under it rather than hide behind it.
+        .safeAreaInset(edge: .top, spacing: 0) { if connectivity.offline { OfflineBar() } }
         .overlay(alignment: .bottom) {
             if !path.isEmpty, let feature {
                 GameBottomBar(title: feature.title, onLobby: navigation.toLobby, onPick: navigation.open)

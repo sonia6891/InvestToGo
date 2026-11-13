@@ -7,7 +7,7 @@ struct DexCardView: View {
     let symbol: String
     @EnvironmentObject private var store: PortfolioStore
     @Environment(\.skin) private var skin
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.motionReduced) private var reduceMotion
     @Environment(\.lobbyNavigation) private var navigation
     /// The card on screen once the user has swiped; nil shows `symbol`.
     @State private var swiped: String?

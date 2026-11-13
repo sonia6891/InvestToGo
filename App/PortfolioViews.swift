@@ -456,7 +456,7 @@ struct HoldingFormView: View {
         guard t >= 0 else { error = "請填寫總成本（含手續費）。"; return }
         let h = Holding(id: existing?.id ?? UUID(), symbol: code, name: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? (fund?.name ?? "") : name.trimmingCharacters(in: .whitespacesAndNewlines), shares: s, unitCost: t / s, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: existing.map { $0.symbol == code ? $0.strategy : (fund?.strategy ?? .unclassified) } ?? (fund?.strategy ?? .unclassified), sourceAccount: existing?.sourceAccount, purchaseDate: date)
         SellCosts.remember(feeRate, for: broker)
-        do { try store.save(h); dismiss() } catch { self.error = error.localizedDescription }
+        do { try store.save(h); ConfirmFeedback.confirm(SkinStore.shared.skin); dismiss() } catch { self.error = error.localizedDescription }
     }
 }
 struct TradeFormView: View {
