@@ -1,0 +1,167 @@
+{
+ "ResultCode": 0,
+ "ResultMsg": "",
+ "Data": {
+  "Fund": [
+   {
+    "CNO": "93150242",
+    "ETF_ID": "00934",
+    "FID": "E0024",
+    "FundName": "中國信託臺灣優選成長高股息ETF基金",
+    "FID_SNAME": "中信臺灣優選成長高股息ETF基金",
+    "FID_NAME": "中國信託臺灣優選成長高股息ETF證券投資信託基金",
+    "FID_TITLE": "(基金之配息來源可能為收益平準金且基金並無保證收益及配息)"
+   }
+  ],
+  "FundAssets": [
+   {
+    "FID": "E0024",
+    "基金淨資產": "14,816,093,838",
+    "基金在外流通單位數": "539,526,000",
+    "資料日期": "2026/11/13",
+    "基金每單位淨值": "27.46",
+    "NAV_CURX": "台幣",
+    "NAV_DOT": 2,
+    "NAV_DT": "2026-11-13T00:00:00"
+   }
+  ],
+  "FundAssetsDetail": [
+   {
+    "Collapsed": true,
+    "Code": "STOCK",
+    "Name": "股票",
+    "SumTitle": "股票合計",
+    "Sum": 99.42,
+    "Data": [
+     {
+      "invtp_": "STOCK",
+      "code_": "3293",
+      "name_": "鈊象電子",
+      "ename_": "International Games System Co.",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "1,495,000.00",
+      "weights_": "8.10",
+      "amount_": "1,194,505,000.00",
+      "price_": "799.00",
+      "SNO": 6,
+      "SSNO": 1
+     },
+     {
+      "invtp_": "STOCK",
+      "code_": "2603",
+      "name_": "長榮海運",
+      "ename_": "Evergreen Marine Corp.(Taiwan)",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "4,483,000.00",
+      "weights_": "7.79",
+      "amount_": "1,154,372,500.00",
+      "price_": "257.50",
+      "SNO": 7,
+      "SSNO": 2
+     },
+     {
+      "invtp_": "STOCK",
+      "code_": "2382",
+      "name_": "廣達電腦",
+      "ename_": "Quanta Computer Inc.",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "3,429,000.00",
+      "weights_": "6.40",
+      "amount_": "948,118,500.00",
+      "price_": "276.50",
+      "SNO": 8,
+      "SSNO": 3
+     }
+    ],
+    "ColType": 4,
+    "Col0": "序號",
+    "Col1": "股票代碼",
+    "Col2": "中文名稱",
+    "Col3": "英文名稱",
+    "Col4": "股數",
+    "Col5": "權重(%)"
+   },
+   {
+    "Collapsed": true,
+    "Code": "MARGIN",
+    "Name": "保證金",
+    "SumTitle": "",
+    "Sum": 0,
+    "Data": [
+     {
+      "invtp_": "MARGIN",
+      "code_": "",
+      "name_": "保證金",
+      "ename_": "MARGIN",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "0.00",
+      "weights_": "0.12",
+      "amount_": "18,500,369.00",
+      "price_": "0.00",
+      "SNO": 3,
+      "SSNO": 1
+     }
+    ],
+    "ColType": 2,
+    "Col0": "序號",
+    "Col1": "項目",
+    "Col2": "金額"
+   },
+   {
+    "Collapsed": true,
+    "Code": "CASH",
+    "Name": "其他資產",
+    "SumTitle": "",
+    "Sum": 0,
+    "Data": [
+     {
+      "invtp_": "CASH",
+      "code_": "",
+      "name_": "現金",
+      "ename_": "CASH",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "0.00",
+      "weights_": "3.34",
+      "amount_": "494,391,802.00",
+      "price_": "0.00",
+      "SNO": 1,
+      "SSNO": 1
+     },
+     {
+      "invtp_": "PAYRCIV",
+      "code_": "",
+      "name_": "應收(付)證券款",
+      "ename_": "PAYRCIV",
+      "cur_": "TWD",
+      "ym_": "",
+      "qty_": "0.00",
+      "weights_": "0.00",
+      "amount_": "-410,140,616.00",
+      "price_": "0.00",
+      "SNO": 5,
+      "SSNO": 2
+     }
+    ],
+    "ColType": 2,
+    "Col0": "序號",
+    "Col1": "項目",
+    "Col2": "金額"
+   }
+  ],
+  "HoldingWeightPie": [],
+  "Etfidx_Name": [
+   {
+    "FID_SNAME": "中信成長高股息",
+    "TRACK_INDEX_NM": "TIP Customized Taiwan Growth and High Dividend Index",
+    "Different": "差異"
+   }
+  ],
+  "Etfidx_diff": []
+ },
+ "ExecuteTime": "2026-11-13 21:16:17.264"
+}

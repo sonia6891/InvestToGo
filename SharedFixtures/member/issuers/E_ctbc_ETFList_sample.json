@@ -1,0 +1,53 @@
+{
+ "ResultCode": 0,
+ "ResultMsg": "",
+ "Data": {
+  "Data": [
+   {
+    "FundName": "中國信託恒生中國高股息ETF證券投資信託基金",
+    "ETF_ID": "00882",
+    "FID_TITLE": "(基金之配息來源可能為收益平準金且基金並無保證收益及配息)",
+    "FID": "E0014",
+    "FID_BNAME": "中信中國高股息",
+    "NAV": "15.64",
+    "NAV_DT": "2026/11/12",
+    "DIFF": "-0.06",
+    "DIFF_RATE": "-0.38",
+    "CNO": "88134187",
+    "NAV_CURX": "TWD",
+    "RISK_LV": "5",
+    "RISK_LV_NAME": "RR5",
+    "FundType": "00000",
+    "FundTypeName": "海外ETF",
+    "YieldType": "3",
+    "YieldName": "半年配",
+    "FundOri": "ETF",
+    "Sort": 99999,
+    "CAN_BUY": "N"
+   },
+   {
+    "FundName": "中國信託臺灣優選成長高股息ETF證券投資信託基金",
+    "ETF_ID": "00934",
+    "FID_TITLE": "(基金之配息來源可能為收益平準金且基金並無保證收益及配息)",
+    "FID": "E0024",
+    "FID_BNAME": "中信成長高股息",
+    "NAV": "27.46",
+    "NAV_DT": "2026/11/13",
+    "DIFF": "0.47",
+    "DIFF_RATE": "1.74",
+    "CNO": "93150242",
+    "NAV_CURX": "TWD",
+    "RISK_LV": "4",
+    "RISK_LV_NAME": "RR4",
+    "FundType": "00001",
+    "FundTypeName": "國內ETF",
+    "YieldType": "1",
+    "YieldName": "月配",
+    "FundOri": "ETF",
+    "Sort": 99999,
+    "CAN_BUY": "N"
+   }
+  ]
+ },
+ "ExecuteTime": "2026-11-13 21:16:15.608"
+}

@@ -1,0 +1,25 @@
+{
+ "result": [
+  {
+   "stockCode": "2891",
+   "stockName": "中信金",
+   "volumn": "974,354,000",
+   "weights": "11.26"
+  },
+  {
+   "stockCode": "2382",
+   "stockName": "廣達",
+   "volumn": "187,567,000",
+   "weights": "8.01"
+  },
+  {
+   "stockCode": "2882",
+   "stockName": "國泰金",
+   "volumn": "399,358,486",
+   "weights": "6.86"
+  }
+ ],
+ "returnCode": "2000",
+ "success": true,
+ "returnMessage": null
+}

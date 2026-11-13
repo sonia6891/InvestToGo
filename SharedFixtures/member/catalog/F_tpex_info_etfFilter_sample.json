@@ -1,0 +1,119 @@
+{
+ "status": "success",
+ "issuerList": [
+  {
+   "issuerID": "5801",
+   "issuer": "第一金"
+  },
+  {
+   "issuerID": "A00001",
+   "issuer": "兆豐"
+  },
+  {
+   "issuerID": "A00005",
+   "issuer": "元大"
+  },
+  {
+   "issuerID": "A00008",
+   "issuer": "玉山"
+  },
+  {
+   "issuerID": "A00009",
+   "issuer": "統一"
+  },
+  {
+   "issuerID": "A00010",
+   "issuer": "富邦"
+  },
+  {
+   "issuerID": "A00012",
+   "issuer": "華南永昌"
+  },
+  {
+   "issuerID": "A00016",
+   "issuer": "群益"
+  },
+  {
+   "issuerID": "A00018",
+   "issuer": "聯博"
+  },
+  {
+   "issuerID": "A00022",
+   "issuer": "復華"
+  },
+  {
+   "issuerID": "A00025",
+   "issuer": "永豐"
+  },
+  {
+   "issuerID": "A00026",
+   "issuer": "中信"
+  },
+  {
+   "issuerID": "A00031",
+   "issuer": "貝萊德"
+  },
+  {
+   "issuerID": "A00032",
+   "issuer": "野村"
+  },
+  {
+   "issuerID": "A00033",
+   "issuer": "聯邦"
+  },
+  {
+   "issuerID": "A00037",
+   "issuer": "國泰"
+  },
+  {
+   "issuerID": "A00041",
+   "issuer": "凱基"
+  },
+  {
+   "issuerID": "A00043",
+   "issuer": "街口"
+  },
+  {
+   "issuerID": "A00045",
+   "issuer": "富蘭克林華美"
+  },
+  {
+   "issuerID": "A00047",
+   "issuer": "台新"
+  },
+  {
+   "issuerID": "A00049",
+   "issuer": "大華銀"
+  }
+ ],
+ "data": [
+  {
+   "issuerID": "A00005",
+   "listingDate": "20170117",
+   "issuerLink": "http://www.yuantaetfs.com/",
+   "stockName": "元大美債20年",
+   "totalAv": "1,567.06",
+   "holders": "223,926",
+   "indexName": "ICE美國政府20+年期債券指數",
+   "valueYTD": "911.83",
+   "volumeYTD": "34,012,596",
+   "rorYTD": -4.19,
+   "stockNo": "00679B",
+   "issuer": "元大投信"
+  },
+  {
+   "issuerID": "A00016",
+   "listingDate": "20231205",
+   "issuerLink": "https://www.capitalfund.com.tw/",
+   "stockName": "群益ESG投等債20+",
+   "totalAv": "2,356.32",
+   "holders": "201,807",
+   "indexName": "ICE ESG 20年期以上BBB級成熟市場大型美元公司債指數",
+   "valueYTD": "952.24",
+   "volumeYTD": "64,622,421",
+   "rorYTD": -5.44,
+   "stockNo": "00937B",
+   "issuer": "群益投信"
+  }
+ ]
+}

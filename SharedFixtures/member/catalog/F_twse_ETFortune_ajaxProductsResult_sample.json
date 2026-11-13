@@ -1,0 +1,41 @@
+{
+ "status": "success",
+ "data": [
+  {
+   "stockNo": "0050",
+   "stockName": "元大台灣50",
+   "listingDate": "2003.06.30",
+   "indexName": "富時臺灣證券交易所臺灣50指數",
+   "totalAv": "25,304",
+   "close1": "102.5",
+   "holders": "3,874,009",
+   "valueYTD": "13,082.573",
+   "volumeYTD": "140,178,361",
+   "issuer": "元大證券投資信託股份有限公司"
+  },
+  {
+   "stockNo": "00878",
+   "stockName": "國泰永續高股息",
+   "listingDate": "2020.07.20",
+   "indexName": "MSCI臺灣ESG永續高股息精選30指數",
+   "totalAv": "6,523",
+   "close1": "33.6",
+   "holders": "1,748,220",
+   "valueYTD": "1,851.314",
+   "volumeYTD": "65,869,323",
+   "issuer": "國泰證券投資信託股份有限公司"
+  },
+  {
+   "stockNo": "00919",
+   "stockName": "群益台灣精選高息",
+   "listingDate": "2022.10.20",
+   "indexName": "臺灣指數公司特選臺灣上市上櫃精選高息指數",
+   "totalAv": "6,041",
+   "close1": "31.53",
+   "holders": "1,509,182",
+   "valueYTD": "3,072.218",
+   "volumeYTD": "113,419,831",
+   "issuer": "群益證券投資信託股份有限公司"
+  }
+ ]
+}

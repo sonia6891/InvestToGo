@@ -1,0 +1,181 @@
+{
+ "PCF": {
+  "fundid": "1066",
+  "fundname": "元大台灣卓越50基金",
+  "fullname": "元大台灣卓越50證券投資信託基金",
+  "ename": "Yuanta/P-shares Taiwan Top 50 ETF",
+  "markcd": "0050",
+  "trandate": "20261111",
+  "totalav": 2599679370503,
+  "osunit": 25042000000,
+  "nav": 103.81,
+  "baseunit": 500000,
+  "estcvalue": 51906385,
+  "estdvalue": 49481,
+  "issuesdiff": -6000000,
+  "cashdiff": 49481,
+  "preallot": 0,
+  "allot": 0,
+  "anndate": "20261112",
+  "upddate": "2026-11-11 16:29:19",
+  "preunit": 0,
+  "predate": null,
+  "allot_charge_fee": 0.0,
+  "redem_charge_fee": 0.0,
+  "Beneficiary": {
+   "doc_ym": "20261031",
+   "bf_cnt_a": 4001906,
+   "upd_date": "2026-11-02T10:08:26"
+  }
+ },
+ "InKind": {
+  "FundComposition": [
+   {
+    "stkcd": "1216",
+    "name": "統一",
+    "ename": "UNI-PRESIDENT ENTERPRISES CORP.",
+    "qty": 2580,
+    "cashinlieu": "N",
+    "minimum": "Y"
+   },
+   {
+    "stkcd": "1303",
+    "name": "南亞",
+    "ename": "NAN YA PLASTICS CORPORATION",
+    "qty": 2572,
+    "cashinlieu": "N",
+    "minimum": "Y"
+   }
+  ]
+ },
+ "Cash": null,
+ "FundWeights": {
+  "Summary": {
+   "code": "1066",
+   "name": null,
+   "stkvalues": 2595681124596.0,
+   "futvalues": 4659032600.0,
+   "etfvalues": 0.0,
+   "bndvalues": 0.0,
+   "fundsize": 2600302247123
+  },
+  "StockWeights": [
+   {
+    "code": "2330",
+    "ym": null,
+    "name": "台積電",
+    "ename": "Taiwan Semiconductor Manufacturing Co. Ltd.",
+    "weights": 58.7,
+    "qty": 637296293.0
+   },
+   {
+    "code": "2454",
+    "ym": null,
+    "name": "聯發科",
+    "ename": "MediaTek Inc.",
+    "weights": 5.88,
+    "qty": 38339548.0
+   },
+   {
+    "code": "2317",
+    "ym": null,
+    "name": "鴻海",
+    "ename": "HON HAI PRECISION IND. CO. LTD.",
+    "weights": 2.96,
+    "qty": 318156984.0
+   }
+  ],
+  "FutureWeights": [
+   {
+    "code": "TX",
+    "ym": "202611",
+    "name": "臺股期貨",
+    "ename": "TAIEX FUTURE",
+    "weights": 0.11,
+    "qty": 338.0
+   },
+   {
+    "code": "NYF",
+    "ym": "202611",
+    "name": "台灣50ETF股票期貨",
+    "ename": "Taiwan 50 ETF SSF",
+    "weights": 0.06,
+    "qty": 1618.0
+   }
+  ],
+  "ETFWeights": [],
+  "BondWeights": []
+ },
+ "Memo": [
+  {
+   "content": [
+    {
+     "text": "1.There is no cash payment in lieu of shares in the TTT Portfolio "
+    },
+    {
+     "text": "  Composition File today. Estimated Cash Component Per Basket is NT$49,481"
+    },
+    {
+     "text": "2.The Manager will give notice of the Cash Payment Amount after 4 pm on "
+    },
+    {
+     "text": "  Creation Day. "
+    },
+    {
+     "text": "3.The announcement of the above information was made in accordance with "
+    },
+    {
+     "text": "  Article 35 of the 「Yuanta/P-shares Taiwan Top 50 ETF Trust Agreement."
+    },
+    {
+     "text": "  」 The contents of the information were supplied by Yuanta Investment"
+    },
+    {
+     "text": "  Trust Co. Ltd. on 2026/11/11 The contents of this Portfolio "
+    },
+    {
+     "text": "  Composition File are based on the Chinese version of the announcement "
+    },
+    {
+     "text": "  made by Yuanta Investment Trust Co. Ltd. For other related information"
+    },
+    {
+     "text": "   and electronic information, please refer to the web site."
+    },
+    {
+     "text": "  (http://www.yuantaetfs.com)"
+    }
+   ],
+   "locale": "en"
+  },
+  {
+   "content": [
+    {
+     "text": "1.本日實物申購清單中無規定採用現金替代之成份標的。每實物申購單位估計現金差額"
+    },
+    {
+     "text": "  （即預估基準現金差額）為$49,481元"
+    },
+    {
+     "text": "2.每實物申購單位之實際現金差額於申請日下午四點後，以基金經理公司通知給付之金"
+    },
+    {
+     "text": "  額為準。"
+    },
+    {
+     "text": "3.以上資料係依據「元大台灣卓越50證券投資信託基金證券投資信託契約」第三十五條"
+    },
+    {
+     "text": "  之規定公告，資料內容由元大投信2026/11/11提供。"
+    },
+    {
+     "text": "  實物申購買回清單內容以公告之中文版本為準，其餘相關資訊及電子資料請參考網址"
+    },
+    {
+     "text": "  (http://www.yuantaetfs.com)。"
+    }
+   ],
+   "locale": "zh-tw"
+  }
+ ]
+}
