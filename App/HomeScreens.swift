@@ -414,6 +414,8 @@ struct SourcesView: View {
                     Button(store.catalogRefreshing ? "更新中…" : "立即更新") { Task { await store.refreshCatalog() } }.disabled(store.catalogRefreshing)
                 }
                 Divider()
+                row("clock.arrow.circlepath", Palette.purple, "回測歷史資料", status: ("官方資料", Palette.green), lines: ["證交所：個股日成交資訊、除權除息計算結果表、ETF 分割", "櫃買中心：個股日成交資訊、除權除息計算結果表", "按下開始回測才下載，存在手機裡"]) { EmptyView() }
+                Divider()
                 row("powerplug.fill", Palette.muted, "外部整合", status: ("未連線", Palette.red), lines: ["第三方券商整合（開發中）"]) { Button("連結帳戶") {}.disabled(true) }
             }
             if let message = store.officialMessage ?? store.catalogMessage { Text(message).font(.caption).foregroundStyle(Palette.muted) }

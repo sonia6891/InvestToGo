@@ -8,34 +8,80 @@ import Charts
     @Published private(set) var result: BacktestResult?
     /// The finished or running result reads 富果's adjusted closes instead of the exchanges.
     @Published private(set) var fromFugle = false
+    /// A download that failed, in plain words (offline or not); shown with 「再試一次」.
     @Published private(set) var error: String?
+    /// A code neither exchange knows: the user's to fix, not a failed download.
+    @Published private(set) var notFound: String?
+    /// Seconds the next download is expected to take; nil until worked out, or with a 富果 key.
+    @Published private(set) var estimate: Int?
     private var task: Task<Void, Never>?
     /// Only the latest run may report: a cancelled one stays silent.
     private var runID = 0
 
-    func run(legs: [(symbol: String, weight: Double)], markets: [String: String], monthly: Double, years: Int, reinvest: Bool,
-             client: OfficialHistoryClient = .shared) {
+    /// From the same month `years` ago to this month, in Taipei time.
+    static func window(years: Int, now: Date = Date()) -> (start: YearMonth, end: YearMonth) {
+        let end = YearMonth(now)
+        return (YearMonth(year: end.year - years, month: end.month), end)
+    }
+
+    /// What the wait will be like, said before and during the download.
+    static func estimateText(seconds: Int?, fugle: Bool) -> String? {
+        if fugle { return "用富果下載，不到 1 分鐘，離開這頁會停止。" }
+        guard let seconds else { return nil }
+        if seconds <= 0 { return "歷史資料已經在手機裡，不用再下載。" }
+        if seconds < 60 { return "下載不到 1 分鐘，離開這頁會停止。" }
+        let minutes = Int((Double(seconds) / 60).rounded(.up))
+        return "第一次下載大約需要 \(minutes) 分鐘（之後會快很多），離開這頁會停止。"
+    }
+
+    /// Reads the cache (no network) to see how much is left to download for these codes.
+    func refreshEstimate(symbols: [String], markets: [String: String], listed: [String: YearMonth], years: Int,
+                         client: OfficialHistoryClient = .shared) async {
+        guard !running else { return }
+        fromFugle = client.usesFugle
+        let window = Self.window(years: years)
+        var seconds = 0
+        for symbol in symbols {
+            seconds += await client.estimatedSeconds(symbol: symbol, market: markets[symbol], listed: listed[symbol], from: window.start, to: window.end)
+        }
+        guard !Task.isCancelled, !running else { return }
+        estimate = seconds
+    }
+
+    func run(legs: [(symbol: String, weight: Double)], markets: [String: String], listed: [String: YearMonth], monthly: Double, years: Int,
+             reinvest: Bool, client: OfficialHistoryClient = .shared) {
         task?.cancel()
         runID += 1
         let id = runID
-        running = true; progress = 0; error = nil; result = nil
+        running = true; progress = 0; error = nil; notFound = nil; result = nil
         fromFugle = client.usesFugle
         task = Task {
-            let end = YearMonth(Date())
-            let start = YearMonth(year: end.year - years, month: end.month)
+            let window = Self.window(years: years)
             let count = Double(max(legs.count, 1))
             var history: [String: SymbolHistory] = [:]
+            var current = ""
             do {
                 for (i, leg) in legs.enumerated() {
-                    history[leg.symbol] = try await client.history(symbol: leg.symbol, market: markets[leg.symbol], from: start, to: end) { part in
+                    current = leg.symbol
+                    history[leg.symbol] = try await client.history(symbol: leg.symbol, market: markets[leg.symbol], listed: listed[leg.symbol],
+                                                                   from: window.start, to: window.end) { part in
                         Task { @MainActor in self.report(id, (Double(i) + part) / count) }
                     }
                 }
                 try Task.checkCancellation()
-                let input = BacktestInput(legs: legs, monthly: monthly, start: start, end: end, reinvest: reinvest)
-                self.finish(id, result: Backtest.run(input, history: history), error: nil)
+                let input = BacktestInput(legs: legs, monthly: monthly, start: window.start, end: window.end, reinvest: reinvest)
+                self.finish(id, result: Backtest.run(input, history: history))
             } catch {
-                self.finish(id, result: nil, error: Task.isCancelled || error is CancellationError ? nil : error.localizedDescription)
+                if Task.isCancelled || error is CancellationError {
+                    self.finish(id, result: nil)
+                } else if let known = error as? AppDataError, known.text == OfficialHistoryClient.notFound {
+                    self.finish(id, result: nil, notFound: "找不到 \(current) 的歷史資料，請確認代號。")
+                } else {
+                    // Reported with the screen's name only: no codes, holdings or amounts.
+                    let offline = Connectivity.shared.offline || (error as? URLError)?.code == .notConnectedToInternet
+                    CrashReporting.capture(error, context: "backtest", offline: offline)
+                    self.finish(id, result: nil, error: offline ? "目前沒有網路，稍後再試。" : "暫時取不到，稍後再試。")
+                }
             }
         }
     }
@@ -51,9 +97,9 @@ import Charts
         progress = max(progress, min(1, value))
     }
 
-    private func finish(_ id: Int, result: BacktestResult?, error: String?) {
+    private func finish(_ id: Int, result: BacktestResult?, error: String? = nil, notFound: String? = nil) {
         guard id == runID else { return }
-        self.result = result; self.error = error
+        self.result = result; self.error = error; self.notFound = notFound
         running = false
     }
 }
@@ -72,6 +118,22 @@ struct BacktestView: View {
     @State private var formError: String?
 
     private static let spans = [1, 3, 5, 10]
+    /// The saved span, or 5 when what is saved is not one of the choices.
+    private var span: Int { Self.spans.contains(years) ? years : 5 }
+
+    /// 上市／上櫃 and the listing month of each picked code, where the catalogue has them.
+    private var catalogueFacts: (markets: [String: String], listed: [String: YearMonth]) {
+        var markets: [String: String] = [:]
+        var listed: [String: YearMonth] = [:]
+        for code in symbols {
+            guard let fund = store.funds.first(where: { $0.id == code }) else { continue }
+            if let market = fund.market { markets[code] = market }
+            if let date = fund.listingDate.flatMap(DataChecks.date) { listed[code] = YearMonth(date) }
+        }
+        return (markets, listed)
+    }
+
+    private var estimateLine: String? { BacktestModel.estimateText(seconds: model.estimate, fugle: model.fromFugle) }
 
     private var symbols: [String] {
         var seen = Set<String>()
@@ -115,7 +177,14 @@ struct BacktestView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("回測").font(.headline).foregroundStyle(Palette.ink); Text("如果幾年前就開始每月投入").font(.caption2).foregroundStyle(Palette.muted) } } }
+        .onAppear { if years != span { years = span } }
         .onDisappear { model.cancel() }
+        // Works out the wait from what is already on the phone; again when the codes or span change or a run ends.
+        .task(id: "\(savedSymbols)|\(years)|\(model.running)") {
+            guard MembershipStore.shared.has(.backtest) else { return }
+            let facts = catalogueFacts
+            await model.refreshEstimate(symbols: symbols, markets: facts.markets, listed: facts.listed, years: span)
+        }
     }
 
     // MARK: Form
@@ -176,6 +245,10 @@ struct BacktestView: View {
                 ForEach(Self.spans, id: \.self) { Text("\($0) 年前").tag($0) }
             }
             .pickerStyle(.segmented).padding(.top, 6).accessibilityIdentifier("backtest-years")
+            if let estimateLine {
+                Text(estimateLine).font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 6).accessibilityIdentifier("backtest-estimate")
+            }
             Toggle("配息再投入", isOn: $reinvest).font(.subheadline.weight(.semibold)).foregroundStyle(Palette.ink).padding(.top, 12)
             Text(reinvest ? "配息在除息日以收盤價買回。" : "配息領現金，計入期末市值。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 2)
         }
@@ -183,7 +256,9 @@ struct BacktestView: View {
             Card {
                 ProgressView(value: model.progress)
                 Text("下載歷史資料 \(Int(model.progress * 100))%").font(.subheadline.bold()).monospacedDigit().foregroundStyle(Palette.ink).padding(.top, 10)
-                Text("第一次下載需要幾十秒，離開這頁會停止").font(.caption).foregroundStyle(Palette.muted).padding(.top, 4)
+                if let estimateLine {
+                    Text(estimateLine).font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true).padding(.top, 4)
+                }
                 if !model.fromFugle {
                     Text("年數越長、檔數越多就越久：每個月份要向交易所要一次資料，每次間隔 2 秒；下載過的月份會留在手機裡。")
                         .font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true).padding(.top, 2)
@@ -198,8 +273,9 @@ struct BacktestView: View {
                 Text("請選 1–3 檔，比例合計 100%，並輸入每月投入金額。").font(.caption).foregroundStyle(Palette.red)
             }
         }
-        if let error = model.error {
-            Card { Text("沒有完成：\(error)").font(.subheadline).foregroundStyle(Palette.red).fixedSize(horizontal: false, vertical: true) }
+        if let error = model.error { LoadFailed(message: error, retry: { start() }, lastUpdated: nil) }
+        if let notFound = model.notFound {
+            Card { Text(notFound).font(.subheadline).foregroundStyle(Palette.red).fixedSize(horizontal: false, vertical: true) }
         }
         if let result = model.result { resultCard(result) }
         Text(sourceLine).font(.caption).foregroundStyle(Palette.muted).fixedSize(horizontal: false, vertical: true)
@@ -245,12 +321,9 @@ struct BacktestView: View {
 
     private func start() {
         guard let input else { return }
-        var markets: [String: String] = [:]
-        for leg in input.legs {
-            if let market = store.funds.first(where: { $0.id == leg.symbol })?.market { markets[leg.symbol] = market }
-        }
+        let facts = catalogueFacts
         formError = nil
-        model.run(legs: input.legs, markets: markets, monthly: input.monthly, years: years, reinvest: reinvest)
+        model.run(legs: input.legs, markets: facts.markets, listed: facts.listed, monthly: input.monthly, years: span, reinvest: reinvest)
     }
 
     // MARK: Result

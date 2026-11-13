@@ -20,6 +20,8 @@ actor OfficialHistoryClient {
     private struct CachedSplits: Codable { var fetched: Date; var fromYear: Int; var events: [SplitEvent] }
 
     private static let day: TimeInterval = 86_400
+    /// Thrown when neither exchange has a single bar for the code.
+    static let notFound = "找不到這檔的歷史資料"
 
     private let fetcher: HistoryFetching
     private let root: URL
@@ -43,20 +45,31 @@ actor OfficialHistoryClient {
     /// Whether `history` reads 富果 (a key is saved) instead of the exchanges.
     nonisolated var usesFugle: Bool { fugleKeySaved() }
 
+    /// The months to read: `from` (or the listing month, when later) to `to`, capped at the current Taipei month.
+    private func plan(from: YearMonth, to: YearMonth, listed: YearMonth?) -> [YearMonth] {
+        let last = min(to, YearMonth(clock()))
+        var cursor = max(from, listed ?? from)
+        var months: [YearMonth] = []
+        while cursor <= last { months.append(cursor); cursor = cursor.next() }
+        return months
+    }
+
     /// Bars from `from` to `to` (capped at the current Taipei month) with the dividends and splits that go with them.
-    /// `market` is "TWSE" or "TPEx"; nil tries 上市 first, then 上櫃 when a month comes back empty.
+    /// `market` is "TWSE" or "TPEx"; nil tries 上市 first, then 上櫃 when a month comes back empty. `listed` is the
+    /// listing month from the catalogue: earlier months are not asked for. Without it months are read newest first
+    /// and reading stops at three empty months in a row behind the bars (the fund was not listed yet).
     /// `progress` gets 0…1. Thrown results are never cached; a failed refresh falls back to the copy on disk.
-    func history(symbol: String, market: String?, from: YearMonth, to: YearMonth,
+    func history(symbol: String, market: String?, listed: YearMonth? = nil, from: YearMonth, to: YearMonth,
                  progress: @Sendable (Double) -> Void) async throws -> SymbolHistory {
         guard DataChecks.code(symbol) else { throw AppDataError("ETF 代號格式不符。") }
-        let last = min(to, YearMonth(clock()))
-        guard from <= last else { return SymbolHistory(bars: [], dividends: [], splits: [], suspect: false) }
-        var months: [YearMonth] = []
-        var cursor = from
-        while cursor <= last { months.append(cursor); cursor = cursor.next() }
+        let months = plan(from: from, to: to, listed: listed)
+        guard let firstMonth = months.first, let last = months.last else {
+            return SymbolHistory(bars: [], dividends: [], splits: [], suspect: false)
+        }
 
         if fugleKeySaved() {
-            let years = [1, 3, 5, 10, 16].first { $0 * 12 >= months.count - 1 } ?? 16
+            let span = (last.year - from.year) * 12 + last.month - from.month + 1
+            let years = [1, 3, 5, 10, 16].first { $0 * 12 >= span - 1 } ?? 16
             let fugle = try await Fugle.history(symbol: symbol, years: years)
             let bars = fugle.points.map { DailyBar(date: $0.date, close: $0.close) }
                 .filter { $0.date >= from.key + "-01" && $0.date <= last.key + "-31" }
@@ -64,25 +77,41 @@ actor OfficialHistoryClient {
             return SymbolHistory(bars: bars, dividends: [], splits: [], suspect: false)
         }
 
-        let total = Double(months.count + (last.year - from.year + 1) + 1)
+        let total = Double(months.count + (last.year - firstMonth.year + 1) + 1)
         var done = 0.0
-        var resolved = market ?? savedMarket(symbol)
+        var saved = savedMarket(symbol)
+        var resolved = market ?? saved
         var misses = 0
+        var emptyRun = 0
         var bars: [DailyBar] = []
-        // Newest first: with an unknown market, a month the fund trades in settles it soonest.
+        // Newest first: a month the fund trades in settles an unknown market soonest, and the months before the
+        // listing come last, where the stop rule ends them.
         for month in months.reversed() {
             try Task.checkCancellation()
-            // Three months empty on both markets: stop asking both.
-            if resolved == nil, misses >= 3 { resolved = "TWSE" }
             let found = try await monthBars(symbol: symbol, month: month, market: resolved)
             if resolved == nil {
-                if let known = found.market { resolved = known; saveMarket(known, symbol: symbol) } else { misses += 1 }
+                if let known = found.market {
+                    resolved = known
+                } else {
+                    // Three months with nothing on either exchange: not a code they know. Nothing was cached for it.
+                    misses += 1
+                    if misses >= 3 { throw AppDataError(Self.notFound) }
+                }
             }
+            if let known = resolved, saved != known { saveMarket(known, symbol: symbol); saved = known }
             bars.append(contentsOf: found.bars)
             done += 1; progress(done / total)
+            if found.bars.isEmpty {
+                emptyRun += 1
+                // Behind the bars: before the listing. With no bars at all: six empty months is enough to give up.
+                if emptyRun >= (bars.isEmpty ? 6 : 3) { break }
+            } else {
+                emptyRun = 0
+            }
         }
+        guard let exchange = resolved else { throw AppDataError(Self.notFound) }
         bars.sort { $0.date < $1.date }
-        guard let first = bars.first, let firstYear = Int(first.date.prefix(4)), let exchange = resolved else {
+        guard let first = bars.first, let firstYear = Int(first.date.prefix(4)) else {
             progress(1)
             return SymbolHistory(bars: bars, dividends: [], splits: [], suspect: false)
         }
@@ -102,12 +131,51 @@ actor OfficialHistoryClient {
         return SymbolHistory(bars: bars, dividends: dividends, splits: splits, suspect: suspect)
     }
 
+    /// Roughly how long `history` will spend downloading what is not on the phone yet, in seconds: 2 s for each
+    /// request, 8 s for each of 證交所's half-year dividend tables (they are slow to answer). 0 with a 富果 key.
+    /// Only reads the cache. Without a listing month it counts every month, so it can run high.
+    func estimatedSeconds(symbol: String, market: String?, listed: YearMonth? = nil, from: YearMonth, to: YearMonth) -> Int {
+        guard DataChecks.code(symbol), !fugleKeySaved() else { return 0 }
+        let months = plan(from: from, to: to, listed: listed)
+        guard let firstMonth = months.first, let last = months.last else { return 0 }
+        let now = clock()
+        let known = market ?? savedMarket(symbol)
+        var seconds = 0
+        for month in months {
+            let cached: CachedBars? = read(monthFile(symbol, month))
+            if let cached, isFresh(cached.fetched, completeAt: Self.start(of: month.next()), now: now) { continue }
+            seconds += 2
+        }
+        for year in firstMonth.year...last.year {
+            let cached: CachedDividends? = read(dividendsFile(known ?? "TWSE", year))
+            if let cached, isFresh(cached.fetched, completeAt: Self.start(of: YearMonth(year: year + 1, month: 1)), now: now) { continue }
+            if known == "TPEx" { seconds += 2 } else { seconds += Self.date(year, 7, 1) <= now ? 16 : 8 }
+        }
+        if known != "TPEx" {
+            let cached: CachedSplits? = read(splitsFile)
+            var fresh = false
+            if let cached, cached.fromYear <= firstMonth.year { fresh = isFresh(cached.fetched, completeAt: .distantFuture, now: now) }
+            if !fresh { seconds += 2 }
+        }
+        return seconds
+    }
+
+    private func monthFile(_ symbol: String, _ month: YearMonth) -> URL {
+        root.appendingPathComponent(symbol, isDirectory: true).appendingPathComponent("\(month.key).json")
+    }
+
+    private func dividendsFile(_ market: String, _ year: Int) -> URL {
+        root.appendingPathComponent("dividends", isDirectory: true).appendingPathComponent("\(market)-\(year).json")
+    }
+
+    private var splitsFile: URL { root.appendingPathComponent("splits.json") }
+
     // MARK: Months
 
     /// One month of closes. A cached month is kept for good once it was fetched after the month ended; before that
     /// (the current month) it is refetched when older than a day.
     private func monthBars(symbol: String, month: YearMonth, market: String?) async throws -> (bars: [DailyBar], market: String?) {
-        let file = root.appendingPathComponent(symbol, isDirectory: true).appendingPathComponent("\(month.key).json")
+        let file = monthFile(symbol, month)
         let old: CachedBars? = read(file)
         let now = clock()
         if let old, isFresh(old.fetched, completeAt: Self.start(of: month.next()), now: now) { return (old.bars, market) }
@@ -124,7 +192,8 @@ actor OfficialHistoryClient {
             }
             let prefix = month.key + "-"
             bars = bars.filter { $0.date.hasPrefix(prefix) }
-            write(CachedBars(fetched: now, bars: bars), to: file)
+            // Empty on both exchanges with the market unknown: maybe not a real code, so no folder is made for it.
+            if found != nil { write(CachedBars(fetched: now, bars: bars), to: file) }
             return (bars, found)
         } catch {
             if error is CancellationError || Task.isCancelled { throw error }
@@ -149,7 +218,7 @@ actor OfficialHistoryClient {
 
     /// Every cash dividend on one market in one calendar year (the endpoints are market-wide), cached per year.
     private func yearDividends(market: String, year: Int) async throws -> [DividendEvent] {
-        let file = root.appendingPathComponent("dividends", isDirectory: true).appendingPathComponent("\(market)-\(year).json")
+        let file = dividendsFile(market, year)
         let old: CachedDividends? = read(file)
         let now = clock()
         if let old, isFresh(old.fetched, completeAt: Self.start(of: YearMonth(year: year + 1, month: 1)), now: now) { return old.events }
@@ -178,7 +247,7 @@ actor OfficialHistoryClient {
 
     /// 證交所's ETF splits from `fromYear` to today in one request, refetched when older than a day.
     private func splitEvents(fromYear: Int) async throws -> [SplitEvent] {
-        let file = root.appendingPathComponent("splits.json")
+        let file = splitsFile
         let cached: CachedSplits? = read(file)
         let old = cached.flatMap { $0.fromYear <= fromYear ? $0 : nil }
         let now = clock()
