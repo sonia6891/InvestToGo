@@ -2,191 +2,234 @@ import Foundation
 import Security
 import SwiftUI
 
-enum Strategy: String, Codable, CaseIterable, Identifiable {
-    case saving = "存錢筒", income = "印鈔機", risk = "老虎機", unclassified = "待分類"
-    var id: String { rawValue }
-    var symbol: String {
-        switch self { case .saving: return "leaf"; case .income: return "banknote"; case .risk: return "bolt"; case .unclassified: return "tag" }
-    }
-    var subtitle: String {
-        switch self { case .saving: return "長期累積"; case .income: return "關注配息"; case .risk: return "高波動策略"; case .unclassified: return "自行選擇策略" }
-    }
-}
-struct Fund: Identifiable, Codable, Hashable {
-    var id: String
-    var name: String
-    var strategy: Strategy
-    var market: String? = nil
-    var fullName: String? = nil
-    var fundType: String? = nil
-    var listingDate: String? = nil
-    // Demo-only catalogue; the normal app uses the validated TWSE + TPEx catalogue.
-    static let starters: [Fund] = [
-        .init(id: "0050", name: "元大台灣50", strategy: .saving),
-        .init(id: "006208", name: "富邦台50", strategy: .saving),
-        .init(id: "0056", name: "元大高股息", strategy: .income),
-        .init(id: "00878", name: "國泰永續高股息", strategy: .income),
-        .init(id: "00919", name: "群益台灣精選高息", strategy: .income),
-        .init(id: "00631L", name: "元大台灣50正2", strategy: .risk)
-    ]
-}
-struct Holding: Identifiable, Codable {
-    var id = UUID()
-    var symbol: String
-    var name: String
-    var shares: Double
-    var unitCost: Double
-    var broker: String
-    var strategy: Strategy
-    var sourceAccount: String? = nil
-    var cost: Double { shares * unitCost }
-    func validate() throws {
-        guard !symbol.isEmpty, !name.isEmpty, shares.isFinite, shares > 0,
-              shares <= 1e10, unitCost.isFinite, unitCost >= 0, unitCost <= 1e9,
-              cost.isFinite, !broker.isEmpty, broker.count <= 120, symbol.count <= 20, name.count <= 120 else { throw StoreError.invalidHolding }
-    }
-}
-enum DividendStatus: String, Codable, CaseIterable { case paid = "已入帳", announced = "已公告", estimated = "預估" }
-struct Dividend: Identifiable, Codable {
-    var id = UUID()
-    var symbol: String
-    var date: Date
-    var amount: Double
-    var status: DividendStatus
-}
-struct Quote: Codable {
-    var symbol: String
-    var price: Double
-    var changePercent: Double?
-    var date: String
-    var fetchedAt: Date
-    var currency: String? = nil
-    var isTWD: Bool { currency == "TWD" || (currency == nil && Fund.starters.contains { $0.id == symbol }) }
-}
-struct Portfolio: Codable {
-    var schema = 1
-    var holdings: [Holding] = []
-    var dividends: [Dividend] = []
-    var favorites: Set<String> = []
-    var quotes: [String: Quote] = [:]
-    var comparison: [String]? = nil
-    var legacyPlan: LegacyPlan? = nil
-    var legacyPrices: [String: LegacyPrice]? = nil
-    var legacyDividends: [String: BackupImport.OldDividend]? = nil
-    var components: [String: ComponentSnapshot]? = nil
-    var histories: [String: PriceHistory]? = nil
-    var fees: [String: FeeRecord]? = nil
-    var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
-    var marketValue: Double? {
-        guard !holdings.isEmpty, holdings.allSatisfy({ quotes[$0.symbol]?.isTWD == true }) else { return nil }
-        return holdings.reduce(0) { $0 + $1.shares * quotes[$1.symbol]!.price }
-    }
-    static func decodeBackup(_ data: Data) throws -> Portfolio {
-        guard data.count <= 5_000_000 else { throw StoreError.unsupportedBackup }
-        let value = try JSONDecoder().decode(Portfolio.self, from: data)
-        guard value.schema == 1, value.holdings.count <= 10000, value.dividends.count <= 50000, value.favorites.count <= 2000 else { throw StoreError.unsupportedBackup }
-        for holding in value.holdings { try holding.validate() }
-        guard Set(value.holdings.map(\.id)).count == value.holdings.count,
-              Set(value.dividends.map(\.id)).count == value.dividends.count,
-              value.dividends.allSatisfy({ !$0.symbol.isEmpty && $0.amount.isFinite && $0.amount >= 0 }),
-              value.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.price.isFinite && $0.value.price > 0 })
-        else { throw StoreError.unsupportedBackup }
-        try value.legacyPlan?.validate()
-        for d in (value.legacyDividends ?? [:]).values { try d.validate() }
-        for (code, snapshot) in value.components ?? [:] { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
-        for (code, history) in value.histories ?? [:] { guard code == history.symbol else { throw StoreError.unsupportedBackup }; try history.validate() }
-        for (code, fee) in value.fees ?? [:] { guard code == fee.symbol else { throw StoreError.unsupportedBackup }; try fee.validate() }
-        guard (value.comparison?.count ?? 0) <= 3, (value.comparison ?? []).allSatisfy(DataChecks.code),
-              (value.legacyPrices ?? [:]).values.allSatisfy({ DataChecks.code($0.symbol) && $0.price.isFinite && $0.price >= 0 && DataChecks.date($0.date) != nil }) else { throw StoreError.unsupportedBackup }
-        return value
-    }
-    static var demo: Portfolio {
-        var value = Portfolio()
-        value.holdings = [
-            .init(symbol: "0050", name: "元大台灣50", shares: 2000, unitCost: 50, broker: "富邦證券", strategy: .saving),
-            .init(symbol: "00878", name: "國泰永續高股息", shares: 6000, unitCost: 20, broker: "富邦證券", strategy: .income),
-            .init(symbol: "00919", name: "群益台灣精選高息", shares: 5000, unitCost: 22, broker: "國泰證券", strategy: .income)
-        ]
-        let prices: [String: Double] = ["0050": 55, "00878": 21, "00919": 22.5]
-        for (symbol, price) in prices { value.quotes[symbol] = Quote(symbol: symbol, price: price, changePercent: 0.42, date: "示範資料", fetchedAt: Date()) }
-        let start = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date()))!
-        value.dividends = [
-            Dividend(symbol: "00878", date: Calendar.current.date(byAdding: .day, value: 7, to: start)!, amount: 2400, status: .paid),
-            Dividend(symbol: "00919", date: Calendar.current.date(byAdding: .day, value: 19, to: start)!, amount: 3600, status: .announced)
-        ]
-        value.favorites = ["0050", "00878", "00919"]
-        return value
-    }
-}
-enum StoreError: LocalizedError {
-    case invalidHolding, unsupportedBackup, missingKey, invalidQuote, keychain(OSStatus), http(Int)
-    var errorDescription: String? {
-        switch self {
-        case .invalidHolding: return "請填寫代碼、名稱與券商，股數須大於 0，每股成本不可為負數。"
-        case .unsupportedBackup: return "備份格式不支援或資料不完整；現有資料未變更。"
-        case .missingKey: return "請先在行情連線儲存你的富果 API Key。"
-        case .invalidQuote: return "行情沒有有效成交價，請稍後再試。"
-        case .keychain: return "無法安全儲存金鑰，請重試。"
-        case .http(let code):
-            if code == 401 { return "金鑰無效或已失效，請重新確認行情金鑰。" }
-            if code == 403 { return "目前方案沒有這項資料權限；成分股需要富果開發者或進階方案。已有報價會保留。" }
-            if code == 429 { return "已達資料請求額度，請稍後重試；已有資料會保留。" }
-            return "資料服務暫時無法使用（\(code)），保留上次成功資料。"
-        }
-    }
-}
 @MainActor final class PortfolioStore: ObservableObject {
     @Published private(set) var data = Portfolio()
     @Published var message: String?
+    /// 記一筆配息 rewards earned but not yet shown, in experience. In memory only: the root-level `RewardToast`
+    /// shows them wherever the viewer is once the form has closed, then clears them (ruling R25).
+    @Published var pendingReward = 0
+    /// A one-line notice for the same root toast region (e.g. 「收進圖鑑 +30 經驗」), shown once and cleared.
+    @Published var pendingNotice: String?
     @Published var refreshing = false
     @Published private(set) var catalog = CatalogSnapshot.bundled()
     @Published var catalogMessage: String?
     @Published var catalogRefreshing = false
-    var funds: [Fund] { isDemo ? Fund.starters : (catalog?.funds ?? []) }
-    let isDemo: Bool
+    /// The last 更新上市櫃名單 failed; 找 ETF shows LoadFailed over the list it still has.
+    @Published var catalogFailed = false
+    /// The last quote refresh started from a detail page failed, in plain words; nil after a success.
+    @Published var quoteFailure: String?
+    @Published private(set) var official = OfficialDividends.bundled()
+    @Published var officialRefreshing = false
+    @Published var officialMessage: String?
+    /// The last official dividend refresh failed; 配息 shows LoadFailed over the announcements it still has.
+    @Published var officialFailed = false
+    /// 加權 / 櫃買 index quotes, keyed "taiex" and "tpex": live with the viewer's Fugle key, else the latest close.
+    @Published var indices: [String: Quote] = [:]
+    /// Prices pushed or polled during the trading session; kept in memory and saved for holdings and watchlist when the app leaves.
+    @Published var liveQuotes: [String: Quote] = [:]
+    @Published var liveStatus = LiveStatus()
+    /// The stock or ETF page on screen, streamed first.
+    @Published var liveFocus: String?
+    /// Set by the home page: open 探索 on stocks or ETFs, optionally with the search field focused.
+    @Published var discoverRequest: DiscoverRequest?
+    /// The latest trading day's prices from the exchanges' open data (OpenData), cached on the device.
+    @Published var daily: OpenData.Day?
+    var dailyAttemptAt: Date?
+    lazy var live = LiveFeed(store: self)
+    var funds: [Fund] { catalog?.funds ?? [] }
     private let url: URL
-    init(url: URL? = nil, demo: Bool = false, reset: Bool = false) {
-        isDemo = demo
+    init(url: URL? = nil, reset: Bool = false) {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         self.url = url ?? base.appendingPathComponent("ETFToGo/portfolio.json")
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("catalog")), let cached = try? JSONDecoder().decode(CatalogSnapshot.self, from: bytes), (try? cached.validate()) != nil { catalog = cached }
-        if demo { data = .demo; return }
-        if reset { try? FileManager.default.removeItem(at: self.url) }
+        if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
+        if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
+           cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
+        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL) }
         if FileManager.default.fileExists(atPath: self.url.path) {
-            do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url)) }
+            do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url), limit: 100_000_000) }
             catch { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。"; readFailure = true }
+        }
+        historiesSaved = (data.histories ?? [:]).isEmpty
+        // Earlier versions kept histories in the records file; the next save moves them out. A history that does not
+        // validate is dropped, since it can be fetched again.
+        if let bytes = try? Data(contentsOf: historiesURL), let cached = try? JSONDecoder().decode([String: PriceHistory].self, from: bytes) {
+            let valid = cached.filter { $0.key == $0.value.symbol && (try? $0.value.validate()) != nil }
+            if !valid.isEmpty { data.histories = (data.histories ?? [:]).merging(valid) { _, cached in cached } }
         }
     }
     private var readFailure = false
+    /// Price histories are large and can be fetched again, so they are saved apart from the records: a save of the
+    /// records stays small and fast, and many histories never push the records past the backup size limit.
+    private var historiesURL: URL { url.appendingPathExtension("histories") }
     func commit(_ next: Portfolio) throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
-        let encoded = try JSONEncoder().encode(next)
+        var records = next; records.histories = nil
+        let encoded = try JSONEncoder().encode(records)
+        guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
         _ = try Portfolio.decodeBackup(encoded)
-        if !isDemo {
-            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try encoded.write(to: url, options: [.atomic, .completeFileProtection])
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if next.histories != data.histories || !historiesSaved {
+            try JSONEncoder().encode(next.histories ?? [:]).write(to: historiesURL, options: [.atomic, .completeFileProtection])
+            historiesSaved = true
         }
+        try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
     }
-    func save(_ holding: Holding) throws {
-        try holding.validate()
-        var next = data
-        if let i = next.holdings.firstIndex(where: { $0.id == holding.id }) { next.holdings[i] = holding }
-        else { next.holdings.append(holding) }
+    /// Changes the game progress and saves it with the records; nothing is written when it does not change.
+    func updateGame(_ change: (inout GameState) -> Void) throws {
+        var game = data.game ?? GameState()
+        change(&game)
+        guard game != (data.game ?? GameState()) else { return }
+        var next = data; next.game = game
         try commit(next)
     }
-    func remove(_ holding: Holding) throws { var next = data; next.holdings.removeAll { $0.id == holding.id }; try commit(next) }
+    /// False while the records file still holds histories from an earlier version, so the next save moves them out.
+    private var historiesSaved = false
+    /// With `logBuy` (新增持有's 儲存), a new holding with a purchase date is the user's buy: it records the DCA month
+    /// and its capped experience in the same write (`GameState.logBuy`). Edits, imports and seeding earn nothing.
+    func save(_ holding: Holding, logBuy: Bool = false, now: Date = Date()) throws {
+        try holding.validate()
+        var next = data
+        if let i = next.holdings.firstIndex(where: { $0.id == holding.id }) {
+            let old = next.holdings[i]
+            next.holdings[i] = holding
+            if old.symbol != holding.symbol || old.shares != holding.shares || old.unitCost != holding.unitCost || old.broker != holding.broker { next.log(.adjust, holding) }
+        } else {
+            next.holdings.append(holding)
+            next.log(.buy, holding, date: holding.purchaseDate ?? Date(), amount: holding.cost)
+            if logBuy, let bought = holding.purchaseDate {
+                var game = next.game ?? GameState()
+                _ = game.logBuy(on: bought, now: now)
+                next.game = game
+            }
+        }
+        try commit(next)
+    }
+    func remove(_ holding: Holding) throws {
+        var next = data
+        guard let stored = next.holdings.first(where: { $0.id == holding.id }) else { return }
+        next.holdings.removeAll { $0.id == holding.id }
+        next.log(.remove, stored)
+        try commit(next)
+    }
     func favorite(_ symbol: String) {
         var next = data
         if next.favorites.contains(symbol) { next.favorites.remove(symbol) } else { next.favorites.insert(symbol) }
         do { try commit(next) } catch { message = error.localizedDescription }
     }
     func record(_ dividend: Dividend) throws { var next = data; next.dividends.append(dividend); try commit(next) }
+    func markPaid(_ dividend: Dividend) throws {
+        var next = data
+        guard let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) else { return }
+        next.dividends[i].status = .paid
+        try commit(next)
+    }
+    func addToComparison(_ symbol: String) {
+        let list = data.comparison ?? []
+        if list.contains(symbol) { message = "\(symbol) 已在比較清單，可到「工具 › 三檔比較」查看。"; return }
+        do { try appendToComparison(symbol); message = "已加入比較：\((data.comparison ?? []).joined(separator: "、"))。可到「工具 › 三檔比較」查看。" } catch { message = error.localizedDescription }
+    }
     func removeDividend(_ dividend: Dividend) throws { var next = data; next.dividends.removeAll { $0.id == dividend.id }; try commit(next) }
+    /// Saves a dividend record. With `rewardNew` (「記一筆配息」), a new record also earns the flat 記一筆配息 experience
+    /// in the same write — the same +20 for any amount (spec 6), within the limits of `GameState.logDividend` (a held
+    /// code, paid recently, once per code and payment month, three a month); editing a record earns nothing.
+    func saveDividend(_ dividend: Dividend, rewardNew: Bool = false, now: Date = Date()) throws {
+        guard !dividend.symbol.isEmpty, dividend.amount.isFinite, dividend.amount > 0, dividend.detailsValid else { throw AppDataError("請填寫代碼、股數與每股配息；扣繳後的入帳金額必須大於 0。") }
+        var next = data
+        var earned = 0
+        if let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) {
+            next.dividends[i] = dividend
+        } else {
+            next.dividends.append(dividend)
+            if rewardNew {
+                var game = next.game ?? GameState()
+                let before = game.xp
+                let held = next.holdings.contains { $0.symbol == dividend.symbol }
+                _ = game.logDividend(symbol: dividend.symbol, paid: dividend.date, held: held, now: now); next.game = game
+                earned = game.xp - before
+            }
+        }
+        try commit(next)
+        if earned > 0 { pendingReward += earned }
+    }
+    /// Marks a record as received; a payment date still in the future becomes today.
+    @discardableResult func confirmPaid(_ dividend: Dividend) throws -> Dividend {
+        var next = data
+        guard let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) else { return dividend }
+        next.dividends[i].status = .paid
+        next.dividends[i].source = DividendSource.broker.rawValue
+        if next.dividends[i].date > Date() { next.dividends[i].date = Calendar.current.startOfDay(for: Date()) }
+        try commit(next)
+        return next.dividends[i]
+    }
+    /// A buy adds to the holding of the same ETF and broker (re-averaging its cost) or creates one;
+    /// a sell reduces it at its average cost, records the realised result and removes it at zero.
+    /// With `logBuy` (新增交易紀錄's 儲存紀錄), a buy also records the DCA month and its capped experience in the same write.
+    func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String, logBuy: Bool = false, now: Date = Date()) throws {
+        guard action == .buy || action == .sell else { return }
+        guard DataChecks.code(symbol) else { throw AppDataError("請輸入正確的 ETF 代號。") }
+        guard shares.isFinite, shares > 0, shares <= 1e10, amount.isFinite, amount >= 0, amount <= 1e12 else { throw AppDataError("請填寫股數與成交金額。") }
+        var next = data
+        let same = next.holdings.indices.filter { next.holdings[$0].symbol == symbol }
+        let target = broker.isEmpty ? (same.count == 1 ? same.first : same.first(where: { next.holdings[$0].broker.isEmpty })) : same.first(where: { next.holdings[$0].broker == broker })
+        let fundName = funds.first { $0.id == symbol }?.name
+        var realized: Double? = nil
+        if action == .buy {
+            if let i = target {
+                let total = next.holdings[i].cost + amount
+                next.holdings[i].shares += shares
+                next.holdings[i].unitCost = total / next.holdings[i].shares
+            } else {
+                guard let fundName else { throw AppDataError("清單沒有這檔，請先用「新增持有」填寫名稱。") }
+                let strategy = funds.first(where: { $0.id == symbol })?.strategy ?? .unclassified
+                next.holdings.append(Holding(symbol: symbol, name: fundName, shares: shares, unitCost: amount / shares, broker: broker, strategy: strategy, purchaseDate: date))
+            }
+        } else {
+            guard let i = target else { throw AppDataError(same.count > 1 ? "這檔在多個券商都有持有，請填寫券商。" : "找不到這檔的持有，無法賣出。") }
+            guard shares <= next.holdings[i].shares + 1e-9 else { throw AppDataError("賣出股數超過持有（\(decimal(next.holdings[i].shares)) 股）。") }
+            realized = ((amount - shares * next.holdings[i].unitCost) * 100).rounded() / 100
+            next.holdings[i].shares -= shares
+            if next.holdings[i].shares <= 1e-9 { next.holdings.remove(at: i) }
+        }
+        let holdingName = target.map { data.holdings[$0].name }
+        next.log(Trade(date: date, action: action, symbol: symbol, name: fundName ?? holdingName ?? symbol, shares: shares, amount: amount, broker: broker.isEmpty ? (target.map { data.holdings[$0].broker } ?? "") : broker, realized: realized))
+        if logBuy, action == .buy {
+            var game = next.game ?? GameState()
+            _ = game.logBuy(on: date, now: now)
+            next.game = game
+        }
+        try commit(next)
+    }
+    func removeTrade(_ trade: Trade) throws { var next = data; next.trades?.removeAll { $0.id == trade.id }; try commit(next) }
+    func refreshOfficial() async {
+        guard !officialRefreshing else { return }
+        officialRefreshing = true; defer { officialRefreshing = false }
+        do {
+            let markets = Dictionary(uniqueKeysWithValues: (catalog?.funds ?? Fund.starters).map { ($0.id, $0.market ?? "") })
+            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的配息資料。") }
+            var fresh = try await OfficialDividends.fetch(merging: official, markets: markets)
+            fresh.fetchedAt = Date()
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try JSONEncoder().encode(fresh).write(to: url.appendingPathExtension("official"), options: .atomic)
+            official = fresh; officialMessage = "已更新官方配息資料。"; officialFailed = false
+        } catch {
+            officialMessage = error is URLError ? "無法更新官方配息資料，保留原本資料。\(error.localizedDescription)" : error.localizedDescription
+            officialFailed = true
+            CrashReporting.capture(error, context: "dividends", offline: Connectivity.shared.offline)
+        }
+    }
+    func saveDaily() {
+        guard let daily else { return }
+        try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? JSONEncoder().encode(daily).write(to: url.appendingPathExtension("daily"), options: .atomic)
+    }
     func export() throws -> URL {
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("ETFToGo-backup-\(UUID().uuidString.prefix(8)).json")
         // Preserve recoverable bytes when decoding failed; never export an empty replacement.
-        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(data)
+        // Price histories are left out: they can be fetched again and would make the backup too large to import.
+        var records = data; records.histories = nil
+        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
         try bytes.write(to: file, options: .atomic)
         return file
     }
@@ -200,7 +243,12 @@ enum StoreError: LocalizedError {
         for item in incoming.dividends {
             if let i = next.dividends.firstIndex(where: { $0.id == item.id }) { next.dividends[i] = item } else { next.dividends.append(item) }
         }
+        for item in incoming.trades ?? [] {
+            if next.trades == nil { next.trades = [] }
+            if let i = next.trades?.firstIndex(where: { $0.id == item.id }) { next.trades?[i] = item } else { next.trades?.append(item) }
+        }
         next.favorites.formUnion(incoming.favorites)
+        next.combo = incoming.combo ?? next.combo
         next.comparison = incoming.comparison ?? next.comparison
         next.legacyPlan = incoming.legacyPlan ?? next.legacyPlan
         next.legacyPrices = (next.legacyPrices ?? [:]).merging(incoming.legacyPrices ?? [:]) { _, new in new }
@@ -215,52 +263,81 @@ enum StoreError: LocalizedError {
     }
     func saveRecovery() throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
-        if !isDemo, FileManager.default.fileExists(atPath: url.path) {
+        if FileManager.default.fileExists(atPath: url.path) {
             let directory = url.deletingLastPathComponent().appendingPathComponent("Recovery")
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try Data(contentsOf: url).write(to: directory.appendingPathComponent("before-import-\(UUID().uuidString).json"), options: [.atomic, .completeFileProtection])
         }
     }
-    func refreshCatalog() async {
-        guard !isDemo, !catalogRefreshing else { return }
+    /// `automatic` (at launch) skips the three requests when today's list is already on the device; the 立即更新 buttons always fetch.
+    func refreshCatalog(automatic: Bool = false) async {
+        guard !catalogRefreshing, !(automatic && catalog?.fetchedDay == DataChecks.day()) else { return }
         catalogRefreshing = true; defer { catalogRefreshing = false }
         do {
-            let next = try await CatalogAPI.fetch()
+            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的 ETF 名單。") }
+            var next = try await CatalogAPI.fetch(previous: catalog)
+            next.fetchedAt = Date()
             if let old = catalog {
-                guard next.listedDate >= old.listedDate else { throw AppDataError("來源日期比目前資料舊，未覆寫。") }
+                guard next.listedDate >= old.listedDate else { throw AppDataError("新取得的資料日期比目前舊，未覆寫。") }
                 for market in ["TWSE", "TPEx"] {
                     guard Double(next.funds.filter { $0.market == market }.count) >= Double(old.funds.filter { $0.market == market }.count) * 0.8 else { throw AppDataError("名單數量異常減少，保留原有清單。") }
                 }
             }
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(next).write(to: url.appendingPathExtension("catalog"), options: .atomic)
-            catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"
-        } catch { catalogMessage = error.localizedDescription }
+            catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
+        } catch { catalogMessage = error.localizedDescription; catalogFailed = true; CrashReporting.capture(error, context: "catalog", offline: Connectivity.shared.offline) }
     }
     func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; try commit(next) }
     func saveHistory(_ value: PriceHistory) throws { try value.validate(); var next = data; if next.histories == nil { next.histories = [:] }; next.histories?[value.symbol] = value; try commit(next) }
     func saveFee(_ value: FeeRecord) throws { try value.validate(); var next = data; if next.fees == nil { next.fees = [:] }; next.fees?[value.symbol] = value; try commit(next) }
-    func refresh(symbols: [String]? = nil) async {
-        if isDemo { message = "這是介面示範資料，沒有連線取得市場價格。"; return }
+    /// `inline`: a failure is kept in `quoteFailure` for the page's own LoadFailed instead of the app-wide alert.
+    func refresh(symbols: [String]? = nil, inline: Bool = false) async {
         guard !refreshing else { return }
         refreshing = true; defer { refreshing = false }
         message = nil
+        if inline { quoteFailure = nil }
+        let started = Date()
         do {
             let key = try SecureKey.read()
-            guard !key.isEmpty else { throw StoreError.missingKey }
             let targets = Array(Set(symbols ?? data.holdings.map(\.symbol))).sorted()
             guard !targets.isEmpty else { message = "請先新增持有，或到單檔 ETF 頁面更新報價。"; return }
+            // Offline, the bar at the top already says so: only a page's own LoadFailed hears about it, never the alert.
+            if Connectivity.forcedOffline { if inline { throw AppDataError("目前沒有網路，先顯示上次的報價。") } else { return } }
             var fetched: [String: Quote] = [:]
-            for symbol in targets {
-                let quote = try await Fugle.quote(symbol: symbol, key: key)
-                fetched[symbol] = quote
-                if symbol != targets.last { try await Task.sleep(nanoseconds: 2_100_000_000) }
+            if key.isEmpty {
+                // No Fugle key: the latest trading day's closes from the exchanges' open data, saved where newer.
+                guard await refreshDaily(manual: true), let closes = daily?.quotes else { throw AppDataError("暫時取不到收盤資料，保留上次報價。") }
+                let wanted = Set(targets)
+                guard wanted.contains(where: { closes[$0] != nil }) else { throw AppDataError("目前沒有這些代號的收盤資料，保留上次報價。") }
+                fetched = closes.filter { wanted.contains($0.key) && $0.value.fetchedAt > (data.quotes[$0.key]?.fetchedAt ?? .distantPast) }
+                guard !fetched.isEmpty else { message = "收盤資料已是最新（\((daily?.day ?? "").replacingOccurrences(of: "-", with: "/"))）。"; return }
+            } else {
+                // In a list, prices streamed in the last minute are already current. PublicHTTP spaces the requests so
+                // they stay within the plan together with live polling; what arrived before an error is still kept.
+                let stale = targets.count == 1 ? targets : targets.filter { (liveQuotes[$0]?.fetchedAt.timeIntervalSinceNow ?? -.infinity) < -60 }
+                do {
+                    for symbol in stale { fetched[symbol] = try await Fugle.quote(symbol: symbol, key: key, currency: data.quotes[symbol]?.currency) }
+                } catch {
+                    if !fetched.isEmpty { try? keepFetched(fetched, since: started) }
+                    throw error
+                }
             }
-            // The user may have edited holdings while the requests were running.
-            var next = data
-            next.quotes.merge(fetched) { _, refreshed in refreshed }
-            try commit(next)
-        } catch { message = error.localizedDescription }
+            try keepFetched(fetched, since: started)
+        } catch {
+            // Only the detail page's LoadFailed (inline) is reported; the app-wide alert path is not a load failure page.
+            if inline { quoteFailure = error.localizedDescription; CrashReporting.capture(error, context: "market", offline: Connectivity.shared.offline) } else { message = error.localizedDescription }
+        }
+    }
+    /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
+    /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.
+    private func keepFetched(_ fetched: [String: Quote], since started: Date) throws {
+        let trial = fetched.filter { $0.value.trial == true }
+        // A real trade streamed in while the requests were running, or anything newer, is kept.
+        if !trial.isEmpty { liveQuotes.merge(trial) { old, new in (old.trial != true && old.date == new.date && old.fetchedAt >= started) || old.fetchedAt > new.fetchedAt ? old : new } }
+        var next = data
+        next.quotes.merge(fetched.filter { $0.value.trial != true }) { _, refreshed in refreshed }
+        try commit(next)
     }
 }
 enum SecureKey {
@@ -283,30 +360,18 @@ enum SecureKey {
     }
     static func remove() throws { let result = SecItemDelete(query as CFDictionary); guard result == errSecSuccess || result == errSecItemNotFound else { throw StoreError.keychain(result) } }
 }
-enum Fugle {
-    struct Response: Decodable { let symbol: String; let date: String; let closePrice: Double?; let lastPrice: Double?; let changePercent: Double? }
-    static func quote(symbol: String, key: String) async throws -> Quote {
+extension Fugle {
+    /// The ticker request for the trading currency is skipped when it is already known.
+    static func quote(symbol: String, key: String, currency known: String? = nil) async throws -> Quote {
         guard symbol.range(of: "^[0-9A-Z]{4,8}$", options: .regularExpression) != nil else { throw StoreError.invalidQuote }
         let url = URL(string: "https://api.fugle.tw/marketdata/v1.0/stock/intraday/quote/\(symbol)")!
         let bytes = try await PublicHTTP.get(url, key: key)
+        if let known, known != "UNKNOWN" { var quote = try decode(bytes, expectedSymbol: symbol); quote.currency = known; return quote }
         struct Ticker: Decodable { let symbol: String; let tradingCurrency: String? }
         let ticker = try JSONDecoder().decode(Ticker.self, from: await PublicHTTP.get(URL(string: "https://api.fugle.tw/marketdata/v1.0/stock/intraday/ticker/\(symbol)")!, key: key))
         guard ticker.symbol == symbol else { throw StoreError.invalidQuote }
         var quote = try decode(bytes, expectedSymbol: symbol)
         quote.currency = ticker.tradingCurrency ?? "UNKNOWN"
         return quote
-    }
-    static func decode(_ bytes: Data, expectedSymbol: String) throws -> Quote {
-        let value = try JSONDecoder().decode(Response.self, from: bytes)
-        guard value.symbol == expectedSymbol, let price = value.closePrice ?? value.lastPrice, price.isFinite, price > 0 else { throw StoreError.invalidQuote }
-        return Quote(symbol: value.symbol, price: price, changePercent: value.changePercent, date: value.date, fetchedAt: Date())
-    }
-}
-enum Projection {
-    static func value(initial: Double, monthly: Double, years: Int, annualPercent: Double) -> Double {
-        let rate = annualPercent / 100 / 12
-        var total = initial
-        for _ in 0..<(max(years, 0) * 12) { total = total * (1 + rate) + monthly }
-        return total
     }
 }

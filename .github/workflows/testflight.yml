@@ -1,6 +1,22 @@
 name: Sign and upload native ETF app
+# Needs only an App Store Connect API key with the Admin role (secrets APPLE_ASC_KEY_ID, APPLE_ASC_ISSUER_ID,
+# APPLE_ASC_KEY_P8) and the variable ETF_BUNDLE_ID. Each run creates a temporary distribution certificate and
+# App Store profile through the API (Scripts/asc_signing.py) and removes both at the end.
 on:
   workflow_dispatch:
+    inputs:
+      upload:
+        description: Build and upload a new build
+        type: boolean
+        default: true
+      app_name:
+        description: App name to set in App Store Connect (blank keeps it)
+        required: false
+        default: 投資袋著走
+      build:
+        description: Build number to hand to testers when not uploading (blank for the newest)
+        required: false
+        default: ''
 permissions:
   contents: read
 concurrency:
@@ -10,33 +26,31 @@ jobs:
   prerequisites:
     runs-on: ubuntu-latest
     steps:
-      - name: Require ETF-specific release configuration
+      - name: Require the App Store Connect API key and Bundle ID
         env:
           ETF_BUNDLE_ID: ${{ vars.ETF_BUNDLE_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
           APPLE_ASC_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
           APPLE_ASC_KEY_P8: ${{ secrets.APPLE_ASC_KEY_P8 }}
-          APPLE_DISTRIBUTION_P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
-          APPLE_DISTRIBUTION_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
-          APPLE_PROFILE_ETF_BASE64: ${{ secrets.APPLE_PROFILE_ETF_BASE64 }}
         run: |
           set -euo pipefail
           missing=0
-          for name in ETF_BUNDLE_ID APPLE_TEAM_ID APPLE_ASC_KEY_ID APPLE_ASC_ISSUER_ID APPLE_ASC_KEY_P8 APPLE_DISTRIBUTION_P12_BASE64 APPLE_DISTRIBUTION_P12_PASSWORD APPLE_PROFILE_ETF_BASE64; do
+          for name in ETF_BUNDLE_ID APPLE_ASC_KEY_ID APPLE_ASC_ISSUER_ID APPLE_ASC_KEY_P8; do
             if [[ -z "${!name}" ]]; then echo "::error::Missing $name"; missing=1; fi
           done
           [[ "$missing" == 0 ]]
           [[ "$ETF_BUNDLE_ID" != "tw.sonia.etftogo.uireview" ]]
   upload:
     needs: prerequisites
+    if: inputs.upload
     runs-on: macos-26
     timeout-minutes: 40
     env:
       ETF_BUNDLE_ID: ${{ vars.ETF_BUNDLE_ID }}
-      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       APPLE_ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
       APPLE_ASC_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
     steps:
       - uses: actions/checkout@v4
       - name: Generate release project
@@ -45,46 +59,30 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
           xcodebuild -version
           brew install xcodegen
-          sips -z 1024 1024 App/Assets.xcassets/Pocket.imageset/pocket.png --out App/Assets.xcassets/AppIcon.appiconset/AppIcon.png
           xcodegen generate
-      - name: Install and validate temporary signing material
+      - name: Create temporary signing with the API key
         env:
-          P12_BASE64: ${{ secrets.APPLE_DISTRIBUTION_P12_BASE64 }}
-          P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
-          PROFILE_BASE64: ${{ secrets.APPLE_PROFILE_ETF_BASE64 }}
           ASC_KEY_P8: ${{ secrets.APPLE_ASC_KEY_P8 }}
         run: |
           set -euo pipefail
           umask 077
           mkdir -p "$RUNNER_TEMP/etf-signing"
-          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/etf-signing/certificate.p12"
-          printf '%s' "$PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/etf-signing/profile.mobileprovision"
-          printf '%s' "$ASC_KEY_P8" > "$RUNNER_TEMP/etf-signing/AuthKey.p8"
-          security cms -D -i "$RUNNER_TEMP/etf-signing/profile.mobileprovision" > "$RUNNER_TEMP/etf-signing/profile.plist"
+          # The pasted key with or without its BEGIN/END lines.
           python3 - <<'PY'
-          import datetime, os, pathlib, plistlib, shutil, uuid
-          folder = pathlib.Path(os.environ['RUNNER_TEMP']) / 'etf-signing'
-          p = plistlib.loads((folder / 'profile.plist').read_bytes())
-          team, bundle = os.environ['APPLE_TEAM_ID'], os.environ['ETF_BUNDLE_ID']
-          assert team in p['TeamIdentifier'], 'Profile belongs to a different Apple team'
-          assert p['Entitlements']['application-identifier'] == team + '.' + bundle, 'Profile does not match ETF Bundle ID'
-          assert p['ExpirationDate'] > datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None), 'Profile expired'
-          assert not p.get('ProvisionedDevices') and not p.get('ProvisionsAllDevices'), 'App Store profile required'
-          assert not p['Entitlements'].get('get-task-allow', False), 'Distribution profile required'
-          profile_uuid = p['UUID']; uuid.UUID(profile_uuid)
-          for directory in ['Library/Developer/Xcode/UserData/Provisioning Profiles', 'Library/MobileDevice/Provisioning Profiles']:
-              target = pathlib.Path.home() / directory
-              target.mkdir(parents=True, exist_ok=True)
-              shutil.copyfile(folder / 'profile.mobileprovision', target / (profile_uuid + '.mobileprovision'))
-          with open(os.environ['GITHUB_ENV'], 'a') as f:
-              f.write('PROFILE_UUID=' + profile_uuid + '\n')
-              f.write('PROFILE_NAME=' + p['Name'] + '\n')
-          export = dict(method='app-store-connect', destination='upload', teamID=team,
-                        signingStyle='manual', signingCertificate='Apple Distribution',
-                        provisioningProfiles={bundle:p['Name']}, manageAppVersionAndBuildNumber=False,
-                        uploadSymbols=True, stripSwiftSymbols=True)
-          (folder / 'ExportOptions.plist').write_bytes(plistlib.dumps(export))
+          import os, pathlib, re
+          text = os.environ["ASC_KEY_P8"].strip()
+          body = re.sub(r"-----[A-Z ]+-----|\s", "", text)
+          lines = [body[i:i + 64] for i in range(0, len(body), 64)]
+          pem = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(lines) + "\n-----END PRIVATE KEY-----\n"
+          (pathlib.Path(os.environ["RUNNER_TEMP"]) / "etf-signing" / "AuthKey.p8").write_text(pem)
           PY
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          "$RUNNER_TEMP/asc-venv/bin/pip" install --quiet cryptography
+          "$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_signing.py prepare
+      - name: Install the temporary certificate
+        if: env.SIGNING != 'cloud'
+        run: |
+          set -euo pipefail
           KEYCHAIN="$RUNNER_TEMP/etf-signing/build.keychain-db"
           KEYCHAIN_PASSWORD=$(openssl rand -hex 24)
           echo "::add-mask::$KEYCHAIN_PASSWORD"
@@ -94,17 +92,23 @@ jobs:
           security import "$RUNNER_TEMP/etf-signing/certificate.p12" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$KEYCHAIN"
+          security find-identity -v -p codesigning "$KEYCHAIN" | grep -q "Apple Distribution" || { echo "::error::The temporary certificate did not install"; exit 1; }
       - name: Archive signed iPhone app
         run: |
           set -euo pipefail
           mkdir -p build
+          # Build numbers start at 3.x: builds uploaded before used 2.x for the same version.
+          # Signed with the temporary certificate, or (cloud signing) left unsigned for the export to sign.
+          if [[ "${SIGNING:-}" == "cloud" ]]; then
+            SIGN=(CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO)
+          else
+            SIGN=(CODE_SIGN_STYLE=Manual "CODE_SIGN_IDENTITY=Apple Distribution" "PROVISIONING_PROFILE_SPECIFIER=$PROFILE_NAME")
+          fi
           xcodebuild archive -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release \
             -destination 'generic/platform=iOS' -archivePath build/ETFToGo.xcarchive \
-            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$ETF_BUNDLE_ID" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
-            2>&1 | tee build/archive.log
-          python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only archive')"
+            "${SIGN[@]}" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$ETF_BUNDLE_ID" \
+            CURRENT_PROJECT_VERSION="3.$GITHUB_RUN_NUMBER" 2>&1 | tee build/archive.log
+          python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only archive', p['CFBundleShortVersionString'], p['CFBundleVersion'])"
       - name: Upload archive to App Store Connect
         run: |
           set -euo pipefail
@@ -114,7 +118,7 @@ jobs:
             -authenticationKeyPath "$RUNNER_TEMP/etf-signing/AuthKey.p8" \
             -authenticationKeyID "$APPLE_ASC_KEY_ID" \
             -authenticationKeyIssuerID "$APPLE_ASC_ISSUER_ID" 2>&1 | tee build/upload.log
-          echo 'Upload command completed. App Store Connect processing and tester availability still require verification.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Uploaded build 3.$GITHUB_RUN_NUMBER. App Store Connect processing and tester availability still require verification." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -126,4 +130,47 @@ jobs:
         run: |
           security delete-keychain "$RUNNER_TEMP/etf-signing/build.keychain-db" || true
           if [[ -n "${PROFILE_UUID:-}" ]]; then rm -f "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$PROFILE_UUID.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"; fi
+          if [[ -x "$RUNNER_TEMP/asc-venv/bin/python" && -f "$RUNNER_TEMP/etf-signing/AuthKey.p8" ]]; then "$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_signing.py cleanup || true; fi
           rm -rf "$RUNNER_TEMP/etf-signing"
+  # Renames the app in App Store Connect, waits for the newest build to finish processing and gives it to the
+  # internal TestFlight testers (Scripts/asc_app.py), with the same API key.
+  app:
+    needs: [prerequisites, upload]
+    if: always() && needs.prerequisites.result == 'success' && (needs.upload.result == 'success' || needs.upload.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      ETF_BUNDLE_ID: ${{ vars.ETF_BUNDLE_ID }}
+      ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.APPLE_ASC_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare the API key
+        env:
+          ASC_KEY_P8: ${{ secrets.APPLE_ASC_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/etf-signing"
+          python3 - <<'PY'
+          import os, pathlib, re
+          body = re.sub(r"-----[A-Z ]+-----|\s", "", os.environ["ASC_KEY_P8"].strip())
+          pem = "-----BEGIN PRIVATE KEY-----\n" + "\n".join(body[i:i + 64] for i in range(0, len(body), 64)) + "\n-----END PRIVATE KEY-----\n"
+          (pathlib.Path(os.environ["RUNNER_TEMP"]) / "etf-signing" / "AuthKey.p8").write_text(pem)
+          PY
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          "$RUNNER_TEMP/asc-venv/bin/pip" install --quiet cryptography
+      - name: Rename the app
+        if: inputs.app_name != ''
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+        run: '"$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_app.py rename "$APP_NAME"'
+      - name: List the team's distribution certificates
+        run: '"$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_app.py certificates'
+      - name: Wait for the build and give it to internal testers
+        env:
+          BUILD: ${{ needs.upload.result == 'success' && format('3.{0}', github.run_number) || inputs.build }}
+        run: '"$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_app.py testflight "$BUILD"'
+      - name: Remove the key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/etf-signing"

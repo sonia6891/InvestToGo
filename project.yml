@@ -3,7 +3,7 @@ options:
   bundleIdPrefix: tw.sonia
   developmentLanguage: zh-Hant
   deploymentTarget:
-    iOS: '17.0'
+    iOS: '18.0'
 settings:
   base:
     SWIFT_VERSION: '5.0'
@@ -11,18 +11,58 @@ settings:
     MARKETING_VERSION: '0.3.0'
     CURRENT_PROJECT_VERSION: '1'
     CODE_SIGN_STYLE: Automatic
+# Crash and error reporting (Task 14). Pinned: the newest 8.x release at least two weeks old.
+packages:
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    exactVersion: 8.58.4
 targets:
   ETFToGo:
     type: application
     platform: iOS
-    sources: [App]
+    dependencies:
+      - package: Sentry
+        product: Sentry
+    # PocketCore's sources and data are compiled into the app; the same files form a SwiftPM package for Linux tests.
+    sources:
+      - App
+      - PocketCore/Sources/PocketCore
+    # Skin fonts (App/Resources/Fonts, OFL licences beside them). XcodeGen writes this plist; Xcode merges it with
+    # the generated Info.plist keys below.
+    info:
+      path: Support/ETFToGo-Info.plist
+      properties:
+        UIAppFonts:
+          - Anton-Regular.ttf
+          - PressStart2P-Regular.ttf
+          - DotGothic16-Regular.ttf
+          - BreeSerif-Regular.ttf
+          - Caveat-Variable.ttf
+          - NotoSansTC-Bold.ttf
+          - NotoSansTC-Medium.ttf
+          - NotoSerifTC-Bold.otf
+          - NotoSerifTC-Medium.otf
+          - LXGWWenKaiTC-Medium.ttf
+          - JetBrainsMono-Regular.ttf
+        # The launch screen is the default skin's page colour (blackgold #1A1A1D, App/Assets.xcassets/LaunchBackground),
+        # not the generated white: a slow cold start never shows a blank white screen.
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
+        SentryDSN: '$(SENTRY_DSN)'
     settings:
+      configs:
+        # Written into project.pbxproj as a quoted string, not an .xcconfig, so the `//` is not a comment there.
+        # CI checks the resolved Release value with -showBuildSettings.
+        Debug:
+          SENTRY_DSN: ''
+        Release:
+          SENTRY_DSN: 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632'
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview
         TARGETED_DEVICE_FAMILY: '1'
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: ETF 袋著走
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -34,6 +74,9 @@ targets:
       - target: ETFToGo
     settings:
       base:
+        # `@testable import ETFToGo` loads Sentry's module; the test bundle finds it beside the app instead of linking
+        # a second copy of the SDK.
+        FRAMEWORK_SEARCH_PATHS: '$(inherited) $(BUILT_PRODUCTS_DIR) $(BUILT_PRODUCTS_DIR)/PackageFrameworks'
         GENERATE_INFOPLIST_FILE: YES
         TARGETED_DEVICE_FAMILY: '1'
   ETFToGoUITests:

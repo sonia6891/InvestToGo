@@ -2,172 +2,185 @@ import SwiftUI
 
 @main struct ETFToGoApp: App {
     @StateObject private var store: PortfolioStore
+    @AppStorage("appearance") private var appearance = "light"
+    /// The skin decides light or dark text; every screen redraws when it changes.
+    @ObservedObject private var skins = SkinStore.shared
     init() {
+        // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
+        CrashReporting.start()
         let args = ProcessInfo.processInfo.arguments
-        let testURL = args.contains("--ui-testing") ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
-        _store = StateObject(wrappedValue: PortfolioStore(url: testURL, demo: args.contains("--demo"), reset: args.contains("--reset")))
+        let testing = args.contains("--ui-testing")
+        let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
+        // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
+        let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
+        Onboarding.reset(args)
+        // Someone upgrading with records on the phone has started already: no first-launch flow for them.
+        Onboarding.adoptExisting(store.data)
+        // One-time migrations of the game progress: DCA months backfilled from the records, with no experience.
+        try? store.updateGame { $0.migrate(store.data) }
+        // UI tests and screenshots set up game progress with `--demo-…` (only with `--ui-testing`).
+        try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
+        DemoArguments.seedPocket(store, args: args, now: Date())
+        DemoArguments.seedHeld(store, args: args)
+        _store = StateObject(wrappedValue: store)
+        // StoreKit is followed from launch (Apple asks for the Transaction.updates listener then), so renewals and Ask
+        // to Buy answers that arrive during the splash or onboarding are not missed. Once StoreKit has answered, a skin
+        // the player may no longer wear is taken off, with a notice.
+        let membership = MembershipStore.shared
+        membership.level = { [weak store] in GameRules.level(xp: store?.data.game?.xp ?? 0) }
+        membership.onLapse = { [weak store] notice in store?.pendingNotice = notice }
+        Task { await membership.start() }
     }
-    var body: some Scene { WindowGroup { RootView().environmentObject(store).preferredColorScheme(.light) } }
+    var body: some Scene {
+        WindowGroup {
+            LaunchGate().environmentObject(store)
+                // The skin kit's components read the current skin from here.
+                .environment(\.skin, skins.skin)
+                .preferredColorScheme(skins.colorScheme)
+        }
+    }
 }
-enum Palette {
-    static let blue = Color(red: 0.08, green: 0.36, blue: 0.87)
-    static let ink = Color(red: 0.08, green: 0.15, blue: 0.28)
-    static let background = Color(red: 0.95, green: 0.97, blue: 0.99)
-    static let red = Color(red: 0.75, green: 0.16, blue: 0.24)
-    static let green = Color(red: 0.0, green: 0.45, blue: 0.34)
-    static func strategy(_ value: Strategy) -> Color { switch value { case .saving: return blue; case .income: return Color(red: 0.0, green: 0.47, blue: 0.43); case .risk: return Color(red: 0.65, green: 0.34, blue: 0.08); case .unclassified: return .secondary } }
+/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby.
+struct LaunchGate: View {
+    @AppStorage(Onboarding.doneKey) private var onboarded = false
+    @Environment(\.motionReduced) private var reduceMotion
+    /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
+    @State private var start: OnboardingStart?
+
+    init() {
+        _start = State(initialValue: Onboarding.start(ProcessInfo.processInfo.arguments,
+                                                      onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey)))
+    }
+
+    var body: some View {
+        ZStack {
+            if let start {
+                FirstLaunchView(start: start) {
+                    onboarded = true
+                    UserDefaults.standard.synchronize()
+                    withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
+                }
+                .transition(.opacity)
+            } else {
+                RootView().transition(.opacity)
+            }
+        }
+    }
 }
-func money(_ value: Double) -> String { value.formatted(.number.precision(.fractionLength(0))) }
-func decimal(_ value: Double) -> String { value.formatted(.number.precision(.fractionLength(0...2))) }
-struct Card<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View { VStack(alignment: .leading, spacing: 0) { content }.padding(20).frame(maxWidth: .infinity, alignment: .leading).background(.white, in: RoundedRectangle(cornerRadius: 24)).overlay(RoundedRectangle(cornerRadius: 24).stroke(Palette.ink.opacity(0.04))) }
-}
-struct StrategyPill: View {
-    let strategy: Strategy
-    var body: some View { Label(strategy.rawValue, systemImage: strategy.symbol).font(.caption.weight(.medium)).padding(.horizontal, 10).padding(.vertical, 6).foregroundStyle(Palette.strategy(strategy)).background(Palette.strategy(strategy).opacity(0.08), in: Capsule()) }
-}
-struct SectionHeading: View {
-    let title: String
-    var subtitle: String? = nil
-    var body: some View { VStack(alignment: .leading, spacing: 4) { Text(title).font(.title3.bold()).foregroundStyle(Palette.ink); if let subtitle { Text(subtitle).font(.caption).foregroundStyle(.secondary) } }.frame(maxWidth: .infinity, alignment: .leading) }
-}
-struct Page<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View { ScrollView { VStack(alignment: .leading, spacing: 22) { content }.padding(.horizontal, 20).padding(.top, 10).padding(.bottom, 28) }.background(Palette.background) }
-}
+
+/// The lobby is the navigation root; every feature is pushed above it (spec 4.1). Feature screens share the bottom
+/// bar: 「‹ 大廳」, the quick pick, the page name.
 struct RootView: View {
     @EnvironmentObject var store: PortfolioStore
-    @State private var tab = 0
-    var body: some View {
-        TabView(selection: $tab) {
-            NavigationStack { HomeView(tab: $tab) }.tabItem { Label("首頁", systemImage: "square.grid.2x2.fill") }.tag(0)
-            NavigationStack { DiscoverView() }.tabItem { Label("找 ETF", systemImage: "magnifyingglass") }.tag(1)
-            NavigationStack { HoldingsView() }.tabItem { Label("我的持有", systemImage: "wallet.bifold") }.tag(2)
-            NavigationStack { DividendsView() }.tabItem { Label("配息", systemImage: "calendar") }.tag(3)
-            NavigationStack { ToolsView() }.tabItem { Label("工具", systemImage: "slider.horizontal.3") }.tag(4)
+    @Environment(\.scenePhase) private var phase
+    @Environment(\.motionReduced) private var reduceMotion
+    @Namespace private var lobby
+    @State private var path: NavigationPath
+    /// The feature at the bottom of the stack; nil in the lobby and on screens pushed straight from it.
+    @State private var feature: Feature?
+    @ObservedObject private var skins = SkinStore.shared
+    /// The LEVEL×UP on screen (spec 5.12); the level is saved as celebrated when it is accepted.
+    @State private var levelUp: LevelUpMoment?
+    @ObservedObject private var connectivity = Connectivity.shared
+
+    init() {
+        // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
+        let arguments = ProcessInfo.processInfo.arguments
+        if let stack = AppRoute.launchStack(arguments) {
+            if case .feature(let first) = stack.first { _feature = State(initialValue: first) } else { _feature = State(initialValue: nil) }
+            _path = State(initialValue: NavigationPath(stack))
+        } else {
+            let start = Feature.launch(arguments)
+            _feature = State(initialValue: start)
+            _path = State(initialValue: start.map { NavigationPath([AppRoute.feature($0)]) } ?? NavigationPath())
         }
-        .tint(Palette.blue)
-        .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog() } }
-        .onAppear {
-            let args = ProcessInfo.processInfo.arguments
-            if let i = args.firstIndex(of: "--tab"), args.indices.contains(i + 1), let value = Int(args[i + 1]) { tab = value }
+    }
+
+    var body: some View {
+        // 離線中: a thin strip above every screen. The stack starts below it (a VStack, not a safe-area inset, which
+        // screens without a navigation bar scrolled under), so no title or hero is ever drawn behind the strip.
+        VStack(spacing: 0) {
+            if connectivity.offline { OfflineBar() }
+            NavigationStack(path: $path) {
+                LobbyView().appRoutes()
+            }
+            .environment(\.lobbyNavigation, navigation)
+            .environment(\.lobbyNamespace, lobby)
+            .tint(Palette.blue)
+            .id(skins.skin.id)
+            // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑
+            // +30 經驗」. On the stack, not the whole column, so while offline it sits below 「離線中」 and never hides it.
+            .overlay(alignment: .top) { RewardToast() }
         }
-        .alert("ETF 袋著走", isPresented: Binding(get: { store.message != nil }, set: { if !$0 { store.message = nil } })) { Button("知道了", role: .cancel) { store.message = nil } } message: { Text(store.message ?? "") }
+        .overlay(alignment: .bottom) {
+            if !path.isEmpty, let feature {
+                GameBottomBar(title: feature.title, onLobby: navigation.toLobby, onPick: navigation.open)
+                    .ignoresSafeArea(.keyboard)
+            }
+        }
+        // Holding a 換膚 card tries that skin on over everything, the bottom bar included, until the finger lifts.
+        .overlay {
+            ZStack { if let id = skins.tryOn { TryOnPreview(skin: Skins.named(id)).transition(.opacity) } }
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: skins.tryOn)
+        }
+        .onChange(of: path) { _, value in if value.isEmpty { feature = nil } }
+        // Crossing a whole level shows LEVEL×UP once, over everything (spec 5.12).
+        .fullScreenCover(item: $levelUp) { moment in
+            LevelUpView(moment: moment) { accept(moment) }
+                .environmentObject(store)
+                .environment(\.skin, skins.skin)
+                .preferredColorScheme(skins.colorScheme)
+        }
+        .task(id: store.data.game?.levelUpDue) { await celebrateWhenDue() }
+        .modifier(SkinKitLaunch())
+        .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
+        // Live prices while the app is in front during the trading session; stopped in the background, where iOS
+        // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
+        .task(id: phase) {
+            guard phase == .active, !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
+            store.live.start()
+            await store.followMarket()
+        }
+        .onChange(of: phase) { _, value in if value == .background { store.live.stop() } }
+        .task(id: store.data.dividends.map(\.id)) { await DividendReminders.syncIfEnabled(store.data.dividends) }
+        .alert("投資袋著走", isPresented: Binding(get: { store.message != nil }, set: { if !$0 { store.message = nil } })) { Button("知道了", role: .cancel) { store.message = nil } } message: { Text(store.message ?? "") }
     }
-}
-struct HomeView: View {
-    @EnvironmentObject var store: PortfolioStore
-    @Binding var tab: Int
-    @State private var add = false
-    private var paid: Double { store.data.dividends.filter { $0.status == .paid }.reduce(0) { $0 + $1.amount } }
-    private var currentMonth: [Dividend] { store.data.dividends.filter { Calendar.current.isDate($0.date, equalTo: Date(), toGranularity: .month) } }
-    var body: some View {
-        Page {
-            HStack(spacing: 12) {
-                Image("Pocket").resizable().scaledToFit().frame(width: 46, height: 46).clipShape(RoundedRectangle(cornerRadius: 13))
-                VStack(alignment: .leading, spacing: 3) { Text("ETF 袋著走").font(.headline); Text("把每一份累積，看清楚。").font(.caption).foregroundStyle(.secondary) }
-                Spacer()
-                Button { Task { await store.refresh() } } label: { Image(systemName: "arrow.clockwise").font(.headline).padding(12).background(.white, in: Circle()) }.disabled(store.refreshing).accessibilityLabel("更新持有行情")
-            }
-            if store.isDemo { Label("介面預覽・金額及報價均為示範", systemImage: "info.circle").font(.caption).foregroundStyle(Palette.blue) }
-            VStack(alignment: .leading, spacing: 19) {
-                HStack { Label("持有總市值", systemImage: "wallet.bifold").font(.subheadline); Spacer(); Text("TWD").font(.caption.weight(.semibold)).padding(.horizontal, 9).padding(.vertical, 5).background(.white.opacity(0.13), in: Capsule()) }
-                Text(store.data.marketValue.map(money) ?? "—").font(.system(size: 43, weight: .bold, design: .rounded)).minimumScaleFactor(0.6).lineLimit(1).accessibilityIdentifier("portfolio-value")
-                if let value = store.data.marketValue {
-                    HStack(spacing: 6) { Image(systemName: value >= store.data.cost ? "arrow.up.right" : "arrow.down.right"); Text("未實現損益 \(value >= store.data.cost ? "+" : "")\(money(value - store.data.cost))").fontWeight(.semibold) }.font(.subheadline).foregroundStyle(Color(red: 0.65, green: 0.88, blue: 1))
-                } else { Text("加入持有並連接行情，即可查看估值").font(.subheadline).foregroundStyle(.white.opacity(0.8)) }
-                Rectangle().fill(.white.opacity(0.18)).frame(height: 1)
-                HStack {
-                    heroStat("投入成本", value: money(store.data.cost)); Spacer(); heroStat("累計已入帳股息", value: money(paid))
-                }
-                if !store.data.quotes.isEmpty { Text(store.isDemo ? "示範報價，非即時市場資訊" : "依已取得報價估算・不含交易費用").font(.caption2).foregroundStyle(.white.opacity(0.7)) }
-            }.padding(24).foregroundStyle(.white).background(LinearGradient(colors: [Palette.blue, Color(red: 0.06, green: 0.19, blue: 0.47)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
-            HStack(spacing: 12) {
-                Button { add = true } label: { Label("新增持有", systemImage: "plus").frame(maxWidth: .infinity).padding(.vertical, 15) }.buttonStyle(.borderedProminent).buttonBorderShape(.roundedRectangle(radius: 15)).accessibilityIdentifier("home-add-holding")
-                Button { tab = 3 } label: { Label("查看配息", systemImage: "calendar").frame(maxWidth: .infinity).padding(.vertical, 15) }.buttonStyle(.bordered).buttonBorderShape(.roundedRectangle(radius: 15))
-            }
-            SectionHeading(title: "這個月，收進口袋", subtitle: Date().formatted(.dateTime.year().month(.wide).locale(Locale(identifier: "zh_Hant_TW"))))
-            Card {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 9) { Text("已入帳").font(.subheadline).foregroundStyle(.secondary); Text("$\(money(currentMonth.filter { $0.status == .paid }.reduce(0) { $0 + $1.amount }))").font(.title.bold()).foregroundStyle(Palette.ink) }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 9) { Text("已公告待入帳").font(.subheadline).foregroundStyle(.secondary); Text("$\(money(currentMonth.filter { $0.status == .announced }.reduce(0) { $0 + $1.amount }))").font(.title2.bold()).foregroundStyle(Palette.blue) }
-                }
-                Divider().padding(.vertical, 12)
-                if currentMonth.isEmpty { Text("新增一筆配息，開始記錄你的現金流。").font(.subheadline).foregroundStyle(.secondary) }
-                else { ForEach(currentMonth.prefix(2)) { item in HStack { Text(item.symbol).font(.subheadline.bold()); Text(item.date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_Hant_TW")))).font(.caption).foregroundStyle(.secondary); Spacer(); Text(item.status.rawValue).font(.caption).foregroundStyle(item.status == .paid ? Palette.green : Palette.blue) }.padding(.vertical, 4) } }
-            }
-            HStack { SectionHeading(title: "我的配置", subtitle: "依投入成本計算"); Button("查看全部") { tab = 2 }.font(.subheadline) }
-            Card {
-                if store.data.holdings.isEmpty { Label("你的第一筆投資，從這裡開始。", systemImage: "leaf").foregroundStyle(.secondary) }
-                else { ForEach(Strategy.allCases) { strategy in
-                    let amount = store.data.holdings.filter { $0.strategy == strategy }.reduce(0) { $0 + $1.cost }
-                    if amount > 0 { VStack(spacing: 8) { HStack { StrategyPill(strategy: strategy); Spacer(); Text("\(Int(amount / max(store.data.cost, 1) * 100))%").font(.subheadline.bold()) }; ProgressView(value: amount, total: max(store.data.cost, 1)).tint(Palette.strategy(strategy)) }.padding(.bottom, 12) }
-                } }
-            }
-        }.toolbar(.hidden, for: .navigationBar).sheet(isPresented: $add) { HoldingEditor() }
+
+    /// Waits for the action's own feedback first: 記一筆配息's toast appears 0.6 s after the save and the coin drops
+    /// (ruling R25); LEVEL×UP follows about two seconds later, so neither is lost. Achievements reached with the
+    /// level are recorded here; the rewards are read from the saved game, so a replay after a relaunch lists them too.
+    private func celebrateWhenDue() async {
+        guard store.data.game?.levelUpDue != nil, levelUp == nil else { return }
+        try? await Task.sleep(for: .milliseconds(150))
+        let hadReward = store.pendingReward > 0
+        var waits = 0
+        while store.pendingReward > 0, waits < 20, !Task.isCancelled {
+            try? await Task.sleep(for: .milliseconds(150)); waits += 1
+        }
+        if hadReward { try? await Task.sleep(for: .seconds(2)) }
+        guard !Task.isCancelled, levelUp == nil, let level = store.data.game?.levelUpDue else { return }
+        try? store.updateGame { _ = $0.refreshAchievements(store.data, now: Date()) }
+        levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, now: Date())
     }
-    private func heroStat(_ title: String, value: String) -> some View { VStack(alignment: .leading, spacing: 7) { Text(title).font(.caption).foregroundStyle(.white.opacity(0.75)); Text(value).font(.title3.bold()).monospacedDigit() } }
-}
-struct FundRow: View {
-    @EnvironmentObject var store: PortfolioStore
-    let fund: Fund
-    var body: some View {
-        HStack(spacing: 13) {
-            Text(String(fund.id.suffix(2))).font(.system(.title3, design: .rounded).bold()).foregroundStyle(Palette.strategy(fund.strategy)).frame(width: 46, height: 46).background(Palette.strategy(fund.strategy).opacity(0.09), in: RoundedRectangle(cornerRadius: 14))
-            VStack(alignment: .leading, spacing: 6) { Text(fund.name).font(.subheadline.bold()).foregroundStyle(Palette.ink); HStack { Text(fund.id).font(.caption).foregroundStyle(.secondary); Text("· \(fund.strategy.rawValue)").font(.caption).foregroundStyle(Palette.strategy(fund.strategy)) } }
-            Spacer(minLength: 4)
-            VStack(alignment: .trailing, spacing: 5) { Text(store.data.quotes[fund.id].map { decimal($0.price) } ?? "—").font(.headline).foregroundStyle(Palette.ink); Text(store.data.quotes[fund.id] == nil ? "尚未取得報價" : (store.isDemo ? "示範報價" : store.data.quotes[fund.id]!.date)).font(.system(size: 10)).foregroundStyle(.secondary) }
-            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
-        }.padding(.vertical, 8)
+
+    /// 收下: saved as celebrated, so it is never shown again (not after leaving a screen, nor after a relaunch).
+    private func accept(_ moment: LevelUpMoment) {
+        do { try store.updateGame { $0.celebrate(moment.level) } } catch { store.message = error.localizedDescription }
+        levelUp = nil
     }
-}
-struct DiscoverView: View {
-    @EnvironmentObject var store: PortfolioStore
-    @State private var query = ""
-    @State private var filter = "全部"
-    @State private var favoritesOnly = false
-    @FocusState private var searchFocused: Bool
-    var funds: [Fund] { store.funds.filter { (query.isEmpty || $0.id.localizedCaseInsensitiveContains(query) || $0.name.localizedCaseInsensitiveContains(query)) && (filter == "全部" || $0.strategy.rawValue == filter) && (!favoritesOnly || store.data.favorites.contains($0.id)) } }
-    var body: some View {
-        Page {
-            Text("找到適合你的累積方式").font(.subheadline).foregroundStyle(.secondary)
-            HStack { Image(systemName: "magnifyingglass").foregroundStyle(.secondary); TextField("搜尋代碼或名稱", text: $query).autocorrectionDisabled().textInputAutocapitalization(.never).focused($searchFocused).submitLabel(.search).onSubmit { searchFocused = false }.accessibilityIdentifier("fund-search"); if !query.isEmpty { Button { query = "" } label: { Image(systemName: "xmark.circle.fill") }.accessibilityLabel("清除搜尋") } }.padding(15).background(.white, in: RoundedRectangle(cornerRadius: 16))
-            ScrollView(.horizontal, showsIndicators: false) { HStack(spacing: 8) { ForEach(["全部"] + Strategy.allCases.filter { $0 != .unclassified }.map(\.rawValue), id: \.self) { value in Button { filter = value } label: { Text(value).font(.subheadline.weight(.semibold)).padding(.horizontal, 17).padding(.vertical, 11).background(filter == value ? Palette.blue : .white, in: Capsule()).foregroundStyle(filter == value ? .white : Palette.ink) } } } }
-            if filter != "全部", let s = Strategy(rawValue: filter) { Text("\(s.subtitle)・策略標籤不代表保本或保證獲利。").font(.caption).foregroundStyle(.secondary) }
-            HStack { Text("ETF 清單").font(.title3.bold()); Text("\(funds.count)").font(.caption.bold()).padding(6).background(.white, in: Circle()); Spacer(); Button { favoritesOnly.toggle() } label: { Label("收藏", systemImage: favoritesOnly ? "star.fill" : "star") }.font(.subheadline) }
-            Card {
-                if funds.isEmpty { ContentUnavailableView.search(text: query) }
-                ForEach(funds) { fund in
-                    NavigationLink(value: fund) { FundRow(fund: fund) }
-                    if fund.id != funds.last?.id { Divider() }
-                }
-            }
-            Text(store.isDemo ? "示範清單；正式模式使用上市與上櫃名單。" : "上市 \(store.funds.filter { $0.market == "TWSE" }.count) · 上櫃 \(store.funds.filter { $0.market == "TPEx" }.count) 個代碼。外幣級別分開計數，代碼數不等於獨立基金數。" ).font(.caption).foregroundStyle(.secondary)
-        if let catalog = store.catalog, !store.isDemo { Text("上市資料日 \(catalog.listedDate) · 上櫃取得日 \(catalog.fetchedDay)").font(.caption).foregroundStyle(.secondary) }; if let message = store.catalogMessage { Text(message).font(.caption).foregroundStyle(.secondary) }; Button(store.catalogRefreshing ? "更新中…" : "更新上市櫃名單") { Task { await store.refreshCatalog() } }.disabled(store.catalogRefreshing || store.isDemo)
-        }.navigationTitle("找 ETF").navigationDestination(for: Fund.self) { FundDetail(fund: $0) }
-            .toolbar { ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } } }
+
+    private var navigation: LobbyNavigation {
+        LobbyNavigation(
+            toLobby: { move { path = NavigationPath(); feature = nil } },
+            open: { next in move { feature = next; path = NavigationPath([AppRoute.feature(next)]) } },
+            push: { route in move { path.append(route) } })
     }
-}
-struct FundDetail: View {
-    @EnvironmentObject var store: PortfolioStore
-    let fund: Fund
-    @State private var add = false
-    var body: some View {
-        Page {
-            StrategyPill(strategy: fund.strategy)
-            Text(fund.name).font(.title.bold())
-            Card { Text("最近取得的報價").font(.subheadline).foregroundStyle(.secondary); Text(store.data.quotes[fund.id].map { "$\(decimal($0.price))" } ?? "尚未連線").font(.largeTitle.bold()).padding(.vertical, 8); Text(store.data.quotes[fund.id].map { "報價日期：\($0.date)" } ?? "接上你的富果行情後即可更新。").font(.caption).foregroundStyle(.secondary); Button("更新這檔報價") { Task { await store.refresh(symbols: [fund.id]) } }.buttonStyle(.bordered).disabled(store.refreshing).padding(.top, 10) }
-            Button { add = true } label: { Label("新增到我的持有", systemImage: "plus").frame(maxWidth: .infinity).padding(10) }.buttonStyle(.borderedProminent)
-            Card { Label("策略怎麼看", systemImage: "info.circle").font(.headline); Text("\(fund.strategy.rawValue)是整理持有的方式，不是收益保證。配息可能來自收益或本金；槓桿策略需注意每日重設及波動風險。").font(.subheadline).foregroundStyle(.secondary).padding(.top, 8) }
-        Card {
-                NavigationLink("成分股與權重") { ComponentsView(symbol: fund.id) }.padding(.vertical, 10)
-                Divider()
-                NavigationLink("歷史績效") { HistoryView(symbol: fund.id) }.padding(.vertical, 10)
-                Divider()
-                NavigationLink("費用率與級距") { FeesView(fund: fund) }.padding(.vertical, 10)
-            }
-        }.navigationTitle(fund.id).navigationBarTitleDisplayMode(.inline).toolbar { Button { store.favorite(fund.id) } label: { Image(systemName: store.data.favorites.contains(fund.id) ? "star.fill" : "star") }.accessibilityLabel("切換收藏") }.sheet(isPresented: $add) { HoldingEditor(fund: fund) }
+
+    /// With Reduce Motion, screens change without the push or zoom; the new screen fades in instead (spec 3.5).
+    private func move(_ change: () -> Void) {
+        guard reduceMotion else { change(); return }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction, change)
     }
 }

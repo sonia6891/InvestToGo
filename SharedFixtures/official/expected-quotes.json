@@ -1,0 +1,44 @@
+[
+ {
+  "symbol": "00411A",
+  "price": 9.28,
+  "date": "2026-11-11",
+  "currency": "TWD"
+ },
+ {
+  "symbol": "0050",
+  "price": 99.7,
+  "date": "2026-11-10",
+  "currency": "TWD"
+ },
+ {
+  "symbol": "00635U",
+  "price": 42.31,
+  "date": "2026-11-10",
+  "currency": "TWD"
+ },
+ {
+  "symbol": "00636K",
+  "price": 7.71,
+  "date": "2026-11-10",
+  "currency": "UNKNOWN"
+ },
+ {
+  "symbol": "00679B",
+  "price": 26.39,
+  "date": "2026-11-11",
+  "currency": "TWD"
+ },
+ {
+  "symbol": "00687C",
+  "price": 9.01,
+  "date": "2026-11-11",
+  "currency": "UNKNOWN"
+ },
+ {
+  "symbol": "00878",
+  "price": 32.95,
+  "date": "2026-11-10",
+  "currency": "TWD"
+ }
+]

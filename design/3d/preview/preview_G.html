@@ -1,0 +1,213 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>遊戲</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=JetBrains+Mono:wght@500;700&amp;family=Noto+Sans+TC:wght@500;700;900&amp;family=Noto+Serif+TC:wght@900&amp;family=DotGothic16&amp;family=LXGW+WenKai+TC:wght@700&amp;display=swap"><style>
+body{margin:0}
+.ph{width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative;background:#1A1A1D;color:#F4F1E8;font-family:'Noto Sans TC',sans-serif;box-shadow:0 24px 60px rgba(0,0,0,.28);flex:none}
+.mono{font-family:'JetBrains Mono',monospace}
+.anton{font-family:Anton,'Noto Sans TC',sans-serif;letter-spacing:.03em}
+.col{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.bar{position:absolute;left:24px;right:24px;top:56px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#6E6A63}
+.k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#A9A397}
+.ttl{font-weight:900;font-size:34px;line-height:1.1}
+.hexo{display:inline-block;padding:2px;background:#F4F1E8;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)}
+.hexo span{display:block;background:#1A1A1D;color:#F4F1E8;clip-path:polygon(13px 0,calc(100% - 13px) 0,100% 50%,calc(100% - 13px) 100%,13px 100%,0 50%);padding:13px 36px;font-size:16px;font-weight:900;letter-spacing:.12em}
+.hexo.fill span{background:#F4F1E8;color:#111114}
+.hexo.tag{padding:1.5px}
+.hexo.tag span{padding:3px 16px;font-size:11px;font-weight:700;letter-spacing:.1em}
+.chip{padding:2px;background:#4A4A52;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);flex:none}
+.chip span{display:block;background:#1A1A1D;padding:7px 15px;font-size:12px;font-weight:700;color:#C9C3B8;clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%)}
+.chip.on{background:#F2B632}
+.chip.on span{color:#F2B632}
+.chip.full span{background:#F4F1E8;color:#111114}
+.chip.full{background:#F4F1E8}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #2C2C32}
+.code{font-family:Anton,sans-serif;font-size:20px;letter-spacing:.03em;line-height:1}
+.nm{font-size:12px;color:#A9A397}
+.num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;text-align:right}
+.chg{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right}
+.disc{border-radius:50%;background:#F4F1E8;box-shadow:inset 0 0 0 6px #F2B632;display:flex;align-items:center;justify-content:center;flex:none}
+.tb{position:absolute;left:0;right:0;bottom:0;height:78px;padding-bottom:18px;box-sizing:border-box;display:flex;justify-content:space-around;align-items:center;border-top:1px solid #26262C;background:#1A1A1D}
+.ti{display:flex;flex-direction:column;align-items:center;gap:4px;color:#6E6A63;font-size:10px;font-weight:700;background:none;border:0;font-family:inherit;min-width:48px;min-height:44px;justify-content:center}
+.ti.on{color:#F2B632}
+.tile{border-radius:26px;background:#232328;padding:10px 14px 16px;display:flex;flex-direction:column;gap:2px;position:relative;min-height:176px;box-sizing:border-box}
+.tile img{width:112px;height:112px;margin:-4px 0 0 -10px}
+.tile .tt{font-weight:900;font-size:16px}
+.tile .ts{font-size:11px;color:#A9A397}
+.tile.gold{background:#F2B632;color:#111114}
+.tile.gold .ts{color:#5A4510}
+.tile .go{position:absolute;right:14px;top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6E6A63;letter-spacing:.1em}
+.tile.gold .go{color:#5A4510}
+.plan{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:20px;background:#232327}
+.plan.on{background:#F4F1E8;color:#111114}
+.plan .pt{font-weight:900;font-size:16px}
+.plan .ps{font-size:11px;color:#A9A397}
+.plan.on .ps{color:#5A564F}
+.plan .pp{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:#A9A397;text-align:right}
+.plan.on .pp{color:#5A564F}
+.radio{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px #4A4A52;flex:none;display:flex;align-items:center;justify-content:center}
+.plan.on .radio{background:#111114;box-shadow:none}
+.mo{display:flex;flex-direction:column;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#6E6A63}
+.ck{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #3A3A40}
+.ck.paid{background:#F2B632;box-shadow:none}
+.ck.soon{box-shadow:inset 0 0 0 2px #F2B632}
+.stat{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-top:1px solid #2C2C32}
+.stat .sv{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px}
+.stat .sl{font-size:11px;color:#A9A397}
+.qk{position:absolute;left:0;right:0;bottom:0;height:104px;padding:0 28px 22px;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:space-between;background:linear-gradient(rgba(26,26,29,0),#1A1A1D 55%)}
+.qk span{width:70px;padding-bottom:20px}
+.qk span:last-child{text-align:right}
+.qhex{width:66px;height:60px;background:#F2B632;clip-path:polygon(25% 2%,75% 2%,100% 50%,75% 98%,25% 98%,0 50%);display:flex;align-items:center;justify-content:center}
+.demo{position:absolute;right:20px;bottom:86px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#4A4A52;letter-spacing:.1em}
+
+.hud{position:absolute;left:20px;right:20px;top:52px;display:flex;align-items:center;gap:8px;z-index:3}
+.lv{padding:1.5px;background:#F2B632;clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%)}
+.lv span{display:block;background:#F2B632;color:#111114;font-family:Anton,sans-serif;font-size:13px;padding:3px 12px;letter-spacing:.06em}
+.xp{width:96px;height:6px;border-radius:3px;background:#34343A;overflow:hidden}
+.xp i{display:block;height:100%;width:62%;background:#F4F1E8}
+.coin{width:16px;height:16px;border-radius:50%;background:#F2B632;box-shadow:inset 0 0 0 3px #C98E12}
+.obj{position:absolute;display:flex;flex-direction:column;align-items:center;gap:0}
+.obj img{width:118px;height:118px;filter:drop-shadow(6px 10px 7px rgba(0,0,0,.35))}
+.quest{position:absolute;left:18px;right:18px;border-radius:22px;background:#232328;padding:12px 16px;box-sizing:border-box}
+.qr{display:flex;align-items:center;gap:8px;font-size:12px;padding:4px 0}
+.qd{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px #4A4A52;flex:none}
+.qd.ok{background:#F4F1E8;box-shadow:none}
+.mi{display:flex;align-items:baseline;gap:10px;font-weight:900;color:#4A4A52;font-size:24px;line-height:1.5}
+.mi .n{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;width:18px}
+.mi.on{color:#F4F1E8;font-size:50px;line-height:1.15}
+.mi.on .n{color:#F2B632}
+.fan{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
+.card{position:absolute;left:24px;right:24px;border-radius:28px;background:#F4F1E8;color:#111114;padding:18px 20px;box-sizing:border-box;box-shadow:0 0 0 4px #F2B632}
+.sb{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;padding:4px 0}
+.sb .l{width:52px}
+.sb .bk{display:flex;gap:3px;flex:1}
+.sb .bk i{flex:1;height:12px;border-radius:3px;background:#DDD8CC}
+.sb .bk i.f{background:#111114}
+.sb .bk i.g{background:#F2B632}
+.sb .v{font-family:'JetBrains Mono',monospace;font-size:11px;width:44px;text-align:right}
+
+.bd{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.bd .dc{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#F4F1E8;box-shadow:inset 0 0 0 5px #F2B632}
+.bd .dc img{width:100px;height:100px}
+.bd.lock .dc{background:#232328;box-shadow:inset 0 0 0 2px #34343A;color:#4A4A52;font-family:Anton,sans-serif;font-size:30px}
+.bd .bt{font-size:12px;font-weight:900}
+.bd .bs{font-family:'JetBrains Mono',monospace;font-size:9px;color:#6E6A63}
+.pg{width:70px;height:4px;border-radius:2px;background:#34343A;overflow:hidden}
+.pg i{display:block;height:100%;background:#F2B632}
+.sk{position:absolute;width:176px;height:300px;border-radius:28px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.sw{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+</style></head><body><div style="width: 1740px; height: 924px; box-sizing: border-box; padding: 40px 30px; display: flex; gap: 40px; background: #E9E6DF;">
+<div class="ph">
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span></div>
+  <img src="./img/icon_target.png" alt="" style="position:absolute; right:4px; top:72px; width:160px; height:160px; filter:drop-shadow(8px 12px 8px rgba(0,0,0,.3));">
+  <div style="position:absolute; left:24px; top:100px; display:flex; flex-direction:column; gap:6px;">
+    <span class="k">ACH×012</span><span class="ttl">成就</span>
+    <span class="hexo tag" style="align-self:flex-start;"><span>12 / 40 已解鎖</span></span>
+  </div>
+  <div style="position:absolute; left:16px; right:16px; top:236px; display:grid; grid-template-columns:repeat(3,1fr); row-gap:18px;">
+    <div class="bd"><div class="dc"><img src="./img/icon_stack.png" alt=""></div><span class="bt">連續 12 個月</span><span class="bs">10/02 達成</span></div><div class="bd"><div class="dc"><img src="./img/dollar.png" alt=""></div><span class="bt">第一次領息</span><span class="bs">04/18 達成</span></div><div class="bd"><div class="dc"><img src="./img/icon_magnifier.png" alt=""></div><span class="bt">研究家</span><span class="bs">看過 20 檔</span></div><div class="bd"><div class="dc"><img src="./img/icon_bell.png" alt=""></div><span class="bt">從不遲到</span><span class="bs">提醒 6 次全到</span></div><div class="bd"><div class="dc"><img src="./img/pocket_icon.png" alt=""></div><span class="bt">口袋開張</span><span class="bs">01/05 達成</span></div><div class="bd lock"><div class="dc">?</div><span class="bt" style="color:#A9A397;">收集 30 張</span><div class="pg"><i style="width:77%;"></i></div><span class="bs">23/30</span></div><div class="bd lock"><div class="dc">?</div><span class="bt" style="color:#A9A397;">連續 24 個月</span><div class="pg"><i style="width:50%;"></i></div><span class="bs">12/24</span></div><div class="bd lock"><div class="dc">?</div><span class="bt" style="color:#A9A397;">領息 12 次</span><div class="pg"><i style="width:58%;"></i></div><span class="bs">7/12</span></div><div class="bd lock"><div class="dc">?</div><span class="bt" style="color:#A9A397;">存到 50 萬</span><div class="pg"><i style="width:58%;"></i></div><span class="bs">29/50</span></div>
+  </div>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">成就</span>
+  </div>
+</div>
+
+<div class="ph">
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span></div>
+  <div style="position:absolute; left:24px; top:96px;" class="k">SKN×004</div>
+  <div class="sk" style="left:-36px; top:140px; transform:rotate(-9deg); background:#1B1F4B; z-index:1; opacity:1.0;">
+      
+      <img src="./img/skins/voxel/pocket_icon.png" alt="" style="position:absolute; left:8px; top:30px; width:160px; height:160px; object-fit:contain;">
+      <div style="position:absolute; left:0; right:0; top:206px; text-align:center; color:#FFFFFF; font-family:'DotGothic16',sans-serif; font-size:20px;">像素</div>
+      <div style="position:absolute; left:50%; top:244px; transform:translateX(-50%); width:64px; background:#3DE0FF; height:6px;"></div>
+    </div>
+  <div class="sk" style="left:250px; top:140px; transform:rotate(9deg); background:#E9DCC3; z-index:1; opacity:1.0;">
+      <div style="position:absolute; inset:7px; border-radius:22px; border:1.5px dashed #9A7A52; opacity:.6;"></div>
+      <img src="./img/skins/stitch/pocket_icon.svg" alt="" style="position:absolute; left:8px; top:30px; width:160px; height:160px; object-fit:contain;">
+      <div style="position:absolute; left:0; right:0; top:206px; text-align:center; color:#3B2A1A; font-family:'Noto Serif TC',serif; font-weight:900; font-size:20px;">縫線</div>
+      <div style="position:absolute; left:50%; top:244px; transform:translateX(-50%); width:64px; border-top:3px dashed #C9573F; height:0;"></div>
+    </div>
+  <div class="sk" style="left:107px; top:120px; transform:rotate(0deg); background:#1A1A1D; z-index:2; opacity:1.0;">
+      
+      <img src="./img/pocket.png" alt="" style="position:absolute; left:8px; top:30px; width:160px; height:160px; object-fit:contain;">
+      <div style="position:absolute; left:0; right:0; top:206px; text-align:center; color:#F4F1E8; font-weight:900; font-size:20px;">黑金</div>
+      <div style="position:absolute; left:50%; top:244px; transform:translateX(-50%); width:64px; background:#F2B632; height:6px; border-radius:3px;"></div>
+    </div>
+  <div style="position:absolute; left:107px; top:120px; width:176px; height:300px; border-radius:28px; box-shadow:0 0 0 3px #F4F1E8; z-index:3; pointer-events:none;"></div>
+  <div style="position:absolute; left:0; right:0; top:440px; display:flex; justify-content:center; align-items:center; gap:7px;"><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><i style="display:block; width:18px; height:7px; border-radius:4px; background:#F2B632;"></i><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><span class="mono" style="font-size:10px; color:#6E6A63; margin-left:6px;">2 / 4</span></div>
+  <div class="col" style="top:464px; gap:8px;">
+    <span class="ttl">黑金</span>
+    <span class="hexo tag"><span>預設皮膚 · 使用中</span></span>
+    <span style="font-size:12px; color:#C9C3B8;">左右滑：卡片上是那套皮膚的口袋</span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:572px; display:flex; justify-content:center; gap:20px;"><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#1B1F4B; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/pixel.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">LV.10</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#1A1A1D; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 3px #1A1A1D, 0 0 0 5px #F4F1E8;"><img src="./img/skins/badges/blackgold.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#F4F1E8;">使用中</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#E9DCC3; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/stitch.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">會員</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#FAF8F3; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/sketch.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">已解鎖</span></div></div>
+  <div class="col" style="top:668px;"><span class="hexo"><span style="padding:11px 40px; font-size:15px; ">← 滑動試穿 →</span></span></div>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">換膚</span>
+  </div>
+</div>
+
+<div class="ph">
+  <div class="hud"><span class="lv"><span>LV.7</span></span><div class="xp"><i></i></div><span class="mono" style="font-size:9px; color:#6E6A63;">620/1000</span><span style="flex:1;"></span><span class="coin"></span><span class="mono" style="font-size:12px; font-weight:700;">1,280</span></div>
+  <div style="position:absolute; left:24px; top:96px;" class="k">SKN×004</div>
+  <div class="sk" style="left:-36px; top:140px; transform:rotate(-9deg); background:#E9DCC3; z-index:1; opacity:1.0;">
+      <div style="position:absolute; inset:7px; border-radius:22px; border:1.5px dashed #9A7A52; opacity:.6;"></div>
+      <img src="./img/skins/stitch/pocket_icon.svg" alt="" style="position:absolute; left:8px; top:30px; width:160px; height:160px; object-fit:contain;">
+      <div style="position:absolute; left:0; right:0; top:206px; text-align:center; color:#3B2A1A; font-family:'Noto Serif TC',serif; font-weight:900; font-size:20px;">縫線</div>
+      <div style="position:absolute; left:50%; top:244px; transform:translateX(-50%); width:64px; border-top:3px dashed #C9573F; height:0;"></div>
+    </div>
+  
+  <div class="sk" style="left:107px; top:120px; transform:rotate(0deg); background:#FAF8F3; z-index:2; opacity:1.0;">
+      
+      <img src="./img/skins/sketch/pocket_icon.svg" alt="" style="position:absolute; left:8px; top:30px; width:160px; height:160px; object-fit:contain;">
+      <div style="position:absolute; left:0; right:0; top:206px; text-align:center; color:#1F1F1F; font-family:'LXGW WenKai TC',serif; font-weight:700; font-size:21px;">手繪</div>
+      <div style="position:absolute; left:50%; top:244px; transform:translateX(-50%); width:64px; background:#F2D16B; height:7px;"></div>
+    </div>
+  <div style="position:absolute; left:107px; top:120px; width:176px; height:300px; border-radius:28px; box-shadow:0 0 0 3px #F4F1E8; z-index:3; pointer-events:none;"></div>
+  <div style="position:absolute; left:0; right:0; top:440px; display:flex; justify-content:center; align-items:center; gap:7px;"><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><i style="display:block; width:7px; height:7px; border-radius:4px; background:#4A4A52;"></i><i style="display:block; width:18px; height:7px; border-radius:4px; background:#F2B632;"></i><span class="mono" style="font-size:10px; color:#6E6A63; margin-left:6px;">4 / 4</span></div>
+  <div class="col" style="top:464px; gap:8px;">
+    <span class="ttl">手繪</span>
+    <span class="hexo tag"><span>LV.5 已解鎖 · 你是 LV.7</span></span>
+    <span style="font-size:12px; color:#C9C3B8;">左右滑：卡片上是那套皮膚的口袋</span>
+  </div>
+  <div style="position:absolute; left:24px; right:24px; top:572px; display:flex; justify-content:center; gap:20px;"><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#1B1F4B; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/pixel.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">LV.10</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#1A1A1D; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/blackgold.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">使用中</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#E9DCC3; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1.5px #34343A;"><img src="./img/skins/badges/stitch.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#6E6A63;">會員</span></div><div style="display:flex; flex-direction:column; align-items:center; gap:7px;"><div style="position:relative; width:56px; height:56px; border-radius:16px; background:#FAF8F3; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 3px #1A1A1D, 0 0 0 5px #F4F1E8;"><img src="./img/skins/badges/sketch.svg" alt="" style="width:42px; height:42px;"></div><span class="mono" style="font-size:9px; color:#F4F1E8;">已解鎖</span></div></div>
+  <div class="col" style="top:668px;"><span class="hexo"><span style="padding:11px 40px; font-size:15px; background:#F4F1E8; color:#111114;">換上這套</span></span></div>
+  <div class="qk">
+    <span class="mono" style="font-size:11px; color:#A9A397; letter-spacing:.1em;">‹ 大廳</span>
+    <div class="qhex"><svg width="24" height="24" viewBox="0 0 24 24" fill="#111114" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
+    <span class="mono" style="font-size:11px; color:#F2B632; letter-spacing:.1em;">換膚</span>
+  </div>
+</div>
+
+<div class="ph">
+  <svg viewBox="0 0 390 844" width="390" height="844" style="position:absolute; inset:0;" aria-hidden="true"><g transform="translate(0,-40)">
+      <polygon points="195.0,180.0 140.1,-367.8 249.9,-367.8" fill="#F4F1E8"></polygon>
+      <polygon points="260.1,183.8 461.7,-317.2 497.5,-301.3" fill="#F2B632"></polygon>
+      <polygon points="354.9,258.8 824.2,23.1 844.0,67.8" fill="#000000"></polygon>
+      <polygon points="96.0,429.0 -236.0,881.6 -356.6,761.0" fill="#F2B632"></polygon>
+      <polygon points="44.9,409.8 -416.0,671.5 -429.8,645.6" fill="#000000"></polygon>
+      <polygon points="35.1,335.6 -224.2,355.6 -225.0,333.7" fill="#F2777A"></polygon>
+      <polygon points="351.9,381.0 597.1,451.4 591.6,468.1" fill="#3D7BF2"></polygon>
+      <path d="M42.4,289.1 A86.6 86.6 0 0 1 154.1,177.4 A158.0 158.0 0 0 0 42.4,289.1 Z" fill="#F4F1E8"></path>
+      <path d="M296.6,209.0 A86.6 86.6 0 0 1 350.6,357.4 A158.0 158.0 0 0 0 296.6,209.0 Z" fill="#F4F1E8"></path>
+      <path d="M37.9,313.5 A75.0 75.0 0 0 1 106.6,199.0 A158.0 158.0 0 0 0 37.9,313.5 Z" fill="#F4F1E8"></path>
+      <circle cx="195" cy="330" r="126.96000000000001" fill="#F2B632"></circle>
+      <circle cx="195" cy="330" r="108.56" fill="#F4F1E8"></circle>
+    </g></svg>
+  <img src="./img/icon_stack.png" alt="" style="position:absolute; left:80px; top:175px; width:230px; height:230px; filter:drop-shadow(10px 14px 10px rgba(0,0,0,.28));">
+  <div class="col" style="top:470px; gap:8px;">
+    <span class="k">LEVEL×UP</span>
+    <span class="anton" style="font-size:64px; line-height:1;">LV.8</span>
+    <span class="hexo tag"><span>連續定投 12 個月</span></span>
+  </div>
+  <div style="position:absolute; left:40px; right:40px; top:636px; display:flex; justify-content:center; gap:28px;">
+    <div style="display:flex; align-items:center; gap:8px;"><span class="coin"></span><span class="mono" style="font-weight:700;">+200</span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><span style="width:16px; height:16px; border-radius:50%; background:#3DE0FF;"></span><span style="font-size:13px; font-weight:900;">再 2 級解鎖「像素」</span></div>
+  </div>
+  <div class="col" style="bottom:52px; gap:12px;">
+    <span class="hexo fill"><span style="padding:13px 70px;">收下</span></span>
+    <span class="mono" style="font-size:11px; color:#A9A397;">→ 分享這一刻 ←</span>
+  </div>
+</div>
+</div></body></html>

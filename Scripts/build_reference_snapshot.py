@@ -1,8 +1,11 @@
 """Build reviewed app snapshots from saved official responses; no fuzzy name matching.
 
 Usage: python Scripts/build_reference_snapshot.py INPUT_DIR YYYY-MM-DD
-INPUT_DIR contains listed.json, twse-active.json, tpex-filter-data.json,
-fees-2025-annual.html and tpex-details/<security code>.json.
+INPUT_DIR contains the exchanges' open data listed.json (TWSE t187ap47_L 基金基本資料彙總表),
+twse-quotes.json (TWSE STOCK_DAY_ALL) and tpex-quotes.json (TPEx tpex_mainboard_quotes), plus
+fees-2025-annual.html. ETFs are the codes starting with 00 that trade on either exchange. The open
+data has no full name, fund type or listing date for OTC ETFs, so those carry over from the current
+App/Resources/catalog.json.
 The SITCA form must have year=2025 and period=Year selected. When changing
 year, query once to refresh the period options, then query Year again.
 """
@@ -19,7 +22,7 @@ from pathlib import Path
 source = Path(sys.argv[1])
 today = date.fromisoformat(sys.argv[2]).isoformat()
 dest = Path(__file__).resolve().parents[1] / 'App' / 'Resources'
-def load(name): return json.loads((source / name).read_bytes())
+def load(name): return json.loads((source / name).read_bytes().removeprefix(b'\xef\xbb\xbf'))
 def clean(name): return html.unescape(name)
 def day(raw):
     raw = re.sub(r'\D', '', raw)
@@ -30,26 +33,26 @@ def strategy(name):
     if any(x in name for x in ['高股息','優息','高息']): return '印鈔機'
     if name in ['元大台灣50','富邦台50','元大富櫃50']: return '存錢筒'
     return '待分類'
-details = {x['基金代號']: x for x in load('listed.json')}
+details = {x['基金代號'].strip(): x for x in load('listed.json')}
+known = {x['id']: x for x in json.loads((dest/'catalog.json').read_text(encoding='utf-8'))['funds']} if (dest/'catalog.json').exists() else {}
 funds = []
-for market, filename in [('TWSE','twse-active.json'),('TPEx','tpex-filter-data.json')]:
-    response = load(filename)
-    assert response['status'] == 'success' and response['data']
-    for item in response['data']:
-        listing = day(item['listingDate'])
-        if listing > today: continue
-        code = item['stockNo']; name = clean(item['stockName'])
-        fund = dict(id=code,name=name,strategy=strategy(name),market=market,listingDate=listing)
+for market, filename, code_key, name_key in [('TWSE','twse-quotes.json','Code','Name'),('TPEx','tpex-quotes.json','SecuritiesCompanyCode','CompanyName')]:
+    rows = load(filename)
+    assert rows and code_key in rows[0] and name_key in rows[0]
+    count = len(funds)
+    for item in rows:
+        code = item[code_key].strip(); name = clean(item[name_key].strip())
+        if not re.fullmatch(r'00[0-9]{2,4}[A-Z]?', code): continue
+        fund = dict(id=code,name=name,strategy=strategy(name),market=market)
         if market == 'TWSE' and code in details:
-            fund.update(fullName=clean(details[code]['基金中文名稱']),fundType=details[code]['基金類型'])
-        elif (source/'tpex-details'/f'{code}.json').exists():
-            detail = load(f'tpex-details/{code}.json')
-            assert detail['stockNo'] == code
-            fund.update(fullName=detail['name'],fundType=detail['etfCate'])
+            fund.update(listingDate=day(details[code]['上市日期']),fullName=clean(details[code]['基金中文名稱']),fundType=details[code]['基金類型'])
+        else:
+            fund.update({k: known[code][k] for k in ['listingDate','fullName','fundType'] if known.get(code,{}).get(k)})
         funds.append(fund)
+    assert len(funds) > count
 assert len(set(x['id'] for x in funds)) == len(funds)
 catalog = dict(funds=sorted(funds,key=lambda x:x['id']),listedDate=max(day(x['出表日期']) for x in details.values()),fetchedDay=today,
-               sources=['https://openapi.twse.com.tw/v1/opendata/t187ap47_L','https://www.twse.com.tw/zh/ETFortune/ajaxProductsResult','https://info.tpex.org.tw/api/etfFilter'])
+               sources=['https://openapi.twse.com.tw/v1/opendata/t187ap47_L','https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL','https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes'])
 class Table(HTMLParser):
     def __init__(self): super().__init__(); self.rows=[]; self.row=[]; self.cell=None
     def handle_starttag(self, tag, attrs):
@@ -100,7 +103,7 @@ for filename, data in [('catalog.json',catalog),('annual-fees.json',fees)]:
 evidence = Path(__file__).resolve().parents[1]/'Evidence'/'ReferenceData'
 evidence.mkdir(parents=True,exist_ok=True)
 receipt = dict(fetchedDay=today,activeCodes=len(funds),listed=sum(x['market']=='TWSE' for x in funds),otc=sum(x['market']=='TPEx' for x in funds),annualFeeCoverage=len(records),
-    sourceSHA256={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.glob('*') if p.name in ['listed.json','twse-active.json','tpex-filter-data.json','fees-2025-annual.html']},
+    sourceSHA256={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.glob('*') if p.name in ['listed.json','twse-quotes.json','tpex-quotes.json','fees-2025-annual.html']},
     matches=matches,missing=[x['id'] for x in funds if x['id'] not in records])
 (evidence/'snapshot-receipt.json').write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 print(json.dumps({k:receipt[k] for k in ['activeCodes','listed','otc','annualFeeCoverage']},ensure_ascii=False))
