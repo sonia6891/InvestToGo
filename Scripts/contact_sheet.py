@@ -4,7 +4,8 @@
 Usage: python Scripts/contact_sheet.py <dir> <out.png>
 
 <dir> holds the `<skin>-<screen>.png` files from the `skin-matrix` job (artifact ETFToGo-skin-matrix). A missing
-shot is drawn as an empty, labelled frame so a failed launch is visible on the sheet. Needs Pillow.
+shot is drawn as an empty, labelled frame so a failed launch is visible on the sheet, and the script exits 1.
+Needs Pillow.
 """
 from __future__ import annotations
 
@@ -13,12 +14,12 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-# Rows, top to bottom: (file id, name, skin number).
+# Rows, top to bottom, in the global-constraints order: (file id, name, skin number).
 SKINS = [
     ("blackgold", "黑金", "SKN 001"),
-    ("sketch", "手繪", "SKN 004"),
-    ("stitch", "縫線", "SKN 003"),
     ("voxel", "像素", "SKN 002"),
+    ("stitch", "縫線", "SKN 003"),
+    ("sketch", "手繪", "SKN 004"),
 ]
 # Columns, left to right, in the order of the brief (Task 13): (file id, label).
 SCREENS = [
@@ -122,8 +123,9 @@ def main(argv: list[str]) -> int:
     found, missing = build(folder, out)
     print(f"{out}: {found} of {len(SKINS) * len(SCREENS)} screenshots")
     for name in missing:
-        print(f"missing {name}")
-    return 0
+        print(f"missing {name}", file=sys.stderr)
+    # The sheet is still written, with red frames; a missing shot is an error for CI.
+    return 1 if missing else 0
 
 
 if __name__ == "__main__":

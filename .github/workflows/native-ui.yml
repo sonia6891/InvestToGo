@@ -54,40 +54,58 @@ jobs:
           set -euo pipefail
           mkdir -p build/matrix
           xcodebuild build -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/compile.log
+      - name: Set up Pillow for the blank-frame check and the contact sheet
+        run: |
+          set -euo pipefail
+          python3 -m venv build/venv
+          build/venv/bin/pip install --quiet pillow==12.3.0
       - name: Capture four skins × eleven screens
+        # No continue-on-error: fewer than 44 shots fails the job (the artifact is still published below).
         timeout-minutes: 20
-        continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+          # A frame that is one flat colour below the status bar is the launch screen or a page still loading.
+          blank() {
+            build/venv/bin/python -c 'import sys; from PIL import Image, ImageStat; im = Image.open(sys.argv[1]).convert("L"); w, h = im.size; sys.exit(0 if ImageStat.Stat(im.crop((0, h // 8, w, h))).stddev[0] < 3 else 1)' "$1"
+          }
           # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就).
           SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements"
-          for SKIN in blackgold sketch stitch voxel; do
+          # Rows in the global-constraints order, as the skinKit loop.
+          for SKIN in blackgold voxel stitch sketch; do
             for SCREEN in $SCREENS; do
               case "$SCREEN" in
                 onboarding) OPEN="onboarding --page 1"; NAME=onboarding1 ;;
                 detail|dex) OPEN="$SCREEN --symbol 0050"; NAME=$SCREEN ;;
                 *) OPEN="$SCREEN"; NAME=$SCREEN ;;
               esac
+              OUT="build/matrix/$SKIN-$NAME.png"
               xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
-              # --reset each time: every shot starts from the same seeded state (the first 詳情 visit collects a
-              # card, which would otherwise show its toast in the first skin only).
+              # --reset each time: every shot starts from the same seeded state. --quiet-toasts: no first-time
+              # notices (the first 詳情 visit's 「收進圖鑑 +30 經驗」) over the page.
               # shellcheck disable=SC2086
-              xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --skin "$SKIN" --open $OPEN
+              xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --quiet-toasts --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --skin "$SKIN" --open $OPEN || echo "::warning::launch failed for $SKIN-$NAME"
               sleep 5
-              xcrun simctl io "$DEVICE" screenshot "build/matrix/$SKIN-$NAME.png"
+              xcrun simctl io "$DEVICE" screenshot "$OUT" || echo "::warning::screenshot failed for $SKIN-$NAME"
+              # Not settled yet (still the launch screen): wait and shoot again, twice at most.
+              for RETRY in 1 2; do
+                if [ -f "$OUT" ] && blank "$OUT"; then
+                  echo "::warning::$SKIN-$NAME was a blank frame; retry $RETRY"
+                  sleep 4
+                  xcrun simctl io "$DEVICE" screenshot "$OUT" || true
+                fi
+              done
+              if [ -f "$OUT" ] && blank "$OUT"; then echo "::error::$SKIN-$NAME is still blank"; fi
             done
           done
-          ls build/matrix | wc -l
+          COUNT=$(ls build/matrix/*.png 2>/dev/null | wc -l | tr -d ' ')
+          echo "captured $COUNT of 44"
+          if [ "$COUNT" -ne 44 ]; then echo "::error::skin matrix has $COUNT of 44 shots"; exit 1; fi
       - name: Lay out the contact sheet
-        continue-on-error: true
-        run: |
-          set -euo pipefail
-          python3 -m venv build/venv
-          build/venv/bin/pip install --quiet pillow
-          build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
+        if: always()
+        run: build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
       - name: Publish the skin matrix
         if: always()
         uses: actions/upload-artifact@v4
