@@ -50,7 +50,8 @@ enum CoinDropStyle: Equatable {
     init(_ skin: Skin) { self = skin.art.kind == .vector ? .popPlusOne : .coinAndShards }
 }
 
-/// A coin falling onto a screen's hero (spec 3.5): it drops from above while turning, lands with the skin's confirm
+/// A coin falling from the root toast region (`RewardToast`, ruling R25) onto whatever page is showing (spec 3.5): it
+/// drops from above while turning, lands with the skin's confirm
 /// sound and haptic and a burst of shards, then fades. Vector skins pop their pocket picture with 「+1」 instead. With
 /// Reduce Motion it only fades in and out where it lands: no fall, no turning, no pop, no shards. Increasing `trigger`
 /// plays it once; the first value plays nothing.

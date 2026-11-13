@@ -17,8 +17,10 @@ enum CrashReporting {
         #else
         let debug = false
         #endif
+        // TestFlight installs carry a sandbox receipt; App Store installs a production one.
         guard let config = CrashReportingConfig.make(dsn: bundle.object(forInfoDictionaryKey: "SentryDSN") as? String,
-                                                     arguments: process.arguments, environment: process.environment, debug: debug) else { return }
+                                                     arguments: process.arguments, environment: process.environment, debug: debug,
+                                                     receipt: bundle.appStoreReceiptURL?.lastPathComponent) else { return }
         lock.lock(); defer { lock.unlock() }
         guard !started else { return }
         SentrySDK.start(options: config.options())
@@ -58,11 +60,14 @@ struct CrashReportingConfig: Equatable {
     var sendClientReports = false
 
     /// nil (Sentry stays off) when the DSN is missing, blank or not a DSN, with `--ui-testing`, or under XCTest.
-    static func make(dsn: String?, arguments: [String], environment: [String: String], debug: Bool) -> CrashReportingConfig? {
+    /// `receipt` is the App Store receipt's file name: 「sandboxReceipt」 on a TestFlight install, whose events are then
+    /// filed under "testflight" rather than "production".
+    static func make(dsn: String?, arguments: [String], environment: [String: String], debug: Bool, receipt: String? = nil) -> CrashReportingConfig? {
         guard let dsn = dsn?.trimmingCharacters(in: .whitespacesAndNewlines), isDSN(dsn),
               !arguments.contains("--ui-testing"),
               environment["XCTestConfigurationFilePath"] == nil else { return nil }
-        return CrashReportingConfig(dsn: dsn, environment: debug ? "debug" : "production")
+        let name = debug ? "debug" : (receipt == "sandboxReceipt" ? "testflight" : "production")
+        return CrashReportingConfig(dsn: dsn, environment: name)
     }
 
     /// `https://<key>@<host>/<project>`: an unexpanded `$(SENTRY_DSN)` or any other text is refused.
@@ -106,7 +111,7 @@ enum CrashScrub {
     }
 
     /// The event message, exception values, mechanism descriptions and breadcrumb messages. The NSError user info
-    /// (context "user info", mechanism data) is dropped whole: it can hold any text.
+    /// (context "user info", mechanism data) and every breadcrumb's `data` are dropped whole: they can hold any text.
     static func scrub(_ event: Event) -> Event {
         // No user at all: the SDK fills user.userId with its installation UUID in prepareEvent, before beforeSend runs,
         // so sendDefaultPii = false alone does not keep it off the event.
@@ -120,8 +125,16 @@ enum CrashScrub {
             }
         }
         event.context?.removeValue(forKey: "user info")
-        event.breadcrumbs?.forEach { crumb in if let message = crumb.message { crumb.message = scrub(message) } }
+        event.breadcrumbs?.forEach { crumb in (crumb.message, crumb.data) = breadcrumb(message: crumb.message, data: crumb.data) }
         return event
+    }
+}
+
+extension CrashScrub {
+    /// A breadcrumb as it is sent: the message scrubbed, the data (any key, any text) dropped. A plain-value seam, so
+    /// tests check it without creating SDK objects.
+    static func breadcrumb(message: String?, data: [String: Any]?) -> (message: String?, data: [String: Any]?) {
+        (message.map { scrub($0) }, nil)
     }
 }
 
@@ -138,9 +151,14 @@ struct CrashReportGate {
         return true
     }
 
+    /// URLError codes that mean the phone could not reach the server (no network, a dropped or refused connection,
+    /// no DNS), not that the server or the app is wrong.
+    static let unreachable: [URLError.Code] = [.notConnectedToInternet, .timedOut, .cancelled, .networkConnectionLost,
+                                               .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed]
+
     static func isReportable(_ error: Error) -> Bool {
         if error is CancellationError { return false }
-        if let url = error as? URLError, [URLError.Code.notConnectedToInternet, .timedOut, .cancelled].contains(url.code) { return false }
+        if let url = error as? URLError, unreachable.contains(url.code) { return false }
         return true
     }
 }

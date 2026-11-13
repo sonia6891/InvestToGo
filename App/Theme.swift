@@ -312,7 +312,8 @@ struct StrategyArt: View {
         }
     }
 }
-/// "▲ +1.20 (+0.65%)" in the design's colours (gains green, losses red); nothing is invented when the quote has no change data.
+/// "▲ +1.20 (+0.65%)" in the Taiwan colours (gains red, losses green, `Palette.trend`); nothing is invented when the
+/// quote has no change data.
 struct QuoteChange: View {
     let quote: Quote?
     var font: Font = .caption

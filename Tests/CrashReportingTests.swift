@@ -7,8 +7,8 @@ final class CrashReportingTests: XCTestCase {
     /// The project's DSN, in full: `//` and `@` must survive from the build setting to the options.
     static let dsn = "https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632"
 
-    private func make(_ dsn: String?, arguments: [String] = [], environment: [String: String] = [:], debug: Bool = false) -> CrashReportingConfig? {
-        CrashReportingConfig.make(dsn: dsn, arguments: arguments, environment: environment, debug: debug)
+    private func make(_ dsn: String?, arguments: [String] = [], environment: [String: String] = [:], debug: Bool = false, receipt: String? = nil) -> CrashReportingConfig? {
+        CrashReportingConfig.make(dsn: dsn, arguments: arguments, environment: environment, debug: debug, receipt: receipt)
     }
 
     func testNoDSNGivesNoOptions() {
@@ -43,6 +43,20 @@ final class CrashReportingTests: XCTestCase {
     func testEnvironmentFollowsTheBuild() throws {
         XCTAssertEqual(try XCTUnwrap(make(Self.dsn, debug: false)).environment, "production")
         XCTAssertEqual(try XCTUnwrap(make(Self.dsn, debug: true)).environment, "debug")
+    }
+
+    func testTestFlightReceiptFilesEventsUnderTestflight() throws {
+        XCTAssertEqual(try XCTUnwrap(make(Self.dsn, receipt: "sandboxReceipt")).environment, "testflight")
+        XCTAssertEqual(try XCTUnwrap(make(Self.dsn, receipt: "receipt")).environment, "production", "An App Store install")
+        XCTAssertEqual(try XCTUnwrap(make(Self.dsn, receipt: nil)).environment, "production")
+        XCTAssertEqual(try XCTUnwrap(make(Self.dsn, debug: true, receipt: "sandboxReceipt")).environment, "debug", "Debug wins")
+    }
+
+    func testBreadcrumbDataIsDroppedAndMessagesScrubbed() {
+        let sent = CrashScrub.breadcrumb(message: "0050 成本 NT$ 1,200,000", data: ["screen": "元大台灣50 持有 1,000 股", "amount": 255277])
+        XCTAssertEqual(sent.message, "0050 成本 NT$ <n>")
+        XCTAssertNil(sent.data, "Breadcrumb data can hold any text: dropped whole")
+        XCTAssertNil(CrashScrub.breadcrumb(message: nil, data: nil).message)
     }
 
     func testUITestingGivesNoOptions() {
@@ -110,7 +124,7 @@ final class CrashReportingTests: XCTestCase {
 
     func testOfflineTimeoutAndCancelAreNotReported() {
         var gate = CrashReportGate()
-        for code in [URLError.Code.notConnectedToInternet, .timedOut, .cancelled] {
+        for code in [URLError.Code.notConnectedToInternet, .timedOut, .cancelled, .networkConnectionLost, .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed] {
             XCTAssertFalse(CrashReportGate.isReportable(URLError(code)), "\(code)")
             XCTAssertFalse(gate.admit(URLError(code), context: "market"))
         }

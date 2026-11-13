@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import Charts
 
 /// "10/22 除息・11/11 發放・每單位 1.35 元" for an official distribution.
@@ -539,6 +540,14 @@ struct DividendFormView: View {
             Text("紀錄類型決定狀態：證券帳務＝已入帳、投信公告＝已公告、自行預估＝預估。公告與預估不計入已入帳股息。").font(.caption).foregroundStyle(Palette.muted)
         }
         .navigationTitle(id == nil ? "新增配息紀錄" : "編輯配息紀錄").navigationBarTitleDisplayMode(.inline)
+        // The number pads have no return key: 「完成」 above the keyboard closes it.
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("完成") { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
+                    .accessibilityIdentifier("dividend-keyboard-done")
+            }
+        }
         .onChange(of: date) { _, _ in needsPayDate = false }
         .onAppear(perform: load)
     }
@@ -585,7 +594,8 @@ struct DividendFormView: View {
         } else if legacy, let value = Double(total.replacingOccurrences(of: ",", with: "")), value > 0 {
             item.amount = value
         } else { error = "請填寫符合資格股數與每股配息金額。"; return }
-        // 「記一筆配息」: a new record earns the flat +20 in the same write; the dividends page then plays the coin drop.
+        // 「記一筆配息」: a new record earns the flat +20 in the same write (once per code and payment month); the root
+        // toast (`RewardToast`) then plays the coin drop on whatever page the form closes onto.
         do {
             let rewarded = store.pendingReward
             try store.saveDividend(item, rewardNew: id == nil)
@@ -621,7 +631,7 @@ struct YearDividendsView: View {
                     Image(systemName: "dollarsign").font(.title3.bold()).foregroundStyle(.white).frame(width: 44, height: 44).background(LinearGradient(colors: [Color(red: 1, green: 0.78, blue: 0.3), Color(red: 0.96, green: 0.64, blue: 0.06)], startPoint: .top, endPoint: .bottom), in: Circle())
                     VStack(alignment: .leading, spacing: 2) { Text("本年已入帳總金額").font(.caption).foregroundStyle(Palette.muted); Text("\(shown(money(total), hidden: hidden)) 元").font(.title2.bold()).monospacedDigit().foregroundStyle(Palette.ink) }
                     Spacer()
-                    if previous > 0 { let change = (total / previous - 1) * 100; VStack(alignment: .trailing, spacing: 2) { Text("\(change >= 0 ? "▲" : "▼") \(percentText(change))").font(.subheadline.bold()).foregroundStyle(Palette.trend(change)); Text("較去年同期").font(.caption2).foregroundStyle(Palette.muted) } }
+                    if previous > 0 { let change = (total / previous - 1) * 100; VStack(alignment: .trailing, spacing: 2) { TrendText(percent: change, font: .subheadline.bold()); Text("較去年同期").font(.caption2).foregroundStyle(Palette.muted) } }
                 }
                 Chart(Array(months.enumerated()), id: \.offset) { index, value in
                     BarMark(x: .value("月份", "\(index + 1)月"), y: .value("金額", value))

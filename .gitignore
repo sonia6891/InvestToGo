@@ -10,6 +10,8 @@ xcuserdata/
 *.ipa
 Evidence/*.log
 Screens/
+# Written by XcodeGen from project.yml (targets.ETFToGo.info); never edited by hand.
+Support/ETFToGo-Info.plist
 .superpowers/
 PocketCore/.build/
 PocketCore/.swiftpm/
