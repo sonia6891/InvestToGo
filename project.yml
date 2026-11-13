@@ -11,10 +11,18 @@ settings:
     MARKETING_VERSION: '0.3.0'
     CURRENT_PROJECT_VERSION: '1'
     CODE_SIGN_STYLE: Automatic
+# Crash and error reporting (Task 14). Pinned: the newest 8.x release at least two weeks old.
+packages:
+  Sentry:
+    url: https://github.com/getsentry/sentry-cocoa
+    exactVersion: 8.58.4
 targets:
   ETFToGo:
     type: application
     platform: iOS
+    dependencies:
+      - package: Sentry
+        product: Sentry
     # PocketCore's sources and data are compiled into the app; the same files form a SwiftPM package for Linux tests.
     sources:
       - App
@@ -40,7 +48,16 @@ targets:
         # not the generated white: a slow cold start never shows a blank white screen.
         UILaunchScreen:
           UIColorName: LaunchBackground
+        # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
+        SentryDSN: '$(SENTRY_DSN)'
     settings:
+      configs:
+        # Written into project.pbxproj as a quoted string, not an .xcconfig, so the `//` is not a comment there.
+        # CI checks the resolved Release value with -showBuildSettings.
+        Debug:
+          SENTRY_DSN: ''
+        Release:
+          SENTRY_DSN: 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632'
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview
         TARGETED_DEVICE_FAMILY: '1'

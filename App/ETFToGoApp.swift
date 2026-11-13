@@ -6,6 +6,8 @@ import SwiftUI
     /// The skin decides light or dark text; every screen redraws when it changes.
     @ObservedObject private var skins = SkinStore.shared
     init() {
+        // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
+        CrashReporting.start()
         let args = ProcessInfo.processInfo.arguments
         let testURL = args.contains("--ui-testing") ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
         let store = PortfolioStore(url: testURL, reset: args.contains("--reset"))

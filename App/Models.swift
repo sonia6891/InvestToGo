@@ -198,7 +198,7 @@ import SwiftUI
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(fresh).write(to: url.appendingPathExtension("official"), options: .atomic)
             official = fresh; officialMessage = "已更新官方配息資料。"; officialFailed = false
-        } catch { officialMessage = error.localizedDescription; officialFailed = true }
+        } catch { officialMessage = error.localizedDescription; officialFailed = true; CrashReporting.capture(error, context: "dividends") }
     }
     func saveDaily() {
         guard let daily else { return }
@@ -267,7 +267,7 @@ import SwiftUI
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(next).write(to: url.appendingPathExtension("catalog"), options: .atomic)
             catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
-        } catch { catalogMessage = error.localizedDescription; catalogFailed = true }
+        } catch { catalogMessage = error.localizedDescription; catalogFailed = true; CrashReporting.capture(error, context: "catalog") }
     }
     func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; try commit(next) }
     func saveHistory(_ value: PriceHistory) throws { try value.validate(); var next = data; if next.histories == nil { next.histories = [:] }; next.histories?[value.symbol] = value; try commit(next) }
@@ -305,7 +305,10 @@ import SwiftUI
                 }
             }
             try keepFetched(fetched, since: started)
-        } catch { if inline { quoteFailure = error.localizedDescription } else { message = error.localizedDescription } }
+        } catch {
+            // Only the detail page's LoadFailed (inline) is reported; the app-wide alert path is not a load failure page.
+            if inline { quoteFailure = error.localizedDescription; CrashReporting.capture(error, context: "market") } else { message = error.localizedDescription }
+        }
     }
     /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
     /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.
