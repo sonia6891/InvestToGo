@@ -20,6 +20,7 @@ struct ToolsView: View {
         ("持股透視", "成分與集中度", .exposure, "tool-exposure", false),
         ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices", false),
         ("存錢目標反推", "目標金額換算每月投入", .goalPlanner, "tool-goal-planner", true),
+        ("回測", "幾年前開始每月投，現在是多少", .backtest, "tool-backtest", true),
         ("備份資料", "匯出／匯入", .backup, "tool-backup", false),
     ]
 

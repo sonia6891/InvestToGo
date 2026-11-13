@@ -850,4 +850,14 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(member.staticTexts["goal-planner-monthly"].waitForExistence(timeout: 10), "A member sees 每月需投入")
         XCTAssertFalse(member.descendants(matching: .any)["member-lock-goalPlanner"].exists)
     }
+    /// 回測 is a member feature: a non-member sees the lock, a member sees the form. Nothing is downloaded here.
+    func testBacktestLockAndMember() {
+        let app = launch(["--open", "backtest"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-backtest"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "backtest"])
+        XCTAssertTrue(member.buttons["backtest-run"].waitForExistence(timeout: 10), "A member sees the form and 開始回測")
+        XCTAssertTrue(member.textFields["backtest-monthly"].exists, "The form has 每月投入")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-backtest"].exists)
+    }
 }

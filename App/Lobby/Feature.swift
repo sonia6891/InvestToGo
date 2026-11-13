@@ -47,6 +47,7 @@ extension AppRoute {
         case "dex" where testing: return [.feature(.find), .dexCard(symbol)]
         case "reminders" where testing: return [.feature(.tools), .reminders]
         case "goalPlanner" where testing: return [.feature(.tools), .goalPlanner]
+        case "backtest" where testing: return [.feature(.tools), .backtest]
         case "exposure" where testing: return [.feature(.tools), .exposure]
         default: return nil
         }
