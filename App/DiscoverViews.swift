@@ -375,11 +375,9 @@ struct FundDetail: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
     @ObservedObject private var connectivity = Connectivity.shared
-    @Environment(\.motionReduced) private var reduceMotion
     let fund: Fund
     @State private var section = 0
     @State private var range = ChartRange.year
-    @State private var collected = false
     private static let tabs = ["走勢", "持股", "配息", "資訊"]
     private var quote: Quote? { store.quote(fund.id) }
     var body: some View {
@@ -402,12 +400,12 @@ struct FundDetail: View {
             }
         }
         .safeAreaInset(edge: .bottom) { actions }
-        .overlay(alignment: .top) { if collected { toast } }
         .task { await store.refreshDaily() }
         .onAppear {
             store.quoteFailure = nil
             store.liveFocus = fund.id; store.live.syncSoon()
-            if store.collectDexCard(fund.id) { showToast() }
+            // The notice shows in the root's toast region, above the navigation bar's row, never over the code.
+            if store.collectDexCard(fund.id), !DemoArguments.quietToasts { store.pendingNotice = Self.toastText }
         }
         .onDisappear { if store.liveFocus == fund.id { store.liveFocus = nil; store.live.syncSoon() } }
         .navigationBarTitleDisplayMode(.inline)
@@ -521,25 +519,7 @@ struct FundDetail: View {
         .padding(.top, 8)
         .background(skin.color(\.page).ignoresSafeArea(edges: .bottom))
     }
-    private var toastText: String { "收進圖鑑 +\(GameRules.xp[.firstDexCard] ?? 0) 經驗" }
-    private var toast: some View {
-        Text(toastText)
-            .skinFont(.title(14))
-            .foregroundStyle(skin.onFill(skin.colors.accent))
-            .padding(.horizontal, 18).padding(.vertical, 10)
-            .background(Capsule().fill(skin.color(\.accent)))
-            .padding(.top, 8)
-            .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
-    }
-    private func showToast() {
-        let animation: Animation = reduceMotion ? .easeInOut(duration: 0.2) : .snappy
-        withAnimation(animation) { collected = true }
-        AccessibilityNotification.Announcement(toastText).post()
-        Task {
-            try? await Task.sleep(for: .seconds(3))
-            withAnimation(animation) { collected = false }
-        }
-    }
+    static var toastText: String { "收進圖鑑 +\(GameRules.xp[.firstDexCard] ?? 0) 經驗" }
 }
 /// 持股 tab: component weights from the existing research view, plus fund facts.
 struct FundHoldingsContent: View {

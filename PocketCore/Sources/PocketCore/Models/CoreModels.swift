@@ -18,6 +18,7 @@ struct Fund: Identifiable, Codable, Hashable {
     var fullName: String? = nil
     var fundType: String? = nil
     var listingDate: String? = nil
+    enum CodingKeys: String, CodingKey { case id, name, strategy, market, fullName, fundType, listingDate }
     // Well-known NT$ ETFs: the currency and market fallback when the catalogue is missing.
     static let starters: [Fund] = [
         .init(id: "0050", name: "元大台灣50", strategy: .saving),
@@ -27,6 +28,22 @@ struct Fund: Identifiable, Codable, Hashable {
         .init(id: "00919", name: "群益台灣精選高息", strategy: .income),
         .init(id: "00631L", name: "元大台灣50正2", strategy: .risk)
     ]
+}
+extension Fund {
+    /// Names are read in NFC: official lists spell some characters as CJK compatibility ideographs (U+F90A 金,
+    /// U+F92D 來, U+FA17 益), which the bundled skin fonts do not have; NFC turns them into the unified characters.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(id: try c.decode(String.self, forKey: .id), name: try c.decode(String.self, forKey: .name).nfc,
+                  strategy: try c.decode(Strategy.self, forKey: .strategy), market: try c.decodeIfPresent(String.self, forKey: .market),
+                  fullName: try c.decodeIfPresent(String.self, forKey: .fullName)?.nfc, fundType: try c.decodeIfPresent(String.self, forKey: .fundType),
+                  listingDate: try c.decodeIfPresent(String.self, forKey: .listingDate))
+    }
+}
+extension String {
+    /// Unicode NFC (canonical composition). Note Swift's `==` already treats a compatibility ideograph and its unified
+    /// character as equal; fonts do not, so names are stored in this form.
+    var nfc: String { precomposedStringWithCanonicalMapping }
 }
 struct Holding: Identifiable, Codable {
     var id = UUID()

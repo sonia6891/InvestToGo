@@ -66,14 +66,16 @@ enum CatalogAPI {
         guard let text = (value as? String)?.trimmingCharacters(in: .whitespaces), !text.isEmpty else { return nil }
         return text
     }
-    /// The TWSE fund list writes some characters as HTML entities ("S&amp;P", "&#63754;").
+    /// The TWSE fund list writes some characters as HTML entities ("S&amp;P", "&#63754;"). The result is in NFC, so
+    /// a CJK compatibility ideograph such as U+F90A (what "&#63754;" spells) becomes the unified 金 U+91D1, which the
+    /// bundled fonts have.
     static func unescape(_ text: String) -> String {
-        guard text.contains("&") else { return text }
+        guard text.contains("&") else { return text.nfc }
         var result = text
         while let range = result.range(of: "&#[0-9]{1,7};", options: .regularExpression), let scalar = UInt32(result[range].dropFirst(2).dropLast()).flatMap({ Unicode.Scalar($0) }) {
             result.replaceSubrange(range, with: String(Character(scalar)))
         }
         for (entity, character) in [("&lt;", "<"), ("&gt;", ">"), ("&quot;", "\""), ("&#39;", "'"), ("&amp;", "&")] { result = result.replacingOccurrences(of: entity, with: character) }
-        return result
+        return result.nfc
     }
 }

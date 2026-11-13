@@ -36,13 +36,16 @@ targets:
           - NotoSerifTC-Medium.otf
           - LXGWWenKaiTC-Medium.ttf
           - JetBrainsMono-Regular.ttf
+        # The launch screen is the default skin's page colour (blackgold #1A1A1D, App/Assets.xcassets/LaunchBackground),
+        # not the generated white: a slow cold start never shows a blank white screen.
+        UILaunchScreen:
+          UIColorName: LaunchBackground
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: tw.sonia.etftogo.uireview
         TARGETED_DEVICE_FAMILY: '1'
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

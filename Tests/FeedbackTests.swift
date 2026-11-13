@@ -57,6 +57,8 @@ final class FeedbackTests: XCTestCase {
         let lateUTC = utc.date(from: DateComponents(year: 2026, month: 11, day: 11, hour: 23, minute: 30))!
         XCTAssertEqual(OfflineBar.text(lateUTC), "離線中 · 顯示 11/12 07:30 的資料")
         XCTAssertEqual(OfflineBar.text(nil), "離線中 · 顯示上次的資料")
+        // Only the day known (the ETF list's day, midnight in Taipei): 「10/15」, never 「10/15 00:00」.
+        XCTAssertEqual(OfflineBar.text(DataChecks.date("2026-10-15"), timed: false), "離線中 · 顯示 10/15 的資料")
     }
 
     /// LoadFailed's 「上次成功取得」: day and time in Taiwan when the fetch time is known, else the data's day.

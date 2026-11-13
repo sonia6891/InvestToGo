@@ -7,10 +7,17 @@ import Foundation
 /// - `--demo-xp <n>`: experience n (wins over `--demo-level`).
 /// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
 /// - `--demo-pocket`: four sample holdings, one of them at a loss, and a year of received dividends (`seedPocket`).
+/// - `--quiet-toasts`: no first-time notices (「收進圖鑑 +30 經驗」), so screenshots are the same every run.
 ///
 /// Read elsewhere: `--skin <id>` (SkinStore), `--open <feature>` (the root view), `--skip-onboarding`,
 /// `--open splash` and `--open onboarding [--page n]` (`Onboarding.start`), `--offline` and `--reduce-motion`.
 enum DemoArguments {
+    /// `--quiet-toasts` with `--ui-testing`: the CI skin matrix captures pages without first-time notices.
+    static let quietToasts: Bool = {
+        let args = ProcessInfo.processInfo.arguments
+        return args.contains("--ui-testing") && args.contains("--quiet-toasts")
+    }()
+
     static func apply(to game: inout GameState, args: [String], now: Date) {
         guard args.contains("--ui-testing") else { return }
         func number(_ flag: String) -> Int? {

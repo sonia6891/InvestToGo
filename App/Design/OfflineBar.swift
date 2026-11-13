@@ -27,21 +27,23 @@ struct OfflineBar: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
 
-    /// The bar's words for the time of the data on screen; nil when that time is unknown.
-    nonisolated static func text(_ date: Date?) -> String {
+    /// The bar's words for the time of the data on screen; nil when that time is unknown. `timed` is false when only
+    /// the day is known (the ETF list's day): then 「MM/DD」 alone, never a made-up 00:00.
+    nonisolated static func text(_ date: Date?, timed: Bool = true) -> String {
         guard let date else { return "離線中 · 顯示上次的資料" }
-        return "離線中 · 顯示 \(taipeiFormat("MM/dd HH:mm").string(from: date)) 的資料"
+        return "離線中 · 顯示 \(taipeiFormat(timed ? "MM/dd HH:mm" : "MM/dd").string(from: date)) 的資料"
     }
 
     var body: some View {
-        Text(Self.text(store.lastDataDate))
+        let stamp = store.lastDataStamp
+        Text(Self.text(stamp?.date, timed: stamp?.timed ?? true))
             .skinFont(.mono(11))
             .foregroundStyle(skin.color(\.sub))
             .lineLimit(2)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16).padding(.vertical, 5)
-            .background(skin.color(\.card))
+            .background(skin.color(\.card).ignoresSafeArea(edges: .top))
             .overlay(alignment: .bottom) { Rectangle().fill(skin.color(\.line)).frame(height: 1) }
             .accessibilityIdentifier("offline-bar")
     }
@@ -93,11 +95,12 @@ struct LoadFailed: View {
 }
 
 extension PortfolioStore {
-    /// When the newest data on screen was fetched: the latest saved or exchange quote, else the ETF list's day.
-    var lastDataDate: Date? {
+    /// When the newest data on screen was fetched: the latest saved or exchange quote (a time), else the ETF list's
+    /// day (`timed` false: only the day is known).
+    var lastDataStamp: (date: Date, timed: Bool)? {
         let fetched = data.quotes.values.map(\.fetchedAt) + [daily?.fetchedAt].compactMap { $0 }
-        if let newest = fetched.max() { return newest }
-        return catalog.flatMap { DataChecks.date($0.fetchedDay) }
+        if let newest = fetched.max() { return (newest, true) }
+        return catalog.flatMap { DataChecks.date($0.fetchedDay) }.map { ($0, false) }
     }
 }
 

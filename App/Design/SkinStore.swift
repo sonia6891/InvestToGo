@@ -11,7 +11,8 @@ extension Color {
 @MainActor final class SkinStore: ObservableObject {
     /// One store for the whole app, so a skin chosen anywhere restyles the tab bar and every screen at once.
     static let shared = SkinStore()
-    static let skinKey = "pocket.skin", soundKey = "pocket.sound"
+    // nonisolated: `current` below reads the key from a nonisolated initializer (an error in Swift 6 otherwise).
+    nonisolated static let skinKey = "pocket.skin", soundKey = "pocket.sound"
     @Published var skin: Skin { didSet { UserDefaults.standard.set(skin.id, forKey: Self.skinKey); Self.current = skin } }
     /// The skin the ordinary screens' Palette reads; set before any screen draws.
     nonisolated(unsafe) static var current: Skin = Skins.named(UserDefaults.standard.string(forKey: skinKey) ?? "")

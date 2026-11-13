@@ -81,22 +81,25 @@ struct RootView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            LobbyView().appRoutes()
+        // 離線中: a thin strip above every screen. The stack starts below it (a VStack, not a safe-area inset, which
+        // screens without a navigation bar scrolled under), so no title or hero is ever drawn behind the strip.
+        VStack(spacing: 0) {
+            if connectivity.offline { OfflineBar() }
+            NavigationStack(path: $path) {
+                LobbyView().appRoutes()
+            }
+            .environment(\.lobbyNavigation, navigation)
+            .environment(\.lobbyNamespace, lobby)
+            .tint(Palette.blue)
+            .id(skins.skin.id)
         }
-        .environment(\.lobbyNavigation, navigation)
-        .environment(\.lobbyNamespace, lobby)
-        .tint(Palette.blue)
-        .id(skins.skin.id)
-        // 離線中: a thin strip above every screen; the screens move down under it rather than hide behind it.
-        .safeAreaInset(edge: .top, spacing: 0) { if connectivity.offline { OfflineBar() } }
         .overlay(alignment: .bottom) {
             if !path.isEmpty, let feature {
                 GameBottomBar(title: feature.title, onLobby: navigation.toLobby, onPick: navigation.open)
                     .ignoresSafeArea(.keyboard)
             }
         }
-        // 記一筆配息's coin drop and 「+20」, wherever the dividend was logged from (ruling R25).
+        // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑 +30 經驗」.
         .overlay(alignment: .top) { RewardToast() }
         // Holding a 換膚 card tries that skin on over everything, the bottom bar included, until the finger lifts.
         .overlay {

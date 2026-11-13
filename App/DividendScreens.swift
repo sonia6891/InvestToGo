@@ -263,15 +263,19 @@ struct DividendsView: View {
     }
 }
 
-/// The 記一筆配息 reward (ruling R25), mounted once above the navigation stack: when the store reports experience
-/// earned by a new dividend record, it waits for the form to close, then drops a coin and shows 「記一筆配息 +20 經驗」
-/// on whatever page the viewer is on. With Reduce Motion the coin only fades. Rewards that arrive together are shown
-/// as one sum; one arriving while the toast is up replaces it and restarts its timer.
+/// The root toast region (ruling R25), mounted once above the navigation stack, at the top of the screen in the
+/// navigation bar's row, so it never covers a page's title or hero. It shows two things:
+/// - 記一筆配息: when the store reports experience earned by a new dividend record, it waits for the form to close,
+///   then drops a coin and shows 「記一筆配息 +20 經驗」 on whatever page the viewer is on. Rewards that arrive together
+///   are shown as one sum; one arriving while the toast is up replaces it and restarts its timer.
+/// - one-line notices from `store.pendingNotice` (「收進圖鑑 +30 經驗」 on a fund's first 詳情), without a coin.
+/// With Reduce Motion the toast and coin only fade.
 struct RewardToast: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
     @Environment(\.motionReduced) private var reduceMotion
-    @State private var xp: Int?
+    /// The text on screen and whether it is the dividend reward (its accessibility identifier).
+    @State private var current: (text: String, reward: Bool)?
     @State private var drops = 0
     @State private var hide: Task<Void, Never>?
 
@@ -279,21 +283,22 @@ struct RewardToast: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if let xp {
-                Text(Self.text(xp))
+            if let current {
+                Text(current.text)
                     .skinFont(.title(14))
                     .foregroundStyle(skin.onFill(skin.colors.accent))
                     .padding(.horizontal, 18).padding(.vertical, 10)
                     .background(Capsule().fill(skin.color(\.accent)))
-                    .padding(.top, 8)
+                    .padding(.top, 2)
                     .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
-                    .accessibilityIdentifier("dividend-xp-toast")
+                    .accessibilityIdentifier(current.reward ? "dividend-xp-toast" : "notice-toast")
             }
             CoinDrop(trigger: drops).frame(width: 200, height: 160)
         }
         .frame(maxWidth: .infinity)
         .allowsHitTesting(false)
         .task(id: store.pendingReward) { await consume() }
+        .task(id: store.pendingNotice) { consumeNotice() }
     }
 
     private func consume() async {
@@ -303,19 +308,25 @@ struct RewardToast: View {
         guard !Task.isCancelled, store.pendingReward > 0 else { return }
         let earned = store.pendingReward
         store.pendingReward = 0
-        show(earned)
+        drops += 1
+        show(Self.text(earned), reward: true, seconds: 5)
     }
 
-    private func show(_ earned: Int) {
+    private func consumeNotice() {
+        guard let notice = store.pendingNotice else { return }
+        store.pendingNotice = nil
+        show(notice, reward: false, seconds: 3)
+    }
+
+    private func show(_ text: String, reward: Bool, seconds: Double) {
         let animation: Animation = reduceMotion ? .easeInOut(duration: 0.2) : .snappy
         hide?.cancel()
-        withAnimation(animation) { xp = earned }
-        drops += 1
-        AccessibilityNotification.Announcement(Self.text(earned)).post()
+        withAnimation(animation) { current = (text, reward) }
+        AccessibilityNotification.Announcement(text).post()
         hide = Task {
-            try? await Task.sleep(for: .seconds(5))
+            try? await Task.sleep(for: .seconds(seconds))
             guard !Task.isCancelled else { return }
-            withAnimation(animation) { xp = nil }
+            withAnimation(animation) { current = nil }
         }
     }
 }
