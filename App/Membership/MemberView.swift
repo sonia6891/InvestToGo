@@ -29,7 +29,7 @@ enum MembershipProducts {
     var demoMember = MembershipStore.demoMember(from: ProcessInfo.processInfo.arguments)
     /// Whether this person may use a member feature. Reads `owned`, so views observing the store redraw on a change.
     func has(_ feature: MemberFeature) -> Bool { isMember || demoMember }
-    static func demoMember(from args: [String]) -> Bool { args.contains("--ui-testing") && args.contains("--demo-member") }
+    nonisolated static func demoMember(from args: [String]) -> Bool { args.contains("--ui-testing") && args.contains("--demo-member") }
     @Published var message: String?
     private var updates: Task<Void, Never>?
     /// One App Store request at a time: a second caller waits for the first instead of clearing the spinner early.
