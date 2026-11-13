@@ -299,11 +299,22 @@ struct ComboResultView: View {
     var fromSettings = false
     @Environment(\.dismiss) private var dismiss
     @State private var scenario: ComboScenario?
+    @ObservedObject private var membership = MembershipStore.shared
     var body: some View {
-        let c = store.combo, start = store.comboStart(c)
-        let current = scenario ?? c.scenario
-        let rows = [3, 5, 10].map { years in (years, ComboMath.project(stockStart: 0, etfStart: start, settings: c, stockShare: 0, years: years, scenario: current)) }
+        let c = store.combo
+        // Non-members start on 基準 whatever was saved; the saved settings themselves are not touched.
+        let current = scenario ?? (membership.has(.scenarios) ? c.scenario : .base)
         Page {
+            if membership.has(.scenarios) || current == .base { figures(c, current) }
+            else { MemberLock(.scenarios) { figures(c, current) } preview: { VStack(spacing: 14) { figures(c, .base) } } }
+            switcher(c, current)
+            methodology(c)
+        }
+        .navigationTitle("試算結果").navigationBarTitleDisplayMode(.inline)
+    }
+    @ViewBuilder private func figures(_ c: ComboSettings, _ current: ComboScenario) -> some View {
+        let start = store.comboStart(c)
+        let rows = [3, 5, 10].map { years in (years, ComboMath.project(stockStart: 0, etfStart: start, settings: c, stockShare: 0, years: years, scenario: current)) }
             Text(current == .stress ? "壓力測試・第 1 年 −30%，之後 \(scenarioLabel(c, .base))" : "\(current.rawValue)情境・假設年總報酬 \(scenarioLabel(c, current))")
                 .font(.headline).foregroundStyle(Palette.deepBlue).frame(maxWidth: .infinity, alignment: .leading).padding(14)
                 .background(LinearGradient(colors: [Palette.blue.opacity(0.14), Palette.card], startPoint: .leading, endPoint: .trailing), in: RoundedRectangle(cornerRadius: 16))
@@ -322,8 +333,12 @@ struct ComboResultView: View {
                 resultHeader(c)
                 ForEach(rows, id: \.0) { years, result in resultRow(years: years, invested: result.invested, end: result.end, selected: years == c.years) }
             }
+    }
+    @ViewBuilder private func switcher(_ c: ComboSettings, _ current: ComboScenario) -> some View {
             HStack { Text("情境切換").font(.headline).foregroundStyle(Palette.ink); Spacer(); Label("可為負報酬，不保證獲利", systemImage: "info.circle").font(.caption2).foregroundStyle(Palette.muted) }
             HStack(spacing: 8) { ForEach(ComboScenario.allCases) { item in scenarioChip(item, current: current, settings: c) } }
+    }
+    @ViewBuilder private func methodology(_ c: ComboSettings) -> some View {
             Card(padding: 14) {
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: "doc.text").font(.title3).foregroundStyle(Palette.blue).frame(width: 40, height: 40).background(Palette.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
@@ -342,8 +357,6 @@ struct ComboResultView: View {
                 }.font(.subheadline.bold()).frame(maxWidth: .infinity).padding(.vertical, 10).overlay(RoundedRectangle(cornerRadius: 12).stroke(Palette.blue, lineWidth: 1.2)).padding(.top, 10)
             }
             Text("這是依你設定的假設計算的情境，不是預測或保證；實際報酬可能為負。").font(.caption).foregroundStyle(Palette.muted)
-        }
-        .navigationTitle("試算結果").navigationBarTitleDisplayMode(.inline)
     }
     private func resultHeader(_ c: ComboSettings) -> some View {
         HStack {

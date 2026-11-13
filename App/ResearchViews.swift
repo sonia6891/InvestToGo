@@ -55,7 +55,9 @@ struct ExposureView: View {
         let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil && store.isETF($0) }
         Page {
             SegmentBar(items: ["持股集中度", "重疊成分"], selection: $tab, pill: true, filled: true)
-            if tab == 0 { concentration } else { overlaps }
+            if tab == 0 { concentration } else {
+                MemberLock(.overlap) { overlaps } preview: { overlapPreview }
+            }
             if !missing.isEmpty {
                 Button(busy ? "取得中…" : "取得 \(missing.count) 檔持有 ETF 的成分股") { Task { await load(missing) } }.buttonStyle(.bordered).disabled(busy)
                 if let error { Text(error).font(.caption).foregroundStyle(Palette.red) }
@@ -95,6 +97,14 @@ struct ExposureView: View {
                     }.foregroundStyle(Palette.ink).padding(.vertical, 6)
                 }
                 Text("比重＝透過 ETF 間接持有加上直接持有的金額 ÷ 你的台幣持有市值；納入 \(covered.count)／\(store.data.holdings.count) 筆持有。不同 ETF 可能使用不同公告日期。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 8)
+            }
+        }
+    }
+    /// What a non-member sees behind the lock: a fixed sample, never the person's own holdings.
+    private var overlapPreview: some View {
+        Card(padding: 12) {
+            ForEach([("台積電", 2), ("鴻海", 2), ("聯發科", 2)], id: \.0) { row in
+                HStack { Text(row.0).font(.subheadline.bold()).foregroundStyle(Palette.ink); Spacer(); Text("共同 \(row.1) 檔").font(.caption).foregroundStyle(Palette.muted) }.padding(.vertical, 8)
             }
         }
     }

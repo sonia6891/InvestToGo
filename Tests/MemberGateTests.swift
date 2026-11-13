@@ -15,4 +15,11 @@ final class MemberGateTests: XCTestCase {
         store.apply([MembershipProducts.pocketMonthly])
         XCTAssertTrue(store.has(.backtest))
     }
+
+    @MainActor func testDemoMemberWinsOverStoreKit() {
+        let store = MembershipStore()
+        store.apply([])
+        store.demoMember = true
+        XCTAssertTrue(store.has(.backtest))
+    }
 }

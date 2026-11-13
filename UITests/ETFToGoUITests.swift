@@ -826,4 +826,19 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["0050"].waitForExistence(timeout: 5), "The list still shows the last data")
         sleep(1); capture(app, "offline-find")
     }
+
+    /// 重疊成分 is a member feature: a non-member sees the lock, a member (--demo-member) does not.
+    func testNonMemberSeesOverlapLock() {
+        let app = launch(["--open", "exposure"])
+        let tab = app.buttons["重疊成分"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 10), "持股透視 opens")
+        tab.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-overlap"].waitForExistence(timeout: 5), "A non-member sees the overlap lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "exposure"])
+        XCTAssertTrue(member.buttons["重疊成分"].waitForExistence(timeout: 10))
+        member.buttons["重疊成分"].tap()
+        XCTAssertTrue(member.staticTexts["至少需要兩檔持有 ETF 的成分資料才能比較重疊。"].waitForExistence(timeout: 5), "A member sees the overlap list")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-overlap"].exists, "A member sees no lock")
+    }
 }
