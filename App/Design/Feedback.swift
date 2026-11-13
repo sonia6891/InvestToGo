@@ -88,11 +88,17 @@ struct HapticPulse: Equatable {
     }
 
     static func confirm(_ kind: SkinFeedback.HapticKind) {
-        for pulse in pulses(kind) {
-            let generator = UIImpactFeedbackGenerator(style: pulse.style)
-            generator.prepare()
-            if pulse.delay == 0 { generator.impactOccurred(intensity: pulse.intensity) }
-            else { DispatchQueue.main.asyncAfter(deadline: .now() + pulse.delay) { generator.impactOccurred(intensity: pulse.intensity) } }
+        let steps = pulses(kind)
+        // The generators are made and used on the main actor, after each pulse's delay.
+        Task { @MainActor in
+            var elapsed = 0.0
+            for pulse in steps {
+                if pulse.delay > elapsed {
+                    try? await Task.sleep(for: .milliseconds(Int(((pulse.delay - elapsed) * 1000).rounded())))
+                    elapsed = pulse.delay
+                }
+                UIImpactFeedbackGenerator(style: pulse.style).impactOccurred(intensity: pulse.intensity)
+            }
         }
     }
 

@@ -503,6 +503,7 @@ struct TradeFormView: View {
         SellCosts.remember(feeRate, for: broker)
         do {
             try store.applyTrade(kind == 1 ? .sell : .buy, symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), date: date, shares: s, amount: a, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines))
+            ConfirmFeedback.confirm(SkinStore.shared.skin)
             dismiss()
         } catch { self.error = error.localizedDescription }
     }

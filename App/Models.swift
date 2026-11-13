@@ -191,7 +191,8 @@ import SwiftUI
         do {
             let markets = Dictionary(uniqueKeysWithValues: (catalog?.funds ?? Fund.starters).map { ($0.id, $0.market ?? "") })
             if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的配息資料。") }
-            let fresh = try await OfficialDividends.fetch(merging: official, markets: markets)
+            var fresh = try await OfficialDividends.fetch(merging: official, markets: markets)
+            fresh.fetchedAt = Date()
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(fresh).write(to: url.appendingPathExtension("official"), options: .atomic)
             official = fresh; officialMessage = "已更新官方配息資料。"; officialFailed = false
@@ -253,7 +254,8 @@ import SwiftUI
         catalogRefreshing = true; defer { catalogRefreshing = false }
         do {
             if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的 ETF 名單。") }
-            let next = try await CatalogAPI.fetch(previous: catalog)
+            var next = try await CatalogAPI.fetch(previous: catalog)
+            next.fetchedAt = Date()
             if let old = catalog {
                 guard next.listedDate >= old.listedDate else { throw AppDataError("新取得的資料日期比目前舊，未覆寫。") }
                 for market in ["TWSE", "TPEx"] {
@@ -276,10 +278,11 @@ import SwiftUI
         if inline { quoteFailure = nil }
         let started = Date()
         do {
-            if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的報價。") }
             let key = try SecureKey.read()
             let targets = Array(Set(symbols ?? data.holdings.map(\.symbol))).sorted()
             guard !targets.isEmpty else { message = "請先新增持有，或到單檔 ETF 頁面更新報價。"; return }
+            // Offline, the bar at the top already says so: only a page's own LoadFailed hears about it, never the alert.
+            if Connectivity.forcedOffline { if inline { throw AppDataError("目前沒有網路，先顯示上次的報價。") } else { return } }
             var fetched: [String: Quote] = [:]
             if key.isEmpty {
                 // No Fugle key: the latest trading day's closes from the exchanges' open data, saved where newer.

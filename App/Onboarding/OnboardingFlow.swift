@@ -369,6 +369,7 @@ struct OnboardingFlow: View {
         // Off, or no day: no debit-day reminder is left over from an earlier choice.
         if remind, let day { Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: remindEve) } }
         else { DCAReminders.clear() }
+        ConfirmFeedback.confirm(SkinStore.shared.skin)
         onFinish()
     }
 }

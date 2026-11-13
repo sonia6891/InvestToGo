@@ -43,11 +43,26 @@ final class FeedbackTests: XCTestCase {
         XCTAssertEqual(CoinDropStyle(Skins.named("sketch")), .popPlusOne)
     }
 
-    /// 「離線中 · 顯示 MM/DD HH:mm 的資料」.
+    /// 9:05 on 12 November 2026, Taiwan time.
+    private var taipeiMorning: Date {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(identifier: "Asia/Taipei")!
+        return calendar.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 9, minute: 5))!
+    }
+
+    /// 「離線中 · 顯示 MM/DD HH:mm 的資料」, in Taiwan time whatever the phone's time zone.
     @MainActor func testOfflineBarText() {
-        var parts = DateComponents(); parts.year = 2026; parts.month = 11; parts.day = 12; parts.hour = 9; parts.minute = 5
-        let date = Calendar(identifier: .gregorian).date(from: parts)!
-        XCTAssertEqual(OfflineBar.text(date), "離線中 · 顯示 11/12 09:05 的資料")
+        XCTAssertEqual(OfflineBar.text(taipeiMorning), "離線中 · 顯示 11/12 09:05 的資料")
+        // 23:30 UTC on 11 November is already 07:30 on the 12th in Taipei.
+        var utc = Calendar(identifier: .gregorian); utc.timeZone = TimeZone(identifier: "UTC")!
+        let lateUTC = utc.date(from: DateComponents(year: 2026, month: 11, day: 11, hour: 23, minute: 30))!
+        XCTAssertEqual(OfflineBar.text(lateUTC), "離線中 · 顯示 11/12 07:30 的資料")
         XCTAssertEqual(OfflineBar.text(nil), "離線中 · 顯示上次的資料")
+    }
+
+    /// LoadFailed's 「上次成功取得」: day and time in Taiwan when the fetch time is known, else the data's day.
+    @MainActor func testLoadFailedStamp() {
+        XCTAssertEqual(LoadFailed.stamp(taipeiMorning, day: "2026-11-11"), "2026/11/12 09:05")
+        XCTAssertEqual(LoadFailed.stamp(nil, day: "2026-11-11"), "2026/11/11")
+        XCTAssertNil(LoadFailed.stamp(nil, day: nil))
     }
 }

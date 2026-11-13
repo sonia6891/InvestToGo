@@ -5,6 +5,9 @@ struct CatalogSnapshot: Codable {
     var listedDate: String
     var fetchedDay: String
     var sources: [String]
+    /// When this list was fetched on the device (spec 9: LoadFailed shows the last good data's day and time); nil for
+    /// the bundled list and lists saved before it was recorded.
+    var fetchedAt: Date? = nil
     func validate() throws {
         guard !funds.isEmpty, funds.count <= 2000, Set(funds.map(\.id)).count == funds.count,
               DataChecks.date(listedDate) != nil, DataChecks.date(fetchedDay) != nil,

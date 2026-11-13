@@ -149,7 +149,7 @@ struct DiscoverView: View {
                 // The list below is still the last one that came through (spec 9 讀取失敗).
                 LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次取得的 ETF 名單。" : "ETF 名單這次沒有更新成功，先顯示上次的名單。",
                            retry: { Task { await store.refreshCatalog() } },
-                           lastUpdated: store.catalog.map { slashDay($0.fetchedDay) })
+                           lastUpdated: LoadFailed.stamp(store.catalog?.fetchedAt, day: store.catalog?.fetchedDay))
             }
             list(items)
             footer
@@ -388,7 +388,7 @@ struct FundDetail: View {
                 // The price below is still the last one that came through (spec 9 讀取失敗).
                 LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的報價。" : "報價這次沒有更新成功：\(store.quoteFailure ?? "")",
                            retry: { Task { await store.refresh(symbols: [fund.id], inline: true) } },
-                           lastUpdated: quote.map { slashDay($0.date) })
+                           lastUpdated: LoadFailed.stamp(quote?.fetchedAt, day: quote?.date))
             }
             header
             HStack(spacing: 6) {

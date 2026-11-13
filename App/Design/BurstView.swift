@@ -64,8 +64,10 @@ struct CoinDrop: View {
     @State private var scale: CGFloat = 1
     @State private var opacity: Double = 0
     @State private var bursts = 0
-    /// While shards fly, an element named `burst` exists so UI tests can see them; never with VoiceOver (decoration).
+    /// While shards fly in a UI test (`--ui-testing`), an element named `burst` exists so the test can see them. Never in
+    /// normal use and never with VoiceOver: the shards are decoration.
     @State private var bursting = false
+    private static let marksBursts = ProcessInfo.processInfo.arguments.contains("--ui-testing")
 
     var body: some View {
         let style = CoinDropStyle(skin)
@@ -93,10 +95,8 @@ struct CoinDrop: View {
             .offset(y: offset)
             .opacity(opacity)
             .accessibilityHidden(true)
-            if bursting && !voiceOver {
-                Color.black.opacity(0.01).frame(width: 2, height: 2)
-                    .accessibilityElement()
-                    .accessibilityLabel("碎片")
+            if Self.marksBursts && bursting && !voiceOver {
+                Text("碎片").font(.system(size: 2)).opacity(0.01)
                     .accessibilityIdentifier("burst")
             }
         }

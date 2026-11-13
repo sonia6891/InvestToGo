@@ -297,7 +297,7 @@ struct GoalView: View {
     private func apply() {
         if let value = Double(targetText.replacingOccurrences(of: ",", with: "")), value >= 0 { target = value }
         if let value = Double(capitalText.replacingOccurrences(of: ",", with: "")), value >= 0 { capital = value }
-        if let value = Double(yieldText), value > 0, value <= 30 { assumedYield = value } else { store.message = "請輸入 0–30% 之間的殖利率。" }
+        if let value = Double(yieldText), value > 0, value <= 30 { assumedYield = value; ConfirmFeedback.confirm(SkinStore.shared.skin) } else { store.message = "請輸入 0–30% 之間的殖利率。" }
     }
     private func result(_ title: String, _ value: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) { Text(title).font(.caption2).foregroundStyle(Palette.muted); Text(value).font(.subheadline.bold()).monospacedDigit().foregroundStyle(color).minimumScaleFactor(0.6).lineLimit(1) }
@@ -379,6 +379,7 @@ struct ReminderCenterView: View {
             enabled = true
             let count = await DividendReminders.sync(store.data.dividends)
             note = "已排程 \(count) 則提醒。新增或刪除配息紀錄時會自動更新。"
+            ConfirmFeedback.confirm(SkinStore.shared.skin)
         } else {
             enabled = false
             await DividendReminders.clear()

@@ -14,6 +14,8 @@ struct OfficialDividends: Codable {
     var sources: [String: String] = [:]
     var events: [String: [OfficialDistribution]] = [:]
     var freq: [String: String] = [:]
+    /// When the last refresh succeeded on the device (spec 9); nil for the bundled record and older saves.
+    var fetchedAt: Date? = nil
 
     static func bundled() -> OfficialDividends {
         guard let url = CoreBundle.bundle.url(forResource: "official-dividends", withExtension: "json"),

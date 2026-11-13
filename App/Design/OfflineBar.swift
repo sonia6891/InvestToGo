@@ -30,11 +30,7 @@ struct OfflineBar: View {
     /// The bar's words for the time of the data on screen; nil when that time is unknown.
     nonisolated static func text(_ date: Date?) -> String {
         guard let date else { return "離線中 · 顯示上次的資料" }
-        let format = DateFormatter()
-        format.locale = Locale(identifier: "en_US_POSIX")
-        format.calendar = Calendar(identifier: .gregorian)
-        format.dateFormat = "MM/dd HH:mm"
-        return "離線中 · 顯示 \(format.string(from: date)) 的資料"
+        return "離線中 · 顯示 \(taipeiFormat("MM/dd HH:mm").string(from: date)) 的資料"
     }
 
     var body: some View {
@@ -51,6 +47,16 @@ struct OfflineBar: View {
     }
 }
 
+/// A formatter in Taiwan time (market data is dated in Asia/Taipei, as TrendMath and ResearchData read it).
+func taipeiFormat(_ pattern: String) -> DateFormatter {
+    let format = DateFormatter()
+    format.locale = Locale(identifier: "en_US_POSIX")
+    format.calendar = Calendar(identifier: .gregorian)
+    format.timeZone = TimeZone(identifier: "Asia/Taipei")
+    format.dateFormat = pattern
+    return format
+}
+
 /// A read that failed (spec 9 讀取失敗): what happened in plain words and 「再試一次」. The screen keeps showing the
 /// last good data underneath; `lastUpdated` says when that data is from.
 struct LoadFailed: View {
@@ -62,12 +68,19 @@ struct LoadFailed: View {
         self.message = message; self.retry = retry; self.lastUpdated = lastUpdated
     }
 
+    /// When the last good data came in, for `lastUpdated`: 「2026/11/12 09:05」 (Taiwan time) when the fetch time is
+    /// known, else the day it is dated 「2026/11/12」, else nil.
+    nonisolated static func stamp(_ fetched: Date?, day: String? = nil) -> String? {
+        if let fetched { return taipeiFormat("yyyy/MM/dd HH:mm").string(from: fetched) }
+        return day.map(slashDay)
+    }
+
     var body: some View {
         SkinCard {
             VStack(alignment: .leading, spacing: 10) {
                 Text(message).skinFont(.body(14)).skinForeground(\.ink).fixedSize(horizontal: false, vertical: true)
                 if let lastUpdated {
-                    Text("下方是 \(lastUpdated) 的資料").skinFont(.mono(11)).skinForeground(\.sub)
+                    Text("上次成功取得：\(lastUpdated)").skinFont(.mono(11)).skinForeground(\.sub)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("load-failed-last")
                 }

@@ -111,6 +111,12 @@ struct DividendsView: View {
         Page {
             Text("DIV×\(String(Calendar.current.component(.year, from: now)))").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
             hero(year)
+            if store.officialFailed || connectivity.offline {
+                // Newcomer or not, what is below is the last data that came through (spec 9 讀取失敗).
+                LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的配息公告。" : "配息公告這次沒有更新成功，先顯示上次的公告。",
+                           retry: { Task { await store.refreshOfficial() } },
+                           lastUpdated: LoadFailed.stamp(store.official.fetchedAt, day: store.official.sources["twse"]))
+            }
             if newbie {
                 VStack(spacing: 18) {
                     Text("每記下一筆配息，就有一枚金幣掉進這裡。")
@@ -123,12 +129,6 @@ struct DividendsView: View {
             } else {
                 received(year)
                 months(year, now: now)
-                if store.officialFailed || connectivity.offline {
-                    // The announcements below are still the last ones that came through (spec 9 讀取失敗).
-                    LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的配息公告。" : "配息公告這次沒有更新成功，先顯示上次的公告。",
-                               retry: { Task { await store.refreshOfficial() } },
-                               lastUpdated: store.official.sources["twse"].map(slashDay))
-                }
                 upcoming
                 logButton(primary: false).frame(maxWidth: .infinity)
                 more
@@ -575,7 +575,13 @@ struct DividendFormView: View {
             item.amount = value
         } else { error = "請填寫符合資格股數與每股配息金額。"; return }
         // 「記一筆配息」: a new record earns the flat +20 in the same write; the dividends page then plays the coin drop.
-        do { try store.saveDividend(item, rewardNew: id == nil); dismiss() } catch { self.error = error.localizedDescription }
+        do {
+            let rewarded = store.pendingReward
+            try store.saveDividend(item, rewardNew: id == nil)
+            // A rewarded log confirms through the root toast's coin drop; anything else confirms here, so never twice.
+            if store.pendingReward == rewarded { ConfirmFeedback.confirm(SkinStore.shared.skin) }
+            dismiss()
+        } catch { self.error = error.localizedDescription }
     }
 }
 
