@@ -15,6 +15,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test PocketCore
         run: swift test --package-path PocketCore
+      - name: Check the subset fonts cover the app's own text
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/fonts"
+          "$RUNNER_TEMP/fonts/bin/pip" install --quiet fonttools==4.66.1
+          "$RUNNER_TEMP/fonts/bin/python" Scripts/subset_fonts.py --check
   skin-matrix:
     # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
     # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the
