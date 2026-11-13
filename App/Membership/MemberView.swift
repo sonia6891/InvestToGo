@@ -25,6 +25,11 @@ enum MembershipProducts {
     /// The paid plans this Apple ID holds, current and not refunded (StoreKit's own record of its purchases).
     @Published private(set) var owned: Set<String> = []
     var isMember: Bool { !owned.isEmpty }
+    /// `--ui-testing --demo-member`: every member feature open without a purchase (UI tests, screenshots).
+    var demoMember = MembershipStore.demoMember(from: ProcessInfo.processInfo.arguments)
+    /// Whether this person may use a member feature. Reads `owned`, so views observing the store redraw on a change.
+    func has(_ feature: MemberFeature) -> Bool { isMember || demoMember }
+    static func demoMember(from args: [String]) -> Bool { args.contains("--ui-testing") && args.contains("--demo-member") }
     @Published var message: String?
     private var updates: Task<Void, Never>?
     /// One App Store request at a time: a second caller waits for the first instead of clearing the spinner early.
@@ -154,7 +159,7 @@ struct MemberView: View {
         var detail: String {
             switch self {
             case .free: return "記帳、配息、提醒、圖鑑"
-            case .pocket: return "全部皮膚・等級皮膚搶先穿"
+            case .pocket: return "成分重疊・回測・目標反推・到價提醒・月報年報・全部皮膚"
             case .ai: return "AI 問答與月報"
             }
         }
