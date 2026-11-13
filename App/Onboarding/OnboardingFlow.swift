@@ -325,13 +325,13 @@ struct OnboardingFlow: View {
         VStack(alignment: .leading, spacing: 18) {
             heading(4, "登入，資料跟著你走", "登入即將開放；現在可以先開始，資料存在這支 iPhone。")
             VStack(spacing: 12) {
-                Button(action: finish) { Label("使用 Apple 登入", systemImage: "apple.logo") }
+                Button(action: { finish(confirm: true) }) { Label("使用 Apple 登入", systemImage: "apple.logo") }
                     .buttonStyle(SkinButtonStyle(primary: true))
                     .accessibilityIdentifier("login-apple")
-                Button(action: finish) { Text("使用 Google 登入") }
+                Button(action: { finish(confirm: true) }) { Text("使用 Google 登入") }
                     .buttonStyle(SkinButtonStyle(primary: false))
                     .accessibilityIdentifier("login-google")
-                Button(action: finish) {
+                Button(action: { finish(confirm: true) }) {
                     Text("用 Email 連結登入").skinFont(.body(14)).underline().foregroundStyle(skin.color(\.ink))
                         .frame(minWidth: 44, minHeight: 44)
                 }
@@ -342,7 +342,8 @@ struct OnboardingFlow: View {
             Text("繼續即表示你同意服務條款與隱私權政策。").skinFont(.mono(11)).foregroundStyle(skin.color(\.sub))
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
-            Button(action: finish) {
+            // Skipping is not a confirmation: no sound or haptic (ruling R28).
+            Button(action: { finish(confirm: false) }) {
                 Text("稍後再說").skinFont(.title(15)).foregroundStyle(skin.color(\.sub))
                     .frame(minWidth: 120, minHeight: 44)
             }
@@ -355,7 +356,7 @@ struct OnboardingFlow: View {
     // MARK: Finish
 
     /// Every login button and 稍後再說 lead to the lobby for now (sign-in is planned separately, 2026-11-11 文件).
-    private func finish() {
+    private func finish(confirm: Bool) {
         let defaults = UserDefaults.standard
         if let amount { defaults.set(amount, forKey: Onboarding.monthlyKey) }
         if let code = chosenSymbol { defaults.set(code, forKey: Onboarding.symbolKey) }
@@ -369,7 +370,7 @@ struct OnboardingFlow: View {
         // Off, or no day: no debit-day reminder is left over from an earlier choice.
         if remind, let day { Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: remindEve) } }
         else { DCAReminders.clear() }
-        ConfirmFeedback.confirm(SkinStore.shared.skin)
+        if confirm { ConfirmFeedback.confirm(SkinStore.shared.skin) }
         onFinish()
     }
 }
