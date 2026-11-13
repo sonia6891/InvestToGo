@@ -45,6 +45,7 @@ extension AppRoute {
         case "skins": return [.feature(.tools), .member, .skins]
         case "detail" where testing: return [.feature(.find), .fundDetail(symbol)]
         case "dex" where testing: return [.feature(.find), .dexCard(symbol)]
+        case "reminders" where testing: return [.feature(.tools), .reminders]
         default: return nil
         }
     }

@@ -39,12 +39,12 @@ extension PortfolioStore {
         return codes.sorted()
     }
 
-    /// Collects the card on the first visit to its ETF page (spec 6.4); true when it was new. A failed save leaves the
-    /// card uncollected and is not reported: the page itself still works.
-    func collectDexCard(_ symbol: String, now: Date = Date()) -> Bool {
-        var fresh = false
-        try? updateGame { fresh = !$0.collect(symbol, now: now).isEmpty }
-        return fresh
+    /// Collects the card on the first visit to its ETF page (spec 6.4) and finishes the visit's quests
+    /// (`GameState.visitFund`). A failed save leaves the card uncollected and is not reported: the page still works.
+    func collectDexCard(_ symbol: String, now: Date = Date()) -> FundVisit {
+        var visit = FundVisit()
+        do { try updateGame { visit = $0.visitFund(symbol, now: now) } } catch { return FundVisit() }
+        return visit
     }
 
     /// Puts the fund in the three-fund comparison, dropping the oldest when it is full; nothing when it is already

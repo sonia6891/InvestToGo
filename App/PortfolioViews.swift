@@ -225,7 +225,13 @@ struct TradeDetailSheet: View {
                     LabeledContent("股數", value: "\(decimal(trade.shares)) 股")
                     LabeledContent("金額", value: "\(money(trade.total)) 元")
                     if trade.shares > 0 { LabeledContent("每股", value: priceText(trade.total / trade.shares)) }
-                    if let realized = trade.realized { LabeledContent("已實現損益") { Text(signed(realized)).foregroundStyle(Palette.trend(realized)) } }
+                    // The cost of the shares sold is what was received less the result.
+                    if let realized = trade.realized {
+                        LabeledContent("已實現損益") {
+                            if let pct = TrendText.percent(realized, of: trade.total - realized) { TrendText(percent: pct, amount: realized, font: .body) }
+                            else { Text(TrendText.arrowed(realized)).foregroundStyle(Palette.trend(realized)) }
+                        }
+                    }
                     if !trade.broker.isEmpty { LabeledContent("券商", value: trade.broker) }
                 }
                 Section { Button("刪除紀錄", role: .destructive) { confirm = true } } footer: { Text("刪除交易紀錄不會改動目前的持有股數；需要時請到持有明細編輯。") }
@@ -325,7 +331,7 @@ struct HoldingDetailView: View {
                         Spacer()
                         VStack(alignment: .trailing, spacing: 2) {
                             Text(value.map { shown(money($0), hidden: hidden) } ?? "—").font(.title2.bold()).monospacedDigit().foregroundStyle(Palette.ink)
-                            if let gain, h.cost > 0 { Text(shown("\(signed(gain)) (\(percentText(gain / h.cost * 100)))", hidden: hidden)).font(.caption.bold()).monospacedDigit().foregroundStyle(Palette.trend(gain)) }
+                            if let gain, let pct = TrendText.percent(gain, of: h.cost) { TrendText(percent: pct, amount: gain, hidden: hidden).accessibilityIdentifier("holding-gain") }
                         }
                     }
                     HStack(spacing: 0) {
@@ -336,7 +342,7 @@ struct HoldingDetailView: View {
                         stat("市值", value.map { shown(money($0), hidden: hidden) } ?? "—", store.quote(h.symbol).map { "(\(priceText($0.price))/股)" })
                     }.padding(.vertical, 10).background(Palette.cardSoft, in: RoundedRectangle(cornerRadius: 14)).padding(.top, 12)
                     HStack(spacing: 10) {
-                        VStack(alignment: .leading, spacing: 3) { Text("未實現損益").font(.caption).foregroundStyle(Palette.muted); Text(gain.map { shown("\(signed($0)) (\(percentText($0 / max(h.cost, 0.000001) * 100)))", hidden: hidden) } ?? "尚缺報價").font(.subheadline.bold()).monospacedDigit().foregroundStyle(gain.map(Palette.trend) ?? Palette.muted) }
+                        VStack(alignment: .leading, spacing: 3) { Text("未實現損益").font(.caption).foregroundStyle(Palette.muted); if let gain, let pct = TrendText.percent(gain, of: h.cost) { TrendText(percent: pct, amount: gain, font: .subheadline.bold(), hidden: hidden).accessibilityIdentifier("holding-unrealized") } else { Text(gain == nil ? "尚缺報價" : "—").font(.subheadline.bold()).foregroundStyle(Palette.muted) } }
                             .frame(maxWidth: .infinity, alignment: .leading).padding(12).background(Palette.cardSoft, in: RoundedRectangle(cornerRadius: 14))
                         HStack(spacing: 8) {
                             Image(systemName: "dollarsign").font(.headline.bold()).foregroundStyle(.white).frame(width: 34, height: 34).background(LinearGradient(colors: [Color(red: 1, green: 0.78, blue: 0.3), Color(red: 0.96, green: 0.64, blue: 0.06)], startPoint: .top, endPoint: .bottom), in: Circle())
@@ -456,7 +462,7 @@ struct HoldingFormView: View {
         guard t >= 0 else { error = "請填寫總成本（含手續費）。"; return }
         let h = Holding(id: existing?.id ?? UUID(), symbol: code, name: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? (fund?.name ?? "") : name.trimmingCharacters(in: .whitespacesAndNewlines), shares: s, unitCost: t / s, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), strategy: existing.map { $0.symbol == code ? $0.strategy : (fund?.strategy ?? .unclassified) } ?? (fund?.strategy ?? .unclassified), sourceAccount: existing?.sourceAccount, purchaseDate: date)
         SellCosts.remember(feeRate, for: broker)
-        do { try store.save(h); ConfirmFeedback.confirm(SkinStore.shared.skin); dismiss() } catch { self.error = error.localizedDescription }
+        do { try store.save(h, logBuy: existing == nil); ConfirmFeedback.confirm(SkinStore.shared.skin); dismiss() } catch { self.error = error.localizedDescription }
     }
 }
 struct TradeFormView: View {
@@ -502,7 +508,7 @@ struct TradeFormView: View {
         guard let s = Double(shares.replacingOccurrences(of: ",", with: "")), let a = Double(amount.replacingOccurrences(of: ",", with: "")) else { error = "請填寫股數與成交金額。"; return }
         SellCosts.remember(feeRate, for: broker)
         do {
-            try store.applyTrade(kind == 1 ? .sell : .buy, symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), date: date, shares: s, amount: a, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines))
+            try store.applyTrade(kind == 1 ? .sell : .buy, symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), date: date, shares: s, amount: a, broker: broker.trimmingCharacters(in: .whitespacesAndNewlines), logBuy: true)
             ConfirmFeedback.confirm(SkinStore.shared.skin)
             dismiss()
         } catch { self.error = error.localizedDescription }

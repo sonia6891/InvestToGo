@@ -29,8 +29,15 @@ struct Achievement: Identifiable {
     let id: String
     let title: String
     let goal: Int
+    /// The feature that would count toward it is not in the app yet: the wall shows 「即將推出」 instead of a
+    /// progress bar stuck at 0, and it never unlocks (ruling R31).
+    var comingSoon = false
     /// Current value toward `goal`, evaluated at `now`.
     let progress: (GameState, Portfolio, Date) -> Int
+
+    init(id: String, title: String, goal: Int, comingSoon: Bool = false, progress: @escaping (GameState, Portfolio, Date) -> Int) {
+        self.id = id; self.title = title; self.goal = goal; self.comingSoon = comingSoon; self.progress = progress
+    }
 }
 
 enum Achievements {
@@ -65,10 +72,10 @@ enum Achievements {
         Achievement(id: "steadyYear", title: "一年不亂動", goal: steadyYearGoal) { _, p, now in steady(p, now: now) ? 1 : 0 },
         Achievement(id: "reconcileMaster", title: "對帳達人", goal: reconcileMasterGoal) { g, _, _ in g.counter(.reconciled) },
         Achievement(id: "feeSaver", title: "省費達人", goal: feeSaverGoal) { g, _, _ in g.counter(.feeCompared) },
-        Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal) { g, _, _ in g.counter(.checkup) },
+        Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal, comingSoon: true) { g, _, _ in g.counter(.checkup) },
         Achievement(id: "dexCollector", title: "ETF 圖鑑", goal: dexCollectorGoal) { g, _, _ in g.collected.count },
-        Achievement(id: "exDividendSkin", title: "除息季限定皮膚", goal: exDividendSkinGoal) { g, _, _ in g.counter(.exDividendSeason) },
-        Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal) { g, _, _ in g.counter(.yearReport) },
+        Achievement(id: "exDividendSkin", title: "除息季限定皮膚", goal: exDividendSkinGoal, comingSoon: true) { g, _, _ in g.counter(.exDividendSeason) },
+        Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal, comingSoon: true) { g, _, _ in g.counter(.yearReport) },
         Achievement(id: "dividendMilestone", title: "累計領息里程碑", goal: dividendMilestoneGoal) { _, p, _ in p.dividends.filter { $0.status == .paid }.count }
     ]
 }
@@ -82,7 +89,7 @@ extension GameState {
     /// Unlocks every achievement whose goal is met and returns the newly unlocked ids (catalog order).
     mutating func refreshAchievements(_ p: Portfolio, now: Date) -> [String] {
         var fresh: [String] = []
-        for a in Achievements.all where unlocked[a.id] == nil && a.progress(self, p, now) >= a.goal {
+        for a in Achievements.all where !a.comingSoon && unlocked[a.id] == nil && a.progress(self, p, now) >= a.goal {
             unlocked[a.id] = now
             fresh.append(a.id)
         }

@@ -56,6 +56,8 @@ struct PlanView: View {
         .onAppear {
             guard !loaded else { return }; loaded = true
             if let saved = store.data.legacyPlan { plan = saved }
+            // No plan saved yet: start from the monthly amount chosen in onboarding (final review I5).
+            else if let chosen = Onboarding.monthlyDefault() { plan.monthly = Double(chosen) }
             principal = String(Int(plan.principal)); monthly = String(Int(plan.monthly)); years = String(plan.years)
             returnPercent = decimal(plan.totalReturn * 100); yieldPercent = decimal(plan.distributionRate * 100); deductionPercent = decimal(plan.deductionRate * 100); reinvest = plan.reinvest > 0
         }
@@ -72,7 +74,10 @@ struct PlanView: View {
         do {
             try next.validate()
             plan = next
-            var data = store.data; data.legacyPlan = next; try store.commit(data); message = "已試算並儲存設定。"
+            // Saving a plan finishes the newbie quest 設定第一筆定投 (once ever), in the same write.
+            var data = store.data; data.legacyPlan = next
+            var game = data.game ?? GameState(); _ = game.complete(.firstPlanSet, now: Date()); data.game = game
+            try store.commit(data); message = "已試算並儲存設定。"
         } catch { message = error.localizedDescription }
     }
 }

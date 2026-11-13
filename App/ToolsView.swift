@@ -144,7 +144,7 @@ struct ComparisonView: View {
                         }
                     }
                     metric("最新價", symbols) { s in store.quote(s).map { priceText($0.price) } ?? "—" }
-                    metric("總報酬率\n(1年)", symbols, color: { s in store.yearStats(s).map { Palette.trend($0.change) } ?? Palette.muted }) { s in store.yearStats(s).map { percentText($0.change * 100) } ?? "—" }
+                    metric("總報酬率\n(1年)", symbols, color: { s in store.yearStats(s).map { Palette.trend(SkinChange.rounded($0.change * 100)) } ?? Palette.muted }) { s in store.yearStats(s).map { TrendText.text(percent: $0.change * 100) } ?? "—" }
                     metric("內扣費用率", symbols) { s in AnnualFeeCatalog.bundled?.records[s].map { "\(decimal($0.total))%" } ?? "未收錄" }
                     metric("風險指標\n(年化波動度)", symbols) { s in store.yearStats(s)?.volatility.map { "\(decimal($0 * 100))%" } ?? "—" }
                     metric("殖利率\n(近1年)", symbols) { s in store.trailingYield(s).map { "\(decimal($0))%" } ?? "—" }
@@ -165,6 +165,8 @@ struct ComparisonView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("三檔比較").font(.headline).foregroundStyle(Palette.ink); Text("選擇最多三檔 ETF 進行績效與指標比較").font(.caption2).foregroundStyle(Palette.muted) } } }
+        // 費用比較 with at least two funds counts toward 省費達人, once a day.
+        .onAppear { if ComparisonDefaults.symbols(store.data.comparison).count >= 2 { try? store.updateGame { _ = $0.compareFees(now: Date()) } } }
     }
     private func chip(_ index: Int, symbols: [String]) -> some View {
         let code = symbols.indices.contains(index) ? symbols[index] : nil
@@ -216,7 +218,8 @@ struct ComparisonView: View {
 }
 struct CalculatorView: View {
     @State private var initial = "100000"
-    @State private var monthly = "5000"
+    // The monthly amount chosen in onboarding, when there is one (final review I5).
+    @State private var monthly = Onboarding.monthlyDefault().map { String($0) } ?? "5000"
     @State private var years = "10"
     @State private var rate = "4"
     var body: some View {
@@ -236,7 +239,10 @@ struct CalculatorView: View {
                 if valid {
                     VStack(spacing: 2) { Text("期末試算金額").font(.caption).foregroundStyle(Palette.muted); Text("\(money(total)) 元").font(.system(size: 30, weight: .heavy, design: .rounded)).monospacedDigit().foregroundStyle(Palette.blue) }.frame(maxWidth: .infinity).padding(.vertical, 10)
                     LabeledContent("累計投入", value: money(principal))
-                    LabeledContent("試算損益") { Text(signed(total - principal)).foregroundStyle(Palette.trend(total - principal)) }.padding(.top, 6)
+                    LabeledContent("試算損益") {
+                        if let pct = TrendText.percent(total - principal, of: principal) { TrendText(percent: pct, amount: total - principal, font: .body) }
+                        else { Text(TrendText.arrowed(total - principal)).foregroundStyle(Palette.trend(total - principal)) }
+                    }.padding(.top, 6)
                 } else { Text("請輸入有效且非負的本金與每月投入，年數 1–40 年。").font(.subheadline).foregroundStyle(Palette.red).padding(.top, 8) }
             }
             Text("假設報酬按月平均複利、每月底投入，不含稅費與通膨。這是情境試算，不是預測或保證；負報酬情境下可能虧損本金。").font(.caption).foregroundStyle(Palette.muted)
@@ -344,6 +350,12 @@ struct ReminderCenterView: View {
     @AppStorage(DividendReminders.key) private var enabled = false
     @State private var working = false
     @State private var note: String?
+    // The debit-day reminder chosen in onboarding, under the same keys (final review I5).
+    @AppStorage(Onboarding.remindKey) private var dcaOn = false
+    @AppStorage(Onboarding.dayKey) private var dcaDay = 0
+    @AppStorage(Onboarding.remindMinutesKey) private var dcaMinutes = 9 * 60
+    @AppStorage(Onboarding.remindEveKey) private var dcaEve = false
+    @State private var dcaNote: String?
     private var upcoming: [Dividend] {
         let today = Calendar.current.startOfDay(for: Date())
         return store.data.dividends.filter { $0.status != .paid && $0.date >= today }.sorted { $0.date < $1.date }
@@ -359,6 +371,7 @@ struct ReminderCenterView: View {
                 }.tint(Palette.blue).disabled(working)
                 if let note { Text(note).font(.caption).foregroundStyle(Palette.muted).padding(.top, 10) }
             }
+            dcaCard
             SectionHeading(title: "即將入帳", subtitle: "依你的配息紀錄")
             if upcoming.isEmpty {
                 Card { ContentUnavailableView("目前沒有待入帳配息", systemImage: "bell.slash", description: Text("在配息月曆新增「已公告」或「預估」的紀錄。")) }
@@ -371,6 +384,48 @@ struct ReminderCenterView: View {
             }
         }.navigationTitle("提醒中心").navigationBarTitleDisplayMode(.inline)
     }
+    /// 定期定額扣款日提醒: on or off, the day and the time, and the day before; every change reschedules it.
+    private var dcaCard: some View {
+        Card {
+            Toggle(isOn: Binding(get: { dcaOn }, set: { value in Task { await setDCA(value) } })) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("定期定額扣款日提醒").font(.headline).foregroundStyle(Palette.ink)
+                    Text(DCAReminders.summary(on: dcaOn, day: shownDay, minutes: dcaMinutes, dayBefore: dcaEve)).font(.caption).foregroundStyle(Palette.muted)
+                }
+            }.tint(Palette.blue).disabled(working).accessibilityIdentifier("reminder-dca-toggle")
+            Picker("扣款日", selection: Binding(get: { shownDay }, set: { dcaDay = $0; reschedule() })) {
+                ForEach(Onboarding.days, id: \.self) { Text("每月 \($0) 日").tag($0) }
+            }
+            .padding(.top, 8)
+            .accessibilityIdentifier("reminder-dca-day")
+            DatePicker("提醒時間", selection: Binding(get: { DCAReminders.time(dcaMinutes) }, set: { dcaMinutes = DCAReminders.minutes($0); reschedule() }), displayedComponents: .hourAndMinute)
+                .disabled(!dcaOn)
+                .accessibilityIdentifier("reminder-dca-time")
+            Toggle("前一天也提醒", isOn: Binding(get: { dcaEve }, set: { dcaEve = $0; reschedule() })).tint(Palette.blue).disabled(!dcaOn)
+            if let dcaNote { Text(dcaNote).font(.caption).foregroundStyle(Palette.muted).padding(.top, 6) }
+        }
+    }
+    /// The saved day, or the first offered one before any was chosen.
+    private var shownDay: Int { Onboarding.days.contains(dcaDay) ? dcaDay : (Onboarding.days.first ?? 6) }
+    private func reschedule() {
+        guard dcaOn else { return }
+        let (day, minutes, eve) = (shownDay, dcaMinutes, dcaEve)
+        Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: eve) }
+    }
+    private func setDCA(_ value: Bool) async {
+        working = true
+        defer { working = false }
+        if value {
+            guard await DividendReminders.requestAccess() else { dcaOn = false; dcaNote = "未取得通知權限，可到 iPhone 設定 › 通知 開啟。"; return }
+            dcaDay = shownDay; dcaOn = true; dcaNote = nil
+            await DCAReminders.schedule(day: dcaDay, minutes: dcaMinutes, dayBefore: dcaEve)
+            ConfirmFeedback.confirm(SkinStore.shared.skin)
+        } else {
+            dcaOn = false
+            DCAReminders.clear()
+            dcaNote = "已關閉扣款日提醒。"
+        }
+    }
     private func setEnabled(_ value: Bool) async {
         working = true
         defer { working = false }
@@ -379,6 +434,8 @@ struct ReminderCenterView: View {
             enabled = true
             let count = await DividendReminders.sync(store.data.dividends)
             note = "已排程 \(count) 則提醒。新增或刪除配息紀錄時會自動更新。"
+            // Finishes 設定除息提醒 when it is this month's quest.
+            try? store.updateGame { _ = $0.complete(.reminderSet, now: Date()) }
             ConfirmFeedback.confirm(SkinStore.shared.skin)
         } else {
             enabled = false

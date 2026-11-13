@@ -41,6 +41,11 @@ struct GameState: Codable, Equatable {
     /// Achievements already shown, or held, at the last LEVEL×UP; the next one lists the others. Kept until 收下, so
     /// a celebration replayed after the app was closed still lists them.
     var celebratedAchievements: Set<String> = []
+    /// Rewards already paid, by key (「dividend|00878|2026-11」, 「reconciled|2026-11-13」…), so deleting a record and
+    /// adding it again, or repeating an action the same day, earns nothing (ruling R34).
+    var rewardKeys: Set<String> = []
+    /// The one-time migrations already run on this progress (`GameMigration.current`); 0 in saves made before them.
+    var migration = 0
 
     mutating func count(_ key: CounterKey) { counts[key.rawValue, default: 0] += 1 }
     func counter(_ key: CounterKey) -> Int { counts[key.rawValue, default: 0] }
@@ -69,5 +74,7 @@ extension GameState {
         lastAward = (try? c.decodeIfPresent(XPEvent.self, forKey: .lastAward)) ?? nil
         celebratedCoins = try c.decodeIfPresent(Int.self, forKey: .celebratedCoins) ?? coins
         celebratedAchievements = try c.decodeIfPresent(Set<String>.self, forKey: .celebratedAchievements) ?? Set(unlocked.keys)
+        rewardKeys = try c.decodeIfPresent(Set<String>.self, forKey: .rewardKeys) ?? []
+        migration = try c.decodeIfPresent(Int.self, forKey: .migration) ?? 0
     }
 }

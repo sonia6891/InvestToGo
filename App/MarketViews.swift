@@ -134,6 +134,32 @@ struct SkinChange: View {
     }
 }
 
+/// A move on the older (Palette) screens, through `SkinChange`'s words: "▲ 0.75%", "▼ 1,200 (-5.00%)", "－ 0.00%" for an
+/// exact or rounded 0; the 紅漲綠跌 colour follows the shown figure, and VoiceOver hears 上漲 / 下跌 / 持平 (final
+/// review I3: never a bare signed number in a colour).
+struct TrendText: View {
+    let percent: Double
+    var amount: Double? = nil
+    var format: (Double) -> String = money
+    var font: Font = .caption.bold()
+    var hidden = false
+    var body: some View {
+        Text(shown(Self.text(percent: percent, amount: amount, format: format), hidden: hidden))
+            .font(font).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
+            .foregroundStyle(hidden ? Palette.muted : Palette.trend(SkinChange.rounded(percent)))
+            .accessibilityLabel(hidden ? "已隱藏" : SkinChange.spoken(percent: percent, amount: amount, format: format))
+    }
+    static func text(percent: Double, amount: Double? = nil, format: (Double) -> String = money) -> String {
+        SkinChange.text(percent: percent, amount: amount, format: format)
+    }
+    /// An amount with no cost to compare with: still its direction, "▲ 1,200" / "▼ 1,200" / "－ 0".
+    static func arrowed(_ amount: Double, format: (Double) -> String = money) -> String {
+        "\(amount > 0 ? "▲" : (amount < 0 ? "▼" : "－")) \(format(abs(amount)))"
+    }
+    /// A result against what it cost, in percent; nil without a cost to compare with.
+    static func percent(_ result: Double, of cost: Double) -> Double? { cost > 0 && result.isFinite ? result / cost * 100 : nil }
+}
+
 /// The price line in the skin's chart style (spec 7.1): smooth gold (black-gold), stepped (pixel), plain red (stitch),
 /// black pencil (sketch). No axes; the caller labels the range and the data date.
 struct SkinTrendLine: View {

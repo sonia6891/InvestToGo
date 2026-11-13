@@ -184,9 +184,11 @@ final class QuestAchievementTests: XCTestCase {
         g.count(.checkup); g.count(.exDividendSeason); g.count(.yearReport)
         for i in 0..<10 { g.collected["etf\(i)"] = date(2026, 1, 1) }
         let ids = g.refreshAchievements(Portfolio(), now: date(2026, 11, 12))
-        for id in ["reconcileMaster", "feeSaver", "checkupDone", "exDividendSkin", "yearReport", "dexCollector"] {
+        for id in ["reconcileMaster", "feeSaver", "dexCollector"] {
             XCTAssertTrue(ids.contains(id), id)
         }
+        // No feature counts these yet: they stay 「即將推出」 whatever the counter says (ruling R31).
+        for id in ["checkupDone", "exDividendSkin", "yearReport"] { XCTAssertFalse(ids.contains(id), id) }
     }
 
     func testGameStateDecodesJSONWithoutNewKeys() throws {

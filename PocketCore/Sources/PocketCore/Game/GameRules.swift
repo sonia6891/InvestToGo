@@ -30,6 +30,8 @@ enum GameRules {
     }()
     static let xpPerLevel = 300
     static let xp: [XPEvent: Int] = [.monthlyDCA: 100, .questDone: 40, .firstDexCard: 30, .dividendLogged: 20, .reconciled: 20]
+    /// New dex cards that earn experience in one Taipei calendar month; later ones are collected for nothing (R34).
+    static let dexXPPerMonth = 3
 
     /// Starts at 1, no cap.
     static func level(xp: Int) -> Int { max(0, xp) / xpPerLevel + 1 }
@@ -49,15 +51,20 @@ extension GameState {
 
     /// One monthly DCA per calendar month; a repeat in the same month earns nothing.
     mutating func recordDCA(on date: Date) -> [XPEvent] {
-        let month = YearMonth(date)
-        guard dcaMonths.insert(month).inserted else { return [] }
+        guard insertMonth(YearMonth(date)) else { return [] }
+        award(.monthlyDCA)
+        return [.monthlyDCA]
+    }
+
+    /// Adds a DCA month without any reward and keeps `longestStreak` up to date; false when it was already there.
+    @discardableResult mutating func insertMonth(_ month: YearMonth) -> Bool {
+        guard dcaMonths.insert(month).inserted else { return false }
         // The run that contains this month (a backfilled month can join two runs).
         var run = 1
         var m = month.previous(); while dcaMonths.contains(m) { run += 1; m = m.previous() }
         m = month.next(); while dcaMonths.contains(m) { run += 1; m = m.next() }
         longestStreak = max(longestStreak, run)
-        award(.monthlyDCA)
-        return [.monthlyDCA]
+        return true
     }
 
     /// One coin per XP point; coins only accumulate for now.

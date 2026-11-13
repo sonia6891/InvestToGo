@@ -86,7 +86,9 @@ import SwiftUI
     }
     /// False while the records file still holds histories from an earlier version, so the next save moves them out.
     private var historiesSaved = false
-    func save(_ holding: Holding) throws {
+    /// With `logBuy` (新增持有's 儲存), a new holding with a purchase date is the user's buy: it records the DCA month
+    /// and its capped experience in the same write (`GameState.logBuy`). Edits, imports and seeding earn nothing.
+    func save(_ holding: Holding, logBuy: Bool = false, now: Date = Date()) throws {
         try holding.validate()
         var next = data
         if let i = next.holdings.firstIndex(where: { $0.id == holding.id }) {
@@ -96,6 +98,11 @@ import SwiftUI
         } else {
             next.holdings.append(holding)
             next.log(.buy, holding, date: holding.purchaseDate ?? Date(), amount: holding.cost)
+            if logBuy, let bought = holding.purchaseDate {
+                var game = next.game ?? GameState()
+                _ = game.logBuy(on: bought, now: now)
+                next.game = game
+            }
         }
         try commit(next)
     }
@@ -125,7 +132,8 @@ import SwiftUI
     }
     func removeDividend(_ dividend: Dividend) throws { var next = data; next.dividends.removeAll { $0.id == dividend.id }; try commit(next) }
     /// Saves a dividend record. With `rewardNew` (「記一筆配息」), a new record also earns the flat 記一筆配息 experience
-    /// in the same write — the same +20 for any amount (spec 6); editing a record earns nothing.
+    /// in the same write — the same +20 for any amount (spec 6), once per code and payment month (ruling R34);
+    /// editing a record earns nothing.
     func saveDividend(_ dividend: Dividend, rewardNew: Bool = false) throws {
         guard !dividend.symbol.isEmpty, dividend.amount.isFinite, dividend.amount > 0, dividend.detailsValid else { throw AppDataError("請填寫代碼、股數與每股配息；扣繳後的入帳金額必須大於 0。") }
         var next = data
@@ -137,7 +145,7 @@ import SwiftUI
             if rewardNew {
                 var game = next.game ?? GameState()
                 let before = game.xp
-                game.award(.dividendLogged); next.game = game
+                _ = game.logDividend(symbol: dividend.symbol, paid: dividend.date); next.game = game
                 earned = game.xp - before
             }
         }
@@ -156,7 +164,8 @@ import SwiftUI
     }
     /// A buy adds to the holding of the same ETF and broker (re-averaging its cost) or creates one;
     /// a sell reduces it at its average cost, records the realised result and removes it at zero.
-    func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String) throws {
+    /// With `logBuy` (新增交易紀錄's 儲存紀錄), a buy also records the DCA month and its capped experience in the same write.
+    func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String, logBuy: Bool = false, now: Date = Date()) throws {
         guard action == .buy || action == .sell else { return }
         guard DataChecks.code(symbol) else { throw AppDataError("請輸入正確的 ETF 代號。") }
         guard shares.isFinite, shares > 0, shares <= 1e10, amount.isFinite, amount >= 0, amount <= 1e12 else { throw AppDataError("請填寫股數與成交金額。") }
@@ -184,6 +193,11 @@ import SwiftUI
         }
         let holdingName = target.map { data.holdings[$0].name }
         next.log(Trade(date: date, action: action, symbol: symbol, name: fundName ?? holdingName ?? symbol, shares: shares, amount: amount, broker: broker.isEmpty ? (target.map { data.holdings[$0].broker } ?? "") : broker, realized: realized))
+        if logBuy, action == .buy {
+            var game = next.game ?? GameState()
+            _ = game.logBuy(on: date, now: now)
+            next.game = game
+        }
         try commit(next)
     }
     func removeTrade(_ trade: Trade) throws { var next = data; next.trades?.removeAll { $0.id == trade.id }; try commit(next) }

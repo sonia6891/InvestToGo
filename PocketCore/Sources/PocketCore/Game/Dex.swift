@@ -61,11 +61,16 @@ enum Dex {
 }
 
 extension GameState {
-    /// Collects the card the first time it is viewed; later calls return `[]`.
-    /// Calls `award(.firstDexCard)` itself, so XP and coins are applied here and callers must not award again.
+    /// Collects the card the first time it is viewed and returns the experience it earned: `[.firstDexCard]` for the
+    /// first `GameRules.dexXPPerMonth` new cards of the Taipei calendar month, `[]` after that (the card is still
+    /// collected) and for a card already held (ruling R34). Calls `award(.firstDexCard)` itself, so callers must not
+    /// award again; whether the card was new is `collected[symbol] == nil` before the call.
     mutating func collect(_ symbol: String, now: Date) -> [XPEvent] {
         guard collected[symbol] == nil else { return [] }
+        let month = YearMonth(now)
+        let earlier = collected.values.filter { YearMonth($0) == month }.count
         collected[symbol] = now
+        guard earlier < GameRules.dexXPPerMonth else { return [] }
         award(.firstDexCard)
         return [.firstDexCard]
     }

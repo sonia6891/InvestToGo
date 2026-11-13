@@ -2,7 +2,8 @@ import SwiftUI
 
 /// 成就 (spec 5.11): the 3D target top right, 「成就」 and how many are unlocked, then a three-column badge wall.
 /// Unlocked: the skin's stage with an object and the day it was reached. Locked: a dark 「?」, a progress bar and
-/// the numbers. Goals are counts, never money (spec 6.5).
+/// the numbers. One whose feature is not in the app yet shows 「即將推出」 instead of a bar stuck at 0 (ruling R31).
+/// Goals are counts, never money (spec 6.5).
 struct AchievementsView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
@@ -54,22 +55,28 @@ struct AchievementsView: View {
                 .frame(width: 84, height: 84)
                 Text(item.title).skinFont(.title(12)).skinForeground(\.sub)
                     .multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
-                Capsule().fill(skin.color(\.line))
-                    .overlay(alignment: .leading) {
-                        GeometryReader { geo in
-                            Capsule().fill(skin.color(\.dim)).frame(width: geo.size.width * CGFloat(progress) / CGFloat(max(item.goal, 1)))
+                if item.comingSoon {
+                    Text(Self.comingSoon).skinFont(.mono(10)).skinForeground(\.sub)
+                } else {
+                    Capsule().fill(skin.color(\.line))
+                        .overlay(alignment: .leading) {
+                            GeometryReader { geo in
+                                Capsule().fill(skin.color(\.dim)).frame(width: geo.size.width * CGFloat(progress) / CGFloat(max(item.goal, 1)))
+                            }
                         }
-                    }
-                    .frame(width: 64, height: 5)
-                Text("\(progress) / \(item.goal)").skinFont(.mono(10)).skinForeground(\.sub)
+                        .frame(width: 64, height: 5)
+                    Text("\(progress) / \(item.goal)").skinFont(.mono(10)).skinForeground(\.sub)
+                }
             }
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(item.title)
-        .accessibilityValue(date.map { "已解鎖 \(Self.day($0))" } ?? "\(progress) / \(item.goal)")
+        .accessibilityValue(date.map { "已解鎖 \(Self.day($0))" } ?? (item.comingSoon ? Self.comingSoon : "\(progress) / \(item.goal)"))
         .accessibilityIdentifier("achievement-\(item.id)")
     }
+
+    static let comingSoon = "即將推出"
 
     /// The object on an unlocked badge, from the skin's own art.
     static func art(_ id: String) -> SkinArtName {

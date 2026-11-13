@@ -156,7 +156,7 @@ struct DiscoverView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .toolbar { ToolbarItemGroup(placement: .keyboard) { Spacer(); Button("完成搜尋") { searchFocused = false } } }
-        .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter).silencesScrollTop() }
+        .sheet(isPresented: $showFilter) { FilterSheet(filter: $filter, series: series).silencesScrollTop() }
         .onAppear(perform: applyRequest)
         .onChange(of: store.discoverRequest) { _, _ in applyRequest() }
     }
@@ -245,9 +245,14 @@ struct FundRow: View {
 struct FilterSheet: View {
     @EnvironmentObject var store: PortfolioStore
     @Binding var filter: FundFilter
+    /// The series chip chosen under the search field: 「查看 n 檔結果」 counts what the list will show, inside it.
+    var series: DexSeries? = nil
     @Environment(\.dismiss) private var dismiss
+    static func count(_ funds: [Fund], filter: FundFilter, series: DexSeries?, frequency: (String) -> String?) -> Int {
+        funds.filter { (series == nil || DexSeries.of($0) == series) && filter.matches($0, frequency: frequency($0.id)) }.count
+    }
     var body: some View {
-        let count = store.funds.filter { filter.matches($0, frequency: store.official.frequency($0.id)) }.count
+        let count = Self.count(store.funds, filter: filter, series: series) { store.official.frequency($0) }
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
@@ -338,7 +343,9 @@ struct WatchlistView: View {
                                     VStack(alignment: .leading, spacing: 2) { HStack(spacing: 4) { Text(fund.id).font(.subheadline.bold()); MarketBadge(symbol: fund.id) }; Text(fund.name).font(.caption2).foregroundStyle(Palette.muted).lineLimit(1) }
                                     Spacer(minLength: 4)
                                     Text(quote.map { priceText($0.price) } ?? "--").font(.subheadline.bold()).monospacedDigit().frame(width: 64, alignment: .trailing)
-                                    Text(quote?.changePercent.map(percentText) ?? "--").font(.caption.bold()).monospacedDigit().foregroundStyle(quote?.changePercent.map(Palette.trend) ?? Palette.muted).frame(width: 58, alignment: .trailing)
+                                    Group {
+                                        if let change = quote?.changePercent, change.isFinite { TrendText(percent: change) } else { Text("--").font(.caption.bold()).foregroundStyle(Palette.muted) }
+                                    }.frame(width: 64, alignment: .trailing).accessibilityIdentifier("watch-change-\(fund.id)")
                                 }.contentShape(Rectangle())
                             }
                             Button { store.favorite(fund.id) } label: { Image(systemName: "star.fill").foregroundStyle(Palette.orange) }.buttonStyle(.plain).frame(width: 30).accessibilityLabel("取消自選 \(fund.id)")
@@ -405,7 +412,8 @@ struct FundDetail: View {
             store.quoteFailure = nil
             store.liveFocus = fund.id; store.live.syncSoon()
             // The notice shows in the root's toast region, above the navigation bar's row, never over the code.
-            if store.collectDexCard(fund.id), !DemoArguments.quietToasts { store.pendingNotice = Self.toastText }
+            let visit = store.collectDexCard(fund.id)
+            if visit.new, !DemoArguments.quietToasts { store.pendingNotice = Self.toastText(visit) }
         }
         .onDisappear { if store.liveFocus == fund.id { store.liveFocus = nil; store.live.syncSoon() } }
         .navigationBarTitleDisplayMode(.inline)
@@ -519,7 +527,8 @@ struct FundDetail: View {
         .padding(.top, 8)
         .background(skin.color(\.page).ignoresSafeArea(edges: .bottom))
     }
-    static var toastText: String { "收進圖鑑 +\(GameRules.xp[.firstDexCard] ?? 0) 經驗" }
+    /// 「收進圖鑑 +30 經驗」, or just 「收進圖鑑」 once this month's experience-earning cards are used up (ruling R34).
+    static func toastText(_ visit: FundVisit) -> String { visit.cardXP > 0 ? "收進圖鑑 +\(visit.cardXP) 經驗" : "收進圖鑑" }
 }
 /// 持股 tab: component weights from the existing research view, plus fund facts.
 struct FundHoldingsContent: View {
