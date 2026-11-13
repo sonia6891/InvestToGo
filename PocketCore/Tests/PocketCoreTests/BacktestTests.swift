@@ -74,8 +74,10 @@ final class BacktestTests: XCTestCase {
     }
 
     func testRunXirrPositiveOnRisingPrices() {
-        let h = SymbolHistory(bars: base, dividends: [], splits: [], suspect: false)
-        let r = Backtest.run(input(jan, feb), history: ["X": h])
+        // A year-long span keeps the annualised rate inside the -99%...1000% bracket.
+        let b = bars([("2024-01-02", 10), ("2024-02-01", 10), ("2024-12-31", 11)])
+        let h = SymbolHistory(bars: b, dividends: [], splits: [], suspect: false)
+        let r = Backtest.run(input(jan, YearMonth(year: 2024, month: 12)), history: ["X": h])
         XCTAssertNotNil(r.xirr)
         XCTAssertGreaterThan(r.xirr ?? -1, 0)
     }
