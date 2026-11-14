@@ -2,7 +2,7 @@
 
 > **0.3.0 已於 2026-10-18 上傳 TestFlight 並交給內部測試**（來源 `71a8782`，[編譯與測試](https://github.com/sonia6891/InvestToGo/actions/runs/39159534805)、[簽署上傳](https://github.com/sonia6891/InvestToGo/actions/runs/39161906093)均成功）；尚未確認已在使用者 iPhone 安裝。之後的提交須重跑測試。GitHub 原始碼提交不代表測試或發佈完成。
 
-本工程是唯一持續開發來源，藍白 SwiftUI 五分頁：首頁、探索、持有、配息、工具。當前原始碼版本 0.3.0；發佈狀態與實際測試證據以 RELEASE_STATUS.md 為準，不以這份 README 代表已上傳。
+本工程是唯一持續開發來源，藍白 SwiftUI 五分頁：首頁、探索、持有、配息、工具。當前原始碼版本 1.0；發佈狀態與實際測試證據以 RELEASE_STATUS.md 為準，不以這份 README 代表已上傳。
 
 ## 新版介面（ui/pocket-redesign 分支）
 

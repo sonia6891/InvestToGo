@@ -118,14 +118,26 @@ final class StoreDemoTests: XCTestCase {
         XCTAssertGreaterThan(year.total, 0)
         XCTAssertGreaterThan(year.count, 0)
 
-        // 口袋月報 for the month it opens on.
-        let card = PocketReport.make(.month(PocketReportView.lastMonth(now)), portfolio: records.data, now: now)
-        XCTAssertTrue((1_000..<5_000).contains(card.dividends), "領息 in the low thousands: \(card.dividends)")
-        XCTAssertEqual(card.dcaMonths, 1, "定期定額 有做到")
-        XCTAssertEqual(card.reconciles, 1)
-        XCTAssertEqual(card.newDexCards, 2)
-        XCTAssertEqual(card.level, 7)
-        XCTAssertGreaterThan(try XCTUnwrap(card.xpEarned), 0, "獲得經驗 is on the card")
+        // 口袋月報 for the month it opens on. The clock is pinned (as in `testDemoStoreGameIsAYearIn`), one launch in
+        // each month of a year: which sample dividends fall in 「last month」 depends on the month, so with the real
+        // clock this would be a different test every month.
+        for month in 0..<12 {
+            let pinned = GameRules.taipei.date(byAdding: .month, value: month, to: noon(2026, 11, 14))!
+            let seeded = PortfolioStore(url: directory.appendingPathComponent("report-\(month).json"))
+            try seed(seeded, args: store, now: pinned)
+            let card = PocketReport.make(.month(PocketReportView.lastMonth(pinned)), portfolio: seeded.data, now: pinned)
+            XCTAssertTrue((1_000..<5_000).contains(card.dividends), "\(pinned): 領息 in the low thousands: \(card.dividends)")
+            XCTAssertEqual(card.dcaMonths, 1, "\(pinned): 定期定額 有做到")
+            XCTAssertEqual(card.reconciles, 1, "\(pinned)")
+            XCTAssertEqual(card.newDexCards, 2, "\(pinned)")
+            XCTAssertEqual(card.level, 7, "\(pinned)")
+            XCTAssertGreaterThan(try XCTUnwrap(card.xpEarned), 0, "\(pinned): 獲得經驗 is on the card")
+        }
+        // November 2026, exactly: October's 1,500 from the pocket and the 1,280 `--demo-store` adds.
+        let november = noon(2026, 11, 14)
+        let fixed = PortfolioStore(url: directory.appendingPathComponent("report-fixed.json"))
+        try seed(fixed, args: store, now: november)
+        XCTAssertEqual(PocketReport.make(.month(PocketReportView.lastMonth(november)), portfolio: fixed.data, now: november).dividends, 2_780)
 
         // Seeding again (a relaunch without --reset) adds nothing.
         let dividends = records.data.dividends.count

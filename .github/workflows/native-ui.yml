@@ -256,13 +256,8 @@ jobs:
           name: ETFToGo-screens
           path: build/screens/
           retention-days: 14
-      - name: Check the member screens were captured
-        # The capture step may fail without failing the job (continue-on-error), and a failed launch there drops every
-        # later picture. These eight are the evidence for the 口袋會員 pages: one that is missing, or a flat
-        # single-colour frame, fails the job here.
-        run: |
-          set -euo pipefail
-          build/venv/bin/python Scripts/screens.py check build/screens/screen-{goalPlanner,backtest,priceAlerts,activeTracking,report,exposure,backtest-locked,report-locked}.png
+      # The check that the 口袋會員 pictures were captured comes after the tests (below, beside the App Store pictures'
+      # check): a lost screenshot must fail the job, but not before the tests have run and left their results.
       - name: Verify calculations, persistence, search and editing
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -326,6 +321,14 @@ jobs:
           name: ETFToGo-store-screens
           path: build/store/
           retention-days: 14
+      - name: Check the member screens were captured
+        # The capture step near the top may fail without failing the job (continue-on-error), and a failed launch there
+        # drops every later picture. These eight are the evidence for the 口袋會員 pages: one that is missing, or a flat
+        # single-colour frame, fails the job here. After the tests, the Release compile and the App Store pictures, so
+        # a lost screenshot never costs the run its test results; a job that gets this far green still ends red here.
+        run: |
+          set -euo pipefail
+          build/venv/bin/python Scripts/screens.py check build/screens/screen-{goalPlanner,backtest,priceAlerts,activeTracking,report,exposure,backtest-locked,report-locked}.png
       - name: Check the ten App Store screens that need no network
         # store-backtest and store-overlap are left out: they depend on other people's sites.
         run: |
