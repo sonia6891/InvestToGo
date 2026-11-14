@@ -118,6 +118,63 @@ final class PriceAlertMonitorTests: XCTestCase {
         XCTAssertEqual(log.posted.count, 1)
     }
 
+    // MARK: When the checks run
+
+    /// Coming back to the app again and again asks for the watched prices once in five minutes, not every time.
+    @MainActor func testChecksOnReturnAreFiveMinutesApart() async {
+        PriceAlertMonitor.lastForegroundCheck = nil
+        let log = AlertLog()
+        let start = Date(timeIntervalSince1970: 1_800_000_000)
+        func comeBack(after seconds: TimeInterval) async {
+            await PriceAlertMonitor.checkOnReturn(now: start.addingTimeInterval(seconds)) { log.asked.append([]) }
+        }
+        await comeBack(after: 0)
+        XCTAssertEqual(log.asked.count, 1, "The first return checks")
+        await comeBack(after: 10)
+        await comeBack(after: 299)
+        XCTAssertEqual(log.asked.count, 1, "Within five minutes of the last check nothing is done")
+        await comeBack(after: 300)
+        XCTAssertEqual(log.asked.count, 2)
+        // The gap is counted from the last check that ran, not from a return that was skipped.
+        await comeBack(after: 599)
+        XCTAssertEqual(log.asked.count, 2)
+        await comeBack(after: 600)
+        XCTAssertEqual(log.asked.count, 3)
+        // A clock that was set back does not stop the checks.
+        await comeBack(after: -3600)
+        XCTAssertEqual(log.asked.count, 4)
+        PriceAlertMonitor.lastForegroundCheck = nil
+    }
+
+    /// The background task is reported as finished by its run or by its expiration, whichever is first, never both.
+    func testOnceFlagIsClaimedOnce() {
+        let flag = OnceFlag(), lock = NSLock()
+        var claims = 0
+        DispatchQueue.concurrentPerform(iterations: 200) { _ in
+            if flag.claim() { lock.lock(); claims += 1; lock.unlock() }
+        }
+        XCTAssertEqual(claims, 1)
+        XCTAssertFalse(flag.claim())
+    }
+
+    /// 到價提醒's quiet refresh leaves 更新報價 alone: the button does not say 「更新中…」 and a tap on it is answered.
+    @MainActor func testQuietRefreshLeavesTheUsersOwnRefreshAlone() {
+        let store = PortfolioStore(url: file)
+        XCTAssertTrue(store.beginRefresh(quiet: true))
+        XCTAssertFalse(store.refreshing, "The buttons do not show a refresh nobody asked for")
+        XCTAssertTrue(store.fetchingQuotes, "Live polling still waits for it")
+        XCTAssertFalse(store.beginRefresh(quiet: true), "A second quiet refresh is left to the next check")
+        XCTAssertTrue(store.beginRefresh(quiet: false), "The tap on 更新報價 is answered while the quiet one runs")
+        XCTAssertTrue(store.refreshing)
+        XCTAssertFalse(store.beginRefresh(quiet: false), "Two refreshes asked for by hand still do not overlap")
+        store.endRefresh(quiet: true)
+        XCTAssertTrue(store.refreshing, "The quiet one ending does not end the other")
+        XCTAssertFalse(store.beginRefresh(quiet: true), "A quiet refresh gives way to one asked for by hand")
+        store.endRefresh(quiet: false)
+        XCTAssertFalse(store.refreshing)
+        XCTAssertFalse(store.fetchingQuotes)
+    }
+
     // MARK: The list
 
     @MainActor func testStoreKeepsTwentyAndRemoves() throws {
@@ -145,6 +202,15 @@ final class PriceAlertMonitorTests: XCTestCase {
         XCTAssertEqual(other.alerts.map(\.symbol), ["00878", "0050"], "What was here stays; the backup's alert is added")
         try other.importBackup(backup)
         XCTAssertEqual(other.alerts.count, 2, "The same backup again adds nothing")
+    }
+
+    @MainActor func testPriceTypedIntoTheForm() {
+        XCTAssertEqual(try PriceAlertsView.price(from: "18.5"), 18.5)
+        XCTAssertEqual(try PriceAlertsView.price(from: "1,000,000"), AlertEngine.maxPrice, "The largest price is still taken")
+        XCTAssertThrowsError(try PriceAlertsView.price(from: "1000000.01")) { XCTAssertEqual($0.localizedDescription, "價格太大了，請確認後再試。") }
+        for text in ["", "0", "-5", "abc"] {
+            XCTAssertThrowsError(try PriceAlertsView.price(from: text), text) { XCTAssertEqual($0.localizedDescription, "請輸入大於 0 的價格。") }
+        }
     }
 
     @MainActor func testStatusWords() {

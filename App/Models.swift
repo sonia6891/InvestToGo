@@ -10,7 +10,13 @@ import SwiftUI
     @Published var pendingReward = 0
     /// A one-line notice for the same root toast region (e.g. 「收進圖鑑 +30 經驗」), shown once and cleared.
     @Published var pendingNotice: String?
+    /// A refresh somebody asked for is under way: 更新報價 and 立即更新 say 「更新中…」 and wait.
     @Published var refreshing = false
+    /// A quiet refresh (到價提醒's own check) is under way. Not published and never shown: the buttons above are not
+    /// the ones that started it, so they stay as they are and a tap on them is answered.
+    private(set) var quietRefreshing = false
+    /// Either kind is asking for prices; live polling draws on the same request allowance and waits for both.
+    var fetchingQuotes: Bool { refreshing || quietRefreshing }
     @Published private(set) var catalog = CatalogSnapshot.bundled()
     @Published var catalogMessage: String?
     @Published var catalogRefreshing = false
@@ -357,8 +363,8 @@ import SwiftUI
     /// `quiet` (到價提醒's own check, which nobody asked for by hand): the quotes are refreshed and saved the same way,
     /// but nothing is said on screen and nothing is reported, whatever happens.
     func refresh(symbols: [String]? = nil, inline: Bool = false, quiet: Bool = false) async {
-        guard !refreshing else { return }
-        refreshing = true; defer { refreshing = false }
+        guard beginRefresh(quiet: quiet) else { return }
+        defer { endRefresh(quiet: quiet) }
         if !quiet { message = nil }
         if inline { quoteFailure = nil }
         let started = Date()
@@ -394,6 +400,21 @@ import SwiftUI
             if inline { quoteFailure = error.localizedDescription; CrashReporting.capture(error, context: "market", offline: Connectivity.shared.offline) } else { message = error.localizedDescription }
         }
     }
+    /// Takes the turn for a refresh; false when it has to be skipped. One asked for by hand waits only for another
+    /// asked for by hand. A quiet one is nobody's request, so it gives way to any refresh already running, and it
+    /// leaves `refreshing` alone. The two kinds may then overlap: each saves through `keepFetched`, which merges into
+    /// the records as they are at that moment, so neither undoes the other.
+    func beginRefresh(quiet: Bool) -> Bool {
+        if quiet {
+            guard !fetchingQuotes else { return false }
+            quietRefreshing = true
+        } else {
+            guard !refreshing else { return false }
+            refreshing = true
+        }
+        return true
+    }
+    func endRefresh(quiet: Bool) { if quiet { quietRefreshing = false } else { refreshing = false } }
     /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
     /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.
     private func keepFetched(_ fetched: [String: Quote], since started: Date) throws {

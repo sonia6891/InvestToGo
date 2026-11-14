@@ -46,6 +46,18 @@ final class PriceAlertPresenter: NSObject, UNUserNotificationCenterDelegate {
     }
 }
 
+/// True for the first caller only, whichever thread it is on.
+final class OnceFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var claimed = false
+    func claim() -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        if claimed { return false }
+        claimed = true
+        return true
+    }
+}
+
 /// 到價提醒's checks (spec 5.7, 做法 A): when the app comes to the front, and when iOS runs the background refresh task.
 /// Nothing leaves the phone but the codes whose prices are asked for, as for any quote refresh.
 enum PriceAlertMonitor {
@@ -54,6 +66,11 @@ enum PriceAlertMonitor {
     static let notificationPrefix = "price-alert-"
     /// How long iOS is asked to wait before the next background check; it decides the real time itself.
     static let interval: TimeInterval = 3600
+    /// The least time between two checks made because the app came to the front: someone going in and out of the app
+    /// does not have every watched code asked for again each time.
+    static let foregroundGap: TimeInterval = 300
+    /// When the last check on coming to the front began; nil until the first one.
+    @MainActor static var lastForegroundCheck: Date?
 
     @MainActor private static weak var store: PortfolioStore?
     /// The background task has its launch handler: only then may a request be submitted (iOS stops the app otherwise).
@@ -72,20 +89,42 @@ enum PriceAlertMonitor {
     /// iOS calls the handler on a queue of its own, so it is made here, outside the main actor; the work hops over.
     private static func registerTask() -> Bool {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: identifier, using: nil) { task in
+            // The run and the expiration handler are on different threads; whichever comes first reports, once.
+            let finished = OnceFlag()
             let work = Task { @MainActor in
                 await runInBackground()
-                task.setTaskCompleted(success: !Task.isCancelled)
+                let success = !Task.isCancelled
+                if finished.claim() { task.setTaskCompleted(success: success) }
             }
-            // iOS is out of patience: the requests under way stop, and the task is still marked as finished above.
-            task.expirationHandler = { work.cancel() }
+            // iOS is out of patience: it is told at once that the task is over, without waiting for the requests
+            // under way to stop. (Weak: the task keeps this handler, so the handler must not keep the task.)
+            task.expirationHandler = { [weak task] in
+                work.cancel()
+                if finished.claim() { task?.setTaskCompleted(success: false) }
+            }
         }
     }
 
-    /// One background run: the check, then the request for the next run.
+    /// One background run: the request for the next run, then the check.
     @MainActor private static func runInBackground() async {
         // On a locked phone the records cannot be opened (see `PortfolioStore.reloadIfLocked`): nothing to check yet.
-        if let store, store.reloadIfLocked() { await check() }
+        let readable = store?.reloadIfLocked() ?? false
+        // Asked for before the check: a run that iOS cuts short is reported as over at once, and the app may be
+        // suspended before anything after the check runs.
         scheduleNext()
+        guard readable else { return }
+        await check()
+        // An alert that fired is switched off: with nothing left to watch the request is taken back.
+        scheduleNext()
+    }
+
+    /// The check made each time the app comes to the front. One that would begin within `foregroundGap` of the last
+    /// does nothing. Background runs and the check after adding an alert go straight to `check()`.
+    @MainActor static func checkOnReturn(now: Date = Date(), run: () async -> Void = { await PriceAlertMonitor.check() }) async {
+        // A clock that was set back does not hold the checks up until it catches up again.
+        if let last = lastForegroundCheck, now >= last, now.timeIntervalSince(last) < foregroundGap { return }
+        lastForegroundCheck = now
+        await run()
     }
 
     /// The app's own store, checked with the real membership, quotes and notifications.

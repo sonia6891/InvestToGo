@@ -151,8 +151,9 @@ struct RootView: View {
             guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
             store.live.start()
             await store.followMarket()
-            // 到價提醒 (spec 5.7): judged on the prices just refreshed, every time the app comes to the front.
-            await PriceAlertMonitor.check()
+            // 到價提醒 (spec 5.7): judged on the prices just refreshed, when the app comes to the front (five minutes
+            // apart at least).
+            await PriceAlertMonitor.checkOnReturn()
         }
         .onChange(of: phase) { _, value in if value == .background { store.live.stop(); PriceAlertMonitor.scheduleNext() } }
         // Locked records are empty, not gone: the reminders already scheduled stay until they can be read.

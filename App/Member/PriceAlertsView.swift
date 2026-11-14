@@ -138,9 +138,8 @@ struct PriceAlertsView: View {
         guard DataChecks.code(symbol), store.funds.contains(where: { $0.id == symbol }) || store.quote(symbol) != nil else {
             formError = "找不到這個代號，請確認後再試。"; return
         }
-        guard let price = Double(targetText.replacingOccurrences(of: ",", with: "")), price > 0, price <= AlertEngine.maxPrice else {
-            formError = "請輸入大於 0 的價格。"; return
-        }
+        let price: Double
+        do { price = try Self.price(from: targetText) } catch { formError = error.localizedDescription; return }
         do { try store.addAlert(symbol: symbol, above: above, price: price) } catch { formError = error.localizedDescription; return }
         targetText = ""; focus = nil
         // UI tests stop here: no permission prompt, no request for prices.
@@ -150,6 +149,13 @@ struct PriceAlertsView: View {
             notificationsOff = !(await DividendReminders.requestAccess())
             await PriceAlertMonitor.check()
         }
+    }
+
+    /// The price typed into the form, or what is wrong with it.
+    static func price(from text: String) throws -> Double {
+        guard let price = Double(text.replacingOccurrences(of: ",", with: "")), price > 0 else { throw AppDataError("請輸入大於 0 的價格。") }
+        guard price <= AlertEngine.maxPrice else { throw AppDataError("價格太大了，請確認後再試。") }
+        return price
     }
 
     // MARK: Preview behind the lock

@@ -270,8 +270,8 @@ struct LiveStatus: Equatable {
         } else if socket == nil, (reconnectAt ?? .distantPast) <= now {
             connect()
         }
-        // A manual refresh draws on the same request allowance, so polling waits for it.
-        guard now >= backoffUntil, !polling, !store.refreshing else { return }
+        // A refresh draws on the same request allowance, so polling waits for it.
+        guard now >= backoffUntil, !polling, !store.fetchingQuotes else { return }
         if now.timeIntervalSince(indicesAt) >= 15 { indicesAt = now; await pollIndices() }
         else if now >= pollAt { await poll() }
     }
