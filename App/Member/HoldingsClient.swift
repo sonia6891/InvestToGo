@@ -133,22 +133,25 @@ actor HoldingsClient {
     }
 
     /// The company's own page, then 富果 when it fails and a key is saved. A failure is reported once (the company and
-    /// the kind of failure only) and starts the half-hour pause; a cancelled download does neither.
+    /// the kind of failure only) and starts the half-hour pause; a cancelled download does neither, and nor does one
+    /// that failed for want of a connection: the next call, with the network back, asks again at once.
     private func fromCompany(_ issuer: Issuer, _ symbol: String) async throws -> ComponentSnapshot {
         do {
             return try await chain(issuer, symbol)
         } catch {
             if Self.isCancellation(error) { throw error }
             if Task.isCancelled { throw CancellationError() }
-            // The saved id may have gone stale; the next try (after the pause) asks the company for it again.
-            defaults.removeObject(forKey: Self.lookupKey(issuer, symbol))
-            // No network is the phone's trouble, not the company's: as everywhere else, it is not reported.
-            if CrashReportGate.isReportable((error as? RequestFailed)?.cause ?? error) {
+            // No network is the phone's trouble, not the company's: as everywhere else it is not reported, and it
+            // neither drops the saved id nor starts the pause.
+            let companyFailed = CrashReportGate.isReportable((error as? RequestFailed)?.cause ?? error)
+            if companyFailed {
+                // The saved id may have gone stale; the next try (after the pause) asks the company for it again.
+                defaults.removeObject(forKey: Self.lookupKey(issuer, symbol))
                 await report(HoldingsFailure(issuer: issuer, error: error), issuer)
             }
             if fugleKeySaved(), let rescued = try? await fugle(symbol) { return rescued }
             if Task.isCancelled { throw CancellationError() }
-            defaults.set(clock().timeIntervalSinceReferenceDate, forKey: Self.failedKey(symbol))
+            if companyFailed { defaults.set(clock().timeIntervalSinceReferenceDate, forKey: Self.failedKey(symbol)) }
             throw AppDataError(Self.unavailable)
         }
     }

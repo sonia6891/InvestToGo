@@ -511,11 +511,46 @@ final class HoldingsClientTests: XCTestCase {
             }
             XCTAssertEqual(error.domain, "ETFToGo.Holdings")
         }
-        // No network at all is the phone's trouble: not reported (as for every other load), but the pause still starts.
+        // No network at all is the phone's trouble: not reported (as for every other load).
         await transport.setAnswer { _ in throw URLError(.notConnectedToInternet) }
         do { _ = try await client(transport, clock).components(symbol: "0056", fundName: "元大高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         let after = await reported.failures
         XCTAssertEqual(after.count, 2)
+    }
+
+    /// No connection is not the company's failure: no pause starts and the saved fund id stays, so the next call, with
+    /// the network back, goes out at once.
+    func testOfflineFailureStartsNoPause() async throws {
+        let transport = FakeHoldingsTransport { call in
+            if call.url.contains("GetETFList") { return Data(#"{"result":[{"fundCode":"CN","stockCode":"00878"}],"success":true}"#.utf8) }
+            throw URLError(.notConnectedToInternet)
+        }
+        let clock = saturday()
+        let subject = client(transport, clock)
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        var asked = await transport.urls()
+        XCTAssertEqual(asked.count, 2, "The list, then the date, which found no network")
+        // The network is back and the same ETF is asked for straight away: the transport is called again.
+        await transport.setAnswer { call in
+            if call.url.contains("GetETFAssets") { return Data(#"{"result":{"preDate":"2026/11/13"},"success":true}"#.utf8) }
+            return Data(#"{"result":[{"stockCode":"2891","stockName":"中信金","weights":"11.26"}],"success":true}"#.utf8)
+        }
+        let value = try await subject.components(symbol: "00878", fundName: "國泰永續高股息")
+        XCTAssertEqual(value.source, "國泰投信")
+        asked = await transport.urls()
+        XCTAssertEqual(asked.count, 4, "No half-hour pause after an offline failure")
+        let lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 1, "The saved fund code was kept")
+        let failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty, "Nothing is reported for a phone without a connection")
+        // A company's own failure right after still starts the pause.
+        clock.advance(days: 1)
+        await transport.setAnswer { _ in throw StoreError.http(503) }
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let before = await transport.urls().count
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let after = await transport.urls().count
+        XCTAssertEqual(after, before, "Paused: nobody is asked")
     }
 
     // MARK: Fix round 1 — the history has its own file
