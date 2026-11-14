@@ -34,17 +34,17 @@ final class StoreScreensUITests: XCTestCase {
         guard endValue.exists else {
             return fail(app, "store-backtest", run.exists ? "the run ended without a result" : "no result after 8 minutes")
         }
-        // The result card's figures and curve, from its first line down.
+        // The result card's figures and curve, from its first line down; then long enough for the scroll bar to fade.
         settle(app, endValue, at: 0.2)
-        sleep(1)
+        sleep(3)
         save(app, "store-backtest")
     }
 
     /// 持股透視 → 重疊成分 with the demo pocket: the holdings of the pocket's ETFs are fetched from the fund companies,
     /// and the pairs that share stocks are listed. Up to three minutes.
     func testStoreOverlap() {
-        let app = launch("exposure")
-        let tab = app.buttons["重疊成分"]
+        var app = launch("exposure")
+        var tab = app.buttons["重疊成分"]
         guard tab.waitForExistence(timeout: 20) else { return fail(app, "store-overlap", "持股透視 did not open") }
         tab.tap()
         let fetch = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label ENDSWITH %@", "取得 ", "成分股")).firstMatch
@@ -61,15 +61,25 @@ final class StoreScreensUITests: XCTestCase {
         guard pairs.firstMatch.waitForExistence(timeout: 5) else {
             return fail(app, "store-overlap", busy.exists ? "still fetching after 3 minutes" : "no pair of ETFs came back with holdings")
         }
+        // The pocket's bond ETF comes back with 「暫時取不到，稍後再試」 in red, which stays until the page is left. The
+        // picture is the page as it opens the next time, with the holdings that did arrive kept on the phone.
+        app.terminate()
+        app = launch("exposure", reset: false)
+        tab = app.buttons["重疊成分"]
+        guard tab.waitForExistence(timeout: 20) else { return fail(app, "store-overlap", "持股透視 did not open again") }
+        tab.tap()
+        let kept = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", " × ")).firstMatch
+        guard kept.waitForExistence(timeout: 10) else { return fail(app, "store-overlap", "the fetched holdings were not kept") }
         sleep(1)
         save(app, "store-overlap")
     }
 
     // MARK: Helpers
 
-    private func launch(_ screen: String) -> XCUIApplication {
+    /// `reset` false keeps the records of the launch before (the seeds add nothing to a pocket that is already filled).
+    private func launch(_ screen: String, reset: Bool = true) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--reset", "--quiet-toasts", "--skip-onboarding", "--demo-store", "--open", screen]
+        app.launchArguments = ["--ui-testing"] + (reset ? ["--reset"] : []) + ["--quiet-toasts", "--skip-onboarding", "--demo-store", "--open", screen]
         app.launch()
         return app
     }
