@@ -31,10 +31,16 @@ private final class HoldingsClock: @unchecked Sendable {
     func advance(days: Double) { lock.lock(); value = value.addingTimeInterval(days * 86_400); lock.unlock() }
 }
 
-/// Which fund companies' failures were reported.
+/// Which fund companies' failures were reported, and as what.
 private actor Reported {
     private(set) var issuers: [Issuer] = []
-    func add(_ issuer: Issuer) { issuers.append(issuer) }
+    private(set) var failures: [HoldingsFailure] = []
+    /// Reports that were not a `HoldingsFailure` (there should be none).
+    private(set) var others = 0
+    func add(_ issuer: Issuer, _ error: Error) {
+        issuers.append(issuer)
+        if let failure = error as? HoldingsFailure { failures.append(failure) } else { others += 1 }
+    }
 }
 
 final class HoldingsClientTests: XCTestCase {
@@ -66,7 +72,7 @@ final class HoldingsClientTests: XCTestCase {
                               fugle: { symbol in
                                   ComponentSnapshot(symbol: symbol, date: "2026-11-12", components: [FundComponent(symbol: "2330", name: "台積電", weight: 30)], source: "富果／投信揭露資料")
                               },
-                              report: { _, issuer in await reported.add(issuer) })
+                              report: { error, issuer in await reported.add(issuer, error) })
     }
 
     private func snapshot(_ symbol: String, _ date: String, weight: Double = 50) -> ComponentSnapshot {
@@ -95,7 +101,8 @@ final class HoldingsClientTests: XCTestCase {
         let store = PortfolioStore(url: url)
         try store.saveComponents(snapshot("0050", "2026-11-10"))
         let transport = FakeHoldingsTransport { _ in throw URLError(.badServerResponse) }
-        let subject = client(transport, saturday())
+        let clock = saturday()
+        let subject = client(transport, clock)
         do { try await store.refreshComponents("0050", client: subject); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         XCTAssertEqual(store.data.components?["0050"]?.date, "2026-11-10")
         XCTAssertEqual(store.componentHistory(for: "0050").map(\.date), ["2026-11-10"])
@@ -103,9 +110,13 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertEqual(asked.count, 1, "0050 is 元大's (the name in the ETF list), so 元大 was asked")
         let issuers = await reported.issuers
         XCTAssertEqual(issuers, [.yuanta], "The failure is reported under the fund company alone")
-        // A body that is not the company's JSON is the same failure.
+        // A body that is not the company's JSON is the same failure (asked again once the half-hour pause is over).
+        clock.advance(days: 31.0 / 1440)
         await transport.setAnswer { _ in Data("<html>維護中</html>".utf8) }
         do { try await store.refreshComponents("0050", client: subject); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let failures = await reported.failures
+        XCTAssertEqual(failures, [HoldingsFailure(issuer: .yuanta, kind: .network, code: URLError.Code.badServerResponse.rawValue),
+                                  HoldingsFailure(issuer: .yuanta, kind: .parse)])
         let reopened = PortfolioStore(url: url)
         XCTAssertEqual(reopened.data.components?["0050"]?.date, "2026-11-10")
         XCTAssertEqual(reopened.componentHistory(for: "0050").map(\.date), ["2026-11-10"])
@@ -302,7 +313,8 @@ final class HoldingsClientTests: XCTestCase {
                        ["2026/11/21", "2026/11/20", "2026/11/19", "2026/11/18", "2026/11/17", "2026/11/16"])
         asked = await transport.urls("etf_list")
         XCTAssertEqual(asked.count, 1, "The fund id from a week ago was still good")
-        // After a failure the id is asked for again, in case it was the id that went stale.
+        // After a failure (and its half-hour pause) the id is asked for again, in case it was the id that went stale.
+        clock.advance(days: 31.0 / 1440)
         do { _ = try await subject.components(symbol: "00929", fundName: "復華台灣科技優息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         asked = await transport.urls("etf_list")
         XCTAssertEqual(asked.count, 2)
@@ -311,6 +323,7 @@ final class HoldingsClientTests: XCTestCase {
             if call.url.hasSuffix("/ETF/etf_list") { return Data(page.utf8) }
             throw URLError(.badServerResponse)
         }
+        clock.advance(days: 31.0 / 1440)
         let before = await transport.urls("api/assets").count
         do { _ = try await subject.components(symbol: "00929", fundName: "復華台灣科技優息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         let after = await transport.urls("api/assets").count
@@ -357,5 +370,226 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertEqual(HoldingsClient.escaped("aB+/c9== &?#"), "aB%2B%2Fc9%3D%3D%20%26%3F%23")
         XCTAssertEqual(HoldingsClient.escaped("www.ctbcinvestments.com"), "www.ctbcinvestments.com")
         XCTAssertEqual(HoldingsClient.escaped("CN"), "CN")
+    }
+
+    // MARK: Fix round 1 — pause after a failure, cancellation, what is reported
+
+    func testFailureStartsAHalfHourPause() async throws {
+        let transport = FakeHoldingsTransport { _ in throw StoreError.http(503) }
+        let clock = saturday()
+        let subject = client(transport, clock)
+        do { _ = try await subject.components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        // A second tap, and the app opened again: the same words, but nobody is asked and nothing more is reported.
+        do { _ = try await subject.components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        do { _ = try await client(transport, clock).components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        clock.advance(days: 29.0 / 1440)
+        do { _ = try await subject.components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        var asked = await transport.urls()
+        XCTAssertEqual(asked.count, 1, "Only the first call reached 元大")
+        var failures = await reported.failures
+        XCTAssertEqual(failures, [HoldingsFailure(issuer: .yuanta, kind: .http, code: 503)])
+        // Another ETF is not held back by this one's pause.
+        await transport.setAnswer { _ in HoldingsClientTests.yuanta("0056") }
+        _ = try await subject.components(symbol: "0056", fundName: "元大高股息")
+        asked = await transport.urls()
+        XCTAssertEqual(asked.count, 2)
+        // After 30 minutes it tries again; a success ends the pause for good.
+        clock.advance(days: 2.0 / 1440)
+        await transport.setAnswer { _ in HoldingsClientTests.yuanta("0050") }
+        let value = try await subject.components(symbol: "0050", fundName: "元大台灣50")
+        XCTAssertEqual(value.date, "2026-11-13")
+        asked = await transport.urls()
+        XCTAssertEqual(asked.count, 3)
+        clock.advance(days: 1)
+        await transport.setAnswer { _ in throw StoreError.http(500) }
+        do { _ = try await subject.components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        asked = await transport.urls()
+        XCTAssertEqual(asked.count, 4, "The next day's first try is not held back by yesterday's pause")
+        failures = await reported.failures
+        XCTAssertEqual(failures.last, HoldingsFailure(issuer: .yuanta, kind: .http, code: 500))
+    }
+
+    /// The saved fund id is dropped once for a failure, not on every tap during the pause.
+    func testLookupIsDroppedOncePerPause() async throws {
+        let transport = FakeHoldingsTransport { call in
+            if call.url.contains("GetETFList") { return Data(#"{"result":[{"fundCode":"CN","stockCode":"00878"}],"success":true}"#.utf8) }
+            return Data("<html>維護中</html>".utf8)
+        }
+        let clock = saturday()
+        let subject = client(transport, clock)
+        for _ in 0..<3 {
+            do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        }
+        var lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 1)
+        var all = await transport.urls()
+        XCTAssertEqual(all.count, 2, "The list and the date, once; the two later taps asked nothing")
+        clock.advance(days: 31.0 / 1440)
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 2, "After the pause the fund code is looked up afresh")
+        all = await transport.urls()
+        XCTAssertEqual(all.count, 4)
+        let failures = await reported.failures
+        XCTAssertEqual(failures, [HoldingsFailure(issuer: .cathay, kind: .parse), HoldingsFailure(issuer: .cathay, kind: .parse)])
+    }
+
+    /// A request that was called off is nobody's failure: no report, no pause, and the saved fund id stays.
+    func testCancelledRequestIsNotAFailure() async throws {
+        let transport = FakeHoldingsTransport { call in
+            if call.url.contains("GetETFList") { return Data(#"{"result":[{"fundCode":"CN","stockCode":"00878"}],"success":true}"#.utf8) }
+            throw URLError(.cancelled)
+        }
+        let subject = client(transport, saturday(), key: true)
+        do {
+            _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息")
+            XCTFail("Expected an error")
+        } catch {
+            XCTAssertEqual((error as? URLError)?.code, .cancelled, "Not turned into 暫時取不到, and 富果 is not asked instead")
+        }
+        var failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty)
+        // Asked again at once: the request goes out (no pause), and the fund code is still the saved one.
+        await transport.setAnswer { call in
+            if call.url.contains("GetETFAssets") { return Data(#"{"result":{"preDate":"2026/11/13"},"success":true}"#.utf8) }
+            return Data(#"{"result":[{"stockCode":"2891","stockName":"中信金","weights":"11.26"}],"success":true}"#.utf8)
+        }
+        let value = try await subject.components(symbol: "00878", fundName: "國泰永續高股息")
+        XCTAssertEqual(value.source, "國泰投信")
+        let lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 1)
+        failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty)
+    }
+
+    /// A caller that gives up takes the download with it.
+    func testCallerCancellationReachesTheDownload() async throws {
+        let transport = FakeHoldingsTransport { _ in HoldingsClientTests.yuanta("0050") }
+        // Two seconds between requests, and the first slot is taken: the next request waits, and is cancelled there.
+        let reported = self.reported
+        let subject = HoldingsClient(transport: transport, root: directory.appendingPathComponent("kept", isDirectory: true), defaults: defaults,
+                                     minInterval: 2, clock: { Date() }, fugleKeySaved: { false },
+                                     fugle: { _ in throw AppDataError("unused") }, report: { error, issuer in await reported.add(issuer, error) })
+        _ = try await subject.components(symbol: "0050", fundName: "元大台灣50")
+        let waiting = Task { try await subject.components(symbol: "0056", fundName: "元大高股息") }
+        try await Task.sleep(nanoseconds: 200_000_000)
+        waiting.cancel()
+        do {
+            _ = try await waiting.value
+            XCTFail("Expected the cancellation")
+        } catch {
+            XCTAssertTrue(error is CancellationError)
+        }
+        let asked = await transport.urls()
+        XCTAssertEqual(asked.count, 1, "0056 was never asked for")
+        let failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty)
+    }
+
+    /// What goes to the reporter names the company and the kind of failure: no ETF code, no address, no answer text.
+    func testReportCarriesNoCode() async throws {
+        // 元大 answers with another fund: the parser's own message names it (「回應為 0056」).
+        let transport = FakeHoldingsTransport { _ in HoldingsClientTests.yuanta("0056") }
+        let clock = saturday()
+        do { _ = try await client(transport, clock).components(symbol: "0050", fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        // A request error whose user info holds the address (ticker=00631L).
+        await transport.setAnswer { call in
+            throw URLError(.badServerResponse, userInfo: [NSURLErrorFailingURLStringErrorKey: call.url, NSLocalizedDescriptionKey: "failed: " + call.url])
+        }
+        do { _ = try await client(transport, clock).components(symbol: "00631L", fundName: "元大台灣50正2"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let failures = await reported.failures
+        XCTAssertEqual(failures, [HoldingsFailure(issuer: .yuanta, kind: .parse),
+                                  HoldingsFailure(issuer: .yuanta, kind: .network, code: URLError.Code.badServerResponse.rawValue)])
+        let others = await reported.others
+        XCTAssertEqual(others, 0, "Only HoldingsFailure is ever reported")
+        for failure in failures {
+            let error = failure as NSError
+            let text = [failure.localizedDescription, String(describing: failure), String(reflecting: failure),
+                        error.domain, error.description, String(describing: error.userInfo)].joined(separator: " | ")
+            for code in ["0050", "0056", "00631L", "ticker", "yuantaetfs"] {
+                XCTAssertFalse(text.contains(code), "\(code) in \(text)")
+            }
+            XCTAssertEqual(error.domain, "ETFToGo.Holdings")
+        }
+        // No network at all is the phone's trouble: not reported (as for every other load), but the pause still starts.
+        await transport.setAnswer { _ in throw URLError(.notConnectedToInternet) }
+        do { _ = try await client(transport, clock).components(symbol: "0056", fundName: "元大高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let after = await reported.failures
+        XCTAssertEqual(after.count, 2)
+    }
+
+    // MARK: Fix round 1 — the history has its own file
+
+    private func bigHistory(funds: Int) -> [String: [ComponentSnapshot]] {
+        let stocks = (0..<1000).map { FundComponent(symbol: String(format: "S%04d", $0), name: String(format: "成分%04d", $0), weight: 0.1) }
+        var history: [String: [ComponentSnapshot]] = [:]
+        for fund in 0..<funds {
+            let code = String(format: "009%02d", fund)
+            history[code] = (1...12).reversed().map { ComponentSnapshot(symbol: code, date: String(format: "2026-09-%02d", $0), components: stocks, source: "test") }
+        }
+        return history
+    }
+
+    @MainActor func testLargeHistoryDoesNotBlockSaves() throws {
+        let url = directory.appendingPathComponent("p.json")
+        let store = PortfolioStore(url: url)
+        var next = store.data
+        next.componentHistory = bigHistory(funds: 10)
+        XCTAssertGreaterThan(try JSONEncoder().encode(next).count, 5_000_000, "More than the records may weigh")
+        try store.commit(next)
+        // Everything else still saves.
+        try store.save(Portfolio.sample.holdings[0])
+        try store.saveComponents(snapshot("0050", "2026-10-01"))
+        let records = try Data(contentsOf: url)
+        XCTAssertLessThan(records.count, 100_000, "The records file does not carry the history")
+        XCTAssertFalse(String(decoding: records, as: UTF8.self).contains("componentHistory"))
+        XCTAssertGreaterThan(try Data(contentsOf: url.appendingPathExtension("holdings")).count, 5_000_000)
+        // It is all there when the app opens again.
+        let reopened = PortfolioStore(url: url)
+        XCTAssertNil(reopened.message)
+        XCTAssertEqual(reopened.data.holdings.count, 1)
+        XCTAssertEqual(reopened.data.componentHistory?.count, 11)
+        XCTAssertEqual(reopened.componentHistory(for: "00907").map(\.date), (1...12).reversed().map { String(format: "2026-09-%02d", $0) })
+        XCTAssertEqual(reopened.componentHistory(for: "00907").first?.components.count, 1000)
+        XCTAssertEqual(reopened.componentHistory(for: "0050").map(\.date), ["2026-10-01"])
+        try reopened.save(Portfolio.sample.holdings[1])
+        // A backup must stay importable (5 MB): it keeps the newest days of each ETF that fit.
+        let backup = try Data(contentsOf: reopened.export())
+        XCTAssertLessThanOrEqual(backup.count, 5_000_000)
+        let other = PortfolioStore(url: directory.appendingPathComponent("other.json"))
+        try other.importBackup(backup)
+        XCTAssertEqual(other.data.holdings.count, 2)
+        XCTAssertEqual(other.componentHistory(for: "00907").map(\.date), (7...12).reversed().map { String(format: "2026-09-%02d", $0) })
+        XCTAssertEqual(other.componentHistory(for: "0050").map(\.date), ["2026-10-01"])
+    }
+
+    /// A records file from the build that kept the history inside it: read as it is, moved to its own file by the next save.
+    @MainActor func testHistoryMovesOutOfAnOldRecordsFile() throws {
+        let url = directory.appendingPathComponent("old.json")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        var old = Portfolio()
+        old.remember(snapshot("0050", "2026-09-01"))
+        old.remember(snapshot("0050", "2026-09-02"))
+        old.components = ["0050": snapshot("0050", "2026-09-02")]
+        try JSONEncoder().encode(old).write(to: url)
+        let side = url.appendingPathExtension("holdings")
+        let store = PortfolioStore(url: url)
+        XCTAssertNil(store.message)
+        XCTAssertEqual(store.componentHistory(for: "0050").map(\.date), ["2026-09-02", "2026-09-01"])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: side.path), "Opening the app writes nothing")
+        try store.save(Portfolio.sample.holdings[0])
+        XCTAssertFalse(String(decoding: try Data(contentsOf: url), as: UTF8.self).contains("componentHistory"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: side.path))
+        let reopened = PortfolioStore(url: url)
+        XCTAssertEqual(reopened.componentHistory(for: "0050").map(\.date), ["2026-09-02", "2026-09-01"])
+        XCTAssertEqual(reopened.data.components?["0050"]?.date, "2026-09-02")
+        try reopened.saveComponents(snapshot("0050", "2026-09-03"))
+        XCTAssertEqual(PortfolioStore(url: url).componentHistory(for: "0050").map(\.date), ["2026-09-03", "2026-09-02", "2026-09-01"])
+        // A history file that cannot be read costs the history only, never the records.
+        try Data("not json".utf8).write(to: side)
+        let damaged = PortfolioStore(url: url)
+        XCTAssertNil(damaged.message)
+        XCTAssertEqual(damaged.data.holdings.count, 1)
+        XCTAssertTrue(damaged.componentHistory(for: "0050").isEmpty)
     }
 }

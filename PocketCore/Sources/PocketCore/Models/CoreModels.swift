@@ -178,6 +178,11 @@ struct Portfolio: Codable {
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
     /// Days of holdings kept for one ETF.
     static let historyLimit = 12
+    /// One ETF's history as it may be saved: its own snapshots, one per date, no more than `historyLimit`, each valid.
+    static func validate(history list: [ComponentSnapshot], of code: String) throws {
+        guard list.count <= historyLimit, Set(list.map(\.date)).count == list.count else { throw StoreError.unsupportedBackup }
+        for snapshot in list { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
+    }
     /// Files `snapshot` under its ETF: a snapshot of the same date is replaced, the newest `historyLimit` dates stay.
     mutating func remember(_ snapshot: ComponentSnapshot) {
         var list = (componentHistory?[snapshot.symbol] ?? []).filter { $0.date != snapshot.date }
@@ -223,10 +228,7 @@ struct Portfolio: Codable {
         try value.legacyPlan?.validate()
         for d in (value.legacyDividends ?? [:]).values { try d.validate() }
         for (code, snapshot) in value.components ?? [:] { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
-        for (code, list) in value.componentHistory ?? [:] {
-            guard list.count <= historyLimit, Set(list.map(\.date)).count == list.count else { throw StoreError.unsupportedBackup }
-            for snapshot in list { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
-        }
+        for (code, list) in value.componentHistory ?? [:] { try validate(history: list, of: code) }
         for (code, history) in value.histories ?? [:] { guard code == history.symbol else { throw StoreError.unsupportedBackup }; try history.validate() }
         for (code, fee) in value.fees ?? [:] { guard code == fee.symbol else { throw StoreError.unsupportedBackup }; try fee.validate() }
         guard (value.comparison?.count ?? 0) <= 3, (value.comparison ?? []).allSatisfy(DataChecks.code),

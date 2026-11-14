@@ -12,6 +12,38 @@ struct PublicHoldingsTransport: HoldingsTransport {
     func post(_ url: URL, json: Data?) async throws -> Data { try await PublicHTTP.post(url, json: json) }
 }
 
+/// A request that did not get an answer (no connection, an HTTP status other than 200, a refused address).
+private struct RequestFailed: Error { let cause: Error }
+
+/// What is reported when a fund company's page fails: which company and what kind of failure, with the HTTP status
+/// or the URLError code. It holds nothing from the request or the answer, so no ETF code can ride along.
+struct HoldingsFailure: Error, CustomNSError, LocalizedError, Equatable {
+    enum Kind: String { case http, network, request, parse }
+    let issuer: Issuer
+    let kind: Kind
+    /// The HTTP status (`http`) or the URLError code (`network`); 0 otherwise.
+    let code: Int
+
+    init(issuer: Issuer, kind: Kind, code: Int = 0) { self.issuer = issuer; self.kind = kind; self.code = code }
+
+    /// `error` as the client met it: a failed request, or anything else, which is an answer that did not parse.
+    fileprivate init(issuer: Issuer, error: Error) {
+        guard let failed = error as? RequestFailed else { self.init(issuer: issuer, kind: .parse); return }
+        if case .http(let status)? = failed.cause as? StoreError {
+            self.init(issuer: issuer, kind: .http, code: status)
+        } else if let url = failed.cause as? URLError {
+            self.init(issuer: issuer, kind: .network, code: url.code.rawValue)
+        } else {
+            self.init(issuer: issuer, kind: .request)
+        }
+    }
+
+    static var errorDomain: String { "ETFToGo.Holdings" }
+    var errorCode: Int { code }
+    var errorUserInfo: [String: Any] { [:] }
+    var errorDescription: String? { "holdings \(issuer.rawValue) \(kind.rawValue) \(code)" }
+}
+
 /// An ETF's holdings (成分股與權重). The fund company's own public page comes first (元大, 國泰, 富邦, 群益, 復華, 中信,
 /// told apart by the fund's name); 富果 when a key is saved and the company is not one of the six or its page fails.
 /// Requests carry only the ETF code, the company's own id for it and a date. One download per ETF per Taipei day:
@@ -28,6 +60,8 @@ actor HoldingsClient {
     private struct Kept: Codable { var day: String; var snapshot: ComponentSnapshot }
 
     private static let lookupLife: TimeInterval = 30 * 86_400
+    /// After a company's page fails for an ETF, that ETF is not asked for again for this long.
+    static let cooldown: TimeInterval = 30 * 60
 
     private let transport: HoldingsTransport
     private let root: URL
@@ -42,8 +76,8 @@ actor HoldingsClient {
     /// When the next request may start.
     private var nextSlot = Date.distantPast
 
-    /// `report` gets a fund company's failure; the default sends it to the load-failure reporter under the company's
-    /// name alone (never the ETF, never the holdings).
+    /// `report` gets a fund company's failure as a `HoldingsFailure` (the company and the kind of failure; never the
+    /// ETF, the address asked or anything from the answer); the default sends it to the load-failure reporter.
     init(transport: HoldingsTransport = PublicHoldingsTransport(), root: URL? = nil, defaults: UserDefaults = .standard,
          minInterval: TimeInterval = 0.5, clock: @escaping @Sendable () -> Date = { Date() },
          fugleKeySaved: @escaping @Sendable () -> Bool = { !((try? SecureKey.read()) ?? "").isEmpty },
@@ -70,37 +104,61 @@ actor HoldingsClient {
         let today = DataChecks.day(clock())
         if let kept = kept(symbol), kept.day == today { return kept.snapshot }
         if let task = running[symbol] { return try await task.value }
+        // A company's page failed for this ETF in the last half hour: nobody is asked again yet, nothing is reported.
+        if let failed = defaults.object(forKey: Self.failedKey(symbol)) as? Double,
+           (0..<Self.cooldown).contains(clock().timeIntervalSinceReferenceDate - failed) {
+            throw AppDataError(Self.unavailable)
+        }
         let task = Task { try await self.load(symbol: symbol, fundName: fundName, today: today) }
         running[symbol] = task
         defer { running[symbol] = nil }
-        return try await task.value
+        // The caller that started the download can cancel it; the requests stop with it.
+        return try await withTaskCancellationHandler { try await task.value } onCancel: { task.cancel() }
     }
 
     private func load(symbol: String, fundName: String, today: String) async throws -> ComponentSnapshot {
-        let issuer = IssuerDirectory.issuer(forFundName: fundName)
-        let hasKey = fugleKeySaved()
         let snapshot: ComponentSnapshot
-        if let issuer {
-            do {
-                snapshot = try await chain(issuer, symbol)
-            } catch {
-                if error is CancellationError { throw error }
-                // The saved id may have gone stale; the next try asks the company for it again.
-                defaults.removeObject(forKey: Self.lookupKey(issuer, symbol))
-                await report(error, issuer)
-                guard hasKey, let rescued = try? await fugle(symbol) else { throw AppDataError(Self.unavailable) }
-                snapshot = rescued
-            }
-        } else if hasKey {
+        if let issuer = IssuerDirectory.issuer(forFundName: fundName) {
+            snapshot = try await fromCompany(issuer, symbol)
+        } else if fugleKeySaved() {
             // 富果's own messages (金鑰無效, 方案沒有權限…) say more than 暫時取不到, so they pass through.
             snapshot = try await fugle(symbol)
         } else {
             throw AppDataError(Self.unsupported)
         }
         guard snapshot.symbol == symbol else { throw AppDataError(Self.unavailable) }
+        defaults.removeObject(forKey: Self.failedKey(symbol))
         keep(Kept(day: today, snapshot: snapshot), symbol: symbol)
         return snapshot
     }
+
+    /// The company's own page, then 富果 when it fails and a key is saved. A failure is reported once (the company and
+    /// the kind of failure only) and starts the half-hour pause; a cancelled download does neither.
+    private func fromCompany(_ issuer: Issuer, _ symbol: String) async throws -> ComponentSnapshot {
+        do {
+            return try await chain(issuer, symbol)
+        } catch {
+            if Self.isCancellation(error) { throw error }
+            if Task.isCancelled { throw CancellationError() }
+            // The saved id may have gone stale; the next try (after the pause) asks the company for it again.
+            defaults.removeObject(forKey: Self.lookupKey(issuer, symbol))
+            // No network is the phone's trouble, not the company's: as everywhere else, it is not reported.
+            if CrashReportGate.isReportable((error as? RequestFailed)?.cause ?? error) {
+                await report(HoldingsFailure(issuer: issuer, error: error), issuer)
+            }
+            if fugleKeySaved(), let rescued = try? await fugle(symbol) { return rescued }
+            if Task.isCancelled { throw CancellationError() }
+            defaults.set(clock().timeIntervalSinceReferenceDate, forKey: Self.failedKey(symbol))
+            throw AppDataError(Self.unavailable)
+        }
+    }
+
+    /// The download was called off (the task, or the request under it): not a failure of anybody's page.
+    private static func isCancellation(_ error: Error) -> Bool {
+        error is CancellationError || (error as? URLError)?.code == .cancelled
+    }
+
+    private static func failedKey(_ symbol: String) -> String { "holdings.failed.\(symbol)" }
 
     // MARK: The six companies
 
@@ -197,15 +255,25 @@ actor HoldingsClient {
 
     private func get(_ address: String) async throws -> Data {
         guard let url = URL(string: address) else { throw AppDataError(Self.unavailable) }
-        try await pace()
-        return try await transport.get(url)
+        return try await send { try await self.transport.get(url) }
     }
 
     private func post(_ address: String, _ body: [String: Any]?) async throws -> Data {
         guard let url = URL(string: address) else { throw AppDataError(Self.unavailable) }
         let json = try body.map { try JSONSerialization.data(withJSONObject: $0) }
+        return try await send { try await self.transport.post(url, json: json) }
+    }
+
+    /// A request that fails is marked as such (`RequestFailed`), so it is told apart from an answer that does not
+    /// parse; a cancelled one passes through as it is.
+    private func send(_ request: () async throws -> Data) async throws -> Data {
         try await pace()
-        return try await transport.post(url, json: json)
+        do {
+            return try await request()
+        } catch {
+            if Self.isCancellation(error) { throw error }
+            throw RequestFailed(cause: error)
+        }
     }
 
     /// At least `minInterval` between the starts of two requests, whichever company they go to.

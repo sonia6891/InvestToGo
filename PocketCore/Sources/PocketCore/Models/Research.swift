@@ -1,12 +1,12 @@
 import Foundation
 
-struct FundComponent: Codable, Identifiable {
+struct FundComponent: Codable, Identifiable, Equatable {
     var symbol: String
     var name: String?
     var weight: Double
     var id: String { symbol }
 }
-struct ComponentSnapshot: Codable {
+struct ComponentSnapshot: Codable, Equatable {
     var symbol: String
     var date: String
     var components: [FundComponent]

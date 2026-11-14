@@ -45,7 +45,7 @@ import SwiftUI
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
            cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
-        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL) }
+        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL); try? FileManager.default.removeItem(at: componentHistoryURL) }
         if FileManager.default.fileExists(atPath: self.url.path) {
             do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url), limit: 100_000_000) }
             catch { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。"; readFailure = true }
@@ -57,14 +57,24 @@ import SwiftUI
             let valid = cached.filter { $0.key == $0.value.symbol && (try? $0.value.validate()) != nil }
             if !valid.isEmpty { data.histories = (data.histories ?? [:]).merging(valid) { _, cached in cached } }
         }
+        // The holdings history is kept apart from the records in the same way; a records file that still holds it
+        // (written before it had its own file) is moved over by the next save. The file's days win over the records'.
+        componentHistorySaved = (data.componentHistory ?? [:]).isEmpty
+        if let bytes = try? Data(contentsOf: componentHistoryURL), let cached = try? JSONDecoder().decode([String: [ComponentSnapshot]].self, from: bytes) {
+            let valid = cached.filter { (try? Portfolio.validate(history: $0.value, of: $0.key)) != nil }
+            if !valid.isEmpty { data.componentHistory = (data.componentHistory ?? [:]).merging(valid) { _, cached in cached } }
+        }
     }
     private var readFailure = false
     /// Price histories are large and can be fetched again, so they are saved apart from the records: a save of the
     /// records stays small and fast, and many histories never push the records past the backup size limit.
     private var historiesURL: URL { url.appendingPathExtension("histories") }
+    /// Up to twelve days of holdings for every ETF looked at: with many broad ETFs that is megabytes, so it has its own
+    /// file too and never counts against the records' 5 MB. Unlike price histories it goes into backups (`export`).
+    private var componentHistoryURL: URL { url.appendingPathExtension("holdings") }
     func commit(_ next: Portfolio) throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
-        var records = next; records.histories = nil
+        var records = next; records.histories = nil; records.componentHistory = nil
         let encoded = try JSONEncoder().encode(records)
         guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
         _ = try Portfolio.decodeBackup(encoded)
@@ -72,6 +82,10 @@ import SwiftUI
         if next.histories != data.histories || !historiesSaved {
             try JSONEncoder().encode(next.histories ?? [:]).write(to: historiesURL, options: [.atomic, .completeFileProtection])
             historiesSaved = true
+        }
+        if next.componentHistory != data.componentHistory || !componentHistorySaved {
+            try JSONEncoder().encode(next.componentHistory ?? [:]).write(to: componentHistoryURL, options: [.atomic, .completeFileProtection])
+            componentHistorySaved = true
         }
         try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
@@ -86,6 +100,8 @@ import SwiftUI
     }
     /// False while the records file still holds histories from an earlier version, so the next save moves them out.
     private var historiesSaved = false
+    /// The same for the holdings history.
+    private var componentHistorySaved = false
     /// With `logBuy` (新增持有's 儲存), a new holding with a purchase date is the user's buy: it records the DCA month
     /// and its capped experience in the same write (`GameState.logBuy`). Edits, imports and seeding earn nothing.
     func save(_ holding: Holding, logBuy: Bool = false, now: Date = Date()) throws {
@@ -229,7 +245,15 @@ import SwiftUI
         // Preserve recoverable bytes when decoding failed; never export an empty replacement.
         // Price histories are left out: they can be fetched again and would make the backup too large to import.
         var records = data; records.histories = nil
-        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
+        var bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
+        // The holdings history is part of a backup, but a backup over 5 MB cannot be imported: when it is the
+        // history that makes it too large, fewer days of each ETF are kept (the newest), down to none.
+        if !readFailure {
+            for days in [6, 3, 1, 0] where bytes.count > 5_000_000 {
+                records.componentHistory = data.componentHistory?.mapValues { Array($0.sorted { $0.date > $1.date }.prefix(days)) }.filter { !$0.value.isEmpty }
+                bytes = try JSONEncoder().encode(records)
+            }
+        }
         try bytes.write(to: file, options: .atomic)
         return file
     }
