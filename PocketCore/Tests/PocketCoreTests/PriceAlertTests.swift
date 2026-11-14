@@ -3,21 +3,21 @@ import XCTest
 
 /// `AlertEngine` and `Portfolio.alerts`: 到價提醒.
 final class PriceAlertTests: XCTestCase {
-    private func alert(_ symbol: String = "0050", above: Bool = true, _ price: Double, enabled: Bool = true) -> PriceAlert {
+    private func alert(_ price: Double, _ symbol: String = "0050", above: Bool = true, enabled: Bool = true) -> PriceAlert {
         PriceAlert(symbol: symbol, above: above, price: price, enabled: enabled)
     }
 
     // MARK: The brief's five
 
     func testAboveFiresAtOrOver() {
-        let watch = alert(above: true, 100)
+        let watch = alert(100, above: true)
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 100], isMember: true), [watch.id], "At the target counts")
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 100.5], isMember: true), [watch.id])
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 99.9], isMember: true), [])
     }
 
     func testBelowFires() {
-        let watch = alert(above: false, 50)
+        let watch = alert(50, above: false)
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 49], isMember: true), [watch.id])
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 50], isMember: true), [watch.id], "At the target counts")
         XCTAssertEqual(AlertEngine.due([watch], prices: ["0050": 50.01], isMember: true), [])
@@ -41,14 +41,14 @@ final class PriceAlertTests: XCTestCase {
     }
 
     func testNonMemberNeverFires() {
-        let list = [alert(above: true, 100), alert("00878", above: false, 20)]
+        let list = [alert(100, above: true), alert(20, "00878", above: false)]
         let prices = ["0050": 150.0, "00878": 18.0]
         XCTAssertEqual(AlertEngine.due(list, prices: prices, isMember: false), [])
         XCTAssertEqual(AlertEngine.due(list, prices: prices, isMember: true), list.map(\.id))
     }
 
     func testMissingPriceSkipped() {
-        let known = alert(above: true, 100), unknown = alert("00878", above: false, 20)
+        let known = alert(100, above: true), unknown = alert(20, "00878", above: false)
         XCTAssertEqual(AlertEngine.due([unknown, known], prices: ["0050": 100], isMember: true), [known.id])
         XCTAssertEqual(AlertEngine.due([unknown], prices: [:], isMember: true), [])
         // A price that is not a price is no price.
@@ -98,16 +98,16 @@ final class PriceAlertTests: XCTestCase {
     }
 
     func testMessageSaysTheCodeThePriceAndTheTarget() {
-        let up = AlertEngine.message(alert(above: true, 200), price: 205.5)
+        let up = AlertEngine.message(alert(200, above: true), price: 205.5)
         XCTAssertEqual(up, "0050 已到 \(decimal(205.5))，你設定的是高於 \(decimal(200))。")
         XCTAssertTrue(up.hasPrefix("0050 已到 "))
-        let down = AlertEngine.message(alert("00878", above: false, 18.5), price: 18.2)
+        let down = AlertEngine.message(alert(18.5, "00878", above: false), price: 18.2)
         XCTAssertEqual(down, "00878 已到 \(decimal(18.2))，你設定的是低於 \(decimal(18.5))。")
         for word in ["買", "賣", "建議", "進場", "出場", "機會"] {
             XCTAssertFalse(up.contains(word) || down.contains(word), "No advice: \(word)")
         }
-        XCTAssertEqual(alert(above: true, 200).condition, "高於 \(decimal(200))")
-        XCTAssertEqual(alert(above: false, 18.5).condition, "低於 \(decimal(18.5))")
+        XCTAssertEqual(alert(200, above: true).condition, "高於 \(decimal(200))")
+        XCTAssertEqual(alert(18.5, above: false).condition, "低於 \(decimal(18.5))")
     }
 
     // MARK: The records file
@@ -136,8 +136,8 @@ final class PriceAlertTests: XCTestCase {
             data.alerts = alerts
             return try JSONEncoder().encode(data)
         }
-        XCTAssertNoThrow(try Portfolio.decodeBackup(encoded([alert(200), alert("00878", above: false, 20)])))
-        XCTAssertThrowsError(try Portfolio.decodeBackup(encoded([alert("abc", 200)])), "Not a code")
+        XCTAssertNoThrow(try Portfolio.decodeBackup(encoded([alert(200), alert(20, "00878", above: false)])))
+        XCTAssertThrowsError(try Portfolio.decodeBackup(encoded([alert(200, "abc")])), "Not a code")
         XCTAssertThrowsError(try Portfolio.decodeBackup(encoded([alert(0)])), "No price")
         XCTAssertThrowsError(try Portfolio.decodeBackup(encoded([alert(2_000_000)])), "Not a price")
         let twin = alert(200)
@@ -150,7 +150,7 @@ final class PriceAlertTests: XCTestCase {
         let mine = try data.addAlert(symbol: "0050", above: true, price: 200)
         var theirs = mine
         theirs.enabled = false
-        let extra = (1...25).map { alert("0056", above: false, Double($0)) }
+        let extra = (1...25).map { alert(Double($0), "0056", above: false) }
         data.mergeAlerts([theirs] + extra)
         XCTAssertEqual(data.alerts?.count, 20)
         XCTAssertEqual(data.alerts?.first, theirs, "The backup's copy of a known alert replaces it")
