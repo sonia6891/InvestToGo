@@ -121,29 +121,22 @@ final class PriceAlertMonitorTests: XCTestCase {
     // MARK: When the checks run
 
     /// Coming back to the app again and again asks for the watched prices once in five minutes, not every time.
-    @MainActor func testChecksOnReturnAreFiveMinutesApart() async {
-        PriceAlertMonitor.lastForegroundCheck = nil
-        let log = AlertLog()
+    func testChecksOnReturnAreFiveMinutesApart() {
+        XCTAssertEqual(PriceAlertMonitor.foregroundGap, 300)
+        var gate = CheckGate(gap: PriceAlertMonitor.foregroundGap)
         let start = Date(timeIntervalSince1970: 1_800_000_000)
-        func comeBack(after seconds: TimeInterval) async {
-            await PriceAlertMonitor.checkOnReturn(now: start.addingTimeInterval(seconds)) { log.asked.append([]) }
-        }
-        await comeBack(after: 0)
-        XCTAssertEqual(log.asked.count, 1, "The first return checks")
-        await comeBack(after: 10)
-        await comeBack(after: 299)
-        XCTAssertEqual(log.asked.count, 1, "Within five minutes of the last check nothing is done")
-        await comeBack(after: 300)
-        XCTAssertEqual(log.asked.count, 2)
+        func comeBack(after seconds: TimeInterval) -> Bool { gate.open(at: start.addingTimeInterval(seconds)) }
+        XCTAssertTrue(comeBack(after: 0), "The first return checks")
+        XCTAssertFalse(comeBack(after: 10))
+        XCTAssertFalse(comeBack(after: 299), "Within five minutes of the last check nothing is done")
+        XCTAssertTrue(comeBack(after: 300))
         // The gap is counted from the last check that ran, not from a return that was skipped.
-        await comeBack(after: 599)
-        XCTAssertEqual(log.asked.count, 2)
-        await comeBack(after: 600)
-        XCTAssertEqual(log.asked.count, 3)
+        XCTAssertFalse(comeBack(after: 599))
+        XCTAssertTrue(comeBack(after: 600))
+        XCTAssertEqual(gate.last, start.addingTimeInterval(600))
         // A clock that was set back does not stop the checks.
-        await comeBack(after: -3600)
-        XCTAssertEqual(log.asked.count, 4)
-        PriceAlertMonitor.lastForegroundCheck = nil
+        XCTAssertTrue(comeBack(after: -3600))
+        XCTAssertFalse(comeBack(after: -3500))
     }
 
     /// The background task is reported as finished by its run or by its expiration, whichever is first, never both.

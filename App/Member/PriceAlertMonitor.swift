@@ -58,6 +58,22 @@ final class OnceFlag: @unchecked Sendable {
     }
 }
 
+/// Lets a check through at most once in `gap`.
+struct CheckGate {
+    let gap: TimeInterval
+    /// When the last check that was let through began; nil until the first one.
+    private(set) var last: Date?
+    init(gap: TimeInterval) { self.gap = gap }
+
+    /// Whether a check may begin at `now`; when it may, `now` is remembered as the last one.
+    mutating func open(at now: Date) -> Bool {
+        // A clock that was set back does not hold the checks up until it catches up again.
+        if let last, now >= last, now.timeIntervalSince(last) < gap { return false }
+        last = now
+        return true
+    }
+}
+
 /// 到價提醒's checks (spec 5.7, 做法 A): when the app comes to the front, and when iOS runs the background refresh task.
 /// Nothing leaves the phone but the codes whose prices are asked for, as for any quote refresh.
 enum PriceAlertMonitor {
@@ -69,8 +85,7 @@ enum PriceAlertMonitor {
     /// The least time between two checks made because the app came to the front: someone going in and out of the app
     /// does not have every watched code asked for again each time.
     static let foregroundGap: TimeInterval = 300
-    /// When the last check on coming to the front began; nil until the first one.
-    @MainActor static var lastForegroundCheck: Date?
+    @MainActor private static var foregroundGate = CheckGate(gap: foregroundGap)
 
     @MainActor private static weak var store: PortfolioStore?
     /// The background task has its launch handler: only then may a request be submitted (iOS stops the app otherwise).
@@ -120,11 +135,9 @@ enum PriceAlertMonitor {
 
     /// The check made each time the app comes to the front. One that would begin within `foregroundGap` of the last
     /// does nothing. Background runs and the check after adding an alert go straight to `check()`.
-    @MainActor static func checkOnReturn(now: Date = Date(), run: () async -> Void = { await PriceAlertMonitor.check() }) async {
-        // A clock that was set back does not hold the checks up until it catches up again.
-        if let last = lastForegroundCheck, now >= last, now.timeIntervalSince(last) < foregroundGap { return }
-        lastForegroundCheck = now
-        await run()
+    @MainActor static func checkOnReturn(now: Date = Date()) async {
+        guard foregroundGate.open(at: now) else { return }
+        await check()
     }
 
     /// The app's own store, checked with the real membership, quotes and notifications.
