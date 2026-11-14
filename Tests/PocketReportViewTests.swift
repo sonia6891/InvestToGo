@@ -102,11 +102,18 @@ final class PocketReportViewTests: XCTestCase {
             return true
         }
         guard drawn else { return nil }
-        return UInt32(bytes[0]) << 16 | UInt32(bytes[1]) << 8 | UInt32(bytes[2])
+        let red = UInt32(bytes[0]), green = UInt32(bytes[1]), blue = UInt32(bytes[2])
+        return (red << 16) | (green << 8) | blue
     }
 
     /// Within 8 on every channel.
     private func close(_ a: UInt32, _ b: UInt32) -> Bool {
-        [16, 8, 0].allSatisfy { shift in abs(Int((a >> UInt32(shift)) & 0xFF) - Int((b >> UInt32(shift)) & 0xFF)) <= 8 }
+        let shifts: [UInt32] = [16, 8, 0]
+        for shift in shifts {
+            let one = Int((a >> shift) & 0xFF)
+            let other = Int((b >> shift) & 0xFF)
+            if abs(one - other) > 8 { return false }
+        }
+        return true
     }
 }
