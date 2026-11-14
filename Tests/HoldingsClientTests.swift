@@ -621,8 +621,11 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertEqual(all.count, 3, "No pause: the date is asked for again")
         let lists = await transport.urls("GetETFList")
         XCTAssertEqual(lists.count, 1, "The saved fund code was kept")
+        // What is handed to the reporter is as before: "not connected" and a timeout never are; "data not allowed" is
+        // (once per call here), and the reporter itself drops it while the app is 離線中.
         let failures = await reported.failures
-        XCTAssertTrue(failures.isEmpty)
+        let dataOff = HoldingsFailure(issuer: .yuanta, kind: .network, code: URLError.Code.dataNotAllowed.rawValue)
+        XCTAssertEqual(failures, [dataOff, dataOff])
     }
 
     // MARK: Fix round 1 — the history has its own file
