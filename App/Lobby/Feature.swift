@@ -48,6 +48,7 @@ extension AppRoute {
         case "reminders" where testing: return [.feature(.tools), .reminders]
         case "goalPlanner" where testing: return [.feature(.tools), .goalPlanner]
         case "backtest" where testing: return [.feature(.tools), .backtest]
+        case "activeTracking" where testing: return [.feature(.tools), .activeTracking]
         case "exposure" where testing: return [.feature(.tools), .exposure]
         default: return nil
         }

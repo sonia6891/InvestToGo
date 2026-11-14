@@ -7,6 +7,7 @@ import Foundation
 /// - `--demo-xp <n>`: experience n (wins over `--demo-level`).
 /// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
 /// - `--demo-pocket`: four sample holdings, one of them at a loss, and a year of received dividends (`seedPocket`).
+/// - `--demo-active`: 00982A in the favourites with two days of holdings (`seedActive`), for 主動式追蹤.
 /// - `--quiet-toasts`: no first-time notices (「收進圖鑑 +30 經驗」), so screenshots are the same every run.
 ///
 /// Read elsewhere: `--skin <id>` (SkinStore), `--open <feature>` (the root view), `--skip-onboarding`,
@@ -64,6 +65,27 @@ enum DemoArguments {
     @MainActor static func seedHeld(_ store: PortfolioStore, args: [String]) {
         guard args.contains("--ui-testing"), args.contains("--demo-held"), !store.data.holdings.contains(where: { $0.symbol == "0050" }) else { return }
         try? store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
+    }
+
+    /// Two days of made-up holdings for 00982A (the stocks are not real ones): between them one is added, one removed
+    /// and two weights move.
+    static let activeSample: [ComponentSnapshot] = [
+        ComponentSnapshot(symbol: "00982A", date: "2026-11-11", components: [
+            FundComponent(symbol: "1001", name: "範例股票 A", weight: 10), FundComponent(symbol: "1002", name: "範例股票 B", weight: 5),
+            FundComponent(symbol: "1003", name: "範例股票 C", weight: 4.5), FundComponent(symbol: "1004", name: "範例股票 D", weight: 3),
+        ], source: "示意資料"),
+        ComponentSnapshot(symbol: "00982A", date: "2026-11-13", components: [
+            FundComponent(symbol: "1001", name: "範例股票 A", weight: 12), FundComponent(symbol: "1002", name: "範例股票 B", weight: 5),
+            FundComponent(symbol: "1003", name: "範例股票 C", weight: 3.5), FundComponent(symbol: "1005", name: "範例股票 E", weight: 4),
+        ], source: "示意資料"),
+    ]
+
+    /// `--demo-active` with `--ui-testing`: 00982A (an active ETF) in the favourites with `activeSample` as its
+    /// holdings history, so 主動式追蹤 has a change to show without asking anyone.
+    @MainActor static func seedActive(_ store: PortfolioStore, args: [String]) {
+        guard args.contains("--ui-testing"), args.contains("--demo-active"), store.componentHistory(for: "00982A").isEmpty else { return }
+        if !store.data.favorites.contains("00982A") { store.favorite("00982A") }
+        for day in activeSample { try? store.saveComponents(day) }
     }
 
     @MainActor static func seedPocket(_ store: PortfolioStore, args: [String], now: Date, calendar: Calendar = .current) {

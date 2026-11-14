@@ -22,6 +22,7 @@ import SwiftUI
         try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
         DemoArguments.seedPocket(store, args: args, now: Date())
         DemoArguments.seedHeld(store, args: args)
+        DemoArguments.seedActive(store, args: args)
         _store = StateObject(wrappedValue: store)
         // StoreKit is followed from launch (Apple asks for the Transaction.updates listener then), so renewals and Ask
         // to Buy answers that arrive during the splash or onboarding are not missed. Once StoreKit has answered, a skin

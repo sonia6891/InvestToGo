@@ -860,4 +860,33 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(member.textFields["backtest-monthly"].exists, "The form has 每月投入")
         XCTAssertFalse(member.descendants(matching: .any)["member-lock-backtest"].exists)
     }
+    /// 主動式追蹤 is a member feature: a non-member sees the lock; a member sees what changed between the two newest days
+    /// of a favourite active ETF. The holdings are seeded (`--demo-active`): nothing is downloaded here.
+    func testActiveTrackingLockAndMember() {
+        let dates = "11/13 與 11/11 相比"
+        let app = launch(["--demo-active", "--open", "activeTracking"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-activeTracking"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["active-tracking-refresh"].exists, "The list is not there for a non-member")
+        app.terminate()
+        let member = launch(["--demo-member", "--demo-active", "--open", "activeTracking"])
+        XCTAssertTrue(member.buttons["active-tracking-refresh"].waitForExistence(timeout: 10), "A member sees the list and 更新")
+        XCTAssertTrue(member.staticTexts[dates].exists, "The two days compared are said plainly")
+        XCTAssertTrue(member.staticTexts["資料來自各投信官網公開的持股，更新時間依投信而定。"].exists)
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-activeTracking"].exists)
+        sleep(1); capture(member, "active-tracking-member")
+        member.terminate()
+        // The fund's own 持股 tab: the holdings are free, 持股變化 is the member's.
+        let detail = launch(["--demo-active", "--quiet-toasts", "--open", "detail", "--symbol", "00982A"])
+        XCTAssertTrue(detail.buttons["持股"].waitForExistence(timeout: 10))
+        detail.buttons["持股"].tap()
+        XCTAssertTrue(detail.buttons["holding-changes-lock"].waitForExistence(timeout: 5), "A non-member sees one line that opens 會員")
+        XCTAssertTrue(detail.buttons["更新成分股"].exists, "The holdings themselves stay free")
+        XCTAssertFalse(detail.staticTexts[dates].exists, "The change is not shown to a non-member")
+        detail.terminate()
+        let memberDetail = launch(["--demo-member", "--demo-active", "--quiet-toasts", "--open", "detail", "--symbol", "00982A"])
+        XCTAssertTrue(memberDetail.buttons["持股"].waitForExistence(timeout: 10))
+        memberDetail.buttons["持股"].tap()
+        XCTAssertTrue(memberDetail.staticTexts[dates].waitForExistence(timeout: 5), "A member sees the change on the fund's own page")
+        XCTAssertFalse(memberDetail.buttons["holding-changes-lock"].exists)
+    }
 }

@@ -25,6 +25,8 @@ struct ComponentsContent: View {
             if let snapshot {
                 SkinPanel { LabeledContent("資料日期", value: snapshot.date); LabeledContent("揭露股票權重", value: "\(decimal(snapshot.totalWeight))%").padding(.vertical, 12) }
                 Text("只包含已揭露股票部位，可能未含現金、債券與期貨；不是基金全部資產。").font(.caption).foregroundStyle(Palette.muted)
+                // Active ETFs only: what changed between the two newest days (口袋會員; the holdings themselves stay free).
+                if store.isETF(symbol), store.dexFund(symbol).isActive { HoldingChangesSection(symbol: symbol) }
                 SkinPanel {
                     LazyVStack(spacing: 0) {
                         ForEach(snapshot.components.sorted { $0.weight > $1.weight }) { c in

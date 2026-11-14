@@ -12,7 +12,7 @@ enum AppRoute: Hashable {
     case fundDetail(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
-    case member, skins, goalPlanner, backtest
+    case member, skins, goalPlanner, backtest, activeTracking
     #if DEBUG
     /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
     case skinKitPreview
@@ -57,6 +57,7 @@ struct RouteView: View {
         case .skins: SkinsView()
         case .goalPlanner: GoalPlannerView()
         case .backtest: BacktestView()
+        case .activeTracking: ActiveTrackingView()
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
         case .comboSettings: ComboSettingsView()
