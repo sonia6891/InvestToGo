@@ -11,7 +11,7 @@ enum MemberFeature: String, CaseIterable, Codable {
         case .activeTracking: return "主動式追蹤"
         case .scenarios: return "多情境試算"
         case .goalPlanner: return "存錢目標反推"
-        case .report: return "口袋月報年報"
+        case .report: return "口袋月報／年報"
         case .backtest: return "回測"
         case .priceAlerts: return "到價提醒"
         }
@@ -21,7 +21,7 @@ enum MemberFeature: String, CaseIterable, Codable {
         switch self {
         case .overlap: return "看你持有的 ETF 重壓了哪些同樣的股票"
         case .activeTracking: return "看主動式 ETF 新增、剔除了哪些持股，權重怎麼變"
-        case .scenarios: return "樂觀、持平、悲觀三種情境一次試算"
+        case .scenarios: return "保守、基準、樂觀與壓力測試，四種情境一次試算"
         case .goalPlanner: return "告訴我們目標，反推每月要存多少"
         case .report: return "每月與每年自動整理成一份報告"
         case .backtest: return "用過去的價格回頭驗證你的買法"

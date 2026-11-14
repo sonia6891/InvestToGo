@@ -154,6 +154,25 @@ final class StoreDemoTests: XCTestCase {
         XCTAssertEqual(PlanPrice.text(product: nil, loading: true, demoStore: false), "…")
     }
 
+    /// The detail line breaks only after a 「・」, into lines of about the same length.
+    @MainActor func testPlanDetailBreaksAtTheDot() {
+        let detail = MemberView.Plan.pocket.detail
+        XCTAssertEqual(detail, "成分重疊・回測・目標反推・到價提醒・月報年報・全部皮膚", "The line itself is unchanged")
+        XCTAssertEqual(MemberView.detailLines(detail, count: 2), ["成分重疊・回測・目標反推・", "到價提醒・月報年報・全部皮膚"])
+        let three = MemberView.detailLines(detail, count: 3)
+        XCTAssertEqual(three, ["成分重疊・回測・", "目標反推・到價提醒・", "月報年報・全部皮膚"])
+        XCTAssertEqual(three.joined(), detail, "Nothing is lost or added")
+        XCTAssertEqual(MemberView.detailLines(MemberView.Plan.free.detail, count: 2), [MemberView.Plan.free.detail], "Nothing to cut at")
+        XCTAssertEqual(MemberView.detailLines("甲・乙", count: 3), ["甲・乙"], "Too few parts for three lines")
+    }
+
+    /// The first screenful ends above the buy button's block, and is never a negative height.
+    @MainActor func testFirstScreenStopsAboveTheBuyButton() {
+        XCTAssertEqual(MemberView.firstScreen(height: 700, footer: 100), 578)
+        XCTAssertEqual(MemberView.firstScreen(height: 60, footer: 100), 0)
+        XCTAssertLessThan(MemberView.stageSizes.lowerBound, MemberView.stageSizes.upperBound)
+    }
+
     // MARK: 回測's form
 
     func testBacktestFormResetNeedsUITesting() throws {

@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// The gate of every 口袋會員 screen: a member sees `content`; anyone else sees `preview` (dimmed, not touchable, hidden
-/// from VoiceOver) under a card that names the feature and opens 會員.
+/// The gate of every 口袋會員 screen: a member sees `content`; anyone else sees a card that names the feature and opens
+/// 會員, and below it the whole `preview` (dimmed, not touchable, hidden from VoiceOver). The card sits above the
+/// preview, not over it: however tall the preview is, none of it is half covered.
 struct MemberLock<Content: View, Preview: View>: View {
     @ObservedObject private var membership = MembershipStore.shared
     @Environment(\.lobbyNavigation) private var navigation
@@ -19,12 +20,12 @@ struct MemberLock<Content: View, Preview: View>: View {
         if membership.has(feature) {
             content
         } else {
-            ZStack(alignment: .top) {
-                preview
+            VStack(spacing: 14) {
+                lockCard
+                VStack(spacing: 14) { preview }
                     .opacity(0.35)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
-                lockCard.padding(16)
             }
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("member-lock-\(feature.rawValue)")

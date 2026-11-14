@@ -153,7 +153,11 @@ struct MemberView: View {
     @ObservedObject private var skins = SkinStore.shared
     @Environment(\.skin) private var skin
     @State private var plan: Plan = .pocket
+    /// The height of the buy button's block at the bottom, which the first screenful stops above.
+    @State private var footer: CGFloat = 0
     private static let demoStore = DemoArguments.has("--demo-store", in: ProcessInfo.processInfo.arguments)
+    /// The crown's stage gives way, down to the smaller size, so that the three plans fit above the buy button.
+    static let stageSizes: ClosedRange<CGFloat> = 110...180
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
     private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
@@ -191,18 +195,41 @@ struct MemberView: View {
     }
 
     var body: some View {
+        // Measured from outside the page: the room between the status bar and the bottom bar.
+        GeometryReader { screen in page(height: screen.size.height) }
+        .toolbar(.hidden, for: .navigationBar)
+        .task { await membership.start() }
+        .alert("口袋會員", isPresented: Binding(get: { membership.message != nil }, set: { if !$0 { membership.message = nil } })) {
+            Button("知道了", role: .cancel) { membership.message = nil }
+        } message: { Text(membership.message ?? "") }
+    }
+
+    /// How tall the page's first block (the crown down to the last plan) is made at least, so that it ends just above
+    /// the buy button and what follows starts below it: the page's own top padding and a little air are taken off.
+    static func firstScreen(height: CGFloat, footer: CGFloat) -> CGFloat { max(0, height - footer - 8 - 14) }
+
+    private func page(height: CGFloat) -> some View {
         Page {
-            Text("MBR×001").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-            SkinStage(size: 180) { SkinImage(.crown).frame(width: 150, height: 150) }
+            // The first screenful: with room to spare the stage is full size and the rest stays empty; on a shorter
+            // screen the stage shrinks first, so 會員＋AI is whole above the button rather than cut by it.
+            VStack(alignment: .leading, spacing: 18) {
+                Text("MBR×001").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                GeometryReader { room in
+                    let size = min(Self.stageSizes.upperBound, max(Self.stageSizes.lowerBound, room.size.height))
+                    SkinStage(size: size) { SkinImage(.crown).frame(width: size * 5 / 6, height: size * 5 / 6) }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .frame(minHeight: Self.stageSizes.lowerBound, maxHeight: Self.stageSizes.upperBound)
                 .accessibilityHidden(true)
+                VStack(spacing: 8) {
+                    Text("口袋會員").skinFont(.title(30)).skinForeground(\.ink)
+                    SkinTag(membership.isMember ? "你是會員・全部皮膚已解鎖" : "看懂・規劃・回顧")
+                }
                 .frame(maxWidth: .infinity)
-            VStack(spacing: 8) {
-                Text("口袋會員").skinFont(.title(30)).skinForeground(\.ink)
-                SkinTag(membership.isMember ? "你是會員・全部皮膚已解鎖" : "解鎖全部皮膚")
+                skinsEntry
+                VStack(spacing: 10) { ForEach(Plan.allCases) { planCard($0) } }
             }
-            .frame(maxWidth: .infinity)
-            skinsEntry
-            VStack(spacing: 10) { ForEach(Plan.allCases) { planCard($0) } }
+            .frame(minHeight: Self.firstScreen(height: height, footer: footer), alignment: .top)
             if membership.failed && !membership.loading {
                 Button { Task { await membership.loadProducts() } } label: { Text("再試一次") }
                     .buttonStyle(SkinButtonStyle(primary: false, seed: 3))
@@ -238,12 +265,8 @@ struct MemberView: View {
             .padding(.top, 10)
             .frame(maxWidth: .infinity)
             .background(skin.color(\.page))
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footer = $0 }
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .task { await membership.start() }
-        .alert("口袋會員", isPresented: Binding(get: { membership.message != nil }, set: { if !$0 { membership.message = nil } })) {
-            Button("知道了", role: .cancel) { membership.message = nil }
-        } message: { Text(membership.message ?? "") }
     }
 
     /// The selected plan is already this Apple ID's.
@@ -289,7 +312,7 @@ struct MemberView: View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(item.title).skinFont(.title(15)).skinForeground(\.sub)
-                Text(item.detail).skinFont(.body(11)).skinForeground(\.sub).fixedSize(horizontal: false, vertical: true)
+                detailText(item).skinFont(.body(11)).skinForeground(\.sub)
             }
             Spacer(minLength: 8)
             SkinTag("即將推出")
@@ -311,7 +334,7 @@ struct MemberView: View {
                 SkinCheck(done: selected)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(item.title).skinFont(.title(15)).foregroundStyle(text)
-                    Text(item.detail).skinFont(.body(11)).foregroundStyle(detail).fixedSize(horizontal: false, vertical: true)
+                    detailText(item).skinFont(.body(11)).foregroundStyle(detail)
                 }
                 Spacer(minLength: 8)
                 price(item).foregroundStyle(detail)
@@ -338,6 +361,44 @@ struct MemberView: View {
             }
         }
         .skinFont(.mono(12)).lineLimit(1)
+    }
+
+    static let detailSeparator = "・"
+
+    /// A plan's detail cut after a 「・」 into `count` lines (two or three) whose longest is as short as can be; the
+    /// detail whole when it has too few parts to cut.
+    static func detailLines(_ detail: String, count: Int) -> [String] {
+        let terms = detail.components(separatedBy: detailSeparator)
+        guard (2...3).contains(count), terms.count >= count else { return [detail] }
+        func line(_ range: Range<Int>) -> String {
+            terms[range].joined(separator: detailSeparator) + (range.upperBound < terms.count ? detailSeparator : "")
+        }
+        var best = [detail], width = Int.max
+        for first in 1..<terms.count {
+            let seconds = count == 2 ? [terms.count] : Array((first + 1)..<terms.count)
+            for second in seconds {
+                let lines = count == 2 ? [line(0..<first), line(first..<second)] : [line(0..<first), line(first..<second), line(second..<terms.count)]
+                let longest = lines.map(\.count).max() ?? 0
+                if longest < width { best = lines; width = longest }
+            }
+        }
+        return best
+    }
+
+    /// The detail on one line when the card is wide enough, else on two or three lines that each end at a 「・」: a
+    /// line never breaks inside a word, so no 「部皮膚」 is left alone on the last one.
+    @ViewBuilder private func detailText(_ item: Plan) -> some View {
+        if item.detail.contains(Self.detailSeparator) {
+            ViewThatFits(in: .horizontal) {
+                Text(item.detail).lineLimit(1)
+                VStack(alignment: .leading, spacing: 1) { ForEach(Self.detailLines(item.detail, count: 2), id: \.self) { Text($0).lineLimit(1) } }
+                VStack(alignment: .leading, spacing: 1) {
+                    ForEach(Self.detailLines(item.detail, count: 3), id: \.self) { Text($0).fixedSize(horizontal: false, vertical: true) }
+                }
+            }
+        } else {
+            Text(item.detail).fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     /// 「月」, 「年」, 「3 個月」…: the billing period as the App Store states it, never assumed.

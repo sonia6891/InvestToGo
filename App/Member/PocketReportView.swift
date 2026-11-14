@@ -193,7 +193,8 @@ struct ReportCardView: View {
                         .accessibilityIdentifier("report-title")
                 }
                 if showDividends {
-                    VStack(alignment: .leading, spacing: 2) {
+                    // The pixel skin's numerals fill their line to the top: the caption stands clear of them.
+                    VStack(alignment: .leading, spacing: skin.style.button == .pixelBlock ? 10 : 2) {
                         Text("領息").skinFont(.mono(11)).skinForeground(\.sub)
                         Text("\(money(card.dividends)) 元").skinFont(.big(40)).skinForeground(\.ink)
                             .lineLimit(1).minimumScaleFactor(0.5)
