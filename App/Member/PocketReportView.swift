@@ -207,18 +207,24 @@ struct ReportCardView: View {
                     row("定期定額", isMonth ? (card.dcaMonths > 0 ? "有做到" : "沒有紀錄") : "\(card.dcaMonths) 個月", id: "report-dca")
                     row("對帳", "\(card.reconciles) 次", id: "report-reconciles")
                     row("新收集的圖鑑卡", "\(card.newDexCards) 張", id: "report-dex")
-                    row("等級", "LV.\(card.level)", id: "report-level")
+                    // The level is today's, on a past month's or year's card too: the card says so.
+                    row(Self.levelLabel, "LV.\(card.level)", id: "report-level")
                     if let xp = card.xpEarned { row("獲得經驗", "+\(xp)", id: "report-xp") }
                 }
                 ForEach(card.notes, id: \.self) { note in
                     Text(note).skinFont(.body(13)).skinForeground(\.sub).fixedSize(horizontal: false, vertical: true)
                 }
-                Text("ETF 袋著走").skinFont(.mono(11)).tracking(1.5).skinForeground(\.dim)
+                Text(Self.brand).skinFont(.mono(11)).tracking(1.5).skinForeground(\.dim)
                     .frame(maxWidth: .infinity, alignment: .trailing)
+                    .accessibilityIdentifier("report-brand")
             }
             .padding(.vertical, 6)
         }
     }
+
+    static let levelLabel = "目前等級"
+    /// The app's name as the App Store and the home screen show it (project.yml's CFBundleDisplayName).
+    static let brand = "投資袋著走"
 
     private func row(_ title: String, _ value: String, id: String) -> some View {
         HStack(alignment: .firstTextBaseline) {

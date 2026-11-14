@@ -78,6 +78,12 @@ enum Achievements {
         Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal, comingSoon: true) { g, _, _ in g.counter(.yearReport) },
         Achievement(id: "dividendMilestone", title: "累計領息里程碑", goal: dividendMilestoneGoal) { _, p, _ in p.dividends.filter { $0.status == .paid }.count }
     ]
+
+    /// The achievements on the wall and in its count. One whose feature is not in the app yet (`comingSoon`) can
+    /// never be reached, so it is left off while `Upcoming.visible` is false.
+    static func shown(upcoming: Bool = Upcoming.visible) -> [Achievement] {
+        upcoming ? all : all.filter { !$0.comingSoon }
+    }
 }
 
 extension GameState {

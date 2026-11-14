@@ -3,26 +3,28 @@ import SwiftUI
 /// The gate of every 口袋會員 screen: a member sees `content`; anyone else sees a card that names the feature and opens
 /// 會員, and below it the whole `preview` (dimmed, not touchable, hidden from VoiceOver). The card sits above the
 /// preview, not over it: however tall the preview is, none of it is half covered.
+/// `content` and `preview` are kept as closures and only the one that is shown is built: a non-member's phone never
+/// works out the member screen (a report from the records, a scenario's projection) just to throw it away.
 struct MemberLock<Content: View, Preview: View>: View {
     @ObservedObject private var membership = MembershipStore.shared
     @Environment(\.lobbyNavigation) private var navigation
     let feature: MemberFeature
-    private let content: Content
-    private let preview: Preview
+    private let content: () -> Content
+    private let preview: () -> Preview
 
-    init(_ feature: MemberFeature, @ViewBuilder content: () -> Content, @ViewBuilder preview: () -> Preview) {
+    init(_ feature: MemberFeature, @ViewBuilder content: @escaping () -> Content, @ViewBuilder preview: @escaping () -> Preview) {
         self.feature = feature
-        self.content = content()
-        self.preview = preview()
+        self.content = content
+        self.preview = preview
     }
 
     var body: some View {
         if membership.has(feature) {
-            content
+            content()
         } else {
             VStack(spacing: 14) {
                 lockCard
-                VStack(spacing: 14) { preview }
+                VStack(spacing: 14) { preview() }
                     .opacity(0.35)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
@@ -43,10 +45,19 @@ struct MemberLock<Content: View, Preview: View>: View {
                 Button { navigation.push(.member) } label: { Text("看看口袋會員") }
                     .buttonStyle(SkinButtonStyle(primary: true, seed: 7))
                     .accessibilityIdentifier("member-lock-open")
+                // What is dimmed below the card is a made-up sample, and says so (all seven features).
+                Text(MemberLockCopy.sample).skinFont(.mono(11)).skinForeground(\.sub)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("member-lock-sample")
             }
             .frame(maxWidth: .infinity)
         }
     }
+}
+
+enum MemberLockCopy {
+    /// Under the lock card's button, about the preview beneath it.
+    static let sample = "示意畫面，非真實資料"
 }
 
 /// The small crown on a member tile or lock card.

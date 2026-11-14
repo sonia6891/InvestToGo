@@ -32,11 +32,24 @@ struct PriceAlertsView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .principal) { VStack(spacing: 0) { Text("到價提醒").font(.headline).foregroundStyle(Palette.ink); Text("價格到了你設定的數字就通知").font(.caption2).foregroundStyle(Palette.muted) } } }
-        // Reading the setting never asks for permission; asking waits for the first alert (`add`).
+        // Reading the setting never asks for permission; asking waits for the first alert (`add`), or for alerts that
+        // are here without `add` ever having run on this phone (restored from a backup): without the question they
+        // would be judged and fired with no notification allowed to show.
         .task {
-            guard MembershipStore.shared.has(.priceAlerts), !store.alerts.isEmpty else { return }
-            notificationsOff = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .denied
+            guard MembershipStore.shared.has(.priceAlerts) else { return }
+            let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+            if Self.asksPermissionOnAppear(status: status, hasAlerts: !store.alerts.isEmpty, testing: Self.testing) {
+                notificationsOff = !(await DividendReminders.requestAccess())
+            } else if !store.alerts.isEmpty {
+                notificationsOff = status == .denied
+            }
         }
+    }
+
+    /// Whether opening the screen asks for the notification permission: there are alerts, iOS has never been asked,
+    /// and this is not a UI test (which must never meet the system's prompt).
+    static func asksPermissionOnAppear(status: UNAuthorizationStatus, hasAlerts: Bool, testing: Bool) -> Bool {
+        hasAlerts && status == .notDetermined && !testing
     }
 
     // MARK: Member

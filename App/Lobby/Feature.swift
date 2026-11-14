@@ -52,6 +52,8 @@ extension AppRoute {
         case "priceAlerts" where testing: return [.feature(.tools), .priceAlerts]
         case "report" where testing: return [.feature(.tools), .report]
         case "exposure" where testing: return [.feature(.tools), .exposure]
+        case "backup" where testing: return [.feature(.tools), .backup]
+        case "sources" where testing: return [.feature(.tools), .sources]
         default: return nil
         }
     }

@@ -22,9 +22,9 @@ enum MemberFeature: String, CaseIterable, Codable {
         case .overlap: return "看你持有的 ETF 重壓了哪些同樣的股票"
         case .activeTracking: return "看主動式 ETF 新增、剔除了哪些持股，權重怎麼變"
         case .scenarios: return "保守、基準、樂觀與壓力測試，四種情境一次試算"
-        case .goalPlanner: return "告訴我們目標，反推每月要存多少"
+        case .goalPlanner: return "設定目標金額與年數，算出每月要投多少"
         case .report: return "每月與每年自動整理成一份報告"
-        case .backtest: return "用過去的價格回頭驗證你的買法"
+        case .backtest: return "看看過去這樣每月買，會變成多少"
         case .priceAlerts: return "設定價格，到了就通知你"
         }
     }

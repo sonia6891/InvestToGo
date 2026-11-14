@@ -110,7 +110,24 @@ enum PlanPrice {
     /// notice (final review I1).
     func apply(_ held: Set<String>) {
         owned = held
-        guard checksWornSkin else { return }
+        answered = true
+        checkWornSkin()
+    }
+
+    /// StoreKit has answered at least once since launch.
+    private var answered = false
+    /// The records cannot be read yet (a launch in the background on a locked phone); set at launch. `level` then
+    /// reads 1 whatever the player has reached, so the worn skin is not judged until `recordsRead`.
+    var recordsLocked: () -> Bool = { false }
+
+    /// The records have been read after a launch on a locked phone: the worn skin is judged now, on the real level,
+    /// if StoreKit has answered (when it has not, its answer does it).
+    func recordsRead() {
+        if answered { checkWornSkin() }
+    }
+
+    private func checkWornSkin() {
+        guard checksWornSkin, !recordsLocked() else { return }
         if (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: isMember) { onLapse(Self.lapseNotice) }
     }
 
@@ -161,7 +178,6 @@ struct MemberView: View {
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
     private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
-    // TODO(user): confirm URL — the page must be published there before App Review.
     static let privacy = URL(string: "https://sonia6891.github.io/etftogo/privacy")!
 
     enum Plan: String, CaseIterable, Identifiable {
@@ -183,8 +199,13 @@ struct MemberView: View {
             case .ai: return "AI 問答與月報"
             }
         }
-        /// Shown, but not for sale yet: no price, no buy button.
+        /// Not for sale yet: no price, no buy button.
         var comingSoon: Bool { self == .ai }
+        /// The plans on the page. One that is not for sale yet is left off while `Upcoming.visible` is false: the
+        /// page then lists 免費 and 口袋會員.
+        static func shown(upcoming: Bool = Upcoming.visible) -> [Plan] {
+            upcoming ? allCases : allCases.filter { !$0.comingSoon }
+        }
         var product: String? {
             switch self {
             case .free: return nil
@@ -211,7 +232,7 @@ struct MemberView: View {
     private func page(height: CGFloat) -> some View {
         Page {
             // The first screenful: with room to spare the stage is full size and the rest stays empty; on a shorter
-            // screen the stage shrinks first, so 會員＋AI is whole above the button rather than cut by it.
+            // screen the stage shrinks first, so the last plan is whole above the button rather than cut by it.
             VStack(alignment: .leading, spacing: 18) {
                 Text("MBR×001").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
                 GeometryReader { room in
@@ -229,7 +250,7 @@ struct MemberView: View {
                 // Only the stage gives way: the cards have a least height (44) they would otherwise be pressed down
                 // to before it, with their text spilling over the edges.
                 skinsEntry.fixedSize(horizontal: false, vertical: true)
-                VStack(spacing: 10) { ForEach(Plan.allCases) { planCard($0) } }.fixedSize(horizontal: false, vertical: true)
+                VStack(spacing: 10) { ForEach(Plan.shown()) { planCard($0) } }.fixedSize(horizontal: false, vertical: true)
             }
             .frame(minHeight: Self.firstScreen(height: height, footer: footer), alignment: .top)
             if membership.failed && !membership.loading {
