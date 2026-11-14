@@ -24,7 +24,7 @@ jobs:
   skin-matrix:
     # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
     # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the
-    # 44 launches never push that job past its limit.
+    # 52 launches never push that job past its limit.
     needs: core
     runs-on: macos-26
     timeout-minutes: 40
@@ -59,8 +59,8 @@ jobs:
           set -euo pipefail
           python3 -m venv build/venv
           build/venv/bin/pip install --quiet pillow==12.3.0
-      - name: Capture four skins × eleven screens
-        # No continue-on-error: fewer than 44 shots fails the job (the artifact is still published below).
+      - name: Capture four skins × thirteen screens
+        # No continue-on-error: fewer than 52 shots fails the job (the artifact is still published below).
         timeout-minutes: 20
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -71,14 +71,17 @@ jobs:
           blank() {
             build/venv/bin/python -c 'import sys; from PIL import Image, ImageStat; im = Image.open(sys.argv[1]).convert("L"); w, h = im.size; sys.exit(0 if ImageStat.Stat(im.crop((0, h // 8, w, h))).stddev[0] < 3 else 1)' "$1"
           }
-          # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就).
-          SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements"
+          # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就 月報
+          # 到價提醒). The last two are 口袋會員 pages, opened as a member: their cards are `Card`/`Palette` rather than
+          # `SkinCard`, and these shots are where that is judged in every skin.
+          SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements report priceAlerts"
           # Rows in the global-constraints order, as the skinKit loop.
           for SKIN in blackgold voxel stitch sketch; do
             for SCREEN in $SCREENS; do
               case "$SCREEN" in
                 onboarding) OPEN="onboarding --page 1"; NAME=onboarding1 ;;
                 detail|dex) OPEN="$SCREEN --symbol 0050"; NAME=$SCREEN ;;
+                report|priceAlerts) OPEN="$SCREEN --demo-member"; NAME=$SCREEN ;;
                 *) OPEN="$SCREEN"; NAME=$SCREEN ;;
               esac
               OUT="build/matrix/$SKIN-$NAME.png"
@@ -101,8 +104,8 @@ jobs:
             done
           done
           COUNT=$(ls build/matrix/*.png 2>/dev/null | wc -l | tr -d ' ')
-          echo "captured $COUNT of 44"
-          if [ "$COUNT" -ne 44 ]; then echo "::error::skin matrix has $COUNT of 44 shots"; exit 1; fi
+          echo "captured $COUNT of 52"
+          if [ "$COUNT" -ne 52 ]; then echo "::error::skin matrix has $COUNT of 52 shots"; exit 1; fi
       - name: Lay out the contact sheet
         if: always()
         run: build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
@@ -118,8 +121,9 @@ jobs:
   simulator:
     needs: core
     runs-on: macos-26
-    # 55 + the Release compile below.
-    timeout-minutes: 70
+    # 55 + the Release compile and the App Store screens below (up to about 15 more: two of them wait for real
+    # data, a first 回測 download alone takes about four minutes).
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - name: Generate complete Xcode project
@@ -157,14 +161,31 @@ jobs:
           RELEASE_DSN=$(sed -n 's/^ *SENTRY_DSN = //p' build/release-settings.txt | head -n 1)
           test "$RELEASE_DSN" = 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632' || { echo "::error::Release SENTRY_DSN resolved to '$RELEASE_DSN'"; exit 1; }
           echo 'Verified full SENTRY_DSN in Release'
+      - name: Set up Pillow for the blank-frame checks
+        run: |
+          set -euo pipefail
+          python3 -m venv build/venv
+          build/venv/bin/pip install --quiet pillow==12.3.0
       - name: Capture the lobby and every feature screen
-        timeout-minutes: 10
+        # 15, not 10: it has taken from three to almost eight minutes, and a cut-off run now fails the check below.
+        timeout-minutes: 15
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
           xcrun simctl install "$DEVICE" build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app
+          # The 口袋會員 pictures are checked by the step after the upload. One that is still the launch screen (a
+          # flat frame) or was not written is taken again here, twice at most.
+          settle() {
+            for RETRY in 1 2; do
+              if ! build/venv/bin/python Scripts/screens.py check "$1" > /dev/null; then
+                echo "::warning::$1 was missing or blank; retry $RETRY"
+                sleep 4
+                xcrun simctl io "$DEVICE" screenshot "$1" || true
+              fi
+            done
+          }
           for SCREEN in lobby find dividends pocket tools achievements member skins splash levelup; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --open "$SCREEN"
@@ -195,6 +216,26 @@ jobs:
             sleep 5
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-reduce-motion.png"
           done
+          # 口袋會員 pages as a member (--demo-member), each as `--open` shows it. --demo-pocket: 月報 and 持股透視 have
+          # holdings and dividends to show; --demo-active: 主動式追蹤 has a fund with two days of holdings.
+          for SCREEN in goalPlanner backtest priceAlerts activeTracking report exposure; do
+            SEED=""
+            if [ "$SCREEN" = activeTracking ]; then SEED="--demo-active"; fi
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            # shellcheck disable=SC2086
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --demo-member $SEED --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png" || true
+            settle "build/screens/screen-$SCREEN.png"
+          done
+          # Two of them as a non-member: the lock card above the faded preview.
+          for SCREEN in backtest report; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-locked.png" || true
+            settle "build/screens/screen-$SCREEN-locked.png"
+          done
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2
         continue-on-error: true
@@ -215,12 +256,15 @@ jobs:
           name: ETFToGo-screens
           path: build/screens/
           retention-days: 14
+      # The check that the 口袋會員 pictures were captured comes after the tests (below, beside the App Store pictures'
+      # check): a lost screenshot must fail the job, but not before the tests have run and left their results.
       - name: Verify calculations, persistence, search and editing
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
-          xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/tests.log
+          # StoreScreensUITests waits on the exchanges and the fund companies: it runs only in the store-screens step.
+          xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/Tests.xcresult -skip-testing:ETFToGoUITests/StoreScreensUITests -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/tests.log
       - name: Compile Release (build only, no run)
         # Sentry is live only in Release and `#if DEBUG` routes differ, so Release must compile before archive time
         # (final review M2). One simulator architecture keeps it short; nothing is installed or run. It runs after the
@@ -229,6 +273,67 @@ jobs:
         run: |
           set -euo pipefail
           xcodebuild build -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ReleaseDerivedData ONLY_ACTIVE_ARCH=YES ARCHS=arm64 CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/release-compile.log
+      - name: Capture the App Store screens (store-screens)
+        # Raw pictures for the App Store pages, taken in the `--demo-store` state (someone a year in). After the tests
+        # and the Release compile, so it never delays them. continue-on-error: two of the pictures need the
+        # exchanges' and the fund companies' sites, which a runner may not reach; the ten that need no network are
+        # checked by the step after the upload.
+        timeout-minutes: 22
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -uo pipefail
+          mkdir -p build/store
+          # A phone off its charger at 9:41 with full bars (the boot step's override shows a charging battery).
+          xcrun simctl status_bar "$DEVICE" override --time "9:41" --batteryState discharging --batteryLevel 100 --wifiBars 3 --cellularBars 4 --dataNetwork wifi --wifiMode active --cellularMode active
+          for SCREEN in lobby pocket dividends goalPlanner priceAlerts report activeTracking skins member tools; do
+            OUT="build/store/store-$SCREEN.png"
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            # --reset: every picture starts from the same seeded state. --quiet-toasts: no first-time notices.
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --quiet-toasts --skip-onboarding --demo-store --open "$SCREEN" || echo "::warning::launch failed for store-$SCREEN"
+            sleep 6
+            xcrun simctl io "$DEVICE" screenshot "$OUT" || echo "::warning::screenshot failed for store-$SCREEN"
+            # Not settled yet (still the launch screen), or not written: wait and shoot again, twice at most.
+            for RETRY in 1 2; do
+              if ! build/venv/bin/python Scripts/screens.py check "$OUT" > /dev/null; then
+                echo "::warning::store-$SCREEN was missing or blank; retry $RETRY"
+                sleep 4
+                xcrun simctl io "$DEVICE" screenshot "$OUT" || true
+              fi
+            done
+          done
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          # store-backtest and store-overlap: a UI test drives each screen and waits for real data (回測 up to eight
+          # minutes, 重疊成分 up to three). The runner writes each picture into build/store itself; without its data a
+          # test saves what is on screen as store-<name>-FAILED.png and fails, which this step lets pass.
+          TEST_RUNNER_STORE_SCREENS_DIR="$PWD/build/store" xcodebuild test-without-building -project ETFToGo.xcodeproj -scheme ETFToGo -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath build/DerivedData -resultBundlePath build/StoreTests.xcresult -only-testing:ETFToGoUITests/StoreScreensUITests -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO 2>&1 | tee build/store-tests.log || echo "::warning::a store UI test did not get its data; see the -FAILED picture"
+          # Should the runner not have been able to write there, the pictures are taken from the tests' attachments.
+          if [ -d build/StoreTests.xcresult ]; then
+            xcrun xcresulttool export attachments --path build/StoreTests.xcresult --output-path build/store-attachments || true
+            build/venv/bin/python Scripts/screens.py collect build/store-attachments build/store || true
+          fi
+          ls -l build/store
+      - name: Publish the App Store screens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETFToGo-store-screens
+          path: build/store/
+          retention-days: 14
+      - name: Check the member screens were captured
+        # The capture step near the top may fail without failing the job (continue-on-error), and a failed launch there
+        # drops every later picture. These eight are the evidence for the 口袋會員 pages: one that is missing, or a flat
+        # single-colour frame, fails the job here. After the tests, the Release compile and the App Store pictures, so
+        # a lost screenshot never costs the run its test results; a job that gets this far green still ends red here.
+        run: |
+          set -euo pipefail
+          build/venv/bin/python Scripts/screens.py check build/screens/screen-{goalPlanner,backtest,priceAlerts,activeTracking,report,exposure,backtest-locked,report-locked}.png
+      - name: Check the ten App Store screens that need no network
+        # store-backtest and store-overlap are left out: they depend on other people's sites.
+        run: |
+          set -euo pipefail
+          build/venv/bin/python Scripts/screens.py check build/store/store-{lobby,pocket,dividends,goalPlanner,priceAlerts,report,activeTracking,skins,member,tools}.png
       - name: Export UI test screenshots
         if: always()
         run: |

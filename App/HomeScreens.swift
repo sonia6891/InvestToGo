@@ -12,7 +12,11 @@ enum AppRoute: Hashable {
     case fundDetail(String)
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
-    case member, skins
+    case member, skins, goalPlanner, backtest, activeTracking
+    /// 口袋月報／年報, from 工具 and from the lobby's notice at the start of a month.
+    case report
+    /// 到價提醒; `priceAlert` opens it with the form filled in for a code (「設到價提醒」 on a fund's 詳情).
+    case priceAlerts, priceAlert(String)
     #if DEBUG
     /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
     case skinKitPreview
@@ -55,6 +59,12 @@ struct RouteView: View {
         case .reminders: ReminderCenterView()
         case .member: MemberView()
         case .skins: SkinsView()
+        case .goalPlanner: GoalPlannerView()
+        case .backtest: BacktestView()
+        case .activeTracking: ActiveTrackingView()
+        case .report: PocketReportView()
+        case .priceAlerts: PriceAlertsView()
+        case .priceAlert(let symbol): PriceAlertsView(symbol: symbol)
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
         case .comboSettings: ComboSettingsView()
@@ -106,6 +116,11 @@ struct AppNotice: Identifiable {
             guard announced.insert(entry.symbol + entry.event.ex).inserted else { continue }
             let ex = entry.event.ex.suffix(5).replacingOccurrences(of: "-", with: "/")
             items.append(AppNotice(id: "ex-\(entry.symbol)-\(entry.event.ex)", kind: "除息公告", icon: "megaphone.fill", color: Palette.blue, text: "\(entry.symbol) 將於 \(ex) 除息\(entry.event.amount.map { "，每單位 \(decimal($0)) 元" } ?? "，金額待公布")", day: todayText, route: .dividendForm(id: nil, symbol: entry.symbol, officialEx: entry.event.ex)))
+        }
+        // 到價提醒 that fired (spec 5.7: the notification, and a line kept here).
+        for alert in store.alerts {
+            guard let fired = alert.firedAt, fired >= past else { continue }
+            items.append(AppNotice(id: "alert-\(alert.id.uuidString)-\(Int(fired.timeIntervalSince1970))", kind: "到價提醒", icon: "bell.badge.fill", color: Palette.orange, text: "\(alert.symbol) 已到你設定的價格（\(alert.condition)）", day: DataChecks.day(fired), route: .priceAlerts))
         }
         items.append(AppNotice(id: "app-2026-10-16", kind: "App 重要通知", icon: "sparkles", color: Palette.purple, text: "新版介面上線：資產總覽、交易紀錄、配息明細、年度統計與官方配息資料", day: "2026-10-16", route: nil))
         items.append(AppNotice(id: "tip-yield", kind: "投資知識分享", icon: "book.fill", color: Palette.teal, text: "配息率不等於報酬率：配息可能來自本金，記得一起看淨值變化。", day: "2026-10-16", route: nil))
@@ -412,7 +427,14 @@ struct SourcesView: View {
                     Button(store.catalogRefreshing ? "更新中…" : "立即更新") { Task { await store.refreshCatalog() } }.disabled(store.catalogRefreshing)
                 }
                 Divider()
-                row("powerplug.fill", Palette.muted, "外部整合", status: ("未連線", Palette.red), lines: ["第三方券商整合（開發中）"]) { Button("連結帳戶") {}.disabled(true) }
+                row("clock.arrow.circlepath", Palette.purple, "回測歷史資料", status: ("官方資料", Palette.green), lines: ["證交所：個股日成交資訊、除權除息計算結果表、ETF 分割", "櫃買中心：個股日成交資訊、除權除息計算結果表", "按下開始回測才下載，存在手機裡"]) { EmptyView() }
+                Divider()
+                row("square.grid.2x2", Palette.blue, "ETF 成分股", status: ("投信官網", Palette.green), lines: ["投信官網公開的持股：元大、國泰、富邦、群益、復華、中國信託", "其他投信：存了富果金鑰時向富果查詢", "按下更新成分股才下載，每檔一天一次"]) { EmptyView() }
+                // 外部整合 does nothing yet (a button that cannot be pressed): out of sight until it does (`Upcoming`).
+                if Upcoming.visible {
+                    Divider()
+                    row("powerplug.fill", Palette.muted, "外部整合", status: ("未連線", Palette.red), lines: ["第三方券商整合（開發中）"]) { Button("連結帳戶") {}.disabled(true) }
+                }
             }
             if let message = store.officialMessage ?? store.catalogMessage { Text(message).font(.caption).foregroundStyle(Palette.muted) }
             Text("你自己的配息紀錄仍以券商入帳為準；官方資料用來帶入每單位金額與日期、推算配息頻率。上櫃 ETF 只有近期除權息預告，沒有歷史紀錄與發放日。").font(.caption).foregroundStyle(Palette.muted)

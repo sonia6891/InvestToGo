@@ -10,7 +10,13 @@ import SwiftUI
     @Published var pendingReward = 0
     /// A one-line notice for the same root toast region (e.g. 「收進圖鑑 +30 經驗」), shown once and cleared.
     @Published var pendingNotice: String?
+    /// A refresh somebody asked for is under way: 更新報價 and 立即更新 say 「更新中…」 and wait.
     @Published var refreshing = false
+    /// A quiet refresh (到價提醒's own check) is under way. Not published and never shown: the buttons above are not
+    /// the ones that started it, so they stay as they are and a tap on them is answered.
+    private(set) var quietRefreshing = false
+    /// Either kind is asking for prices; live polling draws on the same request allowance and waits for both.
+    var fetchingQuotes: Bool { refreshing || quietRefreshing }
     @Published private(set) var catalog = CatalogSnapshot.bundled()
     @Published var catalogMessage: String?
     @Published var catalogRefreshing = false
@@ -45,26 +51,179 @@ import SwiftUI
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
            cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
-        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL) }
-        if FileManager.default.fileExists(atPath: self.url.path) {
-            do { data = try Portfolio.decodeBackup(Data(contentsOf: self.url), limit: 100_000_000) }
-            catch { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。"; readFailure = true }
+        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL); try? FileManager.default.removeItem(at: componentHistoryURL); try? FileManager.default.removeItem(at: alertsURL) }
+        // The alerts first: whether they have a file of their own decides what is done with any still in the records.
+        loadAlerts()
+        loadRecords()
+    }
+    /// Reads the records file and the two files kept beside it.
+    private func loadRecords() {
+        var loaded = Portfolio()
+        readFailure = false; recordsLocked = false
+        if FileManager.default.fileExists(atPath: url.path) {
+            do { loaded = try Portfolio.decodeBackup(Data(contentsOf: url), limit: 100_000_000) }
+            catch {
+                readFailure = true
+                // 到價提醒's background check can start the app while the phone is locked: the file is there and whole,
+                // but iOS will not open it yet. Nothing is wrong, so nothing is said; `reloadIfLocked` reads it later.
+                if Self.isProtected(error) { recordsLocked = true } else { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。" }
+            }
         }
-        historiesSaved = (data.histories ?? [:]).isEmpty
+        // 到價提醒 written into the records by an earlier build move to their own file: written there first, dropped
+        // from the records by the next save, so nothing is lost if the app is stopped between the two. A later load
+        // that finds them in both places keeps the file's (it is the one kept up to date since).
+        let inRecords = loaded.alerts ?? []
+        loaded.alerts = nil
+        if !inRecords.isEmpty, !alertsOnFile, !alertsLocked {
+            alerts = inRecords
+            do { try writeAlerts(inRecords); alertsOnFile = true } catch { alertsUnsaved = true }
+        }
+        historiesSaved = (loaded.histories ?? [:]).isEmpty
         // Earlier versions kept histories in the records file; the next save moves them out. A history that does not
         // validate is dropped, since it can be fetched again.
         if let bytes = try? Data(contentsOf: historiesURL), let cached = try? JSONDecoder().decode([String: PriceHistory].self, from: bytes) {
             let valid = cached.filter { $0.key == $0.value.symbol && (try? $0.value.validate()) != nil }
-            if !valid.isEmpty { data.histories = (data.histories ?? [:]).merging(valid) { _, cached in cached } }
+            if !valid.isEmpty { loaded.histories = (loaded.histories ?? [:]).merging(valid) { _, cached in cached } }
         }
+        // The holdings history is kept apart from the records in the same way; a records file that still holds it
+        // (written before it had its own file) is moved over by the next save. The file's days win over the records'.
+        componentHistorySaved = (loaded.componentHistory ?? [:]).isEmpty
+        if let valid = readComponentHistory(), !valid.isEmpty {
+            loaded.componentHistory = (loaded.componentHistory ?? [:]).merging(valid) { _, cached in cached }
+        }
+        data = loaded
     }
+    /// The holdings history on file, the ETFs that validate. Nil when there is no file or it does not decode; nil
+    /// too, with `componentHistoryLocked` set, when the file is there but iOS will not open it yet.
+    private func readComponentHistory() -> [String: [ComponentSnapshot]]? {
+        componentHistoryLocked = false
+        let bytes: Data
+        do { bytes = try Data(contentsOf: componentHistoryURL) } catch {
+            if Self.isProtected(error) { componentHistoryLocked = true }
+            return nil
+        }
+        guard let cached = try? JSONDecoder().decode([String: [ComponentSnapshot]].self, from: bytes) else { return nil }
+        return cached.filter { (try? Portfolio.validate(history: $0.value, of: $0.key)) != nil }
+    }
+    /// The holdings history file could not be opened although the records could (the phone locked between the two
+    /// reads, or was unlocking): the history in memory is then not what is on file. Like `recordsLocked` for that one
+    /// file: nothing is saved over it until it has been read (`mergeLockedComponentHistory`).
+    private(set) var componentHistoryLocked = false
+    /// Tries the locked history file again. Once it opens, `history` (what was added while it could not be read)
+    /// joins what the file holds, day by day; nil while it is still locked.
+    private func mergeLockedComponentHistory(_ history: [String: [ComponentSnapshot]]?) -> [String: [ComponentSnapshot]]? {
+        let onFile = readComponentHistory()
+        guard !componentHistoryLocked else { return nil }
+        var merged = Portfolio()
+        merged.componentHistory = onFile
+        // Oldest first, so that the newest days are the ones kept when an ETF has more than the limit.
+        for snapshot in (history ?? [:]).values.joined().sorted(by: { $0.date < $1.date }) { merged.remember(snapshot) }
+        return merged.componentHistory ?? [:]
+    }
+    // MARK: 到價提醒's own file
+
+    /// 到價提醒, in the order they were added. They live in a file of their own beside the records, protected only
+    /// until the phone's first unlock after a restart: the background check mostly runs while the phone is locked,
+    /// when the records (complete protection) cannot be opened, and it has to read the alerts, judge them and save
+    /// which ones fired. The file holds the alerts and nothing else: a code, a price, 高於 or 低於, on or off, and when
+    /// it fired. In memory `data.alerts` is always nil; `Portfolio.alerts` is only the field a backup carries them in.
+    @Published private(set) var alerts: [PriceAlert] = []
+    private var alertsURL: URL { url.appendingPathExtension("alerts") }
+    /// The alerts' own file has been read or written: it is where they live from then on.
+    private var alertsOnFile = false
+    /// The alerts' file is there but iOS will not open it yet (a restart, and no unlock since). Like `recordsLocked`:
+    /// the list is empty, not gone, and nothing is saved over it until `reloadIfLocked` has read it.
+    private(set) var alertsLocked = false
+    /// Alerts taken out of the records whose own file could not be written: they stay in the records until it can.
+    private var alertsUnsaved = false
+    /// Nothing can be said about the alerts yet: their file is locked, or there is none and the records that may
+    /// still hold them (an earlier build's) are locked.
+    var alertsUnknown: Bool { alertsLocked || (recordsLocked && !alertsOnFile) }
+
+    private static func alertsValid(_ list: [PriceAlert]) -> Bool {
+        list.count <= AlertEngine.limit && Set(list.map(\.id)).count == list.count && list.allSatisfy(\.isValid)
+    }
+    private func loadAlerts() {
+        alertsLocked = false
+        let bytes: Data
+        do { bytes = try Data(contentsOf: alertsURL) } catch {
+            if Self.isProtected(error) { alertsLocked = true }
+            return
+        }
+        // A file that does not hold a list of alerts counts as none: alerts still in the records take its place.
+        guard let list = try? JSONDecoder().decode([PriceAlert].self, from: bytes), Self.alertsValid(list) else { return }
+        alerts = list
+        alertsOnFile = true
+    }
+    private func writeAlerts(_ list: [PriceAlert]) throws {
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try JSONEncoder().encode(list).write(to: alertsURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+    }
+    /// Saves the whole list to the alerts' file; the records file is not touched, so this works on a locked phone.
+    func saveAlerts(_ list: [PriceAlert]) throws {
+        guard !alertsUnknown else { throw AppDataError("提醒暫時無法儲存，請解鎖 iPhone 後再試。") }
+        guard Self.alertsValid(list) else { throw AppDataError("請輸入正確的代號與大於 0 的價格。") }
+        try writeAlerts(list)
+        alertsOnFile = true; alertsUnsaved = false
+        alerts = list
+    }
+
     private var readFailure = false
+    /// The records could not be opened at launch because the phone was locked (they are saved with complete file
+    /// protection). Until `reloadIfLocked` reads them, `data` is empty and nothing can be saved.
+    private(set) var recordsLocked = false
+    /// Run after `reloadIfLocked` has read the records: what launch does with them (set by the app).
+    var onRecordsRead: (PortfolioStore) -> Void = { _ in }
+    /// The file exists but may not be read: the phone is locked, not a damaged file.
+    private static func isProtected(_ error: Error) -> Bool {
+        let cocoa = error as NSError
+        if cocoa.domain == NSCocoaErrorDomain, cocoa.code == CocoaError.Code.fileReadNoPermission.rawValue { return true }
+        let posix = (cocoa.userInfo[NSUnderlyingErrorKey] as? NSError) ?? cocoa
+        return posix.domain == NSPOSIXErrorDomain && (posix.code == Int(EPERM) || posix.code == Int(EACCES))
+    }
+    /// After a launch on a locked phone: reads the records now, if iOS lets it. False only while they are still
+    /// locked; true at once when they never were.
+    @discardableResult func reloadIfLocked() -> Bool {
+        // The alerts' file first, as at launch.
+        if alertsLocked { loadAlerts() }
+        guard recordsLocked else {
+            // The records were read but the holdings history was not: read now, it joins what is in memory and is
+            // written back by the next save.
+            if componentHistoryLocked, let merged = mergeLockedComponentHistory(data.componentHistory) {
+                data.componentHistory = merged.isEmpty ? nil : merged
+                componentHistorySaved = false
+            }
+            return true
+        }
+        loadRecords()
+        guard !recordsLocked else { return false }
+        onRecordsRead(self)
+        return true
+    }
     /// Price histories are large and can be fetched again, so they are saved apart from the records: a save of the
     /// records stays small and fast, and many histories never push the records past the backup size limit.
     private var historiesURL: URL { url.appendingPathExtension("histories") }
+    /// Up to twelve days of holdings for every ETF looked at: with many broad ETFs that is megabytes, so it has its own
+    /// file too and never counts against the records' 5 MB. Unlike price histories it goes into backups (`export`).
+    private var componentHistoryURL: URL { url.appendingPathExtension("holdings") }
     func commit(_ next: Portfolio) throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
-        var records = next; records.histories = nil
+        var next = next
+        // A history file that could not be read is never saved over: it is tried again here, and what it holds is
+        // kept together with what this save adds. While it stays locked the records are saved without it and the
+        // history waits in memory (`componentHistorySaved` false) for a save that can read the file first.
+        if componentHistoryLocked {
+            if let merged = mergeLockedComponentHistory(next.componentHistory) { next.componentHistory = merged.isEmpty ? nil : merged }
+            componentHistorySaved = false
+        }
+        // 到價提醒 are saved by `saveAlerts`, never here: the records are written without them. The one exception is
+        // alerts an earlier build left in the records whose own file could not be written yet. It is tried again
+        // now, and until it works they stay in the records.
+        next.alerts = nil
+        var records = next; records.histories = nil; records.componentHistory = nil
+        if alertsUnsaved {
+            if (try? writeAlerts(alerts)) != nil { alertsOnFile = true; alertsUnsaved = false } else { records.alerts = alerts.isEmpty ? nil : alerts }
+        }
         let encoded = try JSONEncoder().encode(records)
         guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
         _ = try Portfolio.decodeBackup(encoded)
@@ -72,6 +231,10 @@ import SwiftUI
         if next.histories != data.histories || !historiesSaved {
             try JSONEncoder().encode(next.histories ?? [:]).write(to: historiesURL, options: [.atomic, .completeFileProtection])
             historiesSaved = true
+        }
+        if !componentHistoryLocked, next.componentHistory != data.componentHistory || !componentHistorySaved {
+            try JSONEncoder().encode(next.componentHistory ?? [:]).write(to: componentHistoryURL, options: [.atomic, .completeFileProtection])
+            componentHistorySaved = true
         }
         try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
@@ -86,6 +249,8 @@ import SwiftUI
     }
     /// False while the records file still holds histories from an earlier version, so the next save moves them out.
     private var historiesSaved = false
+    /// The same for the holdings history.
+    private var componentHistorySaved = false
     /// With `logBuy` (新增持有's 儲存), a new holding with a purchase date is the user's buy: it records the DCA month
     /// and its capped experience in the same write (`GameState.logBuy`). Edits, imports and seeding earn nothing.
     func save(_ holding: Holding, logBuy: Bool = false, now: Date = Date()) throws {
@@ -219,6 +384,17 @@ import SwiftUI
             CrashReporting.capture(error, context: "dividends", offline: Connectivity.shared.offline)
         }
     }
+    /// Announcements shown on top of the record for this launch only; nothing is saved. `--demo-store`'s 「即將除息」
+    /// (`DemoArguments.seedStore`), which is the only caller.
+    func showOfficial(_ extra: [String: [OfficialDistribution]]) {
+        var next = official
+        for (symbol, events) in extra {
+            var list = next.events[symbol] ?? []
+            for event in events where !list.contains(where: { $0.ex == event.ex }) { list.append(event) }
+            next.events[symbol] = list
+        }
+        official = next
+    }
     func saveDaily() {
         guard let daily else { return }
         try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -228,12 +404,29 @@ import SwiftUI
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("ETFToGo-backup-\(UUID().uuidString.prefix(8)).json")
         // Preserve recoverable bytes when decoding failed; never export an empty replacement.
         // Price histories are left out: they can be fetched again and would make the backup too large to import.
-        var records = data; records.histories = nil
-        let bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
+        // 到價提醒 come from their own file and travel in the backup's `alerts` field, as before.
+        var records = data; records.histories = nil; records.alerts = alerts.isEmpty ? nil : alerts
+        var bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
+        // The holdings history is part of a backup, but a backup over 5 MB cannot be imported: when it is the
+        // history that makes it too large, fewer days of each ETF are kept (the newest), down to none.
+        if !readFailure {
+            for days in [6, 3, 1, 0] where bytes.count > 5_000_000 {
+                records.componentHistory = data.componentHistory?.mapValues { Array($0.sorted { $0.date > $1.date }.prefix(days)) }.filter { !$0.value.isEmpty }
+                bytes = try JSONEncoder().encode(records)
+            }
+        }
         try bytes.write(to: file, options: .atomic)
         return file
     }
-    func importBackup(_ bytes: Data) throws {
+    /// What an import left out, for the message that follows it.
+    struct ImportSummary: Equatable {
+        /// The backup had game progress and this phone already has its own: the phone's was kept.
+        var gameSkipped = false
+        static let done = "匯入完成，匯入前資料已保存於復原副本。"
+        static let gameKept = "遊戲進度沒有匯入：這支手機已經有進度。"
+        var message: String { gameSkipped ? Self.done + Self.gameKept : Self.done }
+    }
+    @discardableResult func importBackup(_ bytes: Data) throws -> ImportSummary {
         let incoming = try BackupImport.decode(bytes)
         // Merge by stable IDs; incoming records update matches, existing unmatched records are retained.
         var next = data
@@ -254,12 +447,23 @@ import SwiftUI
         next.legacyPrices = (next.legacyPrices ?? [:]).merging(incoming.legacyPrices ?? [:]) { _, new in new }
         next.legacyDividends = (next.legacyDividends ?? [:]).merging(incoming.legacyDividends ?? [:]) { _, new in new }
         next.components = (next.components ?? [:]).merging(incoming.components ?? [:]) { _, new in new }
+        for snapshot in (incoming.componentHistory ?? [:]).values.joined() { next.remember(snapshot) }
+        // The backup's alerts join the ones here, in the alerts' own file (saved below, once the records are).
+        var alertBook = Portfolio(); alertBook.alerts = alerts
+        alertBook.mergeAlerts(incoming.alerts ?? [])
         next.histories = (next.histories ?? [:]).merging(incoming.histories ?? [:]) { _, new in new }
         next.fees = (next.fees ?? [:]).merging(incoming.fees ?? [:]) { _, new in new }
         // Restore missing cached quotes; retain quotes already on this device.
         for (symbol, quote) in incoming.quotes where next.quotes[symbol] == nil { next.quotes[symbol] = quote }
+        // Game progress (level, streak, cards, the months behind 月報 and 年報): a phone with none yet takes the
+        // backup's whole; one that has its own keeps it untouched and the message says so.
+        let game = GameState.afterImport(local: data.game, incoming: incoming.game)
+        next.game = game.game
         try saveRecovery()
         try commit(next)
+        let merged = alertBook.alerts ?? []
+        if merged != alerts { try saveAlerts(merged) }
+        return ImportSummary(gameSkipped: game.skipped)
     }
     func saveRecovery() throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
@@ -288,20 +492,25 @@ import SwiftUI
             catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
         } catch { catalogMessage = error.localizedDescription; catalogFailed = true; CrashReporting.capture(error, context: "catalog", offline: Connectivity.shared.offline) }
     }
-    func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; try commit(next) }
+    /// Saves an ETF's holdings as its current ones and files them in its history (12 newest dates, one per date).
+    func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; next.remember(value); try commit(next) }
+    /// The holdings saved for an ETF over time, newest first; at most `Portfolio.historyLimit` dates.
+    func componentHistory(for symbol: String) -> [ComponentSnapshot] { (data.componentHistory?[symbol] ?? []).sorted { $0.date > $1.date } }
     func saveHistory(_ value: PriceHistory) throws { try value.validate(); var next = data; if next.histories == nil { next.histories = [:] }; next.histories?[value.symbol] = value; try commit(next) }
     func saveFee(_ value: FeeRecord) throws { try value.validate(); var next = data; if next.fees == nil { next.fees = [:] }; next.fees?[value.symbol] = value; try commit(next) }
     /// `inline`: a failure is kept in `quoteFailure` for the page's own LoadFailed instead of the app-wide alert.
-    func refresh(symbols: [String]? = nil, inline: Bool = false) async {
-        guard !refreshing else { return }
-        refreshing = true; defer { refreshing = false }
-        message = nil
+    /// `quiet` (到價提醒's own check, which nobody asked for by hand): the quotes are refreshed and saved the same way,
+    /// but nothing is said on screen and nothing is reported, whatever happens.
+    func refresh(symbols: [String]? = nil, inline: Bool = false, quiet: Bool = false) async {
+        guard beginRefresh(quiet: quiet) else { return }
+        defer { endRefresh(quiet: quiet) }
+        if !quiet { message = nil }
         if inline { quoteFailure = nil }
         let started = Date()
         do {
             let key = try SecureKey.read()
             let targets = Array(Set(symbols ?? data.holdings.map(\.symbol))).sorted()
-            guard !targets.isEmpty else { message = "請先新增持有，或到單檔 ETF 頁面更新報價。"; return }
+            guard !targets.isEmpty else { if !quiet { message = "請先新增持有，或到單檔 ETF 頁面更新報價。" }; return }
             // Offline, the bar at the top already says so: only a page's own LoadFailed hears about it, never the alert.
             if Connectivity.forcedOffline { if inline { throw AppDataError("目前沒有網路，先顯示上次的報價。") } else { return } }
             var fetched: [String: Quote] = [:]
@@ -311,7 +520,7 @@ import SwiftUI
                 let wanted = Set(targets)
                 guard wanted.contains(where: { closes[$0] != nil }) else { throw AppDataError("目前沒有這些代號的收盤資料，保留上次報價。") }
                 fetched = closes.filter { wanted.contains($0.key) && $0.value.fetchedAt > (data.quotes[$0.key]?.fetchedAt ?? .distantPast) }
-                guard !fetched.isEmpty else { message = "收盤資料已是最新（\((daily?.day ?? "").replacingOccurrences(of: "-", with: "/"))）。"; return }
+                guard !fetched.isEmpty else { if !quiet { message = "收盤資料已是最新（\((daily?.day ?? "").replacingOccurrences(of: "-", with: "/"))）。" }; return }
             } else {
                 // In a list, prices streamed in the last minute are already current. PublicHTTP spaces the requests so
                 // they stay within the plan together with live polling; what arrived before an error is still kept.
@@ -325,18 +534,36 @@ import SwiftUI
             }
             try keepFetched(fetched, since: started)
         } catch {
+            if quiet { return }
             // Only the detail page's LoadFailed (inline) is reported; the app-wide alert path is not a load failure page.
             if inline { quoteFailure = error.localizedDescription; CrashReporting.capture(error, context: "market", offline: Connectivity.shared.offline) } else { message = error.localizedDescription }
         }
     }
+    /// Takes the turn for a refresh; false when it has to be skipped. One asked for by hand waits only for another
+    /// asked for by hand. A quiet one is nobody's request, so it gives way to any refresh already running, and it
+    /// leaves `refreshing` alone. The two kinds may then overlap: each saves through `keepFetched`, which merges into
+    /// the records as they are at that moment and keeps the later price of each code, so neither undoes the other.
+    func beginRefresh(quiet: Bool) -> Bool {
+        if quiet {
+            guard !fetchingQuotes else { return false }
+            quietRefreshing = true
+        } else {
+            guard !refreshing else { return false }
+            refreshing = true
+        }
+        return true
+    }
+    func endRefresh(quiet: Bool) { if quiet { quietRefreshing = false } else { refreshing = false } }
     /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
     /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.
-    private func keepFetched(_ fetched: [String: Quote], since started: Date) throws {
+    /// A quote already saved that was fetched later stays: of two refreshes that overlap, the slower one may finish
+    /// last with the older price, and the price on screen must not go back to it.
+    func keepFetched(_ fetched: [String: Quote], since started: Date) throws {
         let trial = fetched.filter { $0.value.trial == true }
         // A real trade streamed in while the requests were running, or anything newer, is kept.
         if !trial.isEmpty { liveQuotes.merge(trial) { old, new in (old.trial != true && old.date == new.date && old.fetchedAt >= started) || old.fetchedAt > new.fetchedAt ? old : new } }
         var next = data
-        next.quotes.merge(fetched.filter { $0.value.trial != true }) { _, refreshed in refreshed }
+        next.quotes.merge(fetched.filter { $0.value.trial != true }) { saved, refreshed in saved.fetchedAt > refreshed.fetchedAt ? saved : refreshed }
         try commit(next)
     }
 }

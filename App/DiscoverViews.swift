@@ -454,6 +454,12 @@ struct FundDetail: View {
             HStack {
                 Text(updatedText).skinFont(.mono(10)).skinForeground(\.sub)
                 Spacer(minLength: 8)
+                // 口袋會員's 到價提醒 with this code filled in; anyone else lands on its lock.
+                NavigationLink(value: AppRoute.priceAlert(fund.id)) {
+                    Text("設到價提醒").skinFont(.mono(11)).skinForeground(\.ink).frame(minHeight: 44).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain).padding(.trailing, 8)
+                .accessibilityIdentifier("detail-price-alert")
                 Button(store.refreshing ? "更新中…" : "更新報價") { Task { await store.refresh(symbols: [fund.id], inline: true) } }
                     .buttonStyle(.plain).skinFont(.mono(11)).skinForeground(\.ink).frame(minHeight: 44).disabled(store.refreshing)
             }

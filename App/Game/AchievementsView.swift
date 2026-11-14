@@ -2,7 +2,8 @@ import SwiftUI
 
 /// 成就 (spec 5.11): the 3D target top right, 「成就」 and how many are unlocked, then a three-column badge wall.
 /// Unlocked: the skin's stage with an object and the day it was reached. Locked: a dark 「?」, a progress bar and
-/// the numbers. One whose feature is not in the app yet shows 「即將推出」 instead of a bar stuck at 0 (ruling R31).
+/// the numbers. One whose feature is not in the app yet is left off the wall (`Achievements.shown`); were it shown
+/// (`Upcoming.visible`), it would say 「即將推出」 instead of a bar stuck at 0 (ruling R31).
 /// Goals are counts, never money (spec 6.5).
 struct AchievementsView: View {
     @EnvironmentObject var store: PortfolioStore
@@ -11,21 +12,22 @@ struct AchievementsView: View {
 
     var body: some View {
         let game = store.data.game ?? GameState(), now = Date()
-        let unlocked = Achievements.all.filter { game.unlocked[$0.id] != nil }.count
+        let wall = Achievements.shown()
+        let unlocked = wall.filter { game.unlocked[$0.id] != nil }.count
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text("BADGE×\(String(format: "%03d", unlocked))").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
                         Text("成就").skinFont(.title(34)).skinForeground(\.ink)
-                        Text("已解鎖 \(unlocked) / \(Achievements.all.count)").skinFont(.mono(12)).skinForeground(\.sub)
+                        Text("已解鎖 \(unlocked) / \(wall.count)").skinFont(.mono(12)).skinForeground(\.sub)
                             .accessibilityIdentifier("achievements-count")
                     }
                     Spacer()
                     SkinImage(.achievements).frame(width: 96, height: 96).accessibilityHidden(true)
                 }
                 LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(Achievements.all) { item in badge(item, game: game, now: now) }
+                    ForEach(wall) { item in badge(item, game: game, now: now) }
                 }
             }
             .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 24)

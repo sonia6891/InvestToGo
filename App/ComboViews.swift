@@ -207,6 +207,39 @@ struct ComboItemSheet: View {
         dismiss()
     }
 }
+/// Which 組合試算 scenario a person lands on, and which choices wear the member's crown (`MemberFeature.scenarios`:
+/// 基準 is free, the others are 口袋會員's).
+enum ComboGate {
+    /// Read out on a crowned choice, where the crown itself is only a picture.
+    static let memberOnly = "口袋會員專屬"
+
+    /// A choice other than 基準, shown to someone who is not a member.
+    static func crowned(_ scenario: ComboScenario, member: Bool) -> Bool { !member && scenario != .base }
+
+    /// The choice 試算設定 opens with. 壓力測試 is not offered there. A non-member starts on 基準 whatever was saved,
+    /// so a member's scenario is only ever opened by picking it, crown in view.
+    static func preselected(saved: ComboScenario, member: Bool) -> ComboScenario {
+        member && saved != .stress ? saved : .base
+    }
+
+    /// The scenario 試算結果 opens on. From 試算設定 it is the one just picked there, for anybody: a non-member who
+    /// picked 保守 sees the lock card for it, not 基準's figures passed off as the answer. Opened any other way, a
+    /// non-member starts on 基準 whatever is saved (the saved settings themselves are not touched).
+    static func opening(saved: ComboScenario, member: Bool, fromSettings: Bool) -> ComboScenario {
+        member || fromSettings ? saved : .base
+    }
+}
+/// A scenario's name on its chip, with the member's crown in front when it is not free for this person.
+private struct ScenarioName: View {
+    let item: ComboScenario
+    let crowned: Bool
+    var body: some View {
+        HStack(spacing: 3) {
+            if crowned { MemberCrown().frame(width: 13, height: 13) }
+            Text(item.rawValue).font(.subheadline.bold()).lineLimit(1).minimumScaleFactor(0.7)
+        }
+    }
+}
 struct ComboSettingsView: View {
     @EnvironmentObject var store: PortfolioStore
     @State private var monthly = ""
@@ -220,6 +253,7 @@ struct ComboSettingsView: View {
     @State private var loaded = false
     @State private var error: String?
     @State private var showResult = false
+    @ObservedObject private var membership = MembershipStore.shared
     var body: some View {
         let c = store.combo, start = store.comboStart(c)
         Page {
@@ -265,17 +299,25 @@ struct ComboSettingsView: View {
         monthly = String(Int(c.monthly))
         etfReturn = decimal(c.etfReturn)
         etfYield = decimal(c.etfYield ?? store.comboDefaultYield(c))
-        startOfMonth = c.startOfMonth; years = c.years; reinvest = c.reinvest; buyFee = c.buyFee; scenario = c.scenario == .stress ? .base : c.scenario
+        startOfMonth = c.startOfMonth; years = c.years; reinvest = c.reinvest; buyFee = c.buyFee
+        scenario = ComboGate.preselected(saved: c.scenario, member: membership.has(.scenarios))
     }
     private func scenarioButton(_ item: ComboScenario, current: ComboSettings) -> some View {
         let on = scenario == item
+        // 保守 and 樂觀 are the member's: a non-member may pick one, and the crown says what 開始試算 will then show.
+        let crowned = ComboGate.crowned(item, member: membership.has(.scenarios))
         return Button { scenario = item } label: {
-            VStack(spacing: 2) { Text(item.rawValue).font(.subheadline.bold()); Text(scenarioLabel(current, item)).font(.caption2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7) }
+            VStack(spacing: 2) {
+                ScenarioName(item: item, crowned: crowned)
+                Text(scenarioLabel(current, item)).font(.caption2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
+            }
                 .frame(maxWidth: .infinity).padding(.vertical, 9)
                 .foregroundStyle(on && item == .base ? Color.white : item.color)
                 .background(on && item == .base ? AnyShapeStyle(Palette.hero) : AnyShapeStyle(item.color.opacity(0.1)), in: RoundedRectangle(cornerRadius: 14))
                 .overlay(RoundedRectangle(cornerRadius: 14).stroke(on && item != .base ? item.color : Color.clear, lineWidth: 1.5))
         }.buttonStyle(.plain).accessibilityAddTraits(on ? .isSelected : [])
+            .accessibilityValue(crowned ? ComboGate.memberOnly : "")
+            .accessibilityIdentifier("combo-scenario-\(String(describing: item))")
     }
     private func run() {
         error = nil
@@ -299,11 +341,21 @@ struct ComboResultView: View {
     var fromSettings = false
     @Environment(\.dismiss) private var dismiss
     @State private var scenario: ComboScenario?
+    @ObservedObject private var membership = MembershipStore.shared
     var body: some View {
-        let c = store.combo, start = store.comboStart(c)
-        let current = scenario ?? c.scenario
-        let rows = [3, 5, 10].map { years in (years, ComboMath.project(stockStart: 0, etfStart: start, settings: c, stockShare: 0, years: years, scenario: current)) }
+        let c = store.combo
+        let current = scenario ?? ComboGate.opening(saved: c.scenario, member: membership.has(.scenarios), fromSettings: fromSettings)
         Page {
+            if membership.has(.scenarios) || current == .base { figures(c, current) }
+            else { MemberLock(.scenarios) { figures(c, current) } preview: { VStack(spacing: 14) { figures(c, .base) } } }
+            switcher(c, current)
+            methodology(c)
+        }
+        .navigationTitle("試算結果").navigationBarTitleDisplayMode(.inline)
+    }
+    @ViewBuilder private func figures(_ c: ComboSettings, _ current: ComboScenario) -> some View {
+        let start = store.comboStart(c)
+        let rows = [3, 5, 10].map { years in (years, ComboMath.project(stockStart: 0, etfStart: start, settings: c, stockShare: 0, years: years, scenario: current)) }
             Text(current == .stress ? "壓力測試・第 1 年 −30%，之後 \(scenarioLabel(c, .base))" : "\(current.rawValue)情境・假設年總報酬 \(scenarioLabel(c, current))")
                 .font(.headline).foregroundStyle(Palette.deepBlue).frame(maxWidth: .infinity, alignment: .leading).padding(14)
                 .background(LinearGradient(colors: [Palette.blue.opacity(0.14), Palette.card], startPoint: .leading, endPoint: .trailing), in: RoundedRectangle(cornerRadius: 16))
@@ -322,8 +374,12 @@ struct ComboResultView: View {
                 resultHeader(c)
                 ForEach(rows, id: \.0) { years, result in resultRow(years: years, invested: result.invested, end: result.end, selected: years == c.years) }
             }
+    }
+    @ViewBuilder private func switcher(_ c: ComboSettings, _ current: ComboScenario) -> some View {
             HStack { Text("情境切換").font(.headline).foregroundStyle(Palette.ink); Spacer(); Label("可為負報酬，不保證獲利", systemImage: "info.circle").font(.caption2).foregroundStyle(Palette.muted) }
             HStack(spacing: 8) { ForEach(ComboScenario.allCases) { item in scenarioChip(item, current: current, settings: c) } }
+    }
+    @ViewBuilder private func methodology(_ c: ComboSettings) -> some View {
             Card(padding: 14) {
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: "doc.text").font(.title3).foregroundStyle(Palette.blue).frame(width: 40, height: 40).background(Palette.blue.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
@@ -342,8 +398,6 @@ struct ComboResultView: View {
                 }.font(.subheadline.bold()).frame(maxWidth: .infinity).padding(.vertical, 10).overlay(RoundedRectangle(cornerRadius: 12).stroke(Palette.blue, lineWidth: 1.2)).padding(.top, 10)
             }
             Text("這是依你設定的假設計算的情境，不是預測或保證；實際報酬可能為負。").font(.caption).foregroundStyle(Palette.muted)
-        }
-        .navigationTitle("試算結果").navigationBarTitleDisplayMode(.inline)
     }
     private func resultHeader(_ c: ComboSettings) -> some View {
         HStack {
@@ -368,9 +422,10 @@ struct ComboResultView: View {
     }
     private func scenarioChip(_ item: ComboScenario, current: ComboScenario, settings: ComboSettings) -> some View {
         let on = item == current
+        let crowned = ComboGate.crowned(item, member: membership.has(.scenarios))
         return Button { scenario = item } label: {
             VStack(spacing: 2) {
-                Text(item.rawValue).font(.subheadline.bold()).lineLimit(1).minimumScaleFactor(0.7)
+                ScenarioName(item: item, crowned: crowned)
                 if item != .stress { Text(scenarioLabel(settings, item)).font(.caption2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.6) }
             }
             .frame(maxWidth: .infinity).padding(.vertical, 9)
@@ -378,6 +433,7 @@ struct ComboResultView: View {
             .background(on && item == .base ? AnyShapeStyle(Palette.hero) : AnyShapeStyle(item.color.opacity(0.1)), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(on && item != .base ? item.color : Color.clear, lineWidth: 1.5))
         }.buttonStyle(.plain).accessibilityAddTraits(on ? .isSelected : [])
+            .accessibilityValue(crowned ? ComboGate.memberOnly : "")
     }
     private func bullet(_ text: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 6) { Text("•"); Text(text).fixedSize(horizontal: false, vertical: true) }.font(.caption).foregroundStyle(Palette.ink)

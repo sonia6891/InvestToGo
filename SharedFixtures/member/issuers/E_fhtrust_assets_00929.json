@@ -1,0 +1,108 @@
+{
+ "result": [
+  {
+   "fundID": "ETF21",
+   "twNameFull": "復華台灣科技優息ETF基金",
+   "ec002": "(基金之配息來源可能為收益平準金且本基金並無保證收益及配息)",
+   "etf002": "00929",
+   "ec038": "臺灣指數公司特選臺灣上市上櫃科技優息指數",
+   "dDate": "2026/11/11",
+   "pcf_FundNav": "156,230,682,447",
+   "pcf_FundQissue": "6,040,139,000",
+   "pcf_Fundpnav": "25.87",
+   "result": [
+    {
+     "ftype": "股票",
+     "itemName": "股票",
+     "tot_mvalue": "150,518,856,470"
+    },
+    {
+     "ftype": "期貨",
+     "itemName": "期貨",
+     "tot_mvalue": "4,854,960,000"
+    }
+   ],
+   "diff": [],
+   "detail": [
+    {
+     "ftype": "股票",
+     "stockid": "2357",
+     "stockname": "華碩電腦",
+     "qshare": "7,141,000",
+     "etf_index": null,
+     "qshareCur": "NTD",
+     "mvalue": "6,441,182,000",
+     "price": "902.0000",
+     "accint": "0",
+     "prate_addaccint": "4.123%"
+    },
+    {
+     "ftype": "股票",
+     "stockid": "3034",
+     "stockname": "聯詠科技",
+     "qshare": "12,437,000",
+     "etf_index": null,
+     "qshareCur": "NTD",
+     "mvalue": "5,982,197,000",
+     "price": "481.0000",
+     "accint": "0",
+     "prate_addaccint": "3.829%"
+    },
+    {
+     "ftype": "股票",
+     "stockid": "3045",
+     "stockname": "台灣大哥",
+     "qshare": "43,893,000",
+     "etf_index": null,
+     "qshareCur": "NTD",
+     "mvalue": "5,662,197,000",
+     "price": "129.0000",
+     "accint": "0",
+     "prate_addaccint": "3.624%"
+    },
+    {
+     "ftype": "期貨",
+     "stockid": "WTX202611",
+     "stockname": "115/11台股期貨",
+     "qshare": "550",
+     "etf_index": null,
+     "qshareCur": "NTD",
+     "mvalue": "4,854,960,000",
+     "price": "44,136.0000",
+     "accint": "0",
+     "prate_addaccint": "3.110%"
+    }
+   ],
+   "summary": [
+    {
+     "ftype": "股票",
+     "totValue": "150,518,856,470",
+     "totRatio": "96.342%"
+    },
+    {
+     "ftype": "期貨",
+     "totValue": "4,854,960,000",
+     "totRatio": "3.110%"
+    },
+    {
+     "ftype": "其他資產",
+     "totValue": "7,837,957,524",
+     "totRatio": "5.010%"
+    }
+   ],
+   "rate": [
+    {
+     "i_cur": "NTD",
+     "ddate": "2026/11/11",
+     "price": "32.8620"
+    }
+   ]
+  }
+ ],
+ "status": 0,
+ "totalPage": 0,
+ "nowPage": 0,
+ "nextPage": null,
+ "total": null,
+ "responseStatus": null
+}

@@ -1,0 +1,31 @@
+import Foundation
+
+/// The 口袋會員 features: each member screen is wrapped in `MemberLock` with its feature, which supplies the lock card's
+/// title and pitch.
+enum MemberFeature: String, CaseIterable, Codable {
+    case overlap, activeTracking, scenarios, goalPlanner, report, backtest, priceAlerts
+
+    var title: String {
+        switch self {
+        case .overlap: return "重疊成分"
+        case .activeTracking: return "主動式追蹤"
+        case .scenarios: return "多情境試算"
+        case .goalPlanner: return "存錢目標反推"
+        case .report: return "口袋月報／年報"
+        case .backtest: return "回測"
+        case .priceAlerts: return "到價提醒"
+        }
+    }
+
+    var pitch: String {
+        switch self {
+        case .overlap: return "看你持有的 ETF 重壓了哪些同樣的股票"
+        case .activeTracking: return "看主動式 ETF 新增、剔除了哪些持股，權重怎麼變"
+        case .scenarios: return "保守、基準、樂觀與壓力測試，四種情境一次試算"
+        case .goalPlanner: return "設定目標金額與年數，算出每月要投多少"
+        case .report: return "每月與每年自動整理成一份報告"
+        case .backtest: return "看看過去這樣每月買，會變成多少"
+        case .priceAlerts: return "設定價格，到了就通知你"
+        }
+    }
+}

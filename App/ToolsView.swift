@@ -14,12 +14,17 @@ struct ToolsView: View {
         (.goal, "存錢目標", "離目標還差多少", .goal, "tool-goal"),
         (.crown, "會員・換膚", "四套世界任你換", .member, "tool-member"),
     ]
-    private let more: [(title: String, subtitle: String, route: AppRoute, id: String)] = [
-        ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo"),
-        ("股息複利", "配息再投入試算", .plan, "tool-plan"),
-        ("持股透視", "成分與集中度", .exposure, "tool-exposure"),
-        ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices"),
-        ("備份資料", "匯出／匯入", .backup, "tool-backup"),
+    private let more: [(title: String, subtitle: String, route: AppRoute, id: String, member: Bool)] = [
+        ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo", false),
+        ("股息複利", "配息再投入試算", .plan, "tool-plan", false),
+        ("持股透視", "成分與集中度", .exposure, "tool-exposure", false),
+        ("通知中心", "配息、除息與 App 消息", .notices, "tool-notices", false),
+        ("存錢目標反推", "目標金額換算每月投入", .goalPlanner, "tool-goal-planner", true),
+        ("回測", "幾年前開始每月投，現在是多少", .backtest, "tool-backtest", true),
+        ("主動式追蹤", "主動式 ETF 新增、剔除了哪些持股", .activeTracking, "tool-active-tracking", true),
+        ("到價提醒", "價格到了你設定的數字就通知", .priceAlerts, "tool-price-alerts", true),
+        ("口袋月報／年報", "領息與習慣整理成一張可分享的卡", .report, "tool-report", true),
+        ("備份資料", "匯出／匯入", .backup, "tool-backup", false),
     ]
 
     var body: some View {
@@ -38,7 +43,10 @@ struct ToolsView: View {
                         NavigationLink(value: more[i].route) {
                             HStack(spacing: 10) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(more[i].title).skinFont(.title(15)).skinForeground(\.ink)
+                                    HStack(spacing: 6) {
+                                        Text(more[i].title).skinFont(.title(15)).skinForeground(\.ink)
+                                        if more[i].member { MemberCrown().frame(width: 18, height: 18) }
+                                    }
                                     Text(more[i].subtitle).skinFont(.body(12)).skinForeground(\.sub)
                                 }
                                 Spacer(minLength: 0)
@@ -461,8 +469,11 @@ struct ConnectionView: View {
         Section { Link("申請或管理富果行情金鑰", destination: URL(string: "https://developer.fugle.tw/docs/key/")!); Text("沒有金鑰時顯示每個交易日的開盤與收盤價，收盤後更新。想看盤中即時價，請向富果申請你自己的個人金鑰貼在上方；金鑰只供你本人使用，請勿分享給他人。金鑰只傳送給富果官方 API，且不寫入備份；可用商品與請求額度依你的富果方案而定。").font(.footnote).foregroundStyle(.secondary); Link("查看富果行情 API 說明", destination: URL(string: "https://developer.fugle.tw/docs/data/http-api/getting-started/")!) }
     }.navigationTitle("行情連線").navigationBarTitleDisplayMode(.inline).onAppear { do { hasKey = !(try SecureKey.read()).isEmpty } catch { message = error.localizedDescription } } }
 }
-/// 備份與券商資料: backup export/import, broker statement import and (not yet available) broker linking.
+/// 備份與券商資料: backup export/import and broker statement import. Broker linking is written but not available,
+/// and hidden (`Upcoming.visible`).
 struct BackupView: View {
+    /// What a backup holds (`PortfolioStore.export`), in the page's words.
+    static let backupSubtitle = "匯出或匯入持有、配息、交易、收藏、到價提醒、成分股紀錄、試算設定、遊戲進度與已取得報價；不含行情金鑰與可重新取得的歷史走勢"
     @EnvironmentObject var store: PortfolioStore
     @State private var importing = false
     @State private var exportURL: URL?
@@ -473,7 +484,7 @@ struct BackupView: View {
     var body: some View {
         Page {
             Card {
-                SectionHeading(title: "資料備份與還原", subtitle: "匯出或匯入持有、配息、交易、收藏與已取得報價；不含行情金鑰與可重新取得的歷史走勢")
+                SectionHeading(title: "資料備份與還原", subtitle: Self.backupSubtitle)
                 HStack(spacing: 10) {
                     actionTile("匯出備份 (JSON)", "包含自選、持股、設定", icon: "arrow.down.to.line", color: Palette.green) { do { exportURL = try store.export(); message = "已建立備份檔，可用下方按鈕儲存或分享。" } catch { message = error.localizedDescription } }
                     actionTile("匯入資料 (JSON)", "選擇備份檔案恢復資料", icon: "arrow.up.to.line", color: Palette.blue) { importing = true }
@@ -499,12 +510,17 @@ struct BackupView: View {
                     }.padding(12).background(Palette.cardSoft, in: RoundedRectangle(cornerRadius: 14))
                 }.buttonStyle(.plain).padding(.top, 10)
             }
-            Card {
-                SectionHeading(title: "券商連結設定", subtitle: "連結券商帳戶，自動同步持股餘額（開發中）")
-                HStack(spacing: 10) {
-                    status("未連線", "尚未連結券商帳戶", icon: "powerplug", color: Palette.red)
-                    status("自動同步", "待串接・開發中", icon: "arrow.triangle.2.circlepath", color: Palette.muted)
-                }.padding(.top, 10)
+            // Broker linking is not built: the section stays out of sight until it is (`Upcoming`).
+            if Upcoming.visible {
+                Card {
+                    SectionHeading(title: "券商連結設定", subtitle: "連結券商帳戶，自動同步持股餘額（開發中）")
+                    HStack(spacing: 10) {
+                        status("未連線", "尚未連結券商帳戶", icon: "powerplug", color: Palette.red)
+                        status("自動同步", "待串接・開發中", icon: "arrow.triangle.2.circlepath", color: Palette.muted)
+                    }.padding(.top, 10)
+                }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("backup-broker-link")
             }
         }
         .navigationTitle("備份與券商資料").navigationBarTitleDisplayMode(.inline)
@@ -512,7 +528,7 @@ struct BackupView: View {
             pending = nil; preview = nil; message = ""
             do { let url = try result.get(); let access = url.startAccessingSecurityScopedResource(); defer { if access { url.stopAccessingSecurityScopedResource() } }; let bytes = try DataChecks.readFile(url); preview = try BackupImport.decode(bytes); pending = bytes } catch { message = error.localizedDescription }
         }
-        .confirmationDialog("合併這份備份？", isPresented: $confirmation, titleVisibility: .visible) { Button("合併匯入") { do { if let pending { try store.importBackup(pending); message = "匯入完成，匯入前資料已保存於復原副本。"; preview = nil; self.pending = nil } } catch { message = error.localizedDescription } }; Button("取消", role: .cancel) { } }
+        .confirmationDialog("合併這份備份？", isPresented: $confirmation, titleVisibility: .visible) { Button("合併匯入") { do { if let pending { message = try store.importBackup(pending).message; preview = nil; self.pending = nil } } catch { message = error.localizedDescription } }; Button("取消", role: .cancel) { } }
     }
     private func actionTile(_ title: String, _ subtitle: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {

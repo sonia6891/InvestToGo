@@ -46,6 +46,14 @@ extension AppRoute {
         case "detail" where testing: return [.feature(.find), .fundDetail(symbol)]
         case "dex" where testing: return [.feature(.find), .dexCard(symbol)]
         case "reminders" where testing: return [.feature(.tools), .reminders]
+        case "goalPlanner" where testing: return [.feature(.tools), .goalPlanner]
+        case "backtest" where testing: return [.feature(.tools), .backtest]
+        case "activeTracking" where testing: return [.feature(.tools), .activeTracking]
+        case "priceAlerts" where testing: return [.feature(.tools), .priceAlerts]
+        case "report" where testing: return [.feature(.tools), .report]
+        case "exposure" where testing: return [.feature(.tools), .exposure]
+        case "backup" where testing: return [.feature(.tools), .backup]
+        case "sources" where testing: return [.feature(.tools), .sources]
         default: return nil
         }
     }

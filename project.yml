@@ -8,7 +8,7 @@ settings:
   base:
     SWIFT_VERSION: '5.0'
     TARGETED_DEVICE_FAMILY: '1'
-    MARKETING_VERSION: '0.3.0'
+    MARKETING_VERSION: '1.0'
     CURRENT_PROJECT_VERSION: '1'
     CODE_SIGN_STYLE: Automatic
 # Crash and error reporting (Task 14). Pinned: the newest 8.x release at least two weeks old.
@@ -50,6 +50,12 @@ targets:
           UIColorName: LaunchBackground
         # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
         SentryDSN: '$(SENTRY_DSN)'
+        # 到價提醒 (PriceAlertMonitor): the background refresh task that checks prices when iOS allows it. The
+        # identifier is the one the code registers; it does not have to match the bundle id.
+        BGTaskSchedulerPermittedIdentifiers:
+          - tw.sonia.etftogo.alerts
+        UIBackgroundModes:
+          - fetch
     settings:
       configs:
         # Written into project.pbxproj as a quoted string, not an .xcconfig, so the `//` is not a comment there.

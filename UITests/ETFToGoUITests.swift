@@ -653,11 +653,16 @@ final class ETFToGoUITests: XCTestCase {
         let locked = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'achievement-' AND value MATCHES %@", "^[0-9]+ / [0-9]+$"))
         XCTAssertGreaterThan(locked.count, 0, "A locked achievement shows its progress as numbers")
-        // No feature counts 體檢完成 yet: 「即將推出」, not 0 / 1 forever (ruling R31).
-        let soon = app.descendants(matching: .any)["achievement-checkupDone"]
-        if !soon.exists { app.swipeUp() }
-        XCTAssertTrue(soon.waitForExistence(timeout: 5))
-        XCTAssertEqual(soon.value as? String, "即將推出")
+        // No feature counts 體檢完成, 除息季限定皮膚 or 口袋年報 yet: they are not on the wall, and nothing on it says
+        // 「即將推出」 (App Review, guideline 2.1). The count is out of the eight that can be reached.
+        XCTAssertTrue(app.staticTexts["achievements-count"].label.hasSuffix(" / 8"), app.staticTexts["achievements-count"].label)
+        let last = app.descendants(matching: .any)["achievement-dividendMilestone"]
+        if !last.exists { app.swipeUp() }
+        XCTAssertTrue(last.waitForExistence(timeout: 5), "The last one on the wall is in view, so the whole wall has been drawn")
+        for hidden in ["checkupDone", "exDividendSkin", "yearReport"] {
+            XCTAssertFalse(app.descendants(matching: .any)["achievement-\(hidden)"].exists, "\(hidden) is not shown")
+        }
+        XCTAssertEqual(app.descendants(matching: .any).matching(NSPredicate(format: "value == %@ OR label CONTAINS %@", "即將推出", "即將推出")).count, 0)
         sleep(1); capture(app, "achievements")
     }
 
@@ -825,5 +830,314 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["load-failed-last"].exists, "The time of the last good data is shown")
         XCTAssertTrue(app.staticTexts["0050"].waitForExistence(timeout: 5), "The list still shows the last data")
         sleep(1); capture(app, "offline-find")
+    }
+
+    /// 重疊成分 is a member feature: a non-member sees the lock, a member (--demo-member) does not.
+    func testNonMemberSeesOverlapLock() {
+        let app = launch(["--open", "exposure"])
+        let tab = app.buttons["重疊成分"]
+        XCTAssertTrue(tab.waitForExistence(timeout: 10), "持股透視 opens")
+        tab.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-overlap"].waitForExistence(timeout: 5), "A non-member sees the overlap lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "exposure"])
+        XCTAssertTrue(member.buttons["重疊成分"].waitForExistence(timeout: 10))
+        member.buttons["重疊成分"].tap()
+        XCTAssertTrue(member.staticTexts["至少需要兩檔持有 ETF 的成分資料才能比較重疊。"].waitForExistence(timeout: 5), "A member sees the overlap list")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-overlap"].exists, "A member sees no lock")
+    }
+    /// 存錢目標反推 is a member feature: a non-member sees the lock, a member sees the monthly amount.
+    func testGoalPlannerLockAndMember() {
+        let app = launch(["--open", "goalPlanner"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-goalPlanner"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "goalPlanner"])
+        XCTAssertTrue(member.staticTexts["goal-planner-monthly"].waitForExistence(timeout: 10), "A member sees 每月需投入")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-goalPlanner"].exists)
+    }
+    /// 回測 is a member feature: a non-member sees the lock, a member sees the form. Nothing is downloaded here.
+    func testBacktestLockAndMember() {
+        let app = launch(["--open", "backtest"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-backtest"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        app.terminate()
+        let member = launch(["--demo-member", "--open", "backtest"])
+        XCTAssertTrue(member.buttons["backtest-run"].waitForExistence(timeout: 10), "A member sees the form and 開始回測")
+        XCTAssertTrue(member.textFields["backtest-monthly"].exists, "The form has 每月投入")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-backtest"].exists)
+    }
+    /// 主動式追蹤 is a member feature: a non-member sees the lock; a member sees what changed between the two newest days
+    /// of a favourite active ETF. The holdings are seeded (`--demo-active`): nothing is downloaded here.
+    func testActiveTrackingLockAndMember() {
+        let dates = "11/13 與 11/11 相比"
+        let app = launch(["--demo-active", "--open", "activeTracking"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-activeTracking"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["active-tracking-refresh"].exists, "The list is not there for a non-member")
+        app.terminate()
+        let member = launch(["--demo-member", "--demo-active", "--open", "activeTracking"])
+        XCTAssertTrue(member.buttons["active-tracking-refresh"].waitForExistence(timeout: 10), "A member sees the list and 更新")
+        XCTAssertTrue(member.staticTexts[dates].exists, "The two days compared are said plainly")
+        XCTAssertTrue(member.staticTexts["資料來自各投信官網公開的持股，更新時間依投信而定。"].exists)
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-activeTracking"].exists)
+        sleep(1); capture(member, "active-tracking-member")
+        member.terminate()
+        // The fund's own 持股 tab: the holdings are free, 持股變化 is the member's.
+        let detail = launch(["--demo-active", "--quiet-toasts", "--open", "detail", "--symbol", "00982A"])
+        XCTAssertTrue(detail.buttons["持股"].waitForExistence(timeout: 10))
+        detail.buttons["持股"].tap()
+        XCTAssertTrue(detail.buttons["holding-changes-lock"].waitForExistence(timeout: 5), "A non-member sees one line that opens 會員")
+        XCTAssertTrue(detail.buttons["更新成分股"].exists, "The holdings themselves stay free")
+        XCTAssertFalse(detail.staticTexts[dates].exists, "The change is not shown to a non-member")
+        detail.terminate()
+        let memberDetail = launch(["--demo-member", "--demo-active", "--quiet-toasts", "--open", "detail", "--symbol", "00982A"])
+        XCTAssertTrue(memberDetail.buttons["持股"].waitForExistence(timeout: 10))
+        memberDetail.buttons["持股"].tap()
+        XCTAssertTrue(memberDetail.staticTexts[dates].waitForExistence(timeout: 5), "A member sees the change on the fund's own page")
+        XCTAssertFalse(memberDetail.buttons["holding-changes-lock"].exists)
+    }
+    /// 到價提醒 is a member feature: a non-member sees the lock; a member adds an alert through the form and sees it in
+    /// the list. Under `--ui-testing` no price is asked for and no notification permission is requested.
+    func testPriceAlertsLockAndMember() {
+        let note = "沒有富果金鑰時，以每日收盤價判斷；iPhone 會在背景不定時檢查，不保證即時。"
+        let app = launch(["--open", "priceAlerts"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-priceAlerts"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["price-alert-add"].exists, "The form is not there for a non-member")
+        XCTAssertEqual(app.staticTexts["price-alerts-note"].label, note)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "priceAlerts"])
+        let symbol = member.textFields["price-alert-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 10), "A member sees the form")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-priceAlerts"].exists)
+        XCTAssertEqual(member.staticTexts["price-alerts-note"].label, note)
+        waitForLabel(member.staticTexts["price-alert-count"], "我的提醒 0／20")
+        symbol.tap(); symbol.typeText("0050")
+        let price = member.textFields["price-alert-price"]
+        price.tap(); price.typeText("200")
+        reveal(member, member.buttons["price-alert-add"])
+        let condition = member.staticTexts["price-alert-condition-0050"]
+        XCTAssertTrue(condition.waitForExistence(timeout: 5), "The new alert is in the list")
+        XCTAssertEqual(condition.label, "高於 200")
+        XCTAssertTrue(member.staticTexts["監看中"].exists)
+        waitForLabel(member.staticTexts["price-alert-count"], "我的提醒 1／20")
+        XCTAssertFalse(member.staticTexts["price-alert-error"].exists)
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists, "No permission prompt in UI tests")
+        sleep(1); capture(member, "price-alerts-member")
+        member.terminate()
+
+        // 「設到價提醒」 on a fund's 詳情: a non-member lands on the lock, a member on the form with the code filled in.
+        let detail = launch(["--quiet-toasts", "--open", "detail", "--symbol", "0050"])
+        XCTAssertTrue(detail.buttons["detail-price-alert"].waitForExistence(timeout: 10), "詳情 has 「設到價提醒」")
+        detail.buttons["detail-price-alert"].tap()
+        XCTAssertTrue(detail.descendants(matching: .any)["member-lock-priceAlerts"].waitForExistence(timeout: 5), "A non-member lands on the lock")
+        detail.terminate()
+        let memberDetail = launch(["--demo-member", "--quiet-toasts", "--open", "detail", "--symbol", "0050"])
+        XCTAssertTrue(memberDetail.buttons["detail-price-alert"].waitForExistence(timeout: 10))
+        memberDetail.buttons["detail-price-alert"].tap()
+        let filled = memberDetail.textFields["price-alert-symbol"]
+        XCTAssertTrue(filled.waitForExistence(timeout: 5), "A member lands on the form")
+        XCTAssertEqual(filled.value as? String, "0050", "The form starts with this fund's code")
+    }
+    /// 口袋月報／年報 is a member feature: a non-member sees the lock; a member sees the three tabs and the card, with
+    /// the dividend amount on it until 顯示領息金額 is switched off. Nothing is downloaded here.
+    func testReportLockAndMember() {
+        let app = launch(["--demo-pocket", "--open", "report"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-report"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["report-share"].exists, "The report is not there for a non-member")
+        XCTAssertFalse(app.descendants(matching: .any)["report-card"].exists)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--demo-pocket", "--demo-streak", "12", "--open", "report"])
+        let card = member.descendants(matching: .any)["report-card"]
+        XCTAssertTrue(card.waitForExistence(timeout: 10), "A member sees the card")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-report"].exists)
+        for tab in ["月報", "年報", "今年到目前"] { XCTAssertTrue(member.buttons[tab].exists, "The \(tab) tab is there") }
+        XCTAssertTrue(member.buttons["report-previous"].exists, "月報 steps back to earlier months")
+        XCTAssertFalse(member.buttons["report-next"].isEnabled, "It opens on the last month that ended; there is none after it")
+        let dividends = member.descendants(matching: .any)["report-dividends"]
+        XCTAssertTrue(dividends.exists, "領息 is on the card to start with")
+        XCTAssertTrue(member.descendants(matching: .any)["report-dca"].exists)
+        XCTAssertTrue(member.descendants(matching: .any)["report-level"].exists)
+        for word in ["市值", "損益", "報酬", "成本"] {
+            XCTAssertFalse(card.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", word)).firstMatch.exists, "The card never mentions \(word)")
+        }
+        sleep(1); capture(member, "report-month")
+        member.buttons["年報"].tap()
+        XCTAssertTrue(member.descendants(matching: .any)["report-reconciles"].waitForExistence(timeout: 5), "年報 has a card too")
+        member.buttons["今年到目前"].tap()
+        waitForLabel(member.staticTexts["report-heading"], "今年到目前")
+        XCTAssertFalse(member.buttons["report-previous"].exists, "今年到目前 is one period: nothing to step through")
+        XCTAssertTrue(dividends.exists)
+        sleep(1); capture(member, "report-year-to-date")
+        let toggle = member.switches["report-show-dividends"]
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { member.swipeUp() }
+        XCTAssertEqual(toggle.value as? String, "1", "顯示領息金額 starts switched on")
+        let dividendWords = card.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "領息"))
+        XCTAssertTrue(dividendWords.firstMatch.exists, "Switched on, the card speaks of 領息")
+        // The switch itself sits at the row's trailing edge; a tap on the words beside it does nothing.
+        let knob = toggle.switches.firstMatch
+        if knob.exists { knob.tap() } else { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap() }
+        waitForValue(toggle, "0")
+        XCTAssertFalse(dividends.exists, "Switched off, the amount is gone from the card")
+        XCTAssertFalse(dividendWords.firstMatch.exists, "and so is the line that counts the payments")
+        XCTAssertTrue(member.buttons["report-share"].exists, "分享 is there")
+    }
+    /// Every member screen that has a route of its own, opened both ways: a member (`--demo-member`) sees the screen
+    /// and no lock of any feature on it; a non-member sees that feature's lock and not the screen behind it.
+    func testEveryMemberFeatureOpens() {
+        memberScreen("goalPlanner", lock: "goalPlanner") { $0.staticTexts["goal-planner-monthly"] }
+        memberScreen("backtest", lock: "backtest") { $0.buttons["backtest-run"] }
+        memberScreen("priceAlerts", lock: "priceAlerts") { $0.textFields["price-alert-symbol"] }
+        // Seeded (`--demo-active`), so the member's list has a fund on it.
+        memberScreen("activeTracking", lock: "activeTracking", seed: ["--demo-active"]) { $0.buttons["active-tracking-refresh"] }
+        memberScreen("report", lock: "report", seed: ["--demo-pocket"]) { $0.descendants(matching: .any)["report-card"] }
+        // 持股透視 itself is free: the member's part is its 重疊成分 tab.
+        memberScreen("exposure", lock: "overlap", tab: "重疊成分") { $0.staticTexts["至少需要兩檔持有 ETF 的成分資料才能比較重疊。"] }
+    }
+    /// One `--open` route as a member, then as a non-member. `shown` is something only the member's screen has.
+    private func memberScreen(_ route: String, lock feature: String, seed: [String] = [], tab: String? = nil,
+                              shows shown: (XCUIApplication) -> XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        let anyLock = NSPredicate(format: "identifier BEGINSWITH %@", "member-lock-")
+        let member = launch(["--demo-member"] + seed + ["--open", route])
+        if let tab {
+            XCTAssertTrue(member.buttons[tab].waitForExistence(timeout: 10), "\(route) has the \(tab) tab", file: file, line: line)
+            member.buttons[tab].tap()
+        }
+        XCTAssertTrue(shown(member).waitForExistence(timeout: 10), "A member sees \(route)", file: file, line: line)
+        XCTAssertFalse(member.descendants(matching: .any).matching(anyLock).firstMatch.exists, "A member sees no lock on \(route)", file: file, line: line)
+        member.terminate()
+
+        let app = launch(seed + ["--open", route])
+        if let tab {
+            XCTAssertTrue(app.buttons[tab].waitForExistence(timeout: 10), "\(route) has the \(tab) tab", file: file, line: line)
+            app.buttons[tab].tap()
+        }
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-\(feature)"].waitForExistence(timeout: 10), "A non-member sees the \(feature) lock on \(route)", file: file, line: line)
+        XCTAssertTrue(app.buttons["看看口袋會員"].exists, "The lock has 「看看口袋會員」", file: file, line: line)
+        XCTAssertTrue(app.staticTexts["示意畫面，非真實資料"].exists, "The lock card says the preview below it is a sample", file: file, line: line)
+        XCTAssertFalse(shown(app).exists, "A non-member does not see \(route) itself", file: file, line: line)
+        app.terminate()
+    }
+    /// 組合試算's 基準 is free; 保守, 樂觀 and 壓力測試 are the member's (`MemberFeature.scenarios`). A non-member who
+    /// picks one of them sees the lock instead of its figures and can go back to 基準; a member sees every scenario.
+    func testScenarioLockInCombo() {
+        let lock = "member-lock-scenarios"
+        let app = launch(["--open", "tools"])
+        openComboResult(app)
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "A non-member's result opens on 基準")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists, "基準 is free: no lock on it")
+        reveal(app, app.buttons["壓力測試"])
+        XCTAssertTrue(app.descendants(matching: .any)[lock].waitForExistence(timeout: 5), "Another scenario shows the lock")
+        XCTAssertFalse(scenarioHeading(app, "壓力測試").exists, "and not that scenario's figures")
+        sleep(1); capture(app, "combo-scenario-locked")
+        reveal(app, scenarioChip(app, "基準"))
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "基準 is still there to go back to")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists, "Back on 基準 the lock is gone")
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "tools"])
+        openComboResult(member)
+        XCTAssertTrue(scenarioHeading(member, "基準情境").waitForExistence(timeout: 5), "A member's result opens on 基準 too")
+        reveal(member, member.buttons["壓力測試"])
+        XCTAssertTrue(scenarioHeading(member, "壓力測試").waitForExistence(timeout: 5), "A member sees 壓力測試's figures")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists, "A member sees no lock")
+        reveal(member, scenarioChip(member, "保守"))
+        XCTAssertTrue(scenarioHeading(member, "保守情境").waitForExistence(timeout: 5), "and 保守's")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists)
+        sleep(1); capture(member, "combo-scenario-member")
+    }
+    /// A5. A scenario picked in 試算設定 is the one 試算結果 opens on. For a non-member 保守 and 樂觀 wear the crown
+    /// there, and picking one leads to its lock card, never to 基準's figures passed off as the answer; a member gets
+    /// the scenario's own figures and sees no crown.
+    func testScenarioPickedInSettingsOpensOnIt() {
+        let lock = "member-lock-scenarios", crown = "口袋會員專屬"
+        let app = launch(["--open", "tools"])
+        openComboSettings(app)
+        let picked = app.buttons["combo-scenario-conservative"]
+        reveal(app, picked)
+        XCTAssertEqual(picked.value as? String, crown, "保守 is marked as the member's in the settings")
+        XCTAssertEqual(app.buttons["combo-scenario-optimistic"].value as? String, crown)
+        XCTAssertNotEqual(app.buttons["combo-scenario-base"].value as? String, crown, "基準 is free")
+        sleep(1); capture(app, "combo-settings-crowns")
+        reveal(app, app.buttons["combo-run"])
+        XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens")
+        XCTAssertTrue(app.descendants(matching: .any)[lock].waitForExistence(timeout: 5), "保守 was picked: its lock card is what opens")
+        XCTAssertFalse(scenarioHeading(app, "保守情境").exists, "and not its figures")
+        XCTAssertTrue(app.staticTexts["示意畫面，非真實資料"].exists, "The lock card says the preview is a sample")
+        XCTAssertEqual(app.buttons["壓力測試"].value as? String, crown, "The result's chips are marked too")
+        sleep(1); capture(app, "combo-scenario-picked-locked")
+        reveal(app, scenarioChip(app, "基準"))
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "基準 is a tap away")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "tools"])
+        openComboSettings(member)
+        let choice = member.buttons["combo-scenario-conservative"]
+        reveal(member, choice)
+        XCTAssertNotEqual(choice.value as? String, crown, "A member sees no crown")
+        reveal(member, member.buttons["combo-run"])
+        XCTAssertTrue(scenarioHeading(member, "保守情境").waitForExistence(timeout: 5), "A member lands on 保守's figures")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists)
+        XCTAssertNotEqual(member.buttons["壓力測試"].value as? String, crown)
+    }
+    /// App Review readiness (guideline 2.1): nothing on screen only says that it is coming or under development, and
+    /// no button is there that can never be pressed. The paywall lists the two plans there are.
+    func testNoUpcomingContentIsShown() {
+        let soon = NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@ OR label CONTAINS %@", "即將推出", "開發中", "待串接")
+        let paywall = launch(["--open", "member"])
+        XCTAssertTrue(paywall.buttons["member-plan-pocket"].waitForExistence(timeout: 10), "會員 opens")
+        XCTAssertTrue(paywall.buttons["member-plan-free"].exists)
+        XCTAssertFalse(paywall.descendants(matching: .any)["member-plan-ai"].exists, "會員＋AI is not offered and not shown")
+        XCTAssertEqual(paywall.descendants(matching: .any).matching(soon).count, 0)
+        XCTAssertEqual(paywall.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@", "會員＋AI", "AI 問答")).count, 0)
+        XCTAssertTrue(paywall.buttons["member-buy"].exists, "The buy button is still there under the two plans")
+        sleep(1); capture(paywall, "member-two-plans")
+        paywall.terminate()
+
+        let backup = launch(["--open", "backup"])
+        XCTAssertTrue(backup.navigationBars["備份與券商資料"].waitForExistence(timeout: 10), "備份 opens")
+        XCTAssertTrue(backup.staticTexts["券商對帳匯入"].exists, "What works is still there")
+        XCTAssertFalse(backup.staticTexts["券商連結設定"].exists, "Broker linking is not built: its section is not shown")
+        XCTAssertFalse(backup.descendants(matching: .any)["backup-broker-link"].exists)
+        XCTAssertEqual(backup.descendants(matching: .any).matching(soon).count, 0)
+        let subtitle = backup.staticTexts.matching(NSPredicate(format: "label CONTAINS %@ AND label CONTAINS %@", "到價提醒", "成分股紀錄")).firstMatch
+        XCTAssertTrue(subtitle.exists, "The backup's description names 到價提醒 and 成分股紀錄")
+        sleep(1); capture(backup, "backup-no-broker-link")
+        backup.terminate()
+
+        let sources = launch(["--open", "sources"])
+        XCTAssertTrue(sources.navigationBars["資料更新"].waitForExistence(timeout: 10), "資料更新 opens")
+        XCTAssertTrue(sources.staticTexts["ETF 成分股"].exists)
+        sources.swipeUp()
+        XCTAssertFalse(sources.staticTexts["外部整合"].exists, "The row with a dead 連結帳戶 button is not shown")
+        XCTAssertFalse(sources.buttons["連結帳戶"].exists)
+        XCTAssertEqual(sources.descendants(matching: .any).matching(soon).count, 0)
+        sleep(1); capture(sources, "sources-no-external")
+    }
+    /// 工具 → ETF 組合試算 → 設定試算: on 試算設定.
+    private func openComboSettings(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 10), "工具 has ETF 組合試算", file: file, line: line)
+        reveal(app, app.buttons["tool-combo"], file: file, line: line)
+        XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5), "組合試算 opens", file: file, line: line)
+        reveal(app, app.buttons["combo-settings"], file: file, line: line)
+        XCTAssertTrue(app.textFields["combo-monthly"].waitForExistence(timeout: 5), "試算設定 opens", file: file, line: line)
+    }
+    /// 工具 → ETF 組合試算 → 設定試算 → 開始試算: on 試算結果, as `testDiscoverIsETFOnlyAndComboRuns` gets there.
+    private func openComboResult(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        openComboSettings(app, file: file, line: line)
+        reveal(app, app.buttons["combo-run"], file: file, line: line)
+        XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens", file: file, line: line)
+    }
+    /// The line above the figures on 試算結果 that names the scenario they are for: 「基準情境・…」, 「壓力測試・…」.
+    private func scenarioHeading(_ app: XCUIApplication, _ name: String) -> XCUIElement {
+        app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", name + "・")).firstMatch
+    }
+    /// A chip of 情境切換. Its label is the scenario's name followed by its rate.
+    private func scenarioChip(_ app: XCUIApplication, _ name: String) -> XCUIElement {
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name)).firstMatch
+    }
+    private func waitForValue(_ element: XCUIElement, _ value: String, file: StaticString = #filePath, line: UInt = #line) {
+        let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
+        XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(value), got \(element.exists ? String(describing: element.value) : "nothing")", file: file, line: line)
     }
 }

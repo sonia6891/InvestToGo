@@ -69,6 +69,80 @@ final class GameStateTests: XCTestCase {
         XCTAssertEqual(empty, GameState())
     }
 
+    // MARK: Importing a backup (final review A6)
+
+    /// A phone with no progress yet takes the backup's whole; the months 月報 and 年報 read come with it.
+    func testFreshGameAdoptsTheBackups() {
+        var backup = GameState()
+        _ = backup.recordDCA(on: date(2026, 10, 5), now: date(2026, 10, 5))
+        backup.award(.dividendLogged, at: date(2026, 11, 3))
+        backup.collected["0050"] = date(2026, 10, 6)
+        backup.rewardKeys = ["dividend|00878|2026-11"]
+        XCTAssertFalse(backup.isFresh)
+        XCTAssertGreaterThan(backup.xp, 0)
+
+        XCTAssertTrue(GameState().isFresh)
+        // A phone just set up: onboarding and the launch migration have run, nothing has been earned.
+        var local = GameState()
+        local.habit = .dca
+        local.migration = 3
+        local.migratedAt = date(2026, 11, 14)
+        XCTAssertTrue(local.isFresh)
+
+        for start in [nil, GameState(), local] as [GameState?] {
+            let result = GameState.afterImport(local: start, incoming: backup)
+            XCTAssertEqual(result.game, backup, "Adopted whole: level, streak, cards, reward keys")
+            XCTAssertFalse(result.skipped)
+            XCTAssertEqual(result.game?.xpByMonth.values.reduce(0, +), backup.xp, "The experience by month still adds up to the experience")
+        }
+    }
+
+    /// A phone that has its own progress keeps it untouched: nothing is merged, and the caller is told.
+    func testGameWithProgressIsKept() {
+        var backup = GameState()
+        backup.award(.questDone, at: date(2026, 10, 3))
+        backup.collected["0056"] = date(2026, 10, 6)
+        for change in 0..<4 {
+            var local = GameState()
+            switch change {
+            case 0: local.award(.dividendLogged, at: date(2026, 11, 3))
+            case 1: local.dcaMonths = [YearMonth(year: 2026, month: 11)]
+            case 2: local.collected["0050"] = date(2026, 11, 2)
+            default: local.rewardKeys = ["reconciled|2026-11"]
+            }
+            XCTAssertFalse(local.isFresh, "case \(change)")
+            let result = GameState.afterImport(local: local, incoming: backup)
+            XCTAssertEqual(result.game, local, "case \(change): not a point, month or card is added")
+            XCTAssertTrue(result.skipped, "case \(change)")
+        }
+        // Nothing to say when the backup has no progress, none at all, or the very same one.
+        var local = GameState()
+        local.award(.dividendLogged, at: date(2026, 11, 3))
+        XCTAssertFalse(GameState.afterImport(local: local, incoming: nil).skipped)
+        XCTAssertEqual(GameState.afterImport(local: local, incoming: nil).game, local)
+        XCTAssertFalse(GameState.afterImport(local: local, incoming: GameState()).skipped)
+        XCTAssertFalse(GameState.afterImport(local: local, incoming: local).skipped)
+        XCTAssertNil(GameState.afterImport(local: nil, incoming: nil).game)
+    }
+
+    /// A backup whose months add up to more than its experience (or go below zero) loses the months, not the total.
+    func testAdoptedExperienceByMonthNeverExceedsTheTotal() {
+        var odd = GameState()
+        odd.xp = 100
+        odd.xpByMonth = ["2026-10": 80, "2026-11": 90]
+        XCTAssertEqual(GameState.afterImport(local: nil, incoming: odd).game?.xpByMonth, [:])
+        XCTAssertEqual(GameState.afterImport(local: nil, incoming: odd).game?.xp, 100)
+        odd.xpByMonth = ["2026-10": -5]
+        XCTAssertEqual(odd.checkedForAdoption().xpByMonth, [:])
+        odd.xpByMonth = ["2026-10": Int.max, "2026-11": Int.max]
+        XCTAssertEqual(odd.checkedForAdoption().xpByMonth, [:], "No overflow on a file made to break the sum")
+        odd.xpByMonth = ["2026-10": 60, "2026-11": 40]
+        XCTAssertEqual(odd.checkedForAdoption().xpByMonth, ["2026-10": 60, "2026-11": 40])
+        odd.xp = -30; odd.coins = -1; odd.xpByMonth = [:]
+        XCTAssertEqual(odd.checkedForAdoption().xp, 0)
+        XCTAssertEqual(odd.checkedForAdoption().coins, 0)
+    }
+
     func testPortfolioWithoutGameDecodes() throws {
         let json = #"{"schema":1,"holdings":[],"dividends":[],"favorites":[],"quotes":{}}"#
         let p = try JSONDecoder().decode(Portfolio.self, from: Data(json.utf8))

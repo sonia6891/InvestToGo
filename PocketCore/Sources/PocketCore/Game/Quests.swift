@@ -55,7 +55,7 @@ extension GameState {
         guard let quest = Quests.forMonth(m, habit: habit ?? .dca, isNewbie: isNewbie).first(where: { $0.trigger == q }) else { return [] }
         if Quests.newbieOnly.contains(quest.trigger), questsDone.values.contains(where: { $0.contains(quest.id) }) { return [] }
         guard questsDone[m.key, default: []].insert(quest.id).inserted else { return [] }
-        award(.questDone)
+        award(.questDone, at: now)
         return [.questDone]
     }
 }

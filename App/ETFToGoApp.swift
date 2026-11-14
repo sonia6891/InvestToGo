@@ -14,6 +14,8 @@ import SwiftUI
         // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
         let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
         Onboarding.reset(args)
+        ReportSettings.reset(args)
+        BacktestSettings.reset(args)
         // Someone upgrading with records on the phone has started already: no first-launch flow for them.
         Onboarding.adoptExisting(store.data)
         // One-time migrations of the game progress: DCA months backfilled from the records, with no experience.
@@ -22,12 +24,24 @@ import SwiftUI
         try? store.updateGame { DemoArguments.apply(to: &$0, args: args, now: Date()) }
         DemoArguments.seedPocket(store, args: args, now: Date())
         DemoArguments.seedHeld(store, args: args)
+        DemoArguments.seedActive(store, args: args)
+        DemoArguments.seedStore(store, args: args, now: Date())
         _store = StateObject(wrappedValue: store)
+        // A launch in the background on a locked phone reads the records later; the two steps above are then redone.
+        // The worn skin was not judged while they were locked (the level read 1): it is now.
+        store.onRecordsRead = { store in
+            Onboarding.adoptExisting(store.data)
+            try? store.updateGame { $0.migrate(store.data) }
+            MembershipStore.shared.recordsRead()
+        }
+        // 到價提醒: iOS wants the background task's handler before launch ends. Nothing is registered in UI tests.
+        PriceAlertMonitor.start(store, testing: testing)
         // StoreKit is followed from launch (Apple asks for the Transaction.updates listener then), so renewals and Ask
         // to Buy answers that arrive during the splash or onboarding are not missed. Once StoreKit has answered, a skin
         // the player may no longer wear is taken off, with a notice.
         let membership = MembershipStore.shared
         membership.level = { [weak store] in GameRules.level(xp: store?.data.game?.xp ?? 0) }
+        membership.recordsLocked = { [weak store] in store?.recordsLocked ?? false }
         membership.onLapse = { [weak store] notice in store?.pendingNotice = notice }
         Task { await membership.start() }
     }
@@ -137,12 +151,19 @@ struct RootView: View {
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
         .task(id: phase) {
-            guard phase == .active, !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
+            guard phase == .active else { return }
+            // The records could not be opened at a launch in the background (locked phone): read them now.
+            store.reloadIfLocked()
+            guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
             store.live.start()
             await store.followMarket()
+            // 到價提醒 (spec 5.7): judged on the prices just refreshed, when the app comes to the front (five minutes
+            // apart at least).
+            await PriceAlertMonitor.checkOnReturn()
         }
-        .onChange(of: phase) { _, value in if value == .background { store.live.stop() } }
-        .task(id: store.data.dividends.map(\.id)) { await DividendReminders.syncIfEnabled(store.data.dividends) }
+        .onChange(of: phase) { _, value in if value == .background { store.live.stop(); PriceAlertMonitor.scheduleNext() } }
+        // Locked records are empty, not gone: the reminders already scheduled stay until they can be read.
+        .task(id: store.data.dividends.map(\.id)) { if !store.recordsLocked { await DividendReminders.syncIfEnabled(store.data.dividends) } }
         .alert("投資袋著走", isPresented: Binding(get: { store.message != nil }, set: { if !$0 { store.message = nil } })) { Button("知道了", role: .cancel) { store.message = nil } } message: { Text(store.message ?? "") }
     }
 
