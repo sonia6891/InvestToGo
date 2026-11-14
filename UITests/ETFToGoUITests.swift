@@ -653,11 +653,16 @@ final class ETFToGoUITests: XCTestCase {
         let locked = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'achievement-' AND value MATCHES %@", "^[0-9]+ / [0-9]+$"))
         XCTAssertGreaterThan(locked.count, 0, "A locked achievement shows its progress as numbers")
-        // No feature counts 體檢完成 yet: 「即將推出」, not 0 / 1 forever (ruling R31).
-        let soon = app.descendants(matching: .any)["achievement-checkupDone"]
-        if !soon.exists { app.swipeUp() }
-        XCTAssertTrue(soon.waitForExistence(timeout: 5))
-        XCTAssertEqual(soon.value as? String, "即將推出")
+        // No feature counts 體檢完成, 除息季限定皮膚 or 口袋年報 yet: they are not on the wall, and nothing on it says
+        // 「即將推出」 (App Review, guideline 2.1). The count is out of the eight that can be reached.
+        XCTAssertTrue(app.staticTexts["achievements-count"].label.hasSuffix(" / 8"), app.staticTexts["achievements-count"].label)
+        let last = app.descendants(matching: .any)["achievement-dividendMilestone"]
+        if !last.exists { app.swipeUp() }
+        XCTAssertTrue(last.waitForExistence(timeout: 5), "The last one on the wall is in view, so the whole wall has been drawn")
+        for hidden in ["checkupDone", "exDividendSkin", "yearReport"] {
+            XCTAssertFalse(app.descendants(matching: .any)["achievement-\(hidden)"].exists, "\(hidden) is not shown")
+        }
+        XCTAssertEqual(app.descendants(matching: .any).matching(NSPredicate(format: "value == %@ OR label CONTAINS %@", "即將推出", "即將推出")).count, 0)
         sleep(1); capture(app, "achievements")
     }
 
@@ -1008,6 +1013,7 @@ final class ETFToGoUITests: XCTestCase {
         }
         XCTAssertTrue(app.descendants(matching: .any)["member-lock-\(feature)"].waitForExistence(timeout: 10), "A non-member sees the \(feature) lock on \(route)", file: file, line: line)
         XCTAssertTrue(app.buttons["看看口袋會員"].exists, "The lock has 「看看口袋會員」", file: file, line: line)
+        XCTAssertTrue(app.staticTexts["示意畫面，非真實資料"].exists, "The lock card says the preview below it is a sample", file: file, line: line)
         XCTAssertFalse(shown(app).exists, "A non-member does not see \(route) itself", file: file, line: line)
         app.terminate()
     }
@@ -1039,13 +1045,87 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(member.descendants(matching: .any)[lock].exists)
         sleep(1); capture(member, "combo-scenario-member")
     }
-    /// 工具 → ETF 組合試算 → 設定試算 → 開始試算: on 試算結果, as `testDiscoverIsETFOnlyAndComboRuns` gets there.
-    private func openComboResult(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+    /// A5. A scenario picked in 試算設定 is the one 試算結果 opens on. For a non-member 保守 and 樂觀 wear the crown
+    /// there, and picking one leads to its lock card, never to 基準's figures passed off as the answer; a member gets
+    /// the scenario's own figures and sees no crown.
+    func testScenarioPickedInSettingsOpensOnIt() {
+        let lock = "member-lock-scenarios", crown = "口袋會員專屬"
+        let app = launch(["--open", "tools"])
+        openComboSettings(app)
+        let picked = app.buttons["combo-scenario-conservative"]
+        reveal(app, picked)
+        XCTAssertEqual(picked.value as? String, crown, "保守 is marked as the member's in the settings")
+        XCTAssertEqual(app.buttons["combo-scenario-optimistic"].value as? String, crown)
+        XCTAssertNotEqual(app.buttons["combo-scenario-base"].value as? String, crown, "基準 is free")
+        sleep(1); capture(app, "combo-settings-crowns")
+        reveal(app, app.buttons["combo-run"])
+        XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens")
+        XCTAssertTrue(app.descendants(matching: .any)[lock].waitForExistence(timeout: 5), "保守 was picked: its lock card is what opens")
+        XCTAssertFalse(scenarioHeading(app, "保守情境").exists, "and not its figures")
+        XCTAssertFalse(scenarioHeading(app, "基準情境").exists, "nor 基準's figures as if they were the answer")
+        XCTAssertTrue(app.staticTexts["示意畫面，非真實資料"].exists, "The lock card says the preview is a sample")
+        XCTAssertEqual(app.buttons["壓力測試"].value as? String, crown, "The result's chips are marked too")
+        sleep(1); capture(app, "combo-scenario-picked-locked")
+        reveal(app, scenarioChip(app, "基準"))
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "基準 is a tap away")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "tools"])
+        openComboSettings(member)
+        let choice = member.buttons["combo-scenario-conservative"]
+        reveal(member, choice)
+        XCTAssertNotEqual(choice.value as? String, crown, "A member sees no crown")
+        reveal(member, member.buttons["combo-run"])
+        XCTAssertTrue(scenarioHeading(member, "保守情境").waitForExistence(timeout: 5), "A member lands on 保守's figures")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists)
+        XCTAssertNotEqual(member.buttons["壓力測試"].value as? String, crown)
+    }
+    /// App Review readiness (guideline 2.1): nothing on screen only says that it is coming or under development, and
+    /// no button is there that can never be pressed. The paywall lists the two plans there are.
+    func testNoUpcomingContentIsShown() {
+        let soon = NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@ OR label CONTAINS %@", "即將推出", "開發中", "待串接")
+        let paywall = launch(["--open", "member"])
+        XCTAssertTrue(paywall.buttons["member-plan-pocket"].waitForExistence(timeout: 10), "會員 opens")
+        XCTAssertTrue(paywall.buttons["member-plan-free"].exists)
+        XCTAssertFalse(paywall.descendants(matching: .any)["member-plan-ai"].exists, "會員＋AI is not offered and not shown")
+        XCTAssertEqual(paywall.descendants(matching: .any).matching(soon).count, 0)
+        XCTAssertEqual(paywall.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@ OR label CONTAINS %@", "會員＋AI", "AI 問答")).count, 0)
+        XCTAssertTrue(paywall.buttons["member-buy"].exists, "The buy button is still there under the two plans")
+        sleep(1); capture(paywall, "member-two-plans")
+        paywall.terminate()
+
+        let backup = launch(["--open", "backup"])
+        XCTAssertTrue(backup.navigationBars["備份與券商資料"].waitForExistence(timeout: 10), "備份 opens")
+        XCTAssertTrue(backup.staticTexts["券商對帳匯入"].exists, "What works is still there")
+        XCTAssertFalse(backup.staticTexts["券商連結設定"].exists, "Broker linking is not built: its section is not shown")
+        XCTAssertFalse(backup.descendants(matching: .any)["backup-broker-link"].exists)
+        XCTAssertEqual(backup.descendants(matching: .any).matching(soon).count, 0)
+        let subtitle = backup.staticTexts.matching(NSPredicate(format: "label CONTAINS %@ AND label CONTAINS %@", "到價提醒", "成分股紀錄")).firstMatch
+        XCTAssertTrue(subtitle.exists, "The backup's description names 到價提醒 and 成分股紀錄")
+        sleep(1); capture(backup, "backup-no-broker-link")
+        backup.terminate()
+
+        let sources = launch(["--open", "sources"])
+        XCTAssertTrue(sources.navigationBars["資料更新"].waitForExistence(timeout: 10), "資料更新 opens")
+        XCTAssertTrue(sources.staticTexts["ETF 成分股"].exists)
+        sources.swipeUp()
+        XCTAssertFalse(sources.staticTexts["外部整合"].exists, "The row with a dead 連結帳戶 button is not shown")
+        XCTAssertFalse(sources.buttons["連結帳戶"].exists)
+        XCTAssertEqual(sources.descendants(matching: .any).matching(soon).count, 0)
+        sleep(1); capture(sources, "sources-no-external")
+    }
+    /// 工具 → ETF 組合試算 → 設定試算: on 試算設定.
+    private func openComboSettings(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 10), "工具 has ETF 組合試算", file: file, line: line)
         reveal(app, app.buttons["tool-combo"], file: file, line: line)
         XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5), "組合試算 opens", file: file, line: line)
         reveal(app, app.buttons["combo-settings"], file: file, line: line)
         XCTAssertTrue(app.textFields["combo-monthly"].waitForExistence(timeout: 5), "試算設定 opens", file: file, line: line)
+    }
+    /// 工具 → ETF 組合試算 → 設定試算 → 開始試算: on 試算結果, as `testDiscoverIsETFOnlyAndComboRuns` gets there.
+    private func openComboResult(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        openComboSettings(app, file: file, line: line)
         reveal(app, app.buttons["combo-run"], file: file, line: line)
         XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens", file: file, line: line)
     }

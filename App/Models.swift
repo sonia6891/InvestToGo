@@ -77,11 +77,37 @@ import SwiftUI
         // The holdings history is kept apart from the records in the same way; a records file that still holds it
         // (written before it had its own file) is moved over by the next save. The file's days win over the records'.
         componentHistorySaved = (loaded.componentHistory ?? [:]).isEmpty
-        if let bytes = try? Data(contentsOf: componentHistoryURL), let cached = try? JSONDecoder().decode([String: [ComponentSnapshot]].self, from: bytes) {
-            let valid = cached.filter { (try? Portfolio.validate(history: $0.value, of: $0.key)) != nil }
-            if !valid.isEmpty { loaded.componentHistory = (loaded.componentHistory ?? [:]).merging(valid) { _, cached in cached } }
+        if let valid = readComponentHistory(), !valid.isEmpty {
+            loaded.componentHistory = (loaded.componentHistory ?? [:]).merging(valid) { _, cached in cached }
         }
         data = loaded
+    }
+    /// The holdings history on file, the ETFs that validate. Nil when there is no file or it does not decode; nil
+    /// too, with `componentHistoryLocked` set, when the file is there but iOS will not open it yet.
+    private func readComponentHistory() -> [String: [ComponentSnapshot]]? {
+        componentHistoryLocked = false
+        let bytes: Data
+        do { bytes = try Data(contentsOf: componentHistoryURL) } catch {
+            if Self.isProtected(error) { componentHistoryLocked = true }
+            return nil
+        }
+        guard let cached = try? JSONDecoder().decode([String: [ComponentSnapshot]].self, from: bytes) else { return nil }
+        return cached.filter { (try? Portfolio.validate(history: $0.value, of: $0.key)) != nil }
+    }
+    /// The holdings history file could not be opened although the records could (the phone locked between the two
+    /// reads, or was unlocking): the history in memory is then not what is on file. Like `recordsLocked` for that one
+    /// file: nothing is saved over it until it has been read (`mergeLockedComponentHistory`).
+    private(set) var componentHistoryLocked = false
+    /// Tries the locked history file again. Once it opens, `history` (what was added while it could not be read)
+    /// joins what the file holds, day by day; nil while it is still locked.
+    private func mergeLockedComponentHistory(_ history: [String: [ComponentSnapshot]]?) -> [String: [ComponentSnapshot]]? {
+        let onFile = readComponentHistory()
+        guard !componentHistoryLocked else { return nil }
+        var merged = Portfolio()
+        merged.componentHistory = onFile
+        // Oldest first, so that the newest days are the ones kept when an ETF has more than the limit.
+        for snapshot in (history ?? [:]).values.joined().sorted(by: { $0.date < $1.date }) { merged.remember(snapshot) }
+        return merged.componentHistory ?? [:]
     }
     private var readFailure = false
     /// The records could not be opened at launch because the phone was locked (they are saved with complete file
@@ -99,7 +125,15 @@ import SwiftUI
     /// After a launch on a locked phone: reads the records now, if iOS lets it. False only while they are still
     /// locked; true at once when they never were.
     @discardableResult func reloadIfLocked() -> Bool {
-        guard recordsLocked else { return true }
+        guard recordsLocked else {
+            // The records were read but the holdings history was not: read now, it joins what is in memory and is
+            // written back by the next save.
+            if componentHistoryLocked, let merged = mergeLockedComponentHistory(data.componentHistory) {
+                data.componentHistory = merged.isEmpty ? nil : merged
+                componentHistorySaved = false
+            }
+            return true
+        }
         loadRecords()
         guard !recordsLocked else { return false }
         onRecordsRead(self)
@@ -113,6 +147,14 @@ import SwiftUI
     private var componentHistoryURL: URL { url.appendingPathExtension("holdings") }
     func commit(_ next: Portfolio) throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }
+        var next = next
+        // A history file that could not be read is never saved over: it is tried again here, and what it holds is
+        // kept together with what this save adds. While it stays locked the records are saved without it and the
+        // history waits in memory (`componentHistorySaved` false) for a save that can read the file first.
+        if componentHistoryLocked {
+            if let merged = mergeLockedComponentHistory(next.componentHistory) { next.componentHistory = merged.isEmpty ? nil : merged }
+            componentHistorySaved = false
+        }
         var records = next; records.histories = nil; records.componentHistory = nil
         let encoded = try JSONEncoder().encode(records)
         guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
@@ -122,7 +164,7 @@ import SwiftUI
             try JSONEncoder().encode(next.histories ?? [:]).write(to: historiesURL, options: [.atomic, .completeFileProtection])
             historiesSaved = true
         }
-        if next.componentHistory != data.componentHistory || !componentHistorySaved {
+        if !componentHistoryLocked, next.componentHistory != data.componentHistory || !componentHistorySaved {
             try JSONEncoder().encode(next.componentHistory ?? [:]).write(to: componentHistoryURL, options: [.atomic, .completeFileProtection])
             componentHistorySaved = true
         }
@@ -307,7 +349,15 @@ import SwiftUI
         try bytes.write(to: file, options: .atomic)
         return file
     }
-    func importBackup(_ bytes: Data) throws {
+    /// What an import left out, for the message that follows it.
+    struct ImportSummary: Equatable {
+        /// The backup had game progress and this phone already has its own: the phone's was kept.
+        var gameSkipped = false
+        static let done = "匯入完成，匯入前資料已保存於復原副本。"
+        static let gameKept = "遊戲進度沒有匯入：這支手機已經有進度。"
+        var message: String { gameSkipped ? Self.done + Self.gameKept : Self.done }
+    }
+    @discardableResult func importBackup(_ bytes: Data) throws -> ImportSummary {
         let incoming = try BackupImport.decode(bytes)
         // Merge by stable IDs; incoming records update matches, existing unmatched records are retained.
         var next = data
@@ -334,8 +384,13 @@ import SwiftUI
         next.fees = (next.fees ?? [:]).merging(incoming.fees ?? [:]) { _, new in new }
         // Restore missing cached quotes; retain quotes already on this device.
         for (symbol, quote) in incoming.quotes where next.quotes[symbol] == nil { next.quotes[symbol] = quote }
+        // Game progress (level, streak, cards, the months behind 月報 and 年報): a phone with none yet takes the
+        // backup's whole; one that has its own keeps it untouched and the message says so.
+        let game = GameState.afterImport(local: data.game, incoming: incoming.game)
+        next.game = game.game
         try saveRecovery()
         try commit(next)
+        return ImportSummary(gameSkipped: game.skipped)
     }
     func saveRecovery() throws {
         guard !readFailure else { throw StoreError.unsupportedBackup }

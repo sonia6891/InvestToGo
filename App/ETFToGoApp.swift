@@ -28,9 +28,11 @@ import SwiftUI
         DemoArguments.seedStore(store, args: args, now: Date())
         _store = StateObject(wrappedValue: store)
         // A launch in the background on a locked phone reads the records later; the two steps above are then redone.
+        // The worn skin was not judged while they were locked (the level read 1): it is now.
         store.onRecordsRead = { store in
             Onboarding.adoptExisting(store.data)
             try? store.updateGame { $0.migrate(store.data) }
+            MembershipStore.shared.recordsRead()
         }
         // 到價提醒: iOS wants the background task's handler before launch ends. Nothing is registered in UI tests.
         PriceAlertMonitor.start(store, testing: testing)
@@ -39,6 +41,7 @@ import SwiftUI
         // the player may no longer wear is taken off, with a notice.
         let membership = MembershipStore.shared
         membership.level = { [weak store] in GameRules.level(xp: store?.data.game?.xp ?? 0) }
+        membership.recordsLocked = { [weak store] in store?.recordsLocked ?? false }
         membership.onLapse = { [weak store] notice in store?.pendingNotice = notice }
         Task { await membership.start() }
     }

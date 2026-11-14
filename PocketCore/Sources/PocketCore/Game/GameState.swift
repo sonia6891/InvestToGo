@@ -65,6 +65,32 @@ struct GameState: Codable, Equatable {
 
     /// Spec 5.3: a newbie is someone who has not started a DCA yet.
     var isNewbie: Bool { dcaMonths.isEmpty }
+
+    /// Nothing has been earned yet: no experience, no 定期定額 month, no card collected, no reward paid. A phone that
+    /// was just set up is like this, and only then may a backup's progress take this one's place.
+    var isFresh: Bool { xp == 0 && dcaMonths.isEmpty && collected.isEmpty && rewardKeys.isEmpty }
+
+    /// The progress to keep when a backup is imported, and whether the backup's was left out. A fresh game (or
+    /// none) takes the backup's whole: level, streak, cards and the months 月報 and 年報 are made from. A game that
+    /// already has progress stays exactly as it is. The two are never merged: adding one phone's experience to
+    /// another's would be a way to earn it twice.
+    static func afterImport(local: GameState?, incoming: GameState?) -> (game: GameState?, skipped: Bool) {
+        guard let incoming else { return (local, false) }
+        guard let local, !local.isFresh else { return (incoming.checkedForAdoption(), false) }
+        // The same progress, or a backup with none: nothing was left out that is worth a word.
+        return (local, incoming != local && !incoming.isFresh)
+    }
+
+    /// A backup's progress as it is taken over: the totals are never negative, and the experience by month never
+    /// adds up to more than the experience there is (a file that says otherwise loses the months, not the total).
+    func checkedForAdoption() -> GameState {
+        var game = self
+        game.xp = max(0, game.xp)
+        game.coins = max(0, game.coins)
+        let months = game.xpByMonth.values
+        if months.contains(where: { $0 < 0 }) || months.reduce(0.0, { $0 + Double($1) }) > Double(game.xp) { game.xpByMonth = [:] }
+        return game
+    }
 }
 
 /// Every field falls back to its default so progress saved by an older build never fails to decode
