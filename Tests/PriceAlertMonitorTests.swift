@@ -168,6 +168,24 @@ final class PriceAlertMonitorTests: XCTestCase {
         XCTAssertFalse(store.fetchingQuotes)
     }
 
+    /// A quiet refresh and one asked for by hand may overlap; the one that finishes last may carry the older price.
+    /// What is saved is the price fetched later, so the price on screen never goes back.
+    @MainActor func testAnOlderFetchNeverReplacesANewerQuote() throws {
+        let store = PortfolioStore(url: file)
+        let earlier = Date(timeIntervalSinceNow: -60), later = Date()
+        func fetched(_ symbol: String, _ price: Double, at time: Date) -> Quote {
+            Quote(symbol: symbol, price: price, changePercent: nil, date: DataChecks.day(), fetchedAt: time)
+        }
+        // The hand refresh, started second, saves first; the quiet one then finishes with what it fetched earlier.
+        try store.keepFetched(["0050": fetched("0050", 201, at: later)], since: earlier)
+        try store.keepFetched(["0050": fetched("0050", 199, at: earlier), "0056": fetched("0056", 38, at: earlier)], since: earlier)
+        XCTAssertEqual(store.data.quotes["0050"]?.price, 201, "The older fetch does not replace the newer price")
+        XCTAssertEqual(store.data.quotes["0056"]?.price, 38, "A code with nothing newer saved is saved as before")
+        try store.keepFetched(["0050": fetched("0050", 203, at: later.addingTimeInterval(1))], since: later)
+        XCTAssertEqual(store.data.quotes["0050"]?.price, 203, "A later fetch still replaces it")
+        XCTAssertEqual(PortfolioStore(url: file).data.quotes["0050"]?.price, 203, "Saved with the records")
+    }
+
     // MARK: The list
 
     @MainActor func testStoreKeepsTwentyAndRemoves() throws {

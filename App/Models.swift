@@ -403,7 +403,7 @@ import SwiftUI
     /// Takes the turn for a refresh; false when it has to be skipped. One asked for by hand waits only for another
     /// asked for by hand. A quiet one is nobody's request, so it gives way to any refresh already running, and it
     /// leaves `refreshing` alone. The two kinds may then overlap: each saves through `keepFetched`, which merges into
-    /// the records as they are at that moment, so neither undoes the other.
+    /// the records as they are at that moment and keeps the later price of each code, so neither undoes the other.
     func beginRefresh(quiet: Bool) -> Bool {
         if quiet {
             guard !fetchingQuotes else { return false }
@@ -417,12 +417,14 @@ import SwiftUI
     func endRefresh(quiet: Bool) { if quiet { quietRefreshing = false } else { refreshing = false } }
     /// Saves refreshed quotes, merged into the current data since the user may have edited holdings meanwhile.
     /// Trial-match prices only show (through liveQuotes) and are never saved as the day's price.
-    private func keepFetched(_ fetched: [String: Quote], since started: Date) throws {
+    /// A quote already saved that was fetched later stays: of two refreshes that overlap, the slower one may finish
+    /// last with the older price, and the price on screen must not go back to it.
+    func keepFetched(_ fetched: [String: Quote], since started: Date) throws {
         let trial = fetched.filter { $0.value.trial == true }
         // A real trade streamed in while the requests were running, or anything newer, is kept.
         if !trial.isEmpty { liveQuotes.merge(trial) { old, new in (old.trial != true && old.date == new.date && old.fetchedAt >= started) || old.fetchedAt > new.fetchedAt ? old : new } }
         var next = data
-        next.quotes.merge(fetched.filter { $0.value.trial != true }) { _, refreshed in refreshed }
+        next.quotes.merge(fetched.filter { $0.value.trial != true }) { saved, refreshed in saved.fetchedAt > refreshed.fetchedAt ? saved : refreshed }
         try commit(next)
     }
 }

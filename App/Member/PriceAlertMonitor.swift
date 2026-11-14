@@ -125,7 +125,9 @@ enum PriceAlertMonitor {
         // On a locked phone the records cannot be opened (see `PortfolioStore.reloadIfLocked`): nothing to check yet.
         let readable = store?.reloadIfLocked() ?? false
         // Asked for before the check: a run that iOS cuts short is reported as over at once, and the app may be
-        // suspended before anything after the check runs.
+        // suspended before anything after the check runs. StoreKit is heard first: at a launch in the background it
+        // has not answered yet, and `scheduleNext` would take a member for none and take the request back.
+        _ = await memberNow()
         scheduleNext()
         guard readable else { return }
         await check()
