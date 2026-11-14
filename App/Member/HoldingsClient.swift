@@ -71,6 +71,7 @@ actor HoldingsClient {
     private let fugleKeySaved: @Sendable () -> Bool
     private let fugle: @Sendable (String) async throws -> ComponentSnapshot
     private let report: @Sendable (Error, Issuer) async -> Void
+    private let deviceOffline: @Sendable () async -> Bool
     /// Downloads under way, by ETF code: a second caller waits for the first one's answer.
     private var running: [String: Task<ComponentSnapshot, Error>] = [:]
     /// When the next request may start.
@@ -78,6 +79,7 @@ actor HoldingsClient {
 
     /// `report` gets a fund company's failure as a `HoldingsFailure` (the company and the kind of failure; never the
     /// ETF, the address asked or anything from the answer); the default sends it to the load-failure reporter.
+    /// `deviceOffline`: whether the phone has no network right now (the app's own 離線中).
     init(transport: HoldingsTransport = PublicHoldingsTransport(), root: URL? = nil, defaults: UserDefaults = .standard,
          minInterval: TimeInterval = 0.5, clock: @escaping @Sendable () -> Date = { Date() },
          fugleKeySaved: @escaping @Sendable () -> Bool = { !((try? SecureKey.read()) ?? "").isEmpty },
@@ -85,7 +87,8 @@ actor HoldingsClient {
          report: @escaping @Sendable (Error, Issuer) async -> Void = { error, issuer in
              let offline = await MainActor.run { Connectivity.shared.offline }
              CrashReporting.capture(error, context: "holdings:\(issuer.rawValue)", offline: offline)
-         }) {
+         },
+         deviceOffline: @escaping @Sendable () async -> Bool = { await MainActor.run { Connectivity.shared.offline } }) {
         self.transport = transport
         self.root = root ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("holdings", isDirectory: true)
@@ -95,6 +98,7 @@ actor HoldingsClient {
         self.fugleKeySaved = fugleKeySaved
         self.fugle = fugle
         self.report = report
+        self.deviceOffline = deviceOffline
     }
 
     /// The holdings of `symbol`. `fundName` is the fund's short name from the ETF list (「元大台灣50」,
@@ -133,27 +137,35 @@ actor HoldingsClient {
     }
 
     /// The company's own page, then 富果 when it fails and a key is saved. A failure is reported once (the company and
-    /// the kind of failure only) and starts the half-hour pause; a cancelled download does neither, and nor does one
-    /// that failed for want of a connection: the next call, with the network back, asks again at once.
+    /// the kind of failure only; never a phone that could not reach it) and starts the half-hour pause. A cancelled
+    /// download does neither, and a phone with no network (`isOffline`) starts no pause: the next call, with the
+    /// network back, asks again at once. A timeout, a failed DNS lookup or a refused connection is not that: the
+    /// company's site may be down, so the pause starts like after any other failure.
     private func fromCompany(_ issuer: Issuer, _ symbol: String) async throws -> ComponentSnapshot {
         do {
             return try await chain(issuer, symbol)
         } catch {
             if Self.isCancellation(error) { throw error }
             if Task.isCancelled { throw CancellationError() }
-            // No network is the phone's trouble, not the company's: as everywhere else it is not reported, and it
-            // neither drops the saved id nor starts the pause.
-            let companyFailed = CrashReportGate.isReportable((error as? RequestFailed)?.cause ?? error)
-            if companyFailed {
-                // The saved id may have gone stale; the next try (after the pause) asks the company for it again.
-                defaults.removeObject(forKey: Self.lookupKey(issuer, symbol))
-                await report(HoldingsFailure(issuer: issuer, error: error), issuer)
-            }
+            let cause = (error as? RequestFailed)?.cause ?? error
+            // No network is the phone's trouble, not the company's: it neither drops the saved id nor starts the pause.
+            let offline = await isOffline(cause)
+            // The saved id may have gone stale; the next try (after the pause) asks the company for it again.
+            if !offline { defaults.removeObject(forKey: Self.lookupKey(issuer, symbol)) }
+            // Reported as everywhere else: not when the phone could not reach the server.
+            if CrashReportGate.isReportable(cause) { await report(HoldingsFailure(issuer: issuer, error: error), issuer) }
             if fugleKeySaved(), let rescued = try? await fugle(symbol) { return rescued }
             if Task.isCancelled { throw CancellationError() }
-            if companyFailed { defaults.set(clock().timeIntervalSinceReferenceDate, forKey: Self.failedKey(symbol)) }
+            if !offline { defaults.set(clock().timeIntervalSinceReferenceDate, forKey: Self.failedKey(symbol)) }
             throw AppDataError(Self.unavailable)
         }
+    }
+
+    /// The phone itself has no network: the request says so (no connection, or mobile data switched off for the
+    /// app), or the app already knows it is offline.
+    private func isOffline(_ cause: Error) async -> Bool {
+        if let code = (cause as? URLError)?.code, code == .notConnectedToInternet || code == .dataNotAllowed { return true }
+        return await deviceOffline()
     }
 
     /// The download was called off (the task, or the request under it): not a failure of anybody's page.

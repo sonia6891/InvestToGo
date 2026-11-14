@@ -11,6 +11,8 @@ struct SnapshotChange {
     var removed: [FundComponent]
     /// In both, with a weight that moved: the later day's component and how many percentage points it moved by.
     var changed: [(component: FundComponent, delta: Double)]
+    /// More weights moved than `changed` lists: it holds only the `SnapshotDiff.limit` largest moves.
+    var changedCut = false
 
     /// Nothing was added or removed and no weight moved enough to list.
     var isEmpty: Bool { added.isEmpty && removed.isEmpty && changed.isEmpty }
@@ -46,7 +48,7 @@ enum SnapshotDiff {
             return x != y ? x > y : a.component.symbol < b.component.symbol
         }
         return SnapshotChange(from: old.date, to: new.date, added: added.sorted(by: heavier), removed: removed.sorted(by: heavier),
-                              changed: Array(changed.prefix(limit)))
+                              changed: Array(changed.prefix(limit)), changedCut: changed.count > limit)
     }
 
     /// The newest day against the newest day before it; nil until two different days are kept.

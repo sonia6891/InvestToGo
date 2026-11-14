@@ -65,14 +65,16 @@ final class HoldingsClientTests: XCTestCase {
         HoldingsClock(GameRules.taipei.date(from: DateComponents(year: 2026, month: 11, day: 14, hour: 12))!)
     }
 
-    private func client(_ transport: FakeHoldingsTransport, _ clock: HoldingsClock, key: Bool = false) -> HoldingsClient {
+    /// `offline`: what the app's own 離線中 says; the tests never read the simulator's real network.
+    private func client(_ transport: FakeHoldingsTransport, _ clock: HoldingsClock, key: Bool = false, offline: Bool = false) -> HoldingsClient {
         let reported = self.reported
         return HoldingsClient(transport: transport, root: directory.appendingPathComponent("kept", isDirectory: true), defaults: defaults,
                               minInterval: 0, clock: { clock.now }, fugleKeySaved: { key },
                               fugle: { symbol in
                                   ComponentSnapshot(symbol: symbol, date: "2026-11-12", components: [FundComponent(symbol: "2330", name: "台積電", weight: 30)], source: "富果／投信揭露資料")
                               },
-                              report: { error, issuer in await reported.add(issuer, error) })
+                              report: { error, issuer in await reported.add(issuer, error) },
+                              deviceOffline: { offline })
     }
 
     private func snapshot(_ symbol: String, _ date: String, weight: Double = 50) -> ComponentSnapshot {
@@ -551,6 +553,76 @@ final class HoldingsClientTests: XCTestCase {
         do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         let after = await transport.urls().count
         XCTAssertEqual(after, before, "Paused: nobody is asked")
+    }
+
+    /// A timeout, a failed DNS lookup, a refused or dropped connection: the company's site may be down, so the pause
+    /// starts and the next tap asks nobody. None of them is reported (the phone could not reach the server).
+    func testUnreachableCompanyStartsThePause() async throws {
+        for (i, code) in [URLError.Code.timedOut, .dnsLookupFailed, .cannotFindHost, .cannotConnectToHost, .networkConnectionLost].enumerated() {
+            let symbol = "005\(i)"
+            let transport = FakeHoldingsTransport { _ in throw URLError(code) }
+            let clock = saturday()
+            let subject = client(transport, clock)
+            do { _ = try await subject.components(symbol: symbol, fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+            do { _ = try await subject.components(symbol: symbol, fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+            var asked = await transport.urls()
+            XCTAssertEqual(asked.count, 1, "\(code): the second call makes no request")
+            // Half an hour later it asks again.
+            clock.advance(days: 31.0 / 1440)
+            do { _ = try await subject.components(symbol: symbol, fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+            asked = await transport.urls()
+            XCTAssertEqual(asked.count, 2, "\(code): asked again after the pause")
+        }
+        let failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty, "A server the phone could not reach is not reported")
+    }
+
+    /// The saved fund id goes with a timeout as with any other failure: after the pause it is looked up afresh.
+    func testTimeoutDropsTheLookup() async throws {
+        let transport = FakeHoldingsTransport { call in
+            if call.url.contains("GetETFList") { return Data(#"{"result":[{"fundCode":"CN","stockCode":"00878"}],"success":true}"#.utf8) }
+            throw URLError(.timedOut)
+        }
+        let clock = saturday()
+        let subject = client(transport, clock)
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        var all = await transport.urls()
+        XCTAssertEqual(all.count, 2, "The list and the date that timed out; the second call asked nothing")
+        clock.advance(days: 31.0 / 1440)
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 2)
+        all = await transport.urls()
+        XCTAssertEqual(all.count, 4)
+    }
+
+    /// The phone's own "no network": the request says so (not connected, or mobile data off for the app), or the app
+    /// knows it is offline whatever error the request came back with. No pause: the second call asks again.
+    func testPhoneWithoutNetworkStartsNoPause() async throws {
+        for (i, code) in [URLError.Code.notConnectedToInternet, .dataNotAllowed].enumerated() {
+            let symbol = "005\(i)"
+            let transport = FakeHoldingsTransport { _ in throw URLError(code) }
+            let subject = client(transport, saturday())
+            do { _ = try await subject.components(symbol: symbol, fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+            do { _ = try await subject.components(symbol: symbol, fundName: "元大台灣50"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+            let asked = await transport.urls()
+            XCTAssertEqual(asked.count, 2, "\(code): the second call makes a request")
+        }
+        // 離線中 with a request that only timed out: still the phone's trouble.
+        let transport = FakeHoldingsTransport { call in
+            if call.url.contains("GetETFList") { return Data(#"{"result":[{"fundCode":"CN","stockCode":"00878"}],"success":true}"#.utf8) }
+            throw URLError(.timedOut)
+        }
+        let subject = client(transport, saturday(), offline: true)
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        do { _ = try await subject.components(symbol: "00878", fundName: "國泰永續高股息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
+        let all = await transport.urls()
+        XCTAssertEqual(all.count, 3, "No pause: the date is asked for again")
+        let lists = await transport.urls("GetETFList")
+        XCTAssertEqual(lists.count, 1, "The saved fund code was kept")
+        let failures = await reported.failures
+        XCTAssertTrue(failures.isEmpty)
     }
 
     // MARK: Fix round 1 — the history has its own file

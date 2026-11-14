@@ -29,7 +29,7 @@ struct HoldingChangeList: View {
                 ForEach(change.removed) { row($0, value: "\(decimal($0.weight))%", note: "原本權重") }
             }
             if !change.changed.isEmpty {
-                heading("權重變化（變動最大的前 \(SnapshotDiff.limit) 檔）")
+                heading(change.changedCut ? "權重變化（變動最大的前 \(SnapshotDiff.limit) 檔）" : "權重變化")
                 ForEach(change.changed.indices, id: \.self) { i in
                     row(change.changed[i].component, value: "\(signed(change.changed[i].delta, decimal)) 個百分點",
                         note: "目前 \(decimal(change.changed[i].component.weight))%")

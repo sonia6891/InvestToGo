@@ -18,6 +18,7 @@ final class SnapshotDiffTests: XCTestCase {
         XCTAssertEqual(change.changed.map { $0.component }, [FundComponent(symbol: "A", name: "名稱A", weight: 12)], "The later day's weight")
         XCTAssertEqual(change.changed.first?.delta ?? 0, 2, accuracy: 1e-9)
         XCTAssertFalse(change.isEmpty)
+        XCTAssertFalse(change.changedCut, "The one weight that moved is listed")
         XCTAssertEqual(change.title, "11/13 與 11/11 相比")
     }
 
@@ -45,6 +46,15 @@ final class SnapshotDiffTests: XCTestCase {
         let new = snapshot("2026-11-13", moved)
         let change = SnapshotDiff.compare(old: old, new: new)
         XCTAssertEqual(change.changed.count, 10)
+        XCTAssertTrue(change.changedCut, "Fifteen moved and ten are listed: the heading says so")
+        // Exactly ten moved: all of them are listed, so nothing was cut. Eleven: one was.
+        func firstMoved(_ count: Int) -> SnapshotChange {
+            SnapshotDiff.compare(old: snapshot("2026-11-11", codes.prefix(count).map { ($0, 5) }), new: snapshot("2026-11-13", Array(moved.prefix(count))))
+        }
+        XCTAssertEqual(firstMoved(10).changed.count, 10)
+        XCTAssertFalse(firstMoved(10).changedCut)
+        XCTAssertEqual(firstMoved(11).changed.count, 10)
+        XCTAssertTrue(firstMoved(11).changedCut)
         XCTAssertEqual(change.changed.map { $0.component.symbol }, (6...15).reversed().map { String(format: "S%02d", $0) }, "Largest move first, up or down")
         XCTAssertEqual(change.changed[0].delta, 1.5, accuracy: 1e-9)
         XCTAssertEqual(change.changed[1].delta, -1.4, accuracy: 1e-9)

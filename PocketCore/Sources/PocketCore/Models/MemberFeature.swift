@@ -20,7 +20,7 @@ enum MemberFeature: String, CaseIterable, Codable {
     var pitch: String {
         switch self {
         case .overlap: return "看你持有的 ETF 重壓了哪些同樣的股票"
-        case .activeTracking: return "追蹤主動式 ETF 每天買了什麼、賣了什麼"
+        case .activeTracking: return "看主動式 ETF 新增、剔除了哪些持股，權重怎麼變"
         case .scenarios: return "樂觀、持平、悲觀三種情境一次試算"
         case .goalPlanner: return "告訴我們目標，反推每月要存多少"
         case .report: return "每月與每年自動整理成一份報告"
