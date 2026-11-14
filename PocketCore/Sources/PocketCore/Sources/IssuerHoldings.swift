@@ -23,8 +23,10 @@ enum IssuerDirectory {
         ("復華", .fhtrust), ("中信", .ctbc), ("中國信託", .ctbc),
     ]
 
+    /// Active ETFs are listed as 「主動群益台灣強棒」: the 主動 in front is not part of the company's name.
     static func issuer(forFundName name: String) -> Issuer? {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        var trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix("主動") { trimmed = String(trimmed.dropFirst(2)).trimmingCharacters(in: .whitespacesAndNewlines) }
         return prefixes.first { trimmed.hasPrefix($0.0) }?.1
     }
 }
@@ -167,8 +169,8 @@ enum IssuerHoldings {
             throw fail(issuer, "欄位不符（缺少「股票代碼」或「權重」）")
         }
         let ni = head.firstIndex(of: "股票名稱")
-        // A row with a different cell count (a 合計 line) is not a holding.
-        let rows: [[String: Any]] = table.dropFirst().filter { $0.count == head.count }.map { cells in
+        // A row with a different cell count, or with words where the code belongs (a 合計 line), is not a holding.
+        let rows: [[String: Any]] = table.dropFirst().filter { $0.count == head.count && isCode($0[ci]) }.map { cells in
             ["code": cells[ci], "name": ni.map { cells[$0] } ?? "", "weight": cells[wi]]
         }
         return try snapshot(issuer, symbol: symbol, date: date, rows: rows, code: "code", name: "name", weight: "weight")
@@ -222,33 +224,20 @@ enum IssuerHoldings {
 
     // MARK: Fund-code lookups
 
-    /// 國泰 GetETFList：the item that carries `symbol` as one of its values gives the fund code.
-    /// Written from the endpoint's description (no captured sample): it searches nested lists too and accepts
-    /// `fundCode` / `fundId` / `fundNo` in any letter case.
+    /// 國泰 GetETFList?Keyword=<code>：`result[] {stockCode, fundCode}`（00878 → "CN"）.
     static func cathayFundCode(_ data: Data, symbol: String) -> String? {
-        guard let root = try? JSONSerialization.jsonObject(with: data) else { return nil }
-        return cathayCode(root, symbol)
+        let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let items = obj?["result"] as? [[String: Any]] ?? []
+        let hit = items.first { text($0["stockCode"])?.uppercased() == symbol.uppercased() }
+        return filled(hit?["fundCode"])
     }
 
-    private static func cathayCode(_ any: Any, _ symbol: String) -> String? {
-        if let list = any as? [Any] {
-            for item in list {
-                if let hit = cathayCode(item, symbol) { return hit }
-            }
-            return nil
-        }
-        guard let item = any as? [String: Any] else { return nil }
-        let strings: [String: String] = item.compactMapValues { text($0) }
-        if strings.values.contains(where: { $0.uppercased() == symbol.uppercased() }) {
-            for wanted in ["fundcode", "fundid", "fundno"] {
-                let hit = strings.first { $0.key.lowercased() == wanted && !$0.value.isEmpty && $0.value != symbol }
-                if let hit = hit { return hit.value }
-            }
-        }
-        for key in item.keys.sorted() {
-            if let child = item[key], let hit = cathayCode(child, symbol) { return hit }
-        }
-        return nil
+    /// 國泰 GetETFAssets：`result.preDate`（"2026/11/13"）, the day the holdings list is asked for, as "2026-11-13".
+    static func cathayAssetsDate(_ data: Data) -> String? {
+        let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        guard let raw = text((obj?["result"] as? [String: Any])?["preDate"]) else { return nil }
+        // A time after the day ("2026-11-13T00:00:00") is dropped.
+        return day(raw.components(separatedBy: CharacterSet(charactersIn: "T ")).first)
     }
 
     /// 群益 items：`data[] {fundNo, stockNo}`.
@@ -259,13 +248,15 @@ enum IssuerHoldings {
         return filled(hit?["fundNo"])
     }
 
-    /// 復華 etf_list 頁：the `ETF<n>` id written just before the ETF code (same link or same record), else just after.
-    /// Written from the page's description (no captured sample); `fhtrust(_:symbol:)` rejects a wrong fund afterwards.
+    /// 復華 etf_list 頁：one `<tr>` per fund, the ETF code in a cell of its own and the id in the row's
+    /// `/ETF/etf_detail/ETF<n>` link. `fhtrust(_:symbol:)` rejects a wrong fund afterwards.
     static func fhtrustFundID(_ html: String, symbol: String) -> String? {
-        let code = #"(?<![0-9A-Za-z])"# + NSRegularExpression.escapedPattern(for: symbol) + #"(?![0-9A-Za-z])"#
-        let gap = #"(?:(?!ETF\d).){0,400}?"#
-        if let before = matches(#"(ETF\d+)"# + gap + code, in: html).first { return before[0] }
-        return matches(code + gap + #"(ETF\d+)"#, in: html).first?[0]
+        for row in matches(#"(?i)<tr\b[^>]*>(.*?)</tr>"#, in: html) {
+            let cells = matches(#"(?i)<t[dh]\b[^>]*>(.*?)</t[dh]>"#, in: row[0]).map { cellText($0[0]) }
+            guard cells.contains(symbol) else { continue }
+            if let id = matches(#"etf_detail/(ETF\d+)"#, in: row[0]).first?[0] { return id }
+        }
+        return nil
     }
 
     /// 中信 ETFList：`Data.Data[] {ETF_ID, FID}`.
@@ -276,7 +267,21 @@ enum IssuerHoldings {
         return filled(hit?["FID"])
     }
 
+    /// 中信 home/AuthToken：`Data.token`, sent with every later request.
+    static func ctbcToken(_ data: Data) -> String? {
+        let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        return filled((obj?["Data"] as? [String: Any])?["token"])
+    }
+
     // MARK: HTML
+
+    /// A stock code as the pages print one: letters and digits ("2330", "00679B"), for foreign shares also with a
+    /// space, dot, hyphen or slash ("AAPL US", "BRK.B"). 「合計」 and other words are not codes.
+    private static func isCode(_ cell: String) -> Bool {
+        let marks: Set<Character> = [" ", ".", "-", "/"]
+        let alnum = cell.filter { $0.isASCII && ($0.isLetter || $0.isNumber) }
+        return !alnum.isEmpty && cell.allSatisfy { ($0.isASCII && ($0.isLetter || $0.isNumber)) || marks.contains($0) }
+    }
 
     /// Capture groups of every match; `.` also matches newlines.
     private static func matches(_ pattern: String, in text: String) -> [[String]] {
