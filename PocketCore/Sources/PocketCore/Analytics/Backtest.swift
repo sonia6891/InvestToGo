@@ -6,6 +6,8 @@ struct SymbolHistory {
     var splits: [SplitEvent]
     /// The close series looks unadjusted (a jump the splits do not explain); results get a caveat note.
     var suspect: Bool
+    /// The bars are 富果's adjusted closes (dividends already in the price), not the exchanges' own.
+    var fromFugle = false
 }
 
 struct BacktestInput {

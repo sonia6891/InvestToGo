@@ -9,8 +9,9 @@ struct PublicHistoryFetcher: HistoryFetching {
     func get(_ url: URL) async throws -> Data { try await PublicHTTP.get(url) }
 }
 
-/// Price history for 回測 (spec 4, 5.6). With a 富果 key saved it is 富果's adjusted closes; otherwise the exchanges'
-/// own monthly closes, cash dividends and ETF splits, cached on the phone and paced at one request every 2 s.
+/// Price history for 回測 (spec 4, 5.6). With a 富果 key saved it is 富果's adjusted closes; without one, or when 富果
+/// does not answer (a key that stopped working, a 429, a plan without history), the exchanges' own monthly closes,
+/// cash dividends and ETF splits, cached on the phone and paced at one request every 2 s.
 /// Requests carry only the ETF code and dates.
 actor OfficialHistoryClient {
     static let shared = OfficialHistoryClient()
@@ -28,21 +29,26 @@ actor OfficialHistoryClient {
     private let minInterval: TimeInterval
     private let clock: @Sendable () -> Date
     private let fugleKeySaved: @Sendable () -> Bool
+    private let fugleBars: @Sendable (String, Int) async throws -> [DailyBar]
     /// When the next official request may start; one limiter for every endpoint.
     private var nextSlot = Date.distantPast
 
     init(fetcher: HistoryFetching = PublicHistoryFetcher(), root: URL? = nil, minInterval: TimeInterval = 2,
          clock: @escaping @Sendable () -> Date = { Date() },
-         fugleKeySaved: @escaping @Sendable () -> Bool = { !((try? SecureKey.read()) ?? "").isEmpty }) {
+         fugleKeySaved: @escaping @Sendable () -> Bool = { !((try? SecureKey.read()) ?? "").isEmpty },
+         fugleBars: @escaping @Sendable (String, Int) async throws -> [DailyBar] = { symbol, years in
+             try await Fugle.history(symbol: symbol, years: years).points.map { DailyBar(date: $0.date, close: $0.close) }
+         }) {
         self.fetcher = fetcher
         self.root = root ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("history", isDirectory: true)
         self.minInterval = minInterval
         self.clock = clock
         self.fugleKeySaved = fugleKeySaved
+        self.fugleBars = fugleBars
     }
 
-    /// Whether `history` reads 富果 (a key is saved) instead of the exchanges.
+    /// Whether `history` asks 富果 first (a key is saved). What a result really came from is its `fromFugle`.
     nonisolated var usesFugle: Bool { fugleKeySaved() }
 
     /// The months to read: `from` (or the listing month, when later) to `to`, capped at the current Taipei month.
@@ -59,7 +65,11 @@ actor OfficialHistoryClient {
     /// listing month from the catalogue: earlier months are not asked for. Without it months are read newest first
     /// and reading stops at three empty months in a row behind the bars (the fund was not listed yet).
     /// `progress` gets 0…1. Thrown results are never cached; a failed refresh falls back to the copy on disk.
+    /// 富果 is asked only with a key saved and `fugle` true. When it fails for any reason but a cancellation,
+    /// `fellBack` is called and the exchanges are read instead: a key is never a prerequisite. The result's
+    /// `fromFugle` says which of the two it is.
     func history(symbol: String, market: String?, listed: YearMonth? = nil, from: YearMonth, to: YearMonth,
+                 fugle: Bool = true, fellBack: @Sendable () -> Void = {},
                  progress: @Sendable (Double) -> Void) async throws -> SymbolHistory {
         guard DataChecks.code(symbol) else { throw AppDataError("ETF 代號格式不符。") }
         let months = plan(from: from, to: to, listed: listed)
@@ -67,14 +77,19 @@ actor OfficialHistoryClient {
             return SymbolHistory(bars: [], dividends: [], splits: [], suspect: false)
         }
 
-        if fugleKeySaved() {
+        if fugle, fugleKeySaved() {
             let span = (last.year - from.year) * 12 + last.month - from.month + 1
             let years = [1, 3, 5, 10, 16].first { $0 * 12 >= span - 1 } ?? 16
-            let fugle = try await Fugle.history(symbol: symbol, years: years)
-            let bars = fugle.points.map { DailyBar(date: $0.date, close: $0.close) }
-                .filter { $0.date >= from.key + "-01" && $0.date <= last.key + "-31" }
-            progress(1)
-            return SymbolHistory(bars: bars, dividends: [], splits: [], suspect: false)
+            do {
+                let bars = try await fugleBars(symbol, years)
+                    .filter { $0.date >= from.key + "-01" && $0.date <= last.key + "-31" }
+                progress(1)
+                return SymbolHistory(bars: bars, dividends: [], splits: [], suspect: false, fromFugle: true)
+            } catch {
+                if error is CancellationError || Task.isCancelled { throw error }
+                // An invalid key, a 429, a plan without history: the exchanges have the data all the same.
+                fellBack()
+            }
         }
 
         let total = Double(months.count + (last.year - firstMonth.year + 1) + 1)

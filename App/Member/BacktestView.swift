@@ -3,11 +3,20 @@ import Charts
 
 /// Runs one 回測: downloads each ETF's history in turn, then hands it to `Backtest.run`. Leaving the screen cancels it.
 @MainActor final class BacktestModel: ObservableObject {
-    @Published private(set) var running = false
+    /// A first download takes minutes and stops when the app is suspended, so the screen stays on for as long as a
+    /// run lasts and not a moment longer: however a run ends (result, error, cancel, leaving the page), `running`
+    /// goes back to false here and the auto-lock comes back with it.
+    @Published private(set) var running = false {
+        didSet { if running != oldValue { keepAwake(running) } }
+    }
+    private let keepAwake: @MainActor (Bool) -> Void
     @Published private(set) var progress = 0.0
     @Published private(set) var result: BacktestResult?
-    /// The finished or running result reads 富果's adjusted closes instead of the exchanges.
+    /// The finished or running result reads 富果's adjusted closes instead of the exchanges. It is what was really
+    /// used: a run that began on 富果 and had to turn to the exchanges says the exchanges.
     @Published private(set) var fromFugle = false
+    /// A 富果 key is saved, so the next run asks 富果 first (what the wait is said to be before a run).
+    @Published private(set) var keySaved = false
     /// A download that failed, in plain words (offline or not); shown with 「再試一次」.
     @Published private(set) var error: String?
     /// A code neither exchange knows: the user's to fix, not a failed download.
@@ -18,10 +27,15 @@ import Charts
     /// Only the latest run may report: a cancelled one stays silent.
     private var runID = 0
 
-    /// From the same month `years` ago to this month, in Taipei time.
+    init(keepAwake: @escaping @MainActor (Bool) -> Void = { UIApplication.shared.isIdleTimerDisabled = $0 }) {
+        self.keepAwake = keepAwake
+    }
+
+    /// `years` × 12 monthly buys, the last one this month (Taipei time): five years from November 2026 is
+    /// December 2021 to November 2026, 60 months.
     static func window(years: Int, now: Date = Date()) -> (start: YearMonth, end: YearMonth) {
         let end = YearMonth(now)
-        return (YearMonth(year: end.year - years, month: end.month), end)
+        return (YearMonth(year: end.year - years, month: end.month).next(), end)
     }
 
     /// What the wait will be like, said before and during the download.
@@ -38,7 +52,8 @@ import Charts
     func refreshEstimate(symbols: [String], markets: [String: String], listed: [String: YearMonth], years: Int,
                          client: OfficialHistoryClient = .shared) async {
         guard !running else { return }
-        fromFugle = client.usesFugle
+        // Not `fromFugle`: that belongs to the result on screen, and a finished run's source does not change.
+        keySaved = client.usesFugle
         let window = Self.window(years: years)
         var seconds = 0
         for symbol in symbols {
@@ -55,18 +70,32 @@ import Charts
         let id = runID
         running = true; progress = 0; error = nil; notFound = nil; result = nil
         fromFugle = client.usesFugle
+        keySaved = fromFugle
         task = Task {
             let window = Self.window(years: years)
             let count = Double(max(legs.count, 1))
             var history: [String: SymbolHistory] = [:]
             var current = ""
             do {
-                for (i, leg) in legs.enumerated() {
+                var fugle = client.usesFugle
+                var i = 0
+                while i < legs.count {
+                    let leg = legs[i], index = i
                     current = leg.symbol
-                    history[leg.symbol] = try await client.history(symbol: leg.symbol, market: markets[leg.symbol], listed: listed[leg.symbol],
-                                                                   from: window.start, to: window.end) { part in
-                        Task { @MainActor in self.report(id, (Double(i) + part) / count) }
+                    let one = try await client.history(symbol: leg.symbol, market: markets[leg.symbol], listed: listed[leg.symbol],
+                                                       from: window.start, to: window.end, fugle: fugle,
+                                                       fellBack: { Task { @MainActor in self.usesExchanges(id) } }) { part in
+                        Task { @MainActor in self.report(id, (Double(index) + part) / count) }
                     }
+                    if fugle, !one.fromFugle {
+                        // 富果 did not answer for this one. Every leg then reads the exchanges, the ones already
+                        // read from 富果 too: a result has one source and one way of counting dividends.
+                        fugle = false
+                        self.usesExchanges(id)
+                        if i > 0 { history = [:]; i = 0; continue }
+                    }
+                    history[leg.symbol] = one
+                    i += 1
                 }
                 try Task.checkCancellation()
                 let input = BacktestInput(legs: legs, monthly: monthly, start: window.start, end: window.end, reinvest: reinvest)
@@ -97,6 +126,14 @@ import Charts
         progress = max(progress, min(1, value))
     }
 
+    /// 富果 did not answer in this run: what is shown from here on is the exchanges' data. How long their download
+    /// takes was not worked out (with a key the estimate is 富果's), so no wait is promised.
+    private func usesExchanges(_ id: Int) {
+        guard id == runID, running else { return }
+        fromFugle = false
+        estimate = nil
+    }
+
     private func finish(_ id: Int, result: BacktestResult?, error: String? = nil, notFound: String? = nil) {
         guard id == runID else { return }
         self.result = result; self.error = error; self.notFound = notFound
@@ -114,6 +151,29 @@ enum BacktestSettings {
     static func reset(_ arguments: [String], defaults: UserDefaults = .standard) {
         guard arguments.contains("--ui-testing"), arguments.contains("--reset") else { return }
         for key in [symbolsKey, weightsKey, monthlyKey, yearsKey, reinvestKey] { defaults.removeObject(forKey: key) }
+    }
+}
+
+/// What the 回測 form takes. Only ETFs: the history has cash dividends and ETF splits, not a stock's 配股 or 減資, so
+/// a stock would come out with wrong figures.
+enum BacktestForm {
+    static let onlyETF = "回測只支援 ETF。"
+
+    /// The code to add to the picked ones, or why it cannot be added.
+    static func adding(_ text: String, to picked: [String], isETF: (String) -> Bool) -> Result<String, AppDataError> {
+        let code = text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        guard DataChecks.code(code) else { return .failure(AppDataError("代號格式不符，請輸入像 0056 或 00679B 的代號。")) }
+        guard isETF(code) else { return .failure(AppDataError(onlyETF)) }
+        guard !picked.contains(code) else { return .failure(AppDataError("\(code) 已經在清單裡。")) }
+        guard picked.count < 3 else { return .failure(AppDataError("最多 3 檔。")) }
+        return .success(code)
+    }
+
+    /// The person's own codes offered as one-tap choices: ETFs only, none picked already, at most eight.
+    static func candidates(own: [String], picked: [String], isETF: (String) -> Bool) -> [String] {
+        let taken = Set(picked)
+        var seen = Set<String>()
+        return Array(own.filter { DataChecks.code($0) && isETF($0) && !taken.contains($0) && seen.insert($0).inserted }.prefix(8))
     }
 }
 
@@ -146,7 +206,8 @@ struct BacktestView: View {
         return (markets, listed)
     }
 
-    private var estimateLine: String? { BacktestModel.estimateText(seconds: model.estimate, fugle: model.fromFugle) }
+    /// Before a run: what a saved key promises. During one: what the run is really reading.
+    private var estimateLine: String? { BacktestModel.estimateText(seconds: model.estimate, fugle: model.running ? model.fromFugle : model.keySaved) }
 
     private var symbols: [String] {
         var seen = Set<String>()
@@ -159,12 +220,9 @@ struct BacktestView: View {
         return symbols.indices.map { $0 < saved.count ? saved[$0] : "" }
     }
 
-    /// Held and favourite codes that are not picked yet.
+    /// Held and favourite ETFs that are not picked yet.
     private var candidates: [String] {
-        let picked = Set(symbols)
-        var seen = Set<String>()
-        let own = store.data.holdings.map(\.symbol) + store.data.favorites.sorted()
-        return Array(own.filter { DataChecks.code($0) && !picked.contains($0) && seen.insert($0).inserted }.prefix(8))
+        BacktestForm.candidates(own: store.data.holdings.map(\.symbol) + store.data.favorites.sorted(), picked: symbols) { store.isETF($0) }
     }
 
     /// The form as numbers, or nil while something is missing: every weight above 0, 100% in all, a monthly amount.
@@ -296,7 +354,7 @@ struct BacktestView: View {
     }
 
     private var sourceLine: String {
-        guard model.result != nil || model.running else { return "資料來源：證交所／櫃買中心；有儲存富果金鑰時改用富果還原價。" }
+        guard model.result != nil || model.running else { return "資料來源：證交所／櫃買中心；有儲存富果金鑰時先用富果還原價，取不到就用交易所資料。" }
         return model.fromFugle ? "資料來源：富果（還原日收盤價）" : "資料來源：證交所／櫃買中心（日收盤價、除權息、ETF 分割）"
     }
 
@@ -324,16 +382,18 @@ struct BacktestView: View {
     }
 
     private func add(_ text: String) {
-        let code = text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        guard DataChecks.code(code) else { formError = "代號格式不符，請輸入像 0056 或 00679B 的代號。"; return }
-        guard !symbols.contains(code) else { formError = "\(code) 已經在清單裡。"; return }
-        guard symbols.count < 3 else { formError = "最多 3 檔。"; return }
-        formError = nil; codeText = ""
-        setSymbols(symbols + [code])
+        switch BacktestForm.adding(text, to: symbols, isETF: { store.isETF($0) }) {
+        case .failure(let problem): formError = problem.text
+        case .success(let code):
+            formError = nil; codeText = ""
+            setSymbols(symbols + [code])
+        }
     }
 
     private func start() {
         guard let input else { return }
+        // A list saved before only ETFs were taken: a stock's 配股 and 減資 are not in the data, so it is not run.
+        guard input.legs.allSatisfy({ store.isETF($0.symbol) }) else { formError = BacktestForm.onlyETF; return }
         let facts = catalogueFacts
         formError = nil
         model.run(legs: input.legs, markets: facts.markets, listed: facts.listed, monthly: input.monthly, years: span, reinvest: reinvest)
