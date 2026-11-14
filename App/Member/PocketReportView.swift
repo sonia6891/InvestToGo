@@ -78,7 +78,7 @@ struct PocketReportView: View {
     // MARK: Member
 
     @ViewBuilder private var report: some View {
-        let card = PocketReport.make(period, portfolio: store.data, now: now)
+        let card = PocketReport.make(period, portfolio: store.data, now: now, showDividends: showDividends)
         let drawn = Drawn(card: card, heading: tab.heading, isMonth: tab == .month, showDividends: showDividends, skin: skin.id)
         Picker("報告", selection: $tab) {
             ForEach(ReportTab.allCases) { Text($0.rawValue).tag($0) }
@@ -92,7 +92,7 @@ struct PocketReportView: View {
             Toggle("顯示領息金額", isOn: $showDividends)
                 .font(.subheadline.weight(.semibold)).foregroundStyle(Palette.ink).tint(Palette.blue)
                 .accessibilityIdentifier("report-show-dividends")
-            Text("關掉後，畫面上的卡片和分享的圖片都不會出現領息金額。").font(.caption).foregroundStyle(Palette.muted)
+            Text("關掉後，畫面上的卡片和分享的圖片都不會出現領息金額與筆數。").font(.caption).foregroundStyle(Palette.muted)
                 .fixedSize(horizontal: false, vertical: true).padding(.top, 4)
             share(drawn).padding(.top, 12)
         }
@@ -178,7 +178,7 @@ struct ReportCardView: View {
     let heading: String
     /// A month's card says whether there was a 定期定額; a longer one counts the months.
     let isMonth: Bool
-    /// Off: the dividend amount is left out altogether.
+    /// Off: the dividend amount is left out altogether (the card is then made without its payment-count note too).
     let showDividends: Bool
     @Environment(\.skin) private var skin
 

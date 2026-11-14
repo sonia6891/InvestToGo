@@ -63,8 +63,10 @@ struct ReportCard: Equatable {
 }
 
 enum PocketReport {
-    /// The card for `period`, from the records and the game progress as they are at `now`.
-    static func make(_ period: ReportPeriod, portfolio: Portfolio, now: Date) -> ReportCard {
+    /// The card for `period`, from the records and the game progress as they are at `now`. With `showDividends`
+    /// off (顯示領息金額 switched off) the note that counts the payments is left out too: someone hiding what they
+    /// received does not have how many payments there were on a card they share.
+    static func make(_ period: ReportPeriod, portfolio: Portfolio, now: Date, showDividends: Bool = true) -> ReportCard {
         let game = portfolio.game ?? GameState()
         let paid = portfolio.dividends.filter { $0.status == .paid && period.contains($0.date, now: now) }
         let dividends = paid.reduce(0) { $0 + $1.amount }
@@ -75,7 +77,7 @@ enum PocketReport {
         let xpEarned: Int? = logged.isEmpty ? nil : logged.reduce(0) { $0 + $1.xp }
 
         var notes: [String] = []
-        if !paid.isEmpty { notes.append("領息 \(paid.count) 筆，來自 \(Set(paid.map(\.symbol)).count) 檔。") }
+        if showDividends, !paid.isEmpty { notes.append("領息 \(paid.count) 筆，來自 \(Set(paid.map(\.symbol)).count) 檔。") }
         if paid.isEmpty, dcaMonths == 0, reconciles == 0, newDexCards == 0, (xpEarned ?? 0) == 0 {
             notes.append("這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。")
         }
@@ -112,10 +114,13 @@ enum PocketReport {
         return months.filter { $0 <= current }.min()
     }
 
-    /// Whether the lobby says 「上個月的口袋月報出爐了」 now: to a member, once for each month that has ended. `seen`
-    /// is the month (「2026-10」) whose report was last announced, empty when none was.
-    static func noticeDue(now: Date, seen: String, isMember: Bool) -> Bool {
-        isMember && seen != noticeMonth(now: now).key
+    /// Whether the lobby says 「上個月的口袋月報出爐了」 now: to a member, once for each month that has ended, and
+    /// only when the records reach back to that month (someone who started this month has no report of the last).
+    /// `seen` is the month (「2026-10」) whose report was last announced, empty when none was.
+    static func noticeDue(now: Date, seen: String, isMember: Bool, portfolio: Portfolio) -> Bool {
+        let month = noticeMonth(now: now)
+        guard isMember, seen != month.key, let earliest = earliestMonth(portfolio, now: now) else { return false }
+        return earliest <= month
     }
 
     /// The month the lobby's notice is about: the one before `now`'s.

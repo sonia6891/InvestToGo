@@ -73,10 +73,10 @@ struct LobbyView: View {
 
     // MARK: 口袋月報 notice
 
-    /// Shows the notice when last month's report has not been announced yet (members only), and records the month
-    /// at once, so it is announced a single time.
+    /// Shows the notice when last month's report has not been announced yet (members whose records reach back to
+    /// that month), and records the month at once, so it is announced a single time.
     private func announceReport(now: Date) {
-        guard !Self.testing, PocketReport.noticeDue(now: now, seen: reportSeenMonth, isMember: membership.has(.report)) else { return }
+        guard !Self.testing, PocketReport.noticeDue(now: now, seen: reportSeenMonth, isMember: membership.has(.report), portfolio: store.data) else { return }
         reportSeenMonth = PocketReport.noticeMonth(now: now).key
         reportNotice = true
     }

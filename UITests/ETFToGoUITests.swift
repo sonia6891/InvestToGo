@@ -966,11 +966,14 @@ final class ETFToGoUITests: XCTestCase {
         let toggle = member.switches["report-show-dividends"]
         for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { member.swipeUp() }
         XCTAssertEqual(toggle.value as? String, "1", "顯示領息金額 starts switched on")
+        let dividendWords = card.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "領息"))
+        XCTAssertTrue(dividendWords.firstMatch.exists, "Switched on, the card speaks of 領息")
         // The switch itself sits at the row's trailing edge; a tap on the words beside it does nothing.
         let knob = toggle.switches.firstMatch
         if knob.exists { knob.tap() } else { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap() }
         waitForValue(toggle, "0")
         XCTAssertFalse(dividends.exists, "Switched off, the amount is gone from the card")
+        XCTAssertFalse(dividendWords.firstMatch.exists, "and so is the line that counts the payments")
         XCTAssertTrue(member.buttons["report-share"].exists, "分享 is there")
     }
     private func waitForValue(_ element: XCUIElement, _ value: String, file: StaticString = #filePath, line: UInt = #line) {

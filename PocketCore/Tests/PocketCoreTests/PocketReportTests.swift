@@ -24,6 +24,20 @@ final class PocketReportTests: XCTestCase {
         XCTAssertEqual(card.notes, ["領息 2 筆，來自 2 檔。"])
     }
 
+    /// 顯示領息金額 off: the note that counts the payments goes with the amount. A period with payments in it is
+    /// still not called empty.
+    func testDividendNoteIsLeftOutWhenDividendsAreHidden() {
+        var p = Portfolio()
+        p.dividends = [dividend(2026, 10, 5, 300), dividend(2026, 10, 20, 200, symbol: "0056")]
+        let october = ReportPeriod.month(month(2026, 10))
+        XCTAssertEqual(PocketReport.make(october, portfolio: p, now: now, showDividends: true).notes, ["領息 2 筆，來自 2 檔。"])
+        let hidden = PocketReport.make(october, portfolio: p, now: now, showDividends: false)
+        XCTAssertEqual(hidden.notes, [], "Neither the count of payments nor the line for an empty period")
+        XCTAssertFalse(hidden.notes.contains { $0.contains("領息") })
+        let empty = PocketReport.make(october, portfolio: Portfolio(), now: now, showDividends: false)
+        XCTAssertEqual(empty.notes, ["這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"], "A period with nothing in it keeps its line")
+    }
+
     func testYearCountsDcaAndReconciles() {
         var game = GameState()
         game.dcaMonths = [month(2025, 12), month(2026, 1), month(2026, 3)]
@@ -159,14 +173,34 @@ final class PocketReportTests: XCTestCase {
     // MARK: The lobby's notice
 
     func testNoticeIsForMembersOncePerNewMonth() {
-        XCTAssertTrue(PocketReport.noticeDue(now: now, seen: "2026-09", isMember: true), "A new month has ended since the last notice")
-        XCTAssertTrue(PocketReport.noticeDue(now: now, seen: "", isMember: true), "Never announced before")
-        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "2026-10", isMember: true), "October's report was announced already")
-        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "2026-09", isMember: false), "Not a member")
+        // Records since September: October has a report.
+        var p = Portfolio()
+        p.dividends = [dividend(2026, 9, 15, 100)]
+        XCTAssertTrue(PocketReport.noticeDue(now: now, seen: "2026-09", isMember: true, portfolio: p), "A new month has ended since the last notice")
+        XCTAssertTrue(PocketReport.noticeDue(now: now, seen: "", isMember: true, portfolio: p), "Never announced before")
+        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "2026-10", isMember: true, portfolio: p), "October's report was announced already")
+        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "2026-09", isMember: false, portfolio: p), "Not a member")
         XCTAssertEqual(PocketReport.noticeMonth(now: now), month(2026, 10))
-        // The month turns in Taipei time: 00:30 on 1 December there is the first moment November's report exists.
-        XCTAssertFalse(PocketReport.noticeDue(now: date(2026, 11, 30, hour: 23), seen: "2026-10", isMember: true))
-        XCTAssertTrue(PocketReport.noticeDue(now: date(2026, 12, 1, hour: 0), seen: "2026-10", isMember: true))
+        // The month turns in Taipei time: 00:00 on 1 December there is the first moment November's report exists.
+        XCTAssertFalse(PocketReport.noticeDue(now: date(2026, 11, 30, hour: 23), seen: "2026-10", isMember: true, portfolio: p))
+        XCTAssertTrue(PocketReport.noticeDue(now: date(2026, 12, 1, hour: 0), seen: "2026-10", isMember: true, portfolio: p))
         XCTAssertEqual(PocketReport.noticeMonth(now: date(2027, 1, 3)), month(2026, 12))
+    }
+
+    /// 「有新月報時」: a member whose records begin this month, or who has none, has no report of last month to open.
+    func testNoticeNeedsRecordsThatReachBackToTheMonth() {
+        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "", isMember: true, portfolio: Portfolio()), "No records at all")
+        var game = GameState()
+        game.dcaMonths = [month(2026, 11)]
+        game.xpByMonth = ["2026-11": 100]
+        var p = Portfolio()
+        p.game = game
+        p.dividends = [dividend(2026, 11, 3, 100), dividend(2026, 9, 3, 100, .estimated)]
+        XCTAssertFalse(PocketReport.noticeDue(now: now, seen: "", isMember: true, portfolio: p), "Started this month: last month has nothing")
+        XCTAssertTrue(PocketReport.noticeDue(now: date(2026, 12, 2), seen: "", isMember: true, portfolio: p), "Next month there is a report of this one")
+        // Anything a report counts in last month is enough.
+        game.collected = ["0050": date(2026, 10, 31, hour: 23)]
+        p.game = game
+        XCTAssertTrue(PocketReport.noticeDue(now: now, seen: "", isMember: true, portfolio: p))
     }
 }
