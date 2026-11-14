@@ -3,28 +3,42 @@ import Foundation
 import UserNotifications
 
 extension PortfolioStore {
-    /// 到價提醒, in the order they were added.
-    var alerts: [PriceAlert] { data.alerts ?? [] }
+    // The list itself (`alerts`) and its file are in `PortfolioStore`: every change below is one `saveAlerts`, which
+    // writes the alerts' own file and never the records.
+
+    /// The list as a `Portfolio` holds it, for the rules written there (`addAlert`, `fireAlerts`, `mergeAlerts`).
+    private var alertBook: Portfolio {
+        var book = Portfolio()
+        book.alerts = alerts
+        return book
+    }
 
     func addAlert(symbol: String, above: Bool, price: Double) throws {
-        var next = data
+        var next = alertBook
         try next.addAlert(symbol: symbol, above: above, price: price)
-        try commit(next)
+        try saveAlerts(next.alerts ?? [])
     }
 
     /// Switches an alert on or off. One that fired keeps the time it fired when it is switched on again.
     func setAlert(_ id: UUID, enabled: Bool) throws {
-        var next = data
-        guard let i = next.alerts?.firstIndex(where: { $0.id == id }), next.alerts?[i].enabled != enabled else { return }
-        next.alerts?[i].enabled = enabled
-        try commit(next)
+        var list = alerts
+        guard let i = list.firstIndex(where: { $0.id == id }), list[i].enabled != enabled else { return }
+        list[i].enabled = enabled
+        try saveAlerts(list)
     }
 
     func removeAlert(_ id: UUID) throws {
-        var next = data
-        guard next.alerts?.contains(where: { $0.id == id }) == true else { return }
-        next.alerts?.removeAll { $0.id == id }
-        try commit(next)
+        guard alerts.contains(where: { $0.id == id }) else { return }
+        try saveAlerts(alerts.filter { $0.id != id })
+    }
+
+    /// Marks these alerts as fired at `now`, switched off, and saves the list; returns them as they are now. Saved
+    /// before anything is said about them, so an alert can never be announced twice.
+    func fireAlerts(_ ids: [UUID], now: Date) throws -> [PriceAlert] {
+        var next = alertBook
+        let fired = next.fireAlerts(ids, now: now)
+        if !fired.isEmpty { try saveAlerts(next.alerts ?? []) }
+        return fired
     }
 
     /// The price an alert is judged on: the newest one known for the code (`quote`), unless it is a trial match or its
@@ -122,8 +136,10 @@ enum PriceAlertMonitor {
 
     /// One background run: the request for the next run, then the check.
     @MainActor private static func runInBackground() async {
-        // On a locked phone the records cannot be opened (see `PortfolioStore.reloadIfLocked`): nothing to check yet.
-        let readable = store?.reloadIfLocked() ?? false
+        // Background runs mostly come while the phone is locked. The records cannot be opened then (they are read
+        // here if they can be, see `PortfolioStore.reloadIfLocked`), and the check does not need them: the alerts
+        // have their own file, the prices are the day's closes, and what fires is saved to the alerts' file.
+        store?.reloadIfLocked()
         // Asked for before the check: a run that iOS cuts short is reported as over at once, and the app may be
         // suspended before anything after the check runs. StoreKit is heard first: at a launch in the background it
         // has not answered yet, and `scheduleNext` would take a member for none and take the request back.
@@ -131,7 +147,6 @@ enum PriceAlertMonitor {
         // iOS ended the run while StoreKit was answering: it has been reported as over, nothing more is done.
         guard !Task.isCancelled else { return }
         scheduleNext()
-        guard readable else { return }
         await check()
         // An alert that fired is switched off: with nothing left to watch the request is taken back.
         scheduleNext()
@@ -144,10 +159,19 @@ enum PriceAlertMonitor {
         await check()
     }
 
-    /// The app's own store, checked with the real membership, quotes and notifications.
+    /// The app's own store, checked with the real membership, quotes and notifications. Locked records do not stop
+    /// it: nothing it reads or writes is in them.
     @MainActor static func check() async {
-        guard let store, !store.recordsLocked else { return }
+        guard let store else { return }
         await check(store)
+    }
+
+    /// The prices a check is judged on. With the records open: the usual quiet refresh (富果 with a key, else the
+    /// day's closes), saved with the records. With the records locked the phone is locked: the keychain that holds
+    /// the 富果 key is closed too and nothing may be written to the records, so only the day's closes are fetched;
+    /// they go to their own file, which is not protected that way.
+    @MainActor static func refreshPrices(_ store: PortfolioStore, _ symbols: [String]) async {
+        if store.recordsLocked { await store.refreshDaily(manual: true) } else { await store.refresh(symbols: symbols, quiet: true) }
     }
 
     /// Refreshes the prices of the codes being watched, then fires what is due: each alert is switched off with the
@@ -155,7 +179,7 @@ enum PriceAlertMonitor {
     /// here every time: a lapsed member's alerts stay in the list and are never fired.
     @MainActor static func check(_ store: PortfolioStore, now: Date = Date(),
                       isMember: () async -> Bool = { await PriceAlertMonitor.memberNow() },
-                      refresh: (PortfolioStore, [String]) async -> Void = { await $0.refresh(symbols: $1, quiet: true) },
+                      refresh: (PortfolioStore, [String]) async -> Void = { await PriceAlertMonitor.refreshPrices($0, $1) },
                       notify: (PriceAlert, Double) async -> Void = { await PriceAlertMonitor.post($0, price: $1) }) async {
         let watched = Set(store.alerts.filter(\.enabled).map(\.symbol))
         guard !watched.isEmpty, await isMember() else { return }
@@ -163,12 +187,10 @@ enum PriceAlertMonitor {
         let member = await isMember()
         // From here to the save nothing waits: the list is read, judged and saved in one go, so two checks that
         // overlap cannot both fire the same alert.
-        var next = store.data
         var prices: [String: Double] = [:]
-        for symbol in Set((next.alerts ?? []).filter(\.enabled).map(\.symbol)) { prices[symbol] = store.alertPrice(symbol, now: now) }
-        let fired = next.fireAlerts(AlertEngine.due(next.alerts ?? [], prices: prices, isMember: member), now: now)
-        guard !fired.isEmpty else { return }
-        do { try store.commit(next) } catch { return }
+        for symbol in Set(store.alerts.filter(\.enabled).map(\.symbol)) { prices[symbol] = store.alertPrice(symbol, now: now) }
+        // Saved to the alerts' own file, before any notification; a save that fails says nothing.
+        guard let fired = try? store.fireAlerts(AlertEngine.due(store.alerts, prices: prices, isMember: member), now: now), !fired.isEmpty else { return }
         for alert in fired { if let price = prices[alert.symbol] { await notify(alert, price) } }
     }
 
@@ -194,9 +216,10 @@ enum PriceAlertMonitor {
     /// back any request already made (no alerts left, or the membership has lapsed).
     @MainActor static func scheduleNext() {
         guard registered, let store else { return }
-        // Records that are still locked say nothing about the alerts; the run that got here was asked for while there
-        // were some, so it is asked for again.
-        guard store.recordsLocked || AlertEngine.watching(store.alerts, isMember: MembershipStore.shared.has(.priceAlerts)) else {
+        // While nothing can be said about the alerts (their file cannot be opened before the first unlock; an earlier
+        // build's alerts are still in locked records), the run that got here was asked for while there were some, so
+        // it is asked for again.
+        guard store.alertsUnknown || AlertEngine.watching(store.alerts, isMember: MembershipStore.shared.has(.priceAlerts)) else {
             BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: identifier)
             return
         }

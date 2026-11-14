@@ -180,20 +180,20 @@ enum DemoArguments {
         return DataChecks.day(date)
     }
 
-    /// `--demo-store` with `--ui-testing`, after `seedPocket`: `alertSample` in an empty 到價提醒 list (saved as records,
+    /// `--demo-store` with `--ui-testing`, after `seedPocket`: `alertSample` in an empty 到價提醒 list (saved as a list,
     /// so nothing is checked, posted or asked of the notification settings), `lastMonthDividend`, and `upcomingSample`
     /// as announcements kept in memory for this launch. Like every seed it goes to the UI tests' own records file.
     @MainActor static func seedStore(_ store: PortfolioStore, args: [String], now: Date) {
         guard has("--demo-store", in: args) else { return }
-        var next = store.data
-        if (next.alerts ?? []).isEmpty {
+        if store.alerts.isEmpty {
             var fired: [UUID] = []
             for item in alertSample {
-                guard let alert = try? next.addAlert(symbol: item.symbol, above: item.above, price: item.price) else { continue }
+                guard (try? store.addAlert(symbol: item.symbol, above: item.above, price: item.price)) != nil, let alert = store.alerts.last else { continue }
                 if item.fired { fired.append(alert.id) }
             }
-            next.fireAlerts(fired, now: GameRules.taipei.date(byAdding: .day, value: -1, to: now) ?? now)
+            _ = try? store.fireAlerts(fired, now: GameRules.taipei.date(byAdding: .day, value: -1, to: now) ?? now)
         }
+        var next = store.data
         let last = YearMonth(now).previous(), extra = lastMonthDividend
         if !next.dividends.contains(where: { $0.symbol == extra.symbol && $0.amount == extra.amount && YearMonth($0.date) == last }),
            let date = GameRules.taipei.date(from: DateComponents(year: last.year, month: last.month, day: extra.day, hour: 12)) {

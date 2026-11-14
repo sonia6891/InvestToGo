@@ -51,7 +51,9 @@ import SwiftUI
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
         if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
            cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
-        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL); try? FileManager.default.removeItem(at: componentHistoryURL) }
+        if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL); try? FileManager.default.removeItem(at: componentHistoryURL); try? FileManager.default.removeItem(at: alertsURL) }
+        // The alerts first: whether they have a file of their own decides what is done with any still in the records.
+        loadAlerts()
         loadRecords()
     }
     /// Reads the records file and the two files kept beside it.
@@ -66,6 +68,15 @@ import SwiftUI
                 // but iOS will not open it yet. Nothing is wrong, so nothing is said; `reloadIfLocked` reads it later.
                 if Self.isProtected(error) { recordsLocked = true } else { message = "無法讀取既有資料，原始檔已保留。請先匯出或檢查備份。" }
             }
+        }
+        // 到價提醒 written into the records by an earlier build move to their own file: written there first, dropped
+        // from the records by the next save, so nothing is lost if the app is stopped between the two. A later load
+        // that finds them in both places keeps the file's (it is the one kept up to date since).
+        let inRecords = loaded.alerts ?? []
+        loaded.alerts = nil
+        if !inRecords.isEmpty, !alertsOnFile, !alertsLocked {
+            alerts = inRecords
+            do { try writeAlerts(inRecords); alertsOnFile = true } catch { alertsUnsaved = true }
         }
         historiesSaved = (loaded.histories ?? [:]).isEmpty
         // Earlier versions kept histories in the records file; the next save moves them out. A history that does not
@@ -109,6 +120,54 @@ import SwiftUI
         for snapshot in (history ?? [:]).values.joined().sorted(by: { $0.date < $1.date }) { merged.remember(snapshot) }
         return merged.componentHistory ?? [:]
     }
+    // MARK: 到價提醒's own file
+
+    /// 到價提醒, in the order they were added. They live in a file of their own beside the records, protected only
+    /// until the phone's first unlock after a restart: the background check mostly runs while the phone is locked,
+    /// when the records (complete protection) cannot be opened, and it has to read the alerts, judge them and save
+    /// which ones fired. The file holds the alerts and nothing else: a code, a price, 高於 or 低於, on or off, and when
+    /// it fired. In memory `data.alerts` is always nil; `Portfolio.alerts` is only the field a backup carries them in.
+    @Published private(set) var alerts: [PriceAlert] = []
+    private var alertsURL: URL { url.appendingPathExtension("alerts") }
+    /// The alerts' own file has been read or written: it is where they live from then on.
+    private var alertsOnFile = false
+    /// The alerts' file is there but iOS will not open it yet (a restart, and no unlock since). Like `recordsLocked`:
+    /// the list is empty, not gone, and nothing is saved over it until `reloadIfLocked` has read it.
+    private(set) var alertsLocked = false
+    /// Alerts taken out of the records whose own file could not be written: they stay in the records until it can.
+    private var alertsUnsaved = false
+    /// Nothing can be said about the alerts yet: their file is locked, or there is none and the records that may
+    /// still hold them (an earlier build's) are locked.
+    var alertsUnknown: Bool { alertsLocked || (recordsLocked && !alertsOnFile) }
+
+    private static func alertsValid(_ list: [PriceAlert]) -> Bool {
+        list.count <= AlertEngine.limit && Set(list.map(\.id)).count == list.count && list.allSatisfy(\.isValid)
+    }
+    private func loadAlerts() {
+        alertsLocked = false
+        let bytes: Data
+        do { bytes = try Data(contentsOf: alertsURL) } catch {
+            if Self.isProtected(error) { alertsLocked = true }
+            return
+        }
+        // A file that does not hold a list of alerts counts as none: alerts still in the records take its place.
+        guard let list = try? JSONDecoder().decode([PriceAlert].self, from: bytes), Self.alertsValid(list) else { return }
+        alerts = list
+        alertsOnFile = true
+    }
+    private func writeAlerts(_ list: [PriceAlert]) throws {
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try JSONEncoder().encode(list).write(to: alertsURL, options: [.atomic, .completeUntilFirstUserAuthentication])
+    }
+    /// Saves the whole list to the alerts' file; the records file is not touched, so this works on a locked phone.
+    func saveAlerts(_ list: [PriceAlert]) throws {
+        guard !alertsUnknown else { throw AppDataError("提醒暫時無法儲存，請解鎖 iPhone 後再試。") }
+        guard Self.alertsValid(list) else { throw AppDataError("請輸入正確的代號與大於 0 的價格。") }
+        try writeAlerts(list)
+        alertsOnFile = true; alertsUnsaved = false
+        alerts = list
+    }
+
     private var readFailure = false
     /// The records could not be opened at launch because the phone was locked (they are saved with complete file
     /// protection). Until `reloadIfLocked` reads them, `data` is empty and nothing can be saved.
@@ -125,6 +184,8 @@ import SwiftUI
     /// After a launch on a locked phone: reads the records now, if iOS lets it. False only while they are still
     /// locked; true at once when they never were.
     @discardableResult func reloadIfLocked() -> Bool {
+        // The alerts' file first, as at launch.
+        if alertsLocked { loadAlerts() }
         guard recordsLocked else {
             // The records were read but the holdings history was not: read now, it joins what is in memory and is
             // written back by the next save.
@@ -155,7 +216,14 @@ import SwiftUI
             if let merged = mergeLockedComponentHistory(next.componentHistory) { next.componentHistory = merged.isEmpty ? nil : merged }
             componentHistorySaved = false
         }
+        // 到價提醒 are saved by `saveAlerts`, never here: the records are written without them. The one exception is
+        // alerts an earlier build left in the records whose own file could not be written yet. It is tried again
+        // now, and until it works they stay in the records.
+        next.alerts = nil
         var records = next; records.histories = nil; records.componentHistory = nil
+        if alertsUnsaved {
+            if (try? writeAlerts(alerts)) != nil { alertsOnFile = true; alertsUnsaved = false } else { records.alerts = alerts.isEmpty ? nil : alerts }
+        }
         let encoded = try JSONEncoder().encode(records)
         guard encoded.count <= 5_000_000 else { throw AppDataError("紀錄超過 5 MB 上限，這次變更未儲存；現有資料未變更。") }
         _ = try Portfolio.decodeBackup(encoded)
@@ -336,7 +404,8 @@ import SwiftUI
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("ETFToGo-backup-\(UUID().uuidString.prefix(8)).json")
         // Preserve recoverable bytes when decoding failed; never export an empty replacement.
         // Price histories are left out: they can be fetched again and would make the backup too large to import.
-        var records = data; records.histories = nil
+        // 到價提醒 come from their own file and travel in the backup's `alerts` field, as before.
+        var records = data; records.histories = nil; records.alerts = alerts.isEmpty ? nil : alerts
         var bytes = readFailure ? try Data(contentsOf: url) : try JSONEncoder().encode(records)
         // The holdings history is part of a backup, but a backup over 5 MB cannot be imported: when it is the
         // history that makes it too large, fewer days of each ETF are kept (the newest), down to none.
@@ -379,7 +448,9 @@ import SwiftUI
         next.legacyDividends = (next.legacyDividends ?? [:]).merging(incoming.legacyDividends ?? [:]) { _, new in new }
         next.components = (next.components ?? [:]).merging(incoming.components ?? [:]) { _, new in new }
         for snapshot in (incoming.componentHistory ?? [:]).values.joined() { next.remember(snapshot) }
-        next.mergeAlerts(incoming.alerts ?? [])
+        // The backup's alerts join the ones here, in the alerts' own file (saved below, once the records are).
+        var alertBook = Portfolio(); alertBook.alerts = alerts
+        alertBook.mergeAlerts(incoming.alerts ?? [])
         next.histories = (next.histories ?? [:]).merging(incoming.histories ?? [:]) { _, new in new }
         next.fees = (next.fees ?? [:]).merging(incoming.fees ?? [:]) { _, new in new }
         // Restore missing cached quotes; retain quotes already on this device.
@@ -390,6 +461,8 @@ import SwiftUI
         next.game = game.game
         try saveRecovery()
         try commit(next)
+        let merged = alertBook.alerts ?? []
+        if merged != alerts { try saveAlerts(merged) }
         return ImportSummary(gameSkipped: game.skipped)
     }
     func saveRecovery() throws {
