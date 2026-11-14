@@ -128,6 +128,8 @@ enum PriceAlertMonitor {
         // suspended before anything after the check runs. StoreKit is heard first: at a launch in the background it
         // has not answered yet, and `scheduleNext` would take a member for none and take the request back.
         _ = await memberNow()
+        // iOS ended the run while StoreKit was answering: it has been reported as over, nothing more is done.
+        guard !Task.isCancelled else { return }
         scheduleNext()
         guard readable else { return }
         await check()
