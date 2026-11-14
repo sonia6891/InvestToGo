@@ -226,8 +226,10 @@ struct MemberView: View {
                     SkinTag(membership.isMember ? "你是會員・全部皮膚已解鎖" : "看懂・規劃・回顧")
                 }
                 .frame(maxWidth: .infinity)
-                skinsEntry
-                VStack(spacing: 10) { ForEach(Plan.allCases) { planCard($0) } }
+                // Only the stage gives way: the cards have a least height (44) they would otherwise be pressed down
+                // to before it, with their text spilling over the edges.
+                skinsEntry.fixedSize(horizontal: false, vertical: true)
+                VStack(spacing: 10) { ForEach(Plan.allCases) { planCard($0) } }.fixedSize(horizontal: false, vertical: true)
             }
             .frame(minHeight: Self.firstScreen(height: height, footer: footer), alignment: .top)
             if membership.failed && !membership.loading {
