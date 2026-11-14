@@ -157,7 +157,7 @@ import SwiftUI
     }
     private func writeAlerts(_ list: [PriceAlert]) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try JSONEncoder().encode(list).write(to: alertsURL, options: [.atomic, .completeUntilFirstUserAuthentication])
+        try JSONEncoder().encode(list).write(to: alertsURL, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
     /// Saves the whole list to the alerts' file; the records file is not touched, so this works on a locked phone.
     func saveAlerts(_ list: [PriceAlert]) throws {
