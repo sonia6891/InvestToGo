@@ -976,6 +976,87 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(dividendWords.firstMatch.exists, "and so is the line that counts the payments")
         XCTAssertTrue(member.buttons["report-share"].exists, "分享 is there")
     }
+    /// Every member screen that has a route of its own, opened both ways: a member (`--demo-member`) sees the screen
+    /// and no lock of any feature on it; a non-member sees that feature's lock and not the screen behind it.
+    func testEveryMemberFeatureOpens() {
+        memberScreen("goalPlanner", lock: "goalPlanner") { $0.staticTexts["goal-planner-monthly"] }
+        memberScreen("backtest", lock: "backtest") { $0.buttons["backtest-run"] }
+        memberScreen("priceAlerts", lock: "priceAlerts") { $0.textFields["price-alert-symbol"] }
+        // Seeded (`--demo-active`), so the member's list has a fund on it.
+        memberScreen("activeTracking", lock: "activeTracking", seed: ["--demo-active"]) { $0.buttons["active-tracking-refresh"] }
+        memberScreen("report", lock: "report", seed: ["--demo-pocket"]) { $0.descendants(matching: .any)["report-card"] }
+        // 持股透視 itself is free: the member's part is its 重疊成分 tab.
+        memberScreen("exposure", lock: "overlap", tab: "重疊成分") { $0.staticTexts["至少需要兩檔持有 ETF 的成分資料才能比較重疊。"] }
+    }
+    /// One `--open` route as a member, then as a non-member. `shown` is something only the member's screen has.
+    private func memberScreen(_ route: String, lock feature: String, seed: [String] = [], tab: String? = nil,
+                              shows shown: (XCUIApplication) -> XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        let anyLock = NSPredicate(format: "identifier BEGINSWITH %@", "member-lock-")
+        let member = launch(["--demo-member"] + seed + ["--open", route])
+        if let tab {
+            XCTAssertTrue(member.buttons[tab].waitForExistence(timeout: 10), "\(route) has the \(tab) tab", file: file, line: line)
+            member.buttons[tab].tap()
+        }
+        XCTAssertTrue(shown(member).waitForExistence(timeout: 10), "A member sees \(route)", file: file, line: line)
+        XCTAssertFalse(member.descendants(matching: .any).matching(anyLock).firstMatch.exists, "A member sees no lock on \(route)", file: file, line: line)
+        member.terminate()
+
+        let app = launch(seed + ["--open", route])
+        if let tab {
+            XCTAssertTrue(app.buttons[tab].waitForExistence(timeout: 10), "\(route) has the \(tab) tab", file: file, line: line)
+            app.buttons[tab].tap()
+        }
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-\(feature)"].waitForExistence(timeout: 10), "A non-member sees the \(feature) lock on \(route)", file: file, line: line)
+        XCTAssertTrue(app.buttons["看看口袋會員"].exists, "The lock has 「看看口袋會員」", file: file, line: line)
+        XCTAssertFalse(shown(app).exists, "A non-member does not see \(route) itself", file: file, line: line)
+        app.terminate()
+    }
+    /// 組合試算's 基準 is free; 保守, 樂觀 and 壓力測試 are the member's (`MemberFeature.scenarios`). A non-member who
+    /// picks one of them sees the lock instead of its figures and can go back to 基準; a member sees every scenario.
+    func testScenarioLockInCombo() {
+        let lock = "member-lock-scenarios"
+        let app = launch(["--open", "tools"])
+        openComboResult(app)
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "A non-member's result opens on 基準")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists, "基準 is free: no lock on it")
+        reveal(app, app.buttons["壓力測試"])
+        XCTAssertTrue(app.descendants(matching: .any)[lock].waitForExistence(timeout: 5), "Another scenario shows the lock")
+        XCTAssertFalse(scenarioHeading(app, "壓力測試").exists, "and not that scenario's figures")
+        sleep(1); capture(app, "combo-scenario-locked")
+        reveal(app, scenarioChip(app, "基準"))
+        XCTAssertTrue(scenarioHeading(app, "基準情境").waitForExistence(timeout: 5), "基準 is still there to go back to")
+        XCTAssertFalse(app.descendants(matching: .any)[lock].exists, "Back on 基準 the lock is gone")
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "tools"])
+        openComboResult(member)
+        XCTAssertTrue(scenarioHeading(member, "基準情境").waitForExistence(timeout: 5), "A member's result opens on 基準 too")
+        reveal(member, member.buttons["壓力測試"])
+        XCTAssertTrue(scenarioHeading(member, "壓力測試").waitForExistence(timeout: 5), "A member sees 壓力測試's figures")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists, "A member sees no lock")
+        reveal(member, scenarioChip(member, "保守"))
+        XCTAssertTrue(scenarioHeading(member, "保守情境").waitForExistence(timeout: 5), "and 保守's")
+        XCTAssertFalse(member.descendants(matching: .any)[lock].exists)
+        sleep(1); capture(member, "combo-scenario-member")
+    }
+    /// 工具 → ETF 組合試算 → 設定試算 → 開始試算: on 試算結果, as `testDiscoverIsETFOnlyAndComboRuns` gets there.
+    private func openComboResult(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(app.buttons["tool-combo"].waitForExistence(timeout: 10), "工具 has ETF 組合試算", file: file, line: line)
+        reveal(app, app.buttons["tool-combo"], file: file, line: line)
+        XCTAssertTrue(app.buttons["combo-settings"].waitForExistence(timeout: 5), "組合試算 opens", file: file, line: line)
+        reveal(app, app.buttons["combo-settings"], file: file, line: line)
+        XCTAssertTrue(app.textFields["combo-monthly"].waitForExistence(timeout: 5), "試算設定 opens", file: file, line: line)
+        reveal(app, app.buttons["combo-run"], file: file, line: line)
+        XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens", file: file, line: line)
+    }
+    /// The line above the figures on 試算結果 that names the scenario they are for: 「基準情境・…」, 「壓力測試・…」.
+    private func scenarioHeading(_ app: XCUIApplication, _ name: String) -> XCUIElement {
+        app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", name + "・")).firstMatch
+    }
+    /// A chip of 情境切換. Its label is the scenario's name followed by its rate.
+    private func scenarioChip(_ app: XCUIApplication, _ name: String) -> XCUIElement {
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name)).firstMatch
+    }
     private func waitForValue(_ element: XCUIElement, _ value: String, file: StaticString = #filePath, line: UInt = #line) {
         let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
         XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(value), got \(element.exists ? String(describing: element.value) : "nothing")", file: file, line: line)

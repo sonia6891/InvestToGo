@@ -24,7 +24,7 @@ jobs:
   skin-matrix:
     # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
     # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the
-    # 44 launches never push that job past its limit.
+    # 52 launches never push that job past its limit.
     needs: core
     runs-on: macos-26
     timeout-minutes: 40
@@ -59,8 +59,8 @@ jobs:
           set -euo pipefail
           python3 -m venv build/venv
           build/venv/bin/pip install --quiet pillow==12.3.0
-      - name: Capture four skins × eleven screens
-        # No continue-on-error: fewer than 44 shots fails the job (the artifact is still published below).
+      - name: Capture four skins × thirteen screens
+        # No continue-on-error: fewer than 52 shots fails the job (the artifact is still published below).
         timeout-minutes: 20
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -71,14 +71,17 @@ jobs:
           blank() {
             build/venv/bin/python -c 'import sys; from PIL import Image, ImageStat; im = Image.open(sys.argv[1]).convert("L"); w, h = im.size; sys.exit(0 if ImageStat.Stat(im.crop((0, h // 8, w, h))).stddev[0] < 3 else 1)' "$1"
           }
-          # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就).
-          SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements"
+          # screen id → launch arguments after --open (開機 引導1 大廳 找ETF 詳情 圖鑑卡 口袋 配息 工具 換膚 成就 月報
+          # 到價提醒). The last two are 口袋會員 pages, opened as a member: their cards are `Card`/`Palette` rather than
+          # `SkinCard`, and these shots are where that is judged in every skin.
+          SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements report priceAlerts"
           # Rows in the global-constraints order, as the skinKit loop.
           for SKIN in blackgold voxel stitch sketch; do
             for SCREEN in $SCREENS; do
               case "$SCREEN" in
                 onboarding) OPEN="onboarding --page 1"; NAME=onboarding1 ;;
                 detail|dex) OPEN="$SCREEN --symbol 0050"; NAME=$SCREEN ;;
+                report|priceAlerts) OPEN="$SCREEN --demo-member"; NAME=$SCREEN ;;
                 *) OPEN="$SCREEN"; NAME=$SCREEN ;;
               esac
               OUT="build/matrix/$SKIN-$NAME.png"
@@ -101,8 +104,8 @@ jobs:
             done
           done
           COUNT=$(ls build/matrix/*.png 2>/dev/null | wc -l | tr -d ' ')
-          echo "captured $COUNT of 44"
-          if [ "$COUNT" -ne 44 ]; then echo "::error::skin matrix has $COUNT of 44 shots"; exit 1; fi
+          echo "captured $COUNT of 52"
+          if [ "$COUNT" -ne 52 ]; then echo "::error::skin matrix has $COUNT of 52 shots"; exit 1; fi
       - name: Lay out the contact sheet
         if: always()
         run: build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
@@ -194,6 +197,24 @@ jobs:
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --reduce-motion --demo-pocket --demo-streak 12 --open "$SCREEN"
             sleep 5
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-reduce-motion.png"
+          done
+          # 口袋會員 pages as a member (--demo-member), each as `--open` shows it. --demo-pocket: 月報 and 持股透視 have
+          # holdings and dividends to show; --demo-active: 主動式追蹤 has a fund with two days of holdings.
+          for SCREEN in goalPlanner backtest priceAlerts activeTracking report exposure; do
+            SEED=""
+            if [ "$SCREEN" = activeTracking ]; then SEED="--demo-active"; fi
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            # shellcheck disable=SC2086
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --demo-member $SEED --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png"
+          done
+          # Two of them as a non-member: the lock card over the faded preview.
+          for SCREEN in backtest report; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 12 --demo-level 7 --demo-pocket --open "$SCREEN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-locked.png"
           done
       - name: Capture the skin kit sheet in every skin
         timeout-minutes: 2

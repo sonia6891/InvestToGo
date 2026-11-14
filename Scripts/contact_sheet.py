@@ -21,7 +21,7 @@ SKINS = [
     ("stitch", "縫線", "SKN 003"),
     ("sketch", "手繪", "SKN 004"),
 ]
-# Columns, left to right, in the order of the brief (Task 13): (file id, label).
+# Columns, left to right, in the order of the brief (Task 13), then two 口袋會員 pages as a member: (file id, label).
 SCREENS = [
     ("splash", "開機"),
     ("onboarding1", "引導 1"),
@@ -34,6 +34,8 @@ SCREENS = [
     ("tools", "工具"),
     ("skins", "換膚"),
     ("achievements", "成就"),
+    ("report", "月報"),
+    ("priceAlerts", "到價提醒"),
 ]
 
 THUMB_W = 300  # each phone screenshot is scaled to this width
