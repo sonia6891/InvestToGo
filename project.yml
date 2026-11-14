@@ -50,6 +50,12 @@ targets:
           UIColorName: LaunchBackground
         # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
         SentryDSN: '$(SENTRY_DSN)'
+        # 到價提醒 (PriceAlertMonitor): the background refresh task that checks prices when iOS allows it. The
+        # identifier is the one the code registers; it does not have to match the bundle id.
+        BGTaskSchedulerPermittedIdentifiers:
+          - tw.sonia.etftogo.alerts
+        UIBackgroundModes:
+          - fetch
     settings:
       configs:
         # Written into project.pbxproj as a quoted string, not an .xcconfig, so the `//` is not a comment there.

@@ -175,6 +175,8 @@ struct Portfolio: Codable {
     var game: GameState? = nil
     /// 個股＋ETF 組合試算 settings and simulated mix; absent in older files.
     var combo: ComboSettings? = nil
+    /// 到價提醒, at most `AlertEngine.limit`; absent in older files.
+    var alerts: [PriceAlert]? = nil
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
     /// Days of holdings kept for one ETF.
     static let historyLimit = 12
@@ -223,7 +225,10 @@ struct Portfolio: Codable {
               (value.trades?.count ?? 0) <= 50000,
               Set((value.trades ?? []).map(\.id)).count == (value.trades?.count ?? 0),
               (value.trades ?? []).allSatisfy(\.isValid),
-              value.combo?.isValid ?? true
+              value.combo?.isValid ?? true,
+              (value.alerts?.count ?? 0) <= AlertEngine.limit,
+              Set((value.alerts ?? []).map(\.id)).count == (value.alerts?.count ?? 0),
+              (value.alerts ?? []).allSatisfy(\.isValid)
         else { throw StoreError.unsupportedBackup }
         try value.legacyPlan?.validate()
         for d in (value.legacyDividends ?? [:]).values { try d.validate() }

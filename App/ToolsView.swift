@@ -22,6 +22,7 @@ struct ToolsView: View {
         ("存錢目標反推", "目標金額換算每月投入", .goalPlanner, "tool-goal-planner", true),
         ("回測", "幾年前開始每月投，現在是多少", .backtest, "tool-backtest", true),
         ("主動式追蹤", "主動式 ETF 新增、剔除了哪些持股", .activeTracking, "tool-active-tracking", true),
+        ("到價提醒", "價格到了你設定的數字就通知", .priceAlerts, "tool-price-alerts", true),
         ("備份資料", "匯出／匯入", .backup, "tool-backup", false),
     ]
 

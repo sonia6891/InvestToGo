@@ -889,4 +889,47 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(memberDetail.staticTexts[dates].waitForExistence(timeout: 5), "A member sees the change on the fund's own page")
         XCTAssertFalse(memberDetail.buttons["holding-changes-lock"].exists)
     }
+    /// 到價提醒 is a member feature: a non-member sees the lock; a member adds an alert through the form and sees it in
+    /// the list. Under `--ui-testing` no price is asked for and no notification permission is requested.
+    func testPriceAlertsLockAndMember() {
+        let note = "沒有富果金鑰時，以每日收盤價判斷；iPhone 會在背景不定時檢查，不保證即時。"
+        let app = launch(["--open", "priceAlerts"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-priceAlerts"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["price-alert-add"].exists, "The form is not there for a non-member")
+        XCTAssertEqual(app.staticTexts["price-alerts-note"].label, note)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--open", "priceAlerts"])
+        let symbol = member.textFields["price-alert-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 10), "A member sees the form")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-priceAlerts"].exists)
+        XCTAssertEqual(member.staticTexts["price-alerts-note"].label, note)
+        waitForLabel(member.staticTexts["price-alert-count"], "我的提醒 0／20")
+        symbol.tap(); symbol.typeText("0050")
+        let price = member.textFields["price-alert-price"]
+        price.tap(); price.typeText("200")
+        reveal(member, member.buttons["price-alert-add"])
+        let condition = member.staticTexts["price-alert-condition-0050"]
+        XCTAssertTrue(condition.waitForExistence(timeout: 5), "The new alert is in the list")
+        XCTAssertEqual(condition.label, "高於 200")
+        XCTAssertTrue(member.staticTexts["監看中"].exists)
+        waitForLabel(member.staticTexts["price-alert-count"], "我的提醒 1／20")
+        XCTAssertFalse(member.staticTexts["price-alert-error"].exists)
+        XCTAssertFalse(XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists, "No permission prompt in UI tests")
+        sleep(1); capture(member, "price-alerts-member")
+        member.terminate()
+
+        // 「設到價提醒」 on a fund's 詳情: a non-member lands on the lock, a member on the form with the code filled in.
+        let detail = launch(["--quiet-toasts", "--open", "detail", "--symbol", "0050"])
+        XCTAssertTrue(detail.buttons["detail-price-alert"].waitForExistence(timeout: 10), "詳情 has 「設到價提醒」")
+        detail.buttons["detail-price-alert"].tap()
+        XCTAssertTrue(detail.descendants(matching: .any)["member-lock-priceAlerts"].waitForExistence(timeout: 5), "A non-member lands on the lock")
+        detail.terminate()
+        let memberDetail = launch(["--demo-member", "--quiet-toasts", "--open", "detail", "--symbol", "0050"])
+        XCTAssertTrue(memberDetail.buttons["detail-price-alert"].waitForExistence(timeout: 10))
+        memberDetail.buttons["detail-price-alert"].tap()
+        let filled = memberDetail.textFields["price-alert-symbol"]
+        XCTAssertTrue(filled.waitForExistence(timeout: 5), "A member lands on the form")
+        XCTAssertEqual(filled.value as? String, "0050", "The form starts with this fund's code")
+    }
 }

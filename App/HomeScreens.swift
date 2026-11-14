@@ -13,6 +13,8 @@ enum AppRoute: Hashable {
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
     case member, skins, goalPlanner, backtest, activeTracking
+    /// 到價提醒; `priceAlert` opens it with the form filled in for a code (「設到價提醒」 on a fund's 詳情).
+    case priceAlerts, priceAlert(String)
     #if DEBUG
     /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
     case skinKitPreview
@@ -58,6 +60,8 @@ struct RouteView: View {
         case .goalPlanner: GoalPlannerView()
         case .backtest: BacktestView()
         case .activeTracking: ActiveTrackingView()
+        case .priceAlerts: PriceAlertsView()
+        case .priceAlert(let symbol): PriceAlertsView(symbol: symbol)
         case .combo: ComboView()
         case .comboAdding(let symbol): ComboView(addSymbol: symbol)
         case .comboSettings: ComboSettingsView()
@@ -109,6 +113,11 @@ struct AppNotice: Identifiable {
             guard announced.insert(entry.symbol + entry.event.ex).inserted else { continue }
             let ex = entry.event.ex.suffix(5).replacingOccurrences(of: "-", with: "/")
             items.append(AppNotice(id: "ex-\(entry.symbol)-\(entry.event.ex)", kind: "除息公告", icon: "megaphone.fill", color: Palette.blue, text: "\(entry.symbol) 將於 \(ex) 除息\(entry.event.amount.map { "，每單位 \(decimal($0)) 元" } ?? "，金額待公布")", day: todayText, route: .dividendForm(id: nil, symbol: entry.symbol, officialEx: entry.event.ex)))
+        }
+        // 到價提醒 that fired (spec 5.7: the notification, and a line kept here).
+        for alert in store.alerts {
+            guard let fired = alert.firedAt, fired >= past else { continue }
+            items.append(AppNotice(id: "alert-\(alert.id.uuidString)-\(Int(fired.timeIntervalSince1970))", kind: "到價提醒", icon: "bell.badge.fill", color: Palette.orange, text: "\(alert.symbol) 已到你設定的價格（\(alert.condition)）", day: DataChecks.day(fired), route: .priceAlerts))
         }
         items.append(AppNotice(id: "app-2026-10-16", kind: "App 重要通知", icon: "sparkles", color: Palette.purple, text: "新版介面上線：資產總覽、交易紀錄、配息明細、年度統計與官方配息資料", day: "2026-10-16", route: nil))
         items.append(AppNotice(id: "tip-yield", kind: "投資知識分享", icon: "book.fill", color: Palette.teal, text: "配息率不等於報酬率：配息可能來自本金，記得一起看淨值變化。", day: "2026-10-16", route: nil))
