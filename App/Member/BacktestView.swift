@@ -104,16 +104,29 @@ import Charts
     }
 }
 
+/// What 回測 remembers on the phone, outside the records: the last form.
+enum BacktestSettings {
+    static let symbolsKey = "backtest.symbols", weightsKey = "backtest.weights", monthlyKey = "backtest.monthly"
+    static let yearsKey = "backtest.years", reinvestKey = "backtest.reinvest"
+
+    /// `--ui-testing --reset` starts as a fresh install: the form as it first opens (0050 at 100%, 10,000 a month from
+    /// 5 years ago, 配息再投入 on), whatever an earlier UI test left in it.
+    static func reset(_ arguments: [String], defaults: UserDefaults = .standard) {
+        guard arguments.contains("--ui-testing"), arguments.contains("--reset") else { return }
+        for key in [symbolsKey, weightsKey, monthlyKey, yearsKey, reinvestKey] { defaults.removeObject(forKey: key) }
+    }
+}
+
 /// 回測 (spec 5.6, 口袋會員): 1–3 ETFs bought every month from N years ago, on real past prices.
 struct BacktestView: View {
     @EnvironmentObject private var store: PortfolioStore
     @StateObject private var model = BacktestModel()
     /// The last inputs. Codes and their percentages are comma-separated lists of the same length.
-    @AppStorage("backtest.symbols") private var savedSymbols = "0050"
-    @AppStorage("backtest.weights") private var savedWeights = "100"
-    @AppStorage("backtest.monthly") private var monthlyText = "10000"
-    @AppStorage("backtest.years") private var years = 5
-    @AppStorage("backtest.reinvest") private var reinvest = true
+    @AppStorage(BacktestSettings.symbolsKey) private var savedSymbols = "0050"
+    @AppStorage(BacktestSettings.weightsKey) private var savedWeights = "100"
+    @AppStorage(BacktestSettings.monthlyKey) private var monthlyText = "10000"
+    @AppStorage(BacktestSettings.yearsKey) private var years = 5
+    @AppStorage(BacktestSettings.reinvestKey) private var reinvest = true
     @State private var codeText = ""
     @State private var formError: String?
 

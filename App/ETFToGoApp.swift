@@ -15,6 +15,7 @@ import SwiftUI
         let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
         Onboarding.reset(args)
         ReportSettings.reset(args)
+        BacktestSettings.reset(args)
         // Someone upgrading with records on the phone has started already: no first-launch flow for them.
         Onboarding.adoptExisting(store.data)
         // One-time migrations of the game progress: DCA months backfilled from the records, with no experience.
@@ -24,6 +25,7 @@ import SwiftUI
         DemoArguments.seedPocket(store, args: args, now: Date())
         DemoArguments.seedHeld(store, args: args)
         DemoArguments.seedActive(store, args: args)
+        DemoArguments.seedStore(store, args: args, now: Date())
         _store = StateObject(wrappedValue: store)
         // A launch in the background on a locked phone reads the records later; the two steps above are then redone.
         store.onRecordsRead = { store in

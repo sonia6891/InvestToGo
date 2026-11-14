@@ -14,6 +14,20 @@ enum MembershipProducts {
     static let sold = [pocketMonthly]
 }
 
+/// What a plan's price slot says.
+enum PlanPrice {
+    /// The price the App Store screenshots show for 口袋會員 where StoreKit has no product to ask (the CI simulator): the
+    /// one set for Taiwan in App Store Connect. Only `--demo-store` ever shows it.
+    static let demoStore = "NT$120 / 月"
+    /// `product` is the App Store's own price and period, nil until it has answered. Without one a real launch shows
+    /// 「…」 while asking and 「—」 after; `--demo-store` shows the screenshots' price instead.
+    static func text(product: String?, loading: Bool, demoStore: Bool) -> String {
+        if let product { return product }
+        if demoStore { return Self.demoStore }
+        return loading ? "…" : "—"
+    }
+}
+
 /// Prices from the App Store and whether this Apple ID has a membership. Prices are never written into the app: until
 /// the App Store answers, a plan shows 「—」 and 「再試一次」.
 @MainActor final class MembershipStore: ObservableObject {
@@ -25,11 +39,12 @@ enum MembershipProducts {
     /// The paid plans this Apple ID holds, current and not refunded (StoreKit's own record of its purchases).
     @Published private(set) var owned: Set<String> = []
     var isMember: Bool { !owned.isEmpty }
-    /// `--ui-testing --demo-member`: every member feature open without a purchase (UI tests, screenshots).
+    /// `--ui-testing --demo-member` (or `--demo-store`, which implies it): every member feature open without a purchase
+    /// (UI tests, screenshots).
     var demoMember = MembershipStore.demoMember(from: ProcessInfo.processInfo.arguments)
     /// Whether this person may use a member feature. Reads `owned`, so views observing the store redraw on a change.
     func has(_ feature: MemberFeature) -> Bool { isMember || demoMember }
-    nonisolated static func demoMember(from args: [String]) -> Bool { args.contains("--ui-testing") && args.contains("--demo-member") }
+    nonisolated static func demoMember(from args: [String]) -> Bool { DemoArguments.has("--demo-member", in: args) }
     @Published var message: String?
     private var updates: Task<Void, Never>?
     /// One App Store request at a time: a second caller waits for the first instead of clearing the spinner early.
@@ -138,6 +153,7 @@ struct MemberView: View {
     @ObservedObject private var skins = SkinStore.shared
     @Environment(\.skin) private var skin
     @State private var plan: Plan = .pocket
+    private static let demoStore = DemoArguments.has("--demo-store", in: ProcessInfo.processInfo.arguments)
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
     private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
@@ -313,11 +329,10 @@ struct MemberView: View {
     @ViewBuilder private func price(_ item: Plan) -> some View {
         Group {
             if let id = item.product {
-                if let product = membership.products[id] {
-                    Text("\(product.displayPrice) / \(Self.period(product))")
-                } else {
-                    Text(membership.loading ? "…" : "—").accessibilityLabel(membership.loading ? "價格讀取中" : "價格暫時無法取得")
-                }
+                let known = membership.products[id].map { "\($0.displayPrice) / \(Self.period($0))" }
+                let text = Text(PlanPrice.text(product: known, loading: membership.loading, demoStore: Self.demoStore))
+                // The two placeholders are read out as what they mean.
+                if known != nil || Self.demoStore { text } else { text.accessibilityLabel(membership.loading ? "價格讀取中" : "價格暫時無法取得") }
             } else {
                 Text("免費")
             }

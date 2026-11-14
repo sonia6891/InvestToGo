@@ -274,6 +274,17 @@ import SwiftUI
             CrashReporting.capture(error, context: "dividends", offline: Connectivity.shared.offline)
         }
     }
+    /// Announcements shown on top of the record for this launch only; nothing is saved. `--demo-store`'s 「即將除息」
+    /// (`DemoArguments.seedStore`), which is the only caller.
+    func showOfficial(_ extra: [String: [OfficialDistribution]]) {
+        var next = official
+        for (symbol, events) in extra {
+            var list = next.events[symbol] ?? []
+            for event in events where !list.contains(where: { $0.ex == event.ex }) { list.append(event) }
+            next.events[symbol] = list
+        }
+        official = next
+    }
     func saveDaily() {
         guard let daily else { return }
         try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
