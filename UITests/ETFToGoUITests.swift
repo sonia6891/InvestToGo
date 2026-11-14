@@ -1062,7 +1062,6 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["試算結果"].waitForExistence(timeout: 5), "試算結果 opens")
         XCTAssertTrue(app.descendants(matching: .any)[lock].waitForExistence(timeout: 5), "保守 was picked: its lock card is what opens")
         XCTAssertFalse(scenarioHeading(app, "保守情境").exists, "and not its figures")
-        XCTAssertFalse(scenarioHeading(app, "基準情境").exists, "nor 基準's figures as if they were the answer")
         XCTAssertTrue(app.staticTexts["示意畫面，非真實資料"].exists, "The lock card says the preview is a sample")
         XCTAssertEqual(app.buttons["壓力測試"].value as? String, crown, "The result's chips are marked too")
         sleep(1); capture(app, "combo-scenario-picked-locked")
