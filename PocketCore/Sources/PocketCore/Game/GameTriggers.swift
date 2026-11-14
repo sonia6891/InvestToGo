@@ -49,7 +49,7 @@ extension GameState {
         let month = YearMonth(date), current = YearMonth(now)
         guard month <= current else { return [] }
         var events: [XPEvent] = []
-        if month == current || month == current.previous() { events += recordDCA(on: date) } else { insertMonth(month) }
+        if month == current || month == current.previous() { events += recordDCA(on: date, now: now) } else { insertMonth(month) }
         if month == current { events += complete(.dcaLogged, now: now) }
         return events
     }
@@ -77,7 +77,7 @@ extension GameState {
         if let migratedAt, date < GameRules.taipei.startOfDay(for: migratedAt) { return [] }
         let paidIn = "dividendPaidIn|\(current.key)|"
         guard rewardKeys.filter({ $0.hasPrefix(paidIn) }).count < GameRules.dividendXPPerMonth else { return [] }
-        let events = awardOnce(.dividendLogged, key: "dividend|\(symbol)|\(month.key)")
+        let events = awardOnce(.dividendLogged, key: "dividend|\(symbol)|\(month.key)", now: now)
         if !events.isEmpty { rewardKeys.insert(paidIn + "\(symbol)|\(month.key)") }
         return events
     }
@@ -85,7 +85,7 @@ extension GameState {
     /// A broker statement imported over the holdings: 對帳 experience and its counter once per Taipei month, the
     /// quest's cadence (re-review N2), and the 完成一次對帳 quest when it is this month's.
     mutating func reconcile(now: Date) -> [XPEvent] {
-        awardOnce(.reconciled, key: "reconciled|\(YearMonth(now).key)") + complete(.reconciled, now: now)
+        awardOnce(.reconciled, key: Self.reconciledKey + YearMonth(now).key, now: now) + complete(.reconciled, now: now)
     }
 
     /// 費用比較 opened with at least two funds: counts toward 省費達人 once per Taipei day.
@@ -95,10 +95,13 @@ extension GameState {
         return true
     }
 
+    /// The reward key of a month's 對帳 is this and the month: 「reconciled|2026-11」. 口袋月報 counts them.
+    static let reconciledKey = "reconciled|"
+
     /// Pays `event` the first time `key` is seen, never again.
-    mutating func awardOnce(_ event: XPEvent, key: String) -> [XPEvent] {
+    mutating func awardOnce(_ event: XPEvent, key: String, now: Date) -> [XPEvent] {
         guard rewardKeys.insert(key).inserted else { return [] }
-        award(event)
+        award(event, at: now)
         return [event]
     }
 

@@ -12,6 +12,14 @@ struct YearMonth: Codable, Hashable, Comparable {
     func previous() -> YearMonth { month == 1 ? YearMonth(year: year - 1, month: 12) : YearMonth(year: year, month: month - 1) }
     /// "2026-11", the key used by `GameState.questsDone`.
     var key: String { String(format: "%04d-%02d", year, month) }
+    /// Reads a `key` back; nil for anything else.
+    init?(key: String) {
+        let parts = key.split(separator: "-", omittingEmptySubsequences: false)
+        guard parts.count == 2, parts[0].utf8.count == 4, parts[1].utf8.count == 2,
+              key.utf8.allSatisfy({ $0 == UInt8(ascii: "-") || (UInt8(ascii: "0")...UInt8(ascii: "9")).contains($0) }),
+              let year = Int(parts[0]), let month = Int(parts[1]), (1...12).contains(month) else { return nil }
+        self.init(year: year, month: month)
+    }
     static func < (a: YearMonth, b: YearMonth) -> Bool { (a.year, a.month) < (b.year, b.month) }
     init(year: Int, month: Int) { self.year = year; self.month = month }
 }
@@ -44,6 +52,9 @@ struct GameState: Codable, Equatable {
     /// Rewards already paid, by key (「dividend|00878|2026-11」, 「reconciled|2026-11」, 「feeCompared|2026-11-12」…),
     /// so deleting a record and adding it again, or repeating an action, earns nothing (ruling R34).
     var rewardKeys: Set<String> = []
+    /// Experience earned in each Taipei month, "2026-11" -> points, from the day this was first recorded (`award`);
+    /// months before that have no entry, so 口袋月報 leaves the figure out rather than showing 0.
+    var xpByMonth: [String: Int] = [:]
     /// The one-time migrations already run on this progress (`GameMigration.current`); 0 in saves made before them.
     var migration = 0
     /// When the migrations first ran on this phone: dividends paid before it are history typed in, and earn nothing.
@@ -77,6 +88,7 @@ extension GameState {
         celebratedCoins = try c.decodeIfPresent(Int.self, forKey: .celebratedCoins) ?? coins
         celebratedAchievements = try c.decodeIfPresent(Set<String>.self, forKey: .celebratedAchievements) ?? Set(unlocked.keys)
         rewardKeys = try c.decodeIfPresent(Set<String>.self, forKey: .rewardKeys) ?? []
+        xpByMonth = try c.decodeIfPresent([String: Int].self, forKey: .xpByMonth) ?? [:]
         migration = try c.decodeIfPresent(Int.self, forKey: .migration) ?? 0
         migratedAt = try c.decodeIfPresent(Date.self, forKey: .migratedAt)
     }

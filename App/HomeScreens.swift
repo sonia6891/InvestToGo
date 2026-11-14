@@ -13,6 +13,8 @@ enum AppRoute: Hashable {
     case plan, goal, calculator, comparison, exposure, backup, broker, connection, reminders
     /// 會員 and 換膚, opened from 工具 (spec 5.10, 5.13).
     case member, skins, goalPlanner, backtest, activeTracking
+    /// 口袋月報／年報, from 工具 and from the lobby's notice at the start of a month.
+    case report
     /// 到價提醒; `priceAlert` opens it with the form filled in for a code (「設到價提醒」 on a fund's 詳情).
     case priceAlerts, priceAlert(String)
     #if DEBUG
@@ -60,6 +62,7 @@ struct RouteView: View {
         case .goalPlanner: GoalPlannerView()
         case .backtest: BacktestView()
         case .activeTracking: ActiveTrackingView()
+        case .report: PocketReportView()
         case .priceAlerts: PriceAlertsView()
         case .priceAlert(let symbol): PriceAlertsView(symbol: symbol)
         case .combo: ComboView()

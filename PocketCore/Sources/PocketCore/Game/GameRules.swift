@@ -51,10 +51,11 @@ extension GameState {
         return n
     }
 
-    /// One monthly DCA per calendar month; a repeat in the same month earns nothing.
-    mutating func recordDCA(on date: Date) -> [XPEvent] {
+    /// One monthly DCA per calendar month; a repeat in the same month earns nothing. The experience is earned
+    /// `now`, the day the debit was typed in (the debit's own day when not given).
+    mutating func recordDCA(on date: Date, now: Date? = nil) -> [XPEvent] {
         guard insertMonth(YearMonth(date)) else { return [] }
-        award(.monthlyDCA)
+        award(.monthlyDCA, at: now ?? date)
         return [.monthlyDCA]
     }
 
@@ -69,10 +70,12 @@ extension GameState {
         return true
     }
 
-    /// One coin per XP point; coins only accumulate for now.
-    mutating func award(_ e: XPEvent) {
+    /// One coin per XP point; coins only accumulate for now. The one place experience is added: the points also
+    /// go into `xpByMonth` under the Taipei month of `date`, the moment they were earned.
+    mutating func award(_ e: XPEvent, at date: Date = Date()) {
         let gain = GameRules.xp[e] ?? 0
         xp += gain; coins += gain
+        if gain > 0 { xpByMonth[YearMonth(date).key, default: 0] += gain }
         lastAward = e
         count(e.counterKey)
     }

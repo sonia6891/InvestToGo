@@ -29,6 +29,14 @@ struct LobbyView: View {
     @Environment(\.skin) private var skin
     @Environment(\.lobbyNavigation) private var navigation
     @Environment(\.lobbyNamespace) private var namespace
+    @ObservedObject private var membership = MembershipStore.shared
+    /// The month (「2026-10」) whose 口袋月報 the lobby last announced; each month is announced once.
+    @AppStorage(ReportSettings.seenMonthKey) private var reportSeenMonth = ""
+    /// 「上個月的口袋月報出爐了」 is on screen: from the moment it is due until it is opened or the app is closed.
+    @State private var reportNotice = false
+
+    /// UI tests and screenshots never see the notice: the lobby they check stays as it was.
+    private static let testing = ProcessInfo.processInfo.arguments.contains("--ui-testing")
 
     var body: some View {
         let game = store.data.game ?? GameState(), now = Date()
@@ -48,6 +56,7 @@ struct LobbyView: View {
                     if let record = hero.record { Text(record).skinFont(.mono(12)).skinForeground(\.sub) }
                 }
                 HStack(alignment: .top) { entry(.pocket); Spacer(); entry(.tools) }
+                if reportNotice, membership.has(.report) { reportNoticeCard }
                 questCard(game, month: YearMonth(now))
                 Text("→ 點物件進入 ←").skinFont(.mono(11)).skinForeground(\.dim).padding(.top, 4)
                     .accessibilityHidden(true)
@@ -58,6 +67,39 @@ struct LobbyView: View {
         .modifier(FadeInWithReducedMotion())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
+        // Decided each time the lobby comes up, and again once StoreKit has said whether this is a member.
+        .task(id: membership.has(.report)) { announceReport(now: Date()) }
+    }
+
+    // MARK: 口袋月報 notice
+
+    /// Shows the notice when last month's report has not been announced yet (members only), and records the month
+    /// at once, so it is announced a single time.
+    private func announceReport(now: Date) {
+        guard !Self.testing, PocketReport.noticeDue(now: now, seen: reportSeenMonth, isMember: membership.has(.report)) else { return }
+        reportSeenMonth = PocketReport.noticeMonth(now: now).key
+        reportNotice = true
+    }
+
+    private var reportNoticeCard: some View {
+        Button {
+            reportNotice = false
+            navigation.push(.report)
+        } label: {
+            SkinCard {
+                HStack(spacing: 10) {
+                    MemberCrown().frame(width: 22, height: 22)
+                    Text("上個月的口袋月報出爐了").skinFont(.title(14)).fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 4)
+                    Text("看看 ›").skinFont(.mono(12)).skinForeground(\.sub)
+                }
+                .frame(minHeight: 28)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("上個月的口袋月報出爐了，打開看看")
+        .accessibilityIdentifier("lobby-report-notice")
     }
 
     // MARK: Top bar

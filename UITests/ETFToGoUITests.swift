@@ -932,4 +932,49 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(filled.waitForExistence(timeout: 5), "A member lands on the form")
         XCTAssertEqual(filled.value as? String, "0050", "The form starts with this fund's code")
     }
+    /// 口袋月報／年報 is a member feature: a non-member sees the lock; a member sees the three tabs and the card, with
+    /// the dividend amount on it until 顯示領息金額 is switched off. Nothing is downloaded here.
+    func testReportLockAndMember() {
+        let app = launch(["--demo-pocket", "--open", "report"])
+        XCTAssertTrue(app.descendants(matching: .any)["member-lock-report"].waitForExistence(timeout: 10), "A non-member sees the lock")
+        XCTAssertFalse(app.buttons["report-share"].exists, "The report is not there for a non-member")
+        XCTAssertFalse(app.descendants(matching: .any)["report-card"].exists)
+        app.terminate()
+
+        let member = launch(["--demo-member", "--demo-pocket", "--demo-streak", "12", "--open", "report"])
+        let card = member.descendants(matching: .any)["report-card"]
+        XCTAssertTrue(card.waitForExistence(timeout: 10), "A member sees the card")
+        XCTAssertFalse(member.descendants(matching: .any)["member-lock-report"].exists)
+        for tab in ["月報", "年報", "今年到目前"] { XCTAssertTrue(member.buttons[tab].exists, "The \(tab) tab is there") }
+        XCTAssertTrue(member.buttons["report-previous"].exists, "月報 steps back to earlier months")
+        XCTAssertFalse(member.buttons["report-next"].isEnabled, "It opens on the last month that ended; there is none after it")
+        let dividends = member.descendants(matching: .any)["report-dividends"]
+        XCTAssertTrue(dividends.exists, "領息 is on the card to start with")
+        XCTAssertTrue(member.descendants(matching: .any)["report-dca"].exists)
+        XCTAssertTrue(member.descendants(matching: .any)["report-level"].exists)
+        for word in ["市值", "損益", "報酬", "成本"] {
+            XCTAssertFalse(card.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", word)).firstMatch.exists, "The card never mentions \(word)")
+        }
+        sleep(1); capture(member, "report-month")
+        member.buttons["年報"].tap()
+        XCTAssertTrue(member.descendants(matching: .any)["report-reconciles"].waitForExistence(timeout: 5), "年報 has a card too")
+        member.buttons["今年到目前"].tap()
+        waitForLabel(member.staticTexts["report-heading"], "今年到目前")
+        XCTAssertFalse(member.buttons["report-previous"].exists, "今年到目前 is one period: nothing to step through")
+        XCTAssertTrue(dividends.exists)
+        sleep(1); capture(member, "report-year-to-date")
+        let toggle = member.switches["report-show-dividends"]
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { member.swipeUp() }
+        XCTAssertEqual(toggle.value as? String, "1", "顯示領息金額 starts switched on")
+        // The switch itself sits at the row's trailing edge; a tap on the words beside it does nothing.
+        let knob = toggle.switches.firstMatch
+        if knob.exists { knob.tap() } else { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap() }
+        waitForValue(toggle, "0")
+        XCTAssertFalse(dividends.exists, "Switched off, the amount is gone from the card")
+        XCTAssertTrue(member.buttons["report-share"].exists, "分享 is there")
+    }
+    private func waitForValue(_ element: XCUIElement, _ value: String, file: StaticString = #filePath, line: UInt = #line) {
+        let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
+        XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(value), got \(element.exists ? String(describing: element.value) : "nothing")", file: file, line: line)
+    }
 }

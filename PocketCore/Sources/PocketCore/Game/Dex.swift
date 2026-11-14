@@ -71,7 +71,7 @@ extension GameState {
         let earlier = collected.values.filter { YearMonth($0) == month }.count
         collected[symbol] = now
         guard earlier < GameRules.dexXPPerMonth else { return [] }
-        award(.firstDexCard)
+        award(.firstDexCard, at: now)
         return [.firstDexCard]
     }
 

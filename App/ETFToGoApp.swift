@@ -14,6 +14,7 @@ import SwiftUI
         // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
         let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
         Onboarding.reset(args)
+        ReportSettings.reset(args)
         // Someone upgrading with records on the phone has started already: no first-launch flow for them.
         Onboarding.adoptExisting(store.data)
         // One-time migrations of the game progress: DCA months backfilled from the records, with no experience.
