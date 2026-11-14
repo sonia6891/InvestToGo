@@ -229,6 +229,51 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertTrue(asked.isEmpty)
     }
 
+    /// A4. A bond ETF has no stock rows: it is said so at once. Nobody is asked, nothing is reported as a failed
+    /// page, no half-hour pause starts, and a 富果 key does not change that.
+    func testBondFundAsksNobodyAndReportsNothing() async throws {
+        let transport = FakeHoldingsTransport { _ in Data("<html>維護中</html>".utf8) }
+        let clock = saturday()
+        for key in [false, true] {
+            let subject = client(transport, clock, key: key)
+            // By the code alone (the catalogue's type for 00679B is the plain 「指數股票型」).
+            do { _ = try await subject.components(symbol: "00679B", fundName: "元大美債20年", fundType: "指數股票型"); XCTFail("Expected an error") } catch { expect(error, "債券型 ETF 沒有股票成分可顯示") }
+            do { _ = try await subject.components(symbol: "00937B", fundName: "群益ESG投等債20+"); XCTFail("Expected an error") } catch { expect(error, "債券型 ETF 沒有股票成分可顯示") }
+            // By the catalogue's type, whatever the code.
+            do { _ = try await subject.components(symbol: "00999", fundName: "元大某債", fundType: "國外成分證券指數股票型基金(債券)"); XCTFail("Expected an error") } catch { expect(error, "債券型 ETF 沒有股票成分可顯示") }
+            // Asked again straight away: the same answer, not 「暫時取不到」 from a pause.
+            do { _ = try await subject.components(symbol: "00679B", fundName: "元大美債20年"); XCTFail("Expected an error") } catch { expect(error, "債券型 ETF 沒有股票成分可顯示") }
+        }
+        let asked = await transport.urls()
+        XCTAssertTrue(asked.isEmpty, "No request for a bond ETF")
+        let issuers = await reported.issuers
+        XCTAssertTrue(issuers.isEmpty, "Not a failure of the company's page")
+        XCTAssertTrue(defaults.dictionaryRepresentation().keys.filter { $0.hasPrefix("holdings.failed.") }.isEmpty, "No pause was started")
+        // A stock ETF of the same company is still read.
+        await transport.setAnswer { _ in HoldingsClientTests.yuanta("0050") }
+        let value = try await client(transport, clock).components(symbol: "0050", fundName: "元大台灣50", fundType: "國內成分證券指數股票型基金")
+        XCTAssertEqual(value.components.count, 2)
+    }
+
+    /// A4. 持股透視 does not count a bond ETF among the holdings still to fetch, and fetching one by hand says why.
+    @MainActor func testBondFundIsNotMissingHoldings() async throws {
+        let store = PortfolioStore(url: directory.appendingPathComponent("p.json"))
+        try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 10, unitCost: 100, broker: "", strategy: .saving))
+        try store.save(Holding(symbol: "00679B", name: "元大美債20年", shares: 10, unitCost: 30, broker: "", strategy: .unclassified))
+        try store.save(Holding(symbol: "00878", name: "國泰永續高股息", shares: 10, unitCost: 20, broker: "", strategy: .income))
+        XCTAssertTrue(store.isBondFund("00679B"))
+        XCTAssertFalse(store.isBondFund("0050"))
+        XCTAssertEqual(store.holdingsToFetch, ["0050", "00878"], "「取得 N 檔…」 counts two, not three")
+        try store.saveComponents(snapshot("0050", "2026-11-13"))
+        XCTAssertEqual(store.holdingsToFetch, ["00878"])
+        let transport = FakeHoldingsTransport { _ in throw URLError(.badServerResponse) }
+        do { try await store.refreshComponents("00679B", client: client(transport, saturday())); XCTFail("Expected an error") } catch { expect(error, "債券型 ETF 沒有股票成分可顯示") }
+        let asked = await transport.urls()
+        XCTAssertTrue(asked.isEmpty)
+        let issuers = await reported.issuers
+        XCTAssertTrue(issuers.isEmpty)
+    }
+
     // MARK: Each company's requests
 
     func testCathayChainAndThirtyDayLookup() async throws {
@@ -292,7 +337,7 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertEqual(object(calls[3].body)["token"] as? String, token)
     }
 
-    func testFhtrustAsksWithSlashesAndGivesUpAfterSixDays() async throws {
+    func testFhtrustAsksWithSlashesAndGivesUpAfterThirteenDays() async throws {
         let page = "<table><tr><td>00929</td><td><a href=\"/ETF/etf_detail/ETF21#nav\">復華台灣科技優息ETF基金</a></td></tr></table>"
         let transport = FakeHoldingsTransport { call in
             if call.url.hasSuffix("/ETF/etf_list") { return Data(page.utf8) }
@@ -306,15 +351,29 @@ final class HoldingsClientTests: XCTestCase {
         XCTAssertEqual(asked, ["https://www.fhtrust.com.tw/ETF/etf_list",
                                "https://www.fhtrust.com.tw/api/assets?fundID=ETF21&qDate=2026/11/14",
                                "https://www.fhtrust.com.tw/api/assets?fundID=ETF21&qDate=2026/11/13"])
-        // A week later nothing parses for today or the five days before it: six tries, then the plain message.
-        clock.advance(days: 7)
+        // B3. 農曆年 closes the market for six days or more in a row: nine days after the last day with data it is
+        // still found, and nothing is reported.
+        clock.advance(days: 8)
         let subject = client(transport, clock)
+        let afterHoliday = try await subject.components(symbol: "00929", fundName: "復華台灣科技優息")
+        XCTAssertEqual(afterHoliday.date, "2026-11-13")
+        asked = await transport.urls("api/assets")
+        XCTAssertEqual(asked.count, 2 + 10, "11/22 back to 11/13")
+        XCTAssertEqual(asked.last.map { String($0.suffix(10)) }, "2026/11/13")
+        var issuers = await reported.issuers
+        XCTAssertTrue(issuers.isEmpty, "A long holiday is not a failure of 復華's page")
+        // Six days on nothing parses for today or the twelve days before it: thirteen tries, then the plain message.
+        clock.advance(days: 6)
         do { _ = try await subject.components(symbol: "00929", fundName: "復華台灣科技優息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }
         asked = await transport.urls("api/assets")
-        XCTAssertEqual(asked.suffix(6).map { String($0.suffix(10)) },
-                       ["2026/11/21", "2026/11/20", "2026/11/19", "2026/11/18", "2026/11/17", "2026/11/16"])
+        XCTAssertEqual(asked.suffix(HoldingsClient.daysBack + 1).map { String($0.suffix(10)) },
+                       ["2026/11/28", "2026/11/27", "2026/11/26", "2026/11/25", "2026/11/24", "2026/11/23", "2026/11/22",
+                        "2026/11/21", "2026/11/20", "2026/11/19", "2026/11/18", "2026/11/17", "2026/11/16"])
+        XCTAssertEqual(asked.count, 2 + 10 + 13)
+        issuers = await reported.issuers
+        XCTAssertEqual(issuers, [.fhtrust])
         asked = await transport.urls("etf_list")
-        XCTAssertEqual(asked.count, 1, "The fund id from a week ago was still good")
+        XCTAssertEqual(asked.count, 1, "The fund id from two weeks ago was still good")
         // After a failure (and its half-hour pause) the id is asked for again, in case it was the id that went stale.
         clock.advance(days: 31.0 / 1440)
         do { _ = try await subject.components(symbol: "00929", fundName: "復華台灣科技優息"); XCTFail("Expected an error") } catch { expect(error, "暫時取不到，稍後再試") }

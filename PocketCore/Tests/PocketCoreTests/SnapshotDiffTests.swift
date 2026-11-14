@@ -86,6 +86,35 @@ final class SnapshotDiffTests: XCTestCase {
         XCTAssertEqual(change?.changed.first?.delta ?? 0, 2, accuracy: 1e-9)
     }
 
+    /// B4. A fund company's day against a day from 富果 or an imported file is not compared: the two list holdings
+    /// differently, and the difference would read as 新增 and 剔除.
+    func testDifferentSourcesAreNotCompared() {
+        XCTAssertEqual(SnapshotDiff.mixedSources, "兩次資料來源不同，暫不比較。")
+        var old = snapshot("2026-11-11", [("A", 10), ("B", 5), ("C", 3)])
+        var new = snapshot("2026-11-13", [("A", 12), ("B", 5), ("D", 4)])
+        old.source = "群益投信"
+        new.source = "富果／投信揭露資料"
+        let mixed = SnapshotDiff.compare(old: old, new: new)
+        XCTAssertTrue(mixed.mixedSources)
+        XCTAssertTrue(mixed.added.isEmpty && mixed.removed.isEmpty && mixed.changed.isEmpty, "No 新增, 剔除 or 權重變化 is made up")
+        XCTAssertEqual(mixed.from, "2026-11-11")
+        XCTAssertEqual(mixed.to, "2026-11-13")
+        XCTAssertEqual(SnapshotDiff.latest([new, old])?.mixedSources, true, "The screen's own comparison says so too")
+        // An imported day, or one saved before the source was kept, is another source as well.
+        new.source = "使用者匯入；原來源：未提供"
+        XCTAssertTrue(SnapshotDiff.compare(old: old, new: new).mixedSources)
+        new.source = nil
+        XCTAssertTrue(SnapshotDiff.compare(old: old, new: new).mixedSources)
+        // The same source on both days is compared as before.
+        new.source = "群益投信"
+        let same = SnapshotDiff.compare(old: old, new: new)
+        XCTAssertFalse(same.mixedSources)
+        XCTAssertEqual(same.added.map(\.symbol), ["D"])
+        XCTAssertEqual(same.removed.map(\.symbol), ["C"])
+        old.source = nil; new.source = nil
+        XCTAssertFalse(SnapshotDiff.compare(old: old, new: new).mixedSources, "Two days with no source recorded are from the same build")
+    }
+
     func testTitleSaysBothDays() {
         XCTAssertEqual(SnapshotDiff.shortDay("2026-11-03"), "11/3")
         XCTAssertEqual(SnapshotDiff.shortDay("2026-01-13", year: true), "2026/1/13")

@@ -13,6 +13,10 @@ struct SnapshotChange {
     var changed: [(component: FundComponent, delta: Double)]
     /// More weights moved than `changed` lists: it holds only the `SnapshotDiff.limit` largest moves.
     var changedCut = false
+    /// The two days came from different places (a fund company's page against 富果 or an imported file): they list
+    /// holdings differently, so nothing is compared and the lists above are empty. The screen says
+    /// `SnapshotDiff.mixedSources` instead.
+    var mixedSources = false
 
     /// Nothing was added or removed and no weight moved enough to list.
     var isEmpty: Bool { added.isEmpty && removed.isEmpty && changed.isEmpty }
@@ -29,9 +33,16 @@ enum SnapshotDiff {
     static let threshold = 0.01
     /// How many weight changes are listed.
     static let limit = 10
+    /// Said in place of the lists when the two days are not from the same source.
+    static let mixedSources = "兩次資料來源不同，暫不比較。"
 
-    /// `changed` holds what is in both with |Δweight| ≥ 0.01, the largest move first, ten at most.
+    /// `changed` holds what is in both with |Δweight| ≥ 0.01, the largest move first, ten at most. Two days from
+    /// different sources are not compared (`mixedSources`): one source's missing rows would read as 剔除, the
+    /// other's extra ones as 新增.
     static func compare(old: ComponentSnapshot, new: ComponentSnapshot) -> SnapshotChange {
+        guard old.source == new.source else {
+            return SnapshotChange(from: old.date, to: new.date, added: [], removed: [], changed: [], mixedSources: true)
+        }
         let before = Dictionary(old.components.map { ($0.symbol, $0) }, uniquingKeysWith: { first, _ in first })
         let after = Set(new.components.map(\.symbol))
         var added: [FundComponent] = []

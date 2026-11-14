@@ -54,7 +54,7 @@ struct ExposureView: View {
     private var rows: [ExposureRow] { store.exposures }
     private var covered: [Holding] { store.data.holdings.filter { store.quote($0.symbol)?.isTWD == true && store.data.components?[$0.symbol] != nil } }
     var body: some View {
-        let missing = Array(Set(store.data.holdings.map(\.symbol))).sorted().filter { store.data.components?[$0] == nil && store.isETF($0) }
+        let missing = store.holdingsToFetch
         Page {
             SegmentBar(items: ["持股集中度", "重疊成分"], selection: $tab, pill: true, filled: true)
             if tab == 0 { concentration } else {

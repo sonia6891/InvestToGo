@@ -102,9 +102,12 @@ actor HoldingsClient {
     }
 
     /// The holdings of `symbol`. `fundName` is the fund's short name from the ETF list (「元大台灣50」,
-    /// 「主動群益台灣強棒」): it tells which company to ask.
-    func components(symbol: String, fundName: String) async throws -> ComponentSnapshot {
+    /// 「主動群益台灣強棒」): it tells which company to ask. `fundType` is the catalogue's type for it, when it has one.
+    /// A bond ETF has no stock holdings to show: that is said at once (`IssuerDirectory.bondFund`), with no request,
+    /// no report and no pause.
+    func components(symbol: String, fundName: String, fundType: String? = nil) async throws -> ComponentSnapshot {
         guard DataChecks.code(symbol) else { throw AppDataError("ETF 代號格式不符。") }
+        guard !IssuerDirectory.isBondFund(symbol: symbol, fundType: fundType) else { throw AppDataError(IssuerDirectory.bondFund) }
         let today = DataChecks.day(clock())
         if let kept = kept(symbol), kept.day == today { return kept.snapshot }
         if let task = running[symbol] { return try await task.value }
@@ -234,14 +237,17 @@ actor HoldingsClient {
         }
     }
 
+    /// How far back `newestDay` looks: 農曆年 closes the market for six days or more in a row, a weekend on each side.
+    static let daysBack = 12
+
     /// 復華 and 中信 answer for one day at a time and have nothing on a day without trading: today first, then up to
-    /// five days back ("yyyy/MM/dd", Taipei). Only an answer that does not parse moves on to the day before; a
+    /// `daysBack` days back ("yyyy/MM/dd", Taipei). Only an answer that does not parse moves on to the day before; a
     /// request that fails ends the search.
     private func newestDay(_ fetch: (String) async throws -> Data,
                            parse: (Data) throws -> ComponentSnapshot) async throws -> ComponentSnapshot {
         let now = clock()
         var last: Error = AppDataError(Self.unavailable)
-        for back in 0...5 {
+        for back in 0...Self.daysBack {
             let date = GameRules.taipei.date(byAdding: .day, value: -back, to: now) ?? now
             let body = try await fetch(DataChecks.day(date).replacingOccurrences(of: "-", with: "/"))
             do { return try parse(body) } catch { last = error }
@@ -342,7 +348,19 @@ extension PortfolioStore {
     /// Downloads an ETF's holdings (`HoldingsClient`) and saves them with their history. A failure throws and leaves
     /// what is saved as it was.
     func refreshComponents(_ symbol: String, client: HoldingsClient = .shared) async throws {
+        // Before the offline check: a bond ETF has nothing to download with or without a network.
+        if isBondFund(symbol) { throw AppDataError(IssuerDirectory.bondFund) }
         if Connectivity.forcedOffline { throw AppDataError("目前沒有網路，先顯示上次的成分股。") }
-        try saveComponents(await client.components(symbol: symbol, fundName: name(for: symbol)))
+        try saveComponents(await client.components(symbol: symbol, fundName: name(for: symbol), fundType: funds.first { $0.id == symbol }?.fundType))
+    }
+
+    /// A bond ETF: it has no stock holdings, so it is neither asked for nor counted as one still to fetch.
+    func isBondFund(_ symbol: String) -> Bool {
+        IssuerDirectory.isBondFund(symbol: symbol, fundType: funds.first { $0.id == symbol }?.fundType)
+    }
+
+    /// The held ETFs whose holdings 持股透視 can still fetch: none saved yet, and not a bond ETF.
+    var holdingsToFetch: [String] {
+        Array(Set(data.holdings.map(\.symbol))).sorted().filter { data.components?[$0] == nil && isETF($0) && !isBondFund($0) }
     }
 }

@@ -16,9 +16,16 @@ struct HoldingChangeList: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(change.title).font(.subheadline.bold()).foregroundStyle(Palette.ink)
-            if change.isEmpty {
-                Text("這兩次公布的持股沒有變化。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 6)
+            if change.mixedSources {
+                // One line and no lists: a company's page and 富果 (or an imported file) do not list alike.
+                Text(SnapshotDiff.mixedSources).font(.subheadline).foregroundStyle(Palette.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("holding-changes-mixed")
+            } else {
+                Text(change.title).font(.subheadline.bold()).foregroundStyle(Palette.ink)
+                if change.isEmpty {
+                    Text("這兩次公布的持股沒有變化。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 6)
+                }
             }
             if !change.added.isEmpty {
                 heading("新增 \(change.added.count) 檔")
@@ -69,10 +76,15 @@ struct ActiveTrackingView: View {
     @State private var errors: [String: String] = [:]
     @State private var task: Task<Void, Never>?
 
+    /// The six companies whose pages `HoldingsClient` reads (`Issuer`); an active ETF from another one stays empty.
+    static let supported = "目前支援元大、國泰、富邦、群益、復華、中信六家投信。"
+
     var body: some View {
         Page {
             MemberLock(.activeTracking) { tracking } preview: { preview }
+            // Outside the lock: a member and someone looking at the preview both read which companies are covered.
             VStack(alignment: .leading, spacing: 4) {
+                Text(Self.supported).accessibilityIdentifier("active-tracking-supported")
                 Text("資料來自各投信官網公開的持股，更新時間依投信而定。")
                 Text("這裡只整理公開持股的變動，不是投資建議。")
             }

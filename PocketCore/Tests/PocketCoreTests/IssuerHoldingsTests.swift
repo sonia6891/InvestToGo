@@ -51,6 +51,28 @@ final class IssuerHoldingsTests: XCTestCase {
         XCTAssertNil(IssuerDirectory.issuer(forFundName: "統一主動元大"))
     }
 
+    /// A4. Bond ETFs are told before any page is asked: the catalogue's type when it names bonds, else a code
+    /// ending in B.
+    func testBondFunds() {
+        XCTAssertEqual(IssuerDirectory.bondFund, "債券型 ETF 沒有股票成分可顯示")
+        // By the code: the catalogue often has only the plain type, or none.
+        XCTAssertTrue(IssuerDirectory.isBondFund(symbol: "00679B", fundType: "指數股票型"))
+        XCTAssertTrue(IssuerDirectory.isBondFund(symbol: "00687B", fundType: nil))
+        XCTAssertTrue(IssuerDirectory.isBondFund(symbol: "00937b", fundType: ""))
+        // By the type, whatever the code.
+        XCTAssertTrue(IssuerDirectory.isBondFund(symbol: "00999", fundType: "國外成分證券指數股票型基金(債券)"))
+        XCTAssertTrue(IssuerDirectory.isBondFund(symbol: "00998A", fundType: "主動式債券型"))
+        // Stock ETFs, leveraged, inverse, active and futures ones are not.
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "0050", fundType: "國內成分證券指數股票型基金"))
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00878", fundType: nil))
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00631L", fundType: "槓桿型"))
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00632R", fundType: "反向型"))
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00982A", fundType: "主動式"))
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00635U", fundType: "期貨信託"))
+        // A balanced fund holds stocks as well as bonds: its stock holdings can be shown.
+        XCTAssertFalse(IssuerDirectory.isBondFund(symbol: "00980T", fundType: "股債平衡型"))
+    }
+
     func testDay() {
         XCTAssertEqual(IssuerHoldings.day("20261111"), "2026-11-11")
         XCTAssertEqual(IssuerHoldings.day("2026/11/11"), "2026-11-11")

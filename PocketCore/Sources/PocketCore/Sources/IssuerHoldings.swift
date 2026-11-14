@@ -29,6 +29,18 @@ enum IssuerDirectory {
         if trimmed.hasPrefix("主動") { trimmed = String(trimmed.dropFirst(2)).trimmingCharacters(in: .whitespacesAndNewlines) }
         return prefixes.first { trimmed.hasPrefix($0.0) }?.1
     }
+
+    /// Said instead of holdings for a bond ETF.
+    static let bondFund = "債券型 ETF 沒有股票成分可顯示"
+
+    /// A bond ETF (00679B, 00687B, 00937B…) holds bonds: its company's page has no stock rows, and reading it would
+    /// look like a page that was redesigned. It is told before anything is asked for: by the catalogue's fund type
+    /// when that names bonds (a 平衡 fund holds stocks too, so it is not one), else by a code ending in B, which the
+    /// exchanges give to bond ETFs only.
+    static func isBondFund(symbol: String, fundType: String?) -> Bool {
+        if let type = fundType, type.contains("債"), !type.contains("平衡"), !type.contains("多重資產") { return true }
+        return symbol.uppercased().hasSuffix("B")
+    }
 }
 
 /// Parsers for each fund company's holdings response. A reshaped or error body throws; none returns an empty snapshot.
