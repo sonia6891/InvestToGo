@@ -165,6 +165,8 @@ struct Portfolio: Codable {
     var legacyPrices: [String: LegacyPrice]? = nil
     var legacyDividends: [String: BackupImport.OldDividend]? = nil
     var components: [String: ComponentSnapshot]? = nil
+    /// Earlier holdings of each ETF, newest first, at most `historyLimit` days apiece; absent in older files.
+    var componentHistory: [String: [ComponentSnapshot]]? = nil
     var histories: [String: PriceHistory]? = nil
     var fees: [String: FeeRecord]? = nil
     /// Absent in files written before the trade log existed.
@@ -174,6 +176,17 @@ struct Portfolio: Codable {
     /// 個股＋ETF 組合試算 settings and simulated mix; absent in older files.
     var combo: ComboSettings? = nil
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
+    /// Days of holdings kept for one ETF.
+    static let historyLimit = 12
+    /// Files `snapshot` under its ETF: a snapshot of the same date is replaced, the newest `historyLimit` dates stay.
+    mutating func remember(_ snapshot: ComponentSnapshot) {
+        var list = (componentHistory?[snapshot.symbol] ?? []).filter { $0.date != snapshot.date }
+        list.append(snapshot)
+        list.sort { $0.date > $1.date }
+        var all = componentHistory ?? [:]
+        all[snapshot.symbol] = Array(list.prefix(Self.historyLimit))
+        componentHistory = all
+    }
     /// Appends to the trade log, keeping the most recent 5,000 entries.
     mutating func log(_ action: TradeAction, _ holding: Holding, date: Date = Date(), amount: Double? = nil) {
         var list = trades ?? []
@@ -210,6 +223,10 @@ struct Portfolio: Codable {
         try value.legacyPlan?.validate()
         for d in (value.legacyDividends ?? [:]).values { try d.validate() }
         for (code, snapshot) in value.components ?? [:] { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
+        for (code, list) in value.componentHistory ?? [:] {
+            guard list.count <= historyLimit, Set(list.map(\.date)).count == list.count else { throw StoreError.unsupportedBackup }
+            for snapshot in list { guard code == snapshot.symbol else { throw StoreError.unsupportedBackup }; try snapshot.validate() }
+        }
         for (code, history) in value.histories ?? [:] { guard code == history.symbol else { throw StoreError.unsupportedBackup }; try history.validate() }
         for (code, fee) in value.fees ?? [:] { guard code == fee.symbol else { throw StoreError.unsupportedBackup }; try fee.validate() }
         guard (value.comparison?.count ?? 0) <= 3, (value.comparison ?? []).allSatisfy(DataChecks.code),

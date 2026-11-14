@@ -416,6 +416,8 @@ struct SourcesView: View {
                 Divider()
                 row("clock.arrow.circlepath", Palette.purple, "回測歷史資料", status: ("官方資料", Palette.green), lines: ["證交所：個股日成交資訊、除權除息計算結果表、ETF 分割", "櫃買中心：個股日成交資訊、除權除息計算結果表", "按下開始回測才下載，存在手機裡"]) { EmptyView() }
                 Divider()
+                row("square.grid.2x2", Palette.blue, "ETF 成分股", status: ("投信官網", Palette.green), lines: ["投信官網公開的持股：元大、國泰、富邦、群益、復華、中國信託", "其他投信：存了富果金鑰時向富果查詢", "按下更新成分股才下載，每檔一天一次"]) { EmptyView() }
+                Divider()
                 row("powerplug.fill", Palette.muted, "外部整合", status: ("未連線", Palette.red), lines: ["第三方券商整合（開發中）"]) { Button("連結帳戶") {}.disabled(true) }
             }
             if let message = store.officialMessage ?? store.catalogMessage { Text(message).font(.caption).foregroundStyle(Palette.muted) }

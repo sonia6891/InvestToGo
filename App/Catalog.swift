@@ -27,7 +27,8 @@ actor RequestPace {
 enum PublicHTTP {
     /// Fugle's free plan allows 60 requests a minute, shared by live polling and manual refreshes.
     static let fugle = RequestPace(limit: 55, window: 60)
-    static func get(_ url: URL, key: String? = nil) async throws -> Data {
+    /// `accept`: the fund companies' holdings pages are asked for with "*/*" (some are HTML).
+    static func get(_ url: URL, key: String? = nil, accept: String = "application/json") async throws -> Data {
         guard url.scheme == "https" else { throw AppDataError("只接受安全的資料連線。") }
         if let pace = url.host == "api.fugle.tw" ? fugle : nil {
             while true {
@@ -37,15 +38,31 @@ enum PublicHTTP {
             }
         }
         var request = URLRequest(url: url); request.timeoutInterval = 25; request.cachePolicy = .reloadIgnoringLocalCacheData
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(accept, forHTTPHeaderField: "Accept")
         if let key {
             guard url.host == "api.fugle.tw" else { throw AppDataError("金鑰只能傳給富果。") }
             request.setValue(key, forHTTPHeaderField: "X-API-KEY")
         }
+        return try await send(request, keyed: key != nil)
+    }
+    /// POST for the fund companies' holdings pages: a JSON body, or none (`json` nil). Never carries a key.
+    static func post(_ url: URL, json: Data?) async throws -> Data {
+        guard url.scheme == "https" else { throw AppDataError("只接受安全的資料連線。") }
+        guard url.host != "api.fugle.tw" else { throw AppDataError("不支援的資料連線。") }
+        var request = URLRequest(url: url); request.timeoutInterval = 25; request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.httpMethod = "POST"
+        request.setValue("application/json, */*", forHTTPHeaderField: "Accept")
+        if let json {
+            request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+            request.httpBody = json
+        }
+        return try await send(request, keyed: false)
+    }
+    private static func send(_ request: URLRequest, keyed: Bool) async throws -> Data {
         let (bytes, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             let code = (response as? HTTPURLResponse)?.statusCode ?? 0
-            if key == nil, code == 401 || code == 403 { throw AppDataError("資料服務暫時拒絕連線（\(code)），保留上次成功資料。") }
+            if !keyed, code == 401 || code == 403 { throw AppDataError("資料服務暫時拒絕連線（\(code)），保留上次成功資料。") }
             throw StoreError.http(code)
         }
         guard bytes.count <= 10_000_000 else { throw AppDataError("資料超過大小上限，保留原資料。") }

@@ -17,9 +17,9 @@ struct ComponentsContent: View {
         VStack(alignment: .leading, spacing: 16) {
             SkinPanel {
                 Text("\(symbol) 成分股").font(.title3.bold()).foregroundStyle(Palette.ink)
-                Button(busy ? "取得中…" : "更新成分股") { Task { busy = true; error = nil; defer { busy = false }; do { try store.saveComponents(await Fugle.components(symbol: symbol)) } catch { self.error = error.localizedDescription } } }.buttonStyle(.borderedProminent).disabled(busy).padding(.vertical, 12)
+                Button(busy ? "取得中…" : "更新成分股") { Task { busy = true; error = nil; defer { busy = false }; do { try await store.refreshComponents(symbol) } catch { self.error = error.localizedDescription } } }.buttonStyle(.borderedProminent).disabled(busy).padding(.vertical, 12)
                 Button("匯入成分股 JSON") { importing = true }
-                Text("連線需要行情金鑰的成分股權限；也可匯入有日期的成分檔。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 12)
+                Text("元大、國泰、富邦、群益、復華、中信的 ETF 直接讀投信官網公開的持股；其他投信需要行情金鑰的成分股權限。每檔一天更新一次，也可匯入有日期的成分檔。").font(.caption).foregroundStyle(Palette.muted).padding(.top, 12)
             }
             if let error { Text(error).foregroundStyle(Palette.red) }
             if let snapshot {
@@ -127,7 +127,7 @@ struct ExposureView: View {
         busy = true; error = nil
         defer { busy = false }
         for symbol in symbols {
-            do { try store.saveComponents(await Fugle.components(symbol: symbol)) } catch { self.error = "\(symbol)：\(error.localizedDescription)" }
+            do { try await store.refreshComponents(symbol) } catch { self.error = "\(symbol)：\(error.localizedDescription)" }
         }
     }
 }

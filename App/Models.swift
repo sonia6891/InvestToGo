@@ -254,6 +254,7 @@ import SwiftUI
         next.legacyPrices = (next.legacyPrices ?? [:]).merging(incoming.legacyPrices ?? [:]) { _, new in new }
         next.legacyDividends = (next.legacyDividends ?? [:]).merging(incoming.legacyDividends ?? [:]) { _, new in new }
         next.components = (next.components ?? [:]).merging(incoming.components ?? [:]) { _, new in new }
+        for snapshot in (incoming.componentHistory ?? [:]).values.joined() { next.remember(snapshot) }
         next.histories = (next.histories ?? [:]).merging(incoming.histories ?? [:]) { _, new in new }
         next.fees = (next.fees ?? [:]).merging(incoming.fees ?? [:]) { _, new in new }
         // Restore missing cached quotes; retain quotes already on this device.
@@ -288,7 +289,10 @@ import SwiftUI
             catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
         } catch { catalogMessage = error.localizedDescription; catalogFailed = true; CrashReporting.capture(error, context: "catalog", offline: Connectivity.shared.offline) }
     }
-    func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; try commit(next) }
+    /// Saves an ETF's holdings as its current ones and files them in its history (12 newest dates, one per date).
+    func saveComponents(_ value: ComponentSnapshot) throws { try value.validate(); var next = data; if next.components == nil { next.components = [:] }; next.components?[value.symbol] = value; next.remember(value); try commit(next) }
+    /// The holdings saved for an ETF over time, newest first; at most `Portfolio.historyLimit` dates.
+    func componentHistory(for symbol: String) -> [ComponentSnapshot] { (data.componentHistory?[symbol] ?? []).sorted { $0.date > $1.date } }
     func saveHistory(_ value: PriceHistory) throws { try value.validate(); var next = data; if next.histories == nil { next.histories = [:] }; next.histories?[value.symbol] = value; try commit(next) }
     func saveFee(_ value: FeeRecord) throws { try value.validate(); var next = data; if next.fees == nil { next.fees = [:] }; next.fees?[value.symbol] = value; try commit(next) }
     /// `inline`: a failure is kept in `quoteFailure` for the page's own LoadFailed instead of the app-wide alert.
