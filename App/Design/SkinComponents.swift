@@ -407,7 +407,7 @@ struct SkinDecor: View {
         @Environment(\.skin) private var skin
         func body(content: Content) -> some View {
             let motion = SkinMotion.of(skin)
-            TimelineView(.animation(paused: !enabled)) { timeline in
+            TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
                 let t = motion.clock(timeline.date.timeIntervalSinceReferenceDate)
                 content.offset(x: enabled ? 2 * CGFloat(sin(2 * .pi * t / 11)) : 0,
                                y: enabled ? 4 * CGFloat(sin(2 * .pi * t / 7 + 1)) : 0)

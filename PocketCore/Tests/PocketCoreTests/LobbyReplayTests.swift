@@ -66,4 +66,36 @@ final class LobbyReplayTests: XCTestCase {
         XCTAssertEqual(s.xp, 340); XCTAssertEqual(s.coins, 330)
         XCTAssertEqual(s.month, "2026-11")
     }
+
+    // MARK: arrival (what the lobby plays on arriving)
+
+    func testArrivalCrossingGivesCrossesLevel() throws {
+        XCTAssertLessThan(GameRules.level(xp: 100), GameRules.level(xp: 5000))
+        let r = try XCTUnwrap(LobbyReplay.arrival(shown: snap(xp: 100), now: snap(xp: 5000), questOrder: [], levelUpDue: nil, celebratedLevel: 1))
+        XCTAssertTrue(r.crossesLevel)
+        XCTAssertEqual(r.levelFrom, GameRules.level(xp: 100)); XCTAssertEqual(r.levelTo, GameRules.level(xp: 5000))
+    }
+
+    func testArrivalWithNothingShownPlaysNothingEvenWhenALevelIsDue() {
+        XCTAssertNil(LobbyReplay.arrival(shown: nil, now: snap(xp: 5000), questOrder: [], levelUpDue: 9, celebratedLevel: 1))
+    }
+
+    func testArrivalWithALevelStillDueFillsAgainToFull() throws {
+        let xp = 5000, level = GameRules.level(xp: xp)
+        XCTAssertGreaterThan(level, 1)
+        let r = try XCTUnwrap(LobbyReplay.arrival(shown: snap(xp: xp), now: snap(xp: xp), questOrder: [], levelUpDue: level, celebratedLevel: level - 1))
+        XCTAssertEqual(r.levelFrom, level - 1); XCTAssertEqual(r.levelTo, level)
+        XCTAssertTrue(r.crossesLevel)
+        XCTAssertEqual(r.xpFrom, xp); XCTAssertEqual(r.xpTo, xp)
+        XCTAssertEqual(r.newQuests, [])
+    }
+
+    func testArrivalKeepsTheEarlierLevelWhenADueLevelIsAlsoCrossed() throws {
+        let r = try XCTUnwrap(LobbyReplay.arrival(shown: snap(xp: 5000), now: snap(xp: 5100), questOrder: [], levelUpDue: 9, celebratedLevel: 2))
+        XCTAssertEqual(r.levelFrom, min(GameRules.level(xp: 5000), 2))
+    }
+
+    func testArrivalWithNoLevelDueIsJustTheDifference() {
+        XCTAssertNil(LobbyReplay.arrival(shown: snap(xp: 300), now: snap(xp: 300), questOrder: [], levelUpDue: nil, celebratedLevel: 1))
+    }
 }

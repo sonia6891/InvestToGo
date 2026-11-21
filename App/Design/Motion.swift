@@ -105,7 +105,7 @@ private struct AmbientBob: ViewModifier {
 
     func body(content: Content) -> some View {
         let motion = SkinMotion.of(skin)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             let o = Self.offsets(time: timeline.date.timeIntervalSinceReferenceDate, phase: phase, motion: motion, enabled: enabled)
             content.offset(y: o.dy).rotationEffect(.degrees(o.rotation))
         }
@@ -145,7 +145,7 @@ struct AmbientParticles: View {
     var body: some View {
         let motion = SkinMotion.of(skin)
         let tint = skin.color(\.accent)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             Canvas { context, size in
                 guard enabled, size.width > 0, size.height > 0 else { return }
                 let now = timeline.date.timeIntervalSinceReferenceDate

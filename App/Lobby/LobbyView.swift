@@ -151,24 +151,13 @@ struct LobbyView: View {
         let order = Quests.forMonth(YearMonth(date), habit: game.habit ?? .dca, isNewbie: game.isNewbie).map(\.id)
         let snapshot = LobbySnapshot.of(game, now: date)
         let shown = shownStore.load()
-        var replay = LobbyReplay.between(shown: shown, now: snapshot, questOrder: order)
+        let replay = LobbyReplay.arrival(shown: shown, now: snapshot, questOrder: order, levelUpDue: game.levelUpDue, celebratedLevel: game.celebratedLevel)
         shownStore.save(snapshot)
-        // A LEVEL×UP still due from an earlier visit (its replay was tapped away, or the app closed over it): the bar
-        // fills to full again first (spec 5.4). Not on a first launch or after a restore (nothing was shown before):
-        // a level reached by the new experience curve is celebrated without a fill.
-        if shown != nil, game.levelUpDue != nil {
-            if var grown = replay {
-                grown.levelFrom = min(grown.levelFrom, game.celebratedLevel)
-                replay = grown
-            } else {
-                replay = LobbyReplay(newQuests: [], coinsFrom: snapshot.coins, coinsTo: snapshot.coins, xpFrom: snapshot.xp, xpTo: snapshot.xp,
-                                     levelFrom: game.celebratedLevel, levelTo: GameRules.level(xp: snapshot.xp))
-            }
-        }
         guard let replay, !reduceMotion, !AmbientMotion.uiTesting else {
             // Once the zoom back to the lobby has settled: a cover asked for in the middle of it may not come up.
-            let celebrate = celebrateIfDue
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { celebrate() }
+            // A replay that started meanwhile ends in its own celebrate: not two big events at once.
+            let celebrate = celebrateIfDue, replayer = replayer
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { if !replayer.playing { celebrate() } }
             return
         }
         replayer.play(replay, lead: lead, skin: skin, celebrate: celebrateIfDue)
@@ -342,11 +331,14 @@ struct LobbyView: View {
         let unticked = replayer.display?.unticked ?? []
         let shownDone = { (quest: Quest) in game.isDone(quest, in: month) && !unticked.contains(quest.id) }
         let done = quests.filter(shownDone).count
+        let finalDone = quests.filter { game.isDone($0, in: month) }.count
         let reward = quests.count * (GameRules.xp[.questDone] ?? 0)
         let confetti = skin.burst.map { Color(rgb: $0) }
         let rows = ForEach(quests) { quest in
             HStack(spacing: 7) {
                 SkinCheck(done: shownDone(quest), size: 18)
+                    // VoiceOver reads the real state, not the replay's in-between one (spec 6).
+                    .accessibilityLabel(game.isDone(quest, in: month) ? "已完成" : "未完成")
                     .scaleEffect(replayer.popping == quest.id ? 1.4 : 1)
                     .overlay { BurstView(trigger: replayer.confetti[quest.id] ?? 0, center: .center, colors: confetti).frame(width: 64, height: 64) }
                 Text(quest.title).skinFont(.body(12)).fixedSize(horizontal: false, vertical: true)
@@ -357,6 +349,7 @@ struct LobbyView: View {
                 HStack {
                     Text("本月任務 \(done)/\(quests.count)")
                         .contentTransition(.numericText(value: Double(done)))
+                        .accessibilityLabel("本月任務 \(finalDone)/\(quests.count)")
                         .scaleEffect(replayer.popping != nil ? 1.12 : 1, anchor: .leading)
                     Spacer()
                     // The reward not yet earned breathes (spec 5.1).

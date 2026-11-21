@@ -77,6 +77,8 @@ enum LobbySignature: Equatable {
 extension SkinMotion {
     /// The time the skin's motion shows: whole steps for the stepped (pixel) skin, smooth for the others.
     func clock(_ time: Double) -> Double { stepped ? (time * stepsPerSecond).rounded(.down) / stepsPerSecond : time }
+    /// The least time between two redraws of an ambient clock: 1/30 s, or one step of the stepped (pixel) skin.
+    var frameInterval: Double { stepped ? 1 / max(stepsPerSecond, 1) : 1.0 / 30 }
 }
 
 /// Plays a lobby object's signature move on its picture while `enabled`; still otherwise.
@@ -88,7 +90,10 @@ struct SignatureMove: ViewModifier {
 
     func body(content: Content) -> some View {
         let motion = SkinMotion.of(skin)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        let period = LobbySignature.interval(phase: phase)
+        // Redraws only during the move (0.9 s of every 4–6.25 s); at rest nothing changes, so the clock idles.
+        let schedule = MoveSchedule(period: period, offset: -phase * period, duration: LobbySignature.moveDuration, step: motion.frameInterval)
+        TimelineView(schedule.paused(!enabled)) { timeline in
             let p = enabled ? LobbySignature.progress(time: motion.clock(timeline.date.timeIntervalSinceReferenceDate), phase: phase) : nil
             let pose = signature.pose(p)
             content
@@ -163,7 +168,8 @@ struct HeroShine: View {
 
     var body: some View {
         let motion = SkinMotion.of(skin)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        let schedule = MoveSchedule(period: Self.interval, offset: 2, duration: Self.duration, step: motion.frameInterval)
+        TimelineView(schedule.paused(!enabled)) { timeline in
             Canvas { context, size in
                 guard enabled, size.width > 0, let p = Self.progress(time: motion.clock(timeline.date.timeIntervalSinceReferenceDate)) else { return }
                 let w = max(size.width * 0.2, 30), slant = size.height * 0.3
@@ -192,7 +198,8 @@ struct BarShine: View {
 
     var body: some View {
         let motion = SkinMotion.of(skin)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        let schedule = MoveSchedule(period: 3.2, offset: 0, duration: 1.6, step: motion.frameInterval)
+        TimelineView(schedule.paused(!enabled)) { timeline in
             Canvas { context, size in
                 guard enabled, size.width > 1 else { return }
                 let p = motion.clock(timeline.date.timeIntervalSinceReferenceDate).truncatingRemainder(dividingBy: 3.2) / 1.6
@@ -216,7 +223,7 @@ private struct Breathe: ViewModifier {
 
     func body(content: Content) -> some View {
         let motion = SkinMotion.of(skin)
-        TimelineView(.animation(paused: !enabled)) { timeline in
+        TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             let t = motion.clock(timeline.date.timeIntervalSinceReferenceDate)
             let s = enabled ? (1 - cos(2 * .pi * t / 1.8)) / 2 : 0
             content.scaleEffect(1 + 0.08 * s, anchor: anchor).opacity(1 - 0.2 * s)
@@ -245,4 +252,48 @@ enum LobbyOpening {
     static let numeralDelay = 0.08
 
     static func animation(_ skin: Skin, delay: Double) -> Animation { SkinMotion.of(skin).spring.delay(delay) }
+}
+
+/// A clock for something that moves for `duration` s out of every `period` s (the first move starting at `offset`):
+/// it ticks every `step` s during a move, once just after its end, and then sleeps until the next one begins.
+struct MoveSchedule: TimelineSchedule {
+    let period: Double, offset: Double, duration: Double, step: Double
+
+    /// The first tick after `time` (seconds since the reference date).
+    func next(after time: Double) -> Double {
+        var local = (time - offset).truncatingRemainder(dividingBy: period)
+        if local < 0 { local += period }
+        let windowStart = time - local
+        // One step past the move, so a stepped clock has surely left it too before the clock idles.
+        let end = windowStart + duration + step
+        let result = time < end - 1e-6 ? min(time + step, end) : windowStart + period
+        return result > time ? result : time + step
+    }
+
+    func entries(from start: Date, mode: TimelineScheduleMode) -> AnyIterator<Date> {
+        var time = start.timeIntervalSinceReferenceDate
+        var first = true
+        return AnyIterator {
+            if first { first = false; return start }
+            time = next(after: time)
+            return Date(timeIntervalSinceReferenceDate: time)
+        }
+    }
+
+    /// The same clock, stopped while `paused`.
+    func paused(_ paused: Bool) -> PausableMoveSchedule { PausableMoveSchedule(base: self, paused: paused) }
+}
+
+/// `MoveSchedule` that yields nothing while paused (the view then shows the date it last drew).
+struct PausableMoveSchedule: TimelineSchedule {
+    let base: MoveSchedule
+    let paused: Bool
+
+    func entries(from start: Date, mode: TimelineScheduleMode) -> AnyIterator<Date> {
+        if paused {
+            var first = true
+            return AnyIterator { if first { first = false; return start }; return nil }
+        }
+        return base.entries(from: start, mode: mode)
+    }
 }

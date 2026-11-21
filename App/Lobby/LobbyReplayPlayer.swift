@@ -152,6 +152,7 @@ struct XPFloat: Equatable {
     /// LEVEL×UP was closed: the bar grows from the new level's start to where it is now.
     func coverClosed() {
         guard awaitingCover, coverShown else { return }
+        task?.cancel()
         task = Task { [weak self] in
             guard let self else { return }
             await self.grow()
@@ -199,7 +200,8 @@ struct XPFloat: Equatable {
                 awaitingCover = true; coverShown = false
                 celebrate()
                 // No LEVEL×UP came (none was due, or the lobby was left): the bar grows on its own.
-                guard await pause(1.0), !coverShown else { return }
+                // Not if a cover came up or closed meanwhile (`coverClosed` then grows the bar itself).
+                guard await pause(1.0), awaitingCover, !coverShown else { return }
                 await grow()
                 return
             }

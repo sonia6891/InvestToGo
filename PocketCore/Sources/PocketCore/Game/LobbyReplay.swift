@@ -44,3 +44,22 @@ struct LobbyReplay: Equatable {
                            levelFrom: GameRules.level(xp: shown.xp), levelTo: GameRules.level(xp: now.xp))
     }
 }
+
+extension LobbyReplay {
+    /// What the lobby plays on arriving: the difference since `shown`, plus a LEVEL×UP still due from an earlier visit
+    /// (its replay was tapped away, or the app closed over it): the bar fills to full again first. Not on a first
+    /// launch or after a restore (nothing `shown`): a level reached by the new experience curve is celebrated without
+    /// a fill. nil: nothing to play (a due LEVEL×UP, if any, is celebrated at once).
+    static func arrival(shown: LobbySnapshot?, now: LobbySnapshot, questOrder: [String], levelUpDue: Int?, celebratedLevel: Int) -> LobbyReplay? {
+        var replay = between(shown: shown, now: now, questOrder: questOrder)
+        guard shown != nil, levelUpDue != nil else { return replay }
+        if var grown = replay {
+            grown.levelFrom = min(grown.levelFrom, celebratedLevel)
+            replay = grown
+        } else {
+            replay = LobbyReplay(newQuests: [], coinsFrom: now.coins, coinsTo: now.coins, xpFrom: now.xp, xpTo: now.xp,
+                                 levelFrom: celebratedLevel, levelTo: GameRules.level(xp: now.xp))
+        }
+        return replay
+    }
+}
