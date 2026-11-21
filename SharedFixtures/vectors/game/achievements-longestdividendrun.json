@@ -1,120 +1,143 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [],
-          "quotes": {},
-          "schema": 1
+      "expected" : 0,
+      "input" : {
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
+
+          ],
+          "quotes" : {
+
+          },
+          "schema" : 1
         }
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "portfolio": {
-          "dividends": [
+      "expected" : 3,
+      "input" : {
+        "portfolio" : {
+          "dividends" : [
             {
-              "amount": 100,
-              "date": 790142400.0,
-              "id": "00000000-0000-4000-8000-000000000001",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 790142400,
+              "id" : "00000000-0000-4000-8000-000000000001",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 792820800.0,
-              "id": "00000000-0000-4000-8000-000000000002",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 792820800,
+              "id" : "00000000-0000-4000-8000-000000000002",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 793252800.0,
-              "id": "00000000-0000-4000-8000-000000000003",
-              "status": "已入帳",
-              "symbol": "00878"
+              "amount" : 100,
+              "date" : 793252800,
+              "id" : "00000000-0000-4000-8000-000000000003",
+              "status" : "已入帳",
+              "symbol" : "00878"
             },
             {
-              "amount": 100,
-              "date": 795240000.0,
-              "id": "00000000-0000-4000-8000-000000000004",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 795240000,
+              "id" : "00000000-0000-4000-8000-000000000004",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 800510400.0,
-              "id": "00000000-0000-4000-8000-000000000005",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 800510400,
+              "id" : "00000000-0000-4000-8000-000000000005",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 803188800.0,
-              "id": "00000000-0000-4000-8000-000000000006",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 803188800,
+              "id" : "00000000-0000-4000-8000-000000000006",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 805780800.0,
-              "id": "00000000-0000-4000-8000-000000000007",
-              "status": "已公告",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 805780800,
+              "id" : "00000000-0000-4000-8000-000000000007",
+              "status" : "已公告",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 819000000.0,
-              "id": "00000000-0000-4000-8000-000000000008",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 819000000,
+              "id" : "00000000-0000-4000-8000-000000000008",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 821678400.0,
-              "id": "00000000-0000-4000-8000-000000000009",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 821678400,
+              "id" : "00000000-0000-4000-8000-000000000009",
+              "status" : "已入帳",
+              "symbol" : "0056"
             }
           ],
-          "favorites": [],
-          "holdings": [],
-          "quotes": {},
-          "schema": 1
+          "favorites" : [
+
+          ],
+          "holdings" : [
+
+          ],
+          "quotes" : {
+
+          },
+          "schema" : 1
         }
       },
-      "name": "runs-and-announced-ignored"
+      "name" : "runs-and-announced-ignored"
     },
     {
-      "input": {
-        "portfolio": {
-          "dividends": [
+      "expected" : 2,
+      "input" : {
+        "portfolio" : {
+          "dividends" : [
             {
-              "amount": 100,
-              "date": 791569800.0,
-              "id": "00000000-0000-4000-8000-000000000010",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 791569800,
+              "id" : "00000000-0000-4000-8000-000000000010",
+              "status" : "已入帳",
+              "symbol" : "0056"
             },
             {
-              "amount": 100,
-              "date": 794030400.0,
-              "id": "00000000-0000-4000-8000-000000000011",
-              "status": "已入帳",
-              "symbol": "0056"
+              "amount" : 100,
+              "date" : 794030400,
+              "id" : "00000000-0000-4000-8000-000000000011",
+              "status" : "已入帳",
+              "symbol" : "0056"
             }
           ],
-          "favorites": [],
-          "holdings": [],
-          "quotes": {},
-          "schema": 1
+          "favorites" : [
+
+          ],
+          "holdings" : [
+
+          ],
+          "quotes" : {
+
+          },
+          "schema" : 1
         }
       },
-      "name": "taipei-month-edge"
+      "name" : "taipei-month-edge"
     }
   ],
-  "kind": "Achievements.longestDividendRun"
+  "kind" : "Achievements.longestDividendRun"
 }

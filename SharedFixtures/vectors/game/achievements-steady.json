@@ -1,161 +1,196 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "now": "2026-11-15T12:00:00+08:00",
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [
+      "expected" : true,
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
             {
-              "broker": "測試券商",
-              "id": "00000000-0000-4000-8000-000000000017",
-              "name": "0050 基金",
-              "purchaseDate": 725774400.0,
-              "shares": 1000,
-              "strategy": "存錢筒",
-              "symbol": "0050",
-              "unitCost": 50
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000017",
+              "name" : "0050 基金",
+              "purchaseDate" : 725774400,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ],
-          "quotes": {},
-          "schema": 1,
-          "trades": [
+          "quotes" : {
+
+          },
+          "schema" : 1,
+          "trades" : [
             {
-              "action": "買進",
-              "broker": "測試券商",
-              "date": 725774400.0,
-              "id": "00000000-0000-4000-8000-000000000018",
-              "name": "0050 基金",
-              "shares": 100,
-              "symbol": "0050",
-              "unitCost": 50
+              "action" : "買進",
+              "broker" : "測試券商",
+              "date" : 725774400,
+              "id" : "00000000-0000-4000-8000-000000000018",
+              "name" : "0050 基金",
+              "shares" : 100,
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ]
         }
       },
-      "name": "held-no-sells"
+      "name" : "held-no-sells"
     },
     {
-      "input": {
-        "now": "2026-11-15T12:00:00+08:00",
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [
+      "expected" : false,
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
             {
-              "broker": "測試券商",
-              "id": "00000000-0000-4000-8000-000000000017",
-              "name": "0050 基金",
-              "purchaseDate": 725774400.0,
-              "shares": 1000,
-              "strategy": "存錢筒",
-              "symbol": "0050",
-              "unitCost": 50
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000017",
+              "name" : "0050 基金",
+              "purchaseDate" : 725774400,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ],
-          "quotes": {},
-          "schema": 1,
-          "trades": [
+          "quotes" : {
+
+          },
+          "schema" : 1,
+          "trades" : [
             {
-              "action": "賣出",
-              "broker": "測試券商",
-              "date": 799300800.0,
-              "id": "00000000-0000-4000-8000-000000000019",
-              "name": "0050 基金",
-              "shares": 100,
-              "symbol": "0050",
-              "unitCost": 50
+              "action" : "賣出",
+              "broker" : "測試券商",
+              "date" : 799300800,
+              "id" : "00000000-0000-4000-8000-000000000019",
+              "name" : "0050 基金",
+              "shares" : 100,
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ]
         }
       },
-      "name": "sold-this-year"
+      "name" : "sold-this-year"
     },
     {
-      "input": {
-        "now": "2026-11-15T12:00:00+08:00",
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [
+      "expected" : true,
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
             {
-              "broker": "測試券商",
-              "id": "00000000-0000-4000-8000-000000000017",
-              "name": "0050 基金",
-              "purchaseDate": 725774400.0,
-              "shares": 1000,
-              "strategy": "存錢筒",
-              "symbol": "0050",
-              "unitCost": 50
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000017",
+              "name" : "0050 基金",
+              "purchaseDate" : 725774400,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ],
-          "quotes": {},
-          "schema": 1,
-          "trades": [
+          "quotes" : {
+
+          },
+          "schema" : 1,
+          "trades" : [
             {
-              "action": "賣出",
-              "broker": "測試券商",
-              "date": 783662400.0,
-              "id": "00000000-0000-4000-8000-000000000020",
-              "name": "0050 基金",
-              "shares": 100,
-              "symbol": "0050",
-              "unitCost": 50
+              "action" : "賣出",
+              "broker" : "測試券商",
+              "date" : 783662400,
+              "id" : "00000000-0000-4000-8000-000000000020",
+              "name" : "0050 基金",
+              "shares" : 100,
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ]
         }
       },
-      "name": "sold-before-the-year"
+      "name" : "sold-before-the-year"
     },
     {
-      "input": {
-        "now": "2026-11-15T12:00:00+08:00",
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [
+      "expected" : false,
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
             {
-              "broker": "測試券商",
-              "id": "00000000-0000-4000-8000-000000000021",
-              "name": "0050 基金",
-              "purchaseDate": 788932800.0,
-              "shares": 1000,
-              "strategy": "存錢筒",
-              "symbol": "0050",
-              "unitCost": 50
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000021",
+              "name" : "0050 基金",
+              "purchaseDate" : 788932800,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ],
-          "quotes": {},
-          "schema": 1
+          "quotes" : {
+
+          },
+          "schema" : 1
         }
       },
-      "name": "not-a-year-yet"
+      "name" : "not-a-year-yet"
     },
     {
-      "input": {
-        "now": "2026-11-15T12:00:00+08:00",
-        "portfolio": {
-          "dividends": [],
-          "favorites": [],
-          "holdings": [
+      "expected" : true,
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
             {
-              "broker": "測試券商",
-              "id": "00000000-0000-4000-8000-000000000017",
-              "name": "0050 基金",
-              "purchaseDate": 725774400.0,
-              "shares": 1000,
-              "strategy": "存錢筒",
-              "symbol": "0050",
-              "unitCost": 50
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000017",
+              "name" : "0050 基金",
+              "purchaseDate" : 725774400,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
             }
           ],
-          "quotes": {},
-          "schema": 1
+          "quotes" : {
+
+          },
+          "schema" : 1
         }
       },
-      "name": "no-trade-log"
+      "name" : "no-trade-log"
     }
   ],
-  "kind": "Achievements.steady"
+  "kind" : "Achievements.steady"
 }

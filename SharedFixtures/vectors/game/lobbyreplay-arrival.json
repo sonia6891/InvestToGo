@@ -1,94 +1,145 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "celebratedLevel": 1,
-        "now": {
-          "coins": 130,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 130
+      "expected" : {
+        "coinsFrom" : 90,
+        "coinsTo" : 130,
+        "crossesLevel" : true,
+        "levelFrom" : 1,
+        "levelTo" : 2,
+        "newQuests" : [
+
+        ],
+        "xpFrom" : 90,
+        "xpTo" : 130
+      },
+      "input" : {
+        "celebratedLevel" : 1,
+        "now" : {
+          "coins" : 130,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 130
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 90,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 90
+        "shown" : {
+          "coins" : 90,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 90
         }
       },
-      "name": "no-level-due"
+      "name" : "no-level-due"
     },
     {
-      "input": {
-        "celebratedLevel": 1,
-        "levelUpDue": 4,
-        "now": {
-          "coins": 460,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 460
+      "expected" : null,
+      "input" : {
+        "celebratedLevel" : 1,
+        "levelUpDue" : 4,
+        "now" : {
+          "coins" : 460,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 460
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ]
       },
-      "name": "first-launch-due"
+      "name" : "first-launch-due"
     },
     {
-      "input": {
-        "celebratedLevel": 2,
-        "levelUpDue": 4,
-        "now": {
-          "coins": 460,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 460
+      "expected" : {
+        "coinsFrom" : 460,
+        "coinsTo" : 460,
+        "crossesLevel" : true,
+        "levelFrom" : 2,
+        "levelTo" : 4,
+        "newQuests" : [
+
+        ],
+        "xpFrom" : 460,
+        "xpTo" : 460
+      },
+      "input" : {
+        "celebratedLevel" : 2,
+        "levelUpDue" : 4,
+        "now" : {
+          "coins" : 460,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 460
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 460,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 460
+        "shown" : {
+          "coins" : 460,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 460
         }
       },
-      "name": "due-nothing-grew"
+      "name" : "due-nothing-grew"
     },
     {
-      "input": {
-        "celebratedLevel": 2,
-        "levelUpDue": 4,
-        "now": {
-          "coins": 460,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 460
+      "expected" : {
+        "coinsFrom" : 300,
+        "coinsTo" : 460,
+        "crossesLevel" : true,
+        "levelFrom" : 2,
+        "levelTo" : 4,
+        "newQuests" : [
+
+        ],
+        "xpFrom" : 300,
+        "xpTo" : 460
+      },
+      "input" : {
+        "celebratedLevel" : 2,
+        "levelUpDue" : 4,
+        "now" : {
+          "coins" : 460,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 460
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 300,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 300
+        "shown" : {
+          "coins" : 300,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 300
         }
       },
-      "name": "due-and-grew"
+      "name" : "due-and-grew"
     }
   ],
-  "kind": "LobbyReplay.arrival"
+  "kind" : "LobbyReplay.arrival"
 }

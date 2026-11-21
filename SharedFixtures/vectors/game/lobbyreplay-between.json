@@ -1,164 +1,222 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "now": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 100
+      "expected" : null,
+      "input" : {
+        "now" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 100
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ]
       },
-      "name": "nothing-shown"
+      "name" : "nothing-shown"
     },
     {
-      "input": {
-        "now": {
-          "coins": 130,
-          "month": "2026-11",
-          "quests": [
+      "expected" : {
+        "coinsFrom" : 90,
+        "coinsTo" : 130,
+        "crossesLevel" : true,
+        "levelFrom" : 1,
+        "levelTo" : 2,
+        "newQuests" : [
+          "reconciled",
+          "aaa",
+          "zzz"
+        ],
+        "xpFrom" : 90,
+        "xpTo" : 130
+      },
+      "input" : {
+        "now" : {
+          "coins" : 130,
+          "month" : "2026-11",
+          "quests" : [
             "dcaLogged",
             "reconciled",
             "zzz",
             "aaa"
           ],
-          "xp": 130
+          "xp" : 130
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 90,
-          "month": "2026-11",
-          "quests": [
+        "shown" : {
+          "coins" : 90,
+          "month" : "2026-11",
+          "quests" : [
             "dcaLogged"
           ],
-          "xp": 90
+          "xp" : 90
         }
       },
-      "name": "grew"
+      "name" : "grew"
     },
     {
-      "input": {
-        "now": {
-          "coins": 300,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 100
+      "expected" : null,
+      "input" : {
+        "now" : {
+          "coins" : 300,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 100
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 200,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 200
+        "shown" : {
+          "coins" : 200,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 200
         }
       },
-      "name": "went-down"
+      "name" : "went-down"
     },
     {
-      "input": {
-        "now": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [
+      "expected" : null,
+      "input" : {
+        "now" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
             "dcaLogged"
           ],
-          "xp": 100
+          "xp" : 100
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [
+        "shown" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
             "dcaLogged"
           ],
-          "xp": 100
+          "xp" : 100
         }
       },
-      "name": "same"
+      "name" : "same"
     },
     {
-      "input": {
-        "now": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [
+      "expected" : null,
+      "input" : {
+        "now" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
             "dcaLogged"
           ],
-          "xp": 100
+          "xp" : 100
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 100,
-          "month": "2026-10",
-          "quests": [],
-          "xp": 100
+        "shown" : {
+          "coins" : 100,
+          "month" : "2026-10",
+          "quests" : [
+
+          ],
+          "xp" : 100
         }
       },
-      "name": "new-month-quests-not-compared"
+      "name" : "new-month-quests-not-compared"
     },
     {
-      "input": {
-        "now": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [
+      "expected" : {
+        "coinsFrom" : 100,
+        "coinsTo" : 100,
+        "crossesLevel" : false,
+        "levelFrom" : 2,
+        "levelTo" : 2,
+        "newQuests" : [
+          "reminderSet"
+        ],
+        "xpFrom" : 100,
+        "xpTo" : 100
+      },
+      "input" : {
+        "now" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
             "reminderSet"
           ],
-          "xp": 100
+          "xp" : 100
         },
-        "questOrder": [
+        "questOrder" : [
           "dcaLogged",
           "reminderSet",
           "reconciled"
         ],
-        "shown": {
-          "coins": 100,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 100
+        "shown" : {
+          "coins" : 100,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 100
         }
       },
-      "name": "quest-only"
+      "name" : "quest-only"
     },
     {
-      "input": {
-        "now": {
-          "coins": 460,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 460
+      "expected" : {
+        "coinsFrom" : 240,
+        "coinsTo" : 460,
+        "crossesLevel" : true,
+        "levelFrom" : 2,
+        "levelTo" : 4,
+        "newQuests" : [
+
+        ],
+        "xpFrom" : 240,
+        "xpTo" : 460
+      },
+      "input" : {
+        "now" : {
+          "coins" : 460,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 460
         },
-        "questOrder": [],
-        "shown": {
-          "coins": 240,
-          "month": "2026-11",
-          "quests": [],
-          "xp": 240
+        "questOrder" : [
+
+        ],
+        "shown" : {
+          "coins" : 240,
+          "month" : "2026-11",
+          "quests" : [
+
+          ],
+          "xp" : 240
         }
       },
-      "name": "crosses-level"
+      "name" : "crosses-level"
     }
   ],
-  "kind": "LobbyReplay.between"
+  "kind" : "LobbyReplay.between"
 }

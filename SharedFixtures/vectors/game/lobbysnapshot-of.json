@@ -1,49 +1,65 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "now": "2026-11-10T12:00:00+08:00",
-        "state": {
-          "coins": 30,
-          "collected": {
-            "0050": 815284800.0
+      "expected" : {
+        "coins" : 30,
+        "month" : "2026-11",
+        "quests" : [
+          "firstDexCard"
+        ],
+        "xp" : 30
+      },
+      "input" : {
+        "now" : "2026-11-10T12:00:00+08:00",
+        "state" : {
+          "coins" : 30,
+          "collected" : {
+            "0050" : 815284800
           },
-          "questsDone": {
-            "2026-11": [
+          "questsDone" : {
+            "2026-11" : [
               "firstDexCard"
             ]
           },
-          "xp": 30
+          "xp" : 30
         }
       },
-      "name": "newbie"
+      "name" : "newbie"
     },
     {
-      "input": {
-        "now": "2026-11-10T12:00:00+08:00",
-        "state": {
-          "coins": 280,
-          "dcaMonths": [
+      "expected" : {
+        "coins" : 280,
+        "month" : "2026-11",
+        "quests" : [
+          "dividendsViewed"
+        ],
+        "xp" : 300
+      },
+      "input" : {
+        "now" : "2026-11-10T12:00:00+08:00",
+        "state" : {
+          "coins" : 280,
+          "dcaMonths" : [
             {
-              "month": 10,
-              "year": 2026
+              "month" : 10,
+              "year" : 2026
             }
           ],
-          "habit": "dividends",
-          "questsDone": {
-            "2026-10": [
+          "habit" : "dividends",
+          "questsDone" : {
+            "2026-10" : [
               "reconciled"
             ],
-            "2026-11": [
+            "2026-11" : [
               "dividendsViewed",
               "notShown"
             ]
           },
-          "xp": 300
+          "xp" : 300
         }
       },
-      "name": "regular"
+      "name" : "regular"
     }
   ],
-  "kind": "LobbySnapshot.of"
+  "kind" : "LobbySnapshot.of"
 }

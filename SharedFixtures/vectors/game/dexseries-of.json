@@ -1,95 +1,103 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "fund": {
-          "fundType": "國內成分證券ETF",
-          "id": "0050",
-          "market": "TWSE",
-          "name": "元大台灣50",
-          "strategy": "存錢筒"
+      "expected" : "市值型",
+      "input" : {
+        "fund" : {
+          "fundType" : "國內成分證券ETF",
+          "id" : "0050",
+          "market" : "TWSE",
+          "name" : "元大台灣50",
+          "strategy" : "存錢筒"
         }
       },
-      "name": "0050"
+      "name" : "0050"
     },
     {
-      "input": {
-        "fund": {
-          "id": "0056",
-          "market": "TWSE",
-          "name": "元大高股息",
-          "strategy": "印鈔機"
+      "expected" : "高股息",
+      "input" : {
+        "fund" : {
+          "id" : "0056",
+          "market" : "TWSE",
+          "name" : "元大高股息",
+          "strategy" : "印鈔機"
         }
       },
-      "name": "0056"
+      "name" : "0056"
     },
     {
-      "input": {
-        "fund": {
-          "id": "00878",
-          "market": "TWSE",
-          "name": "國泰永續高股息",
-          "strategy": "待分類"
+      "expected" : "高股息",
+      "input" : {
+        "fund" : {
+          "id" : "00878",
+          "market" : "TWSE",
+          "name" : "國泰永續高股息",
+          "strategy" : "待分類"
         }
       },
-      "name": "00878"
+      "name" : "00878"
     },
     {
-      "input": {
-        "fund": {
-          "fundType": "債券",
-          "id": "00679B",
-          "market": "TWSE",
-          "name": "元大美債20年",
-          "strategy": "待分類"
+      "expected" : "債券",
+      "input" : {
+        "fund" : {
+          "fundType" : "債券",
+          "id" : "00679B",
+          "market" : "TWSE",
+          "name" : "元大美債20年",
+          "strategy" : "待分類"
         }
       },
-      "name": "00679B"
+      "name" : "00679B"
     },
     {
-      "input": {
-        "fund": {
-          "id": "00631L",
-          "market": "TWSE",
-          "name": "元大台灣50正2",
-          "strategy": "老虎機"
+      "expected" : "主題",
+      "input" : {
+        "fund" : {
+          "id" : "00631L",
+          "market" : "TWSE",
+          "name" : "元大台灣50正2",
+          "strategy" : "老虎機"
         }
       },
-      "name": "00631L"
+      "name" : "00631L"
     },
     {
-      "input": {
-        "fund": {
-          "id": "00929",
-          "market": "TWSE",
-          "name": "復華台灣科技優息",
-          "strategy": "待分類"
+      "expected" : "高股息",
+      "input" : {
+        "fund" : {
+          "id" : "00929",
+          "market" : "TWSE",
+          "name" : "復華台灣科技優息",
+          "strategy" : "待分類"
         }
       },
-      "name": "00929"
+      "name" : "00929"
     },
     {
-      "input": {
-        "fund": {
-          "id": "00720B",
-          "market": "TWSE",
-          "name": "元大投資級公司債",
-          "strategy": "印鈔機"
+      "expected" : "債券",
+      "input" : {
+        "fund" : {
+          "id" : "00720B",
+          "market" : "TWSE",
+          "name" : "元大投資級公司債",
+          "strategy" : "印鈔機"
         }
       },
-      "name": "00720B"
+      "name" : "00720B"
     },
     {
-      "input": {
-        "fund": {
-          "id": "00757",
-          "market": "TWSE",
-          "name": "統一FANG+",
-          "strategy": "待分類"
+      "expected" : "主題",
+      "input" : {
+        "fund" : {
+          "id" : "00757",
+          "market" : "TWSE",
+          "name" : "統一FANG+",
+          "strategy" : "待分類"
         }
       },
-      "name": "00757"
+      "name" : "00757"
     }
   ],
-  "kind": "DexSeries.of"
+  "kind" : "DexSeries.of"
 }

@@ -1,83 +1,96 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "xp": -50
+      "expected" : 1,
+      "input" : {
+        "xp" : -50
       },
-      "name": "xp--50"
+      "name" : "xp--50"
     },
     {
-      "input": {
-        "xp": 0
+      "expected" : 1,
+      "input" : {
+        "xp" : 0
       },
-      "name": "xp-0"
+      "name" : "xp-0"
     },
     {
-      "input": {
-        "xp": 99
+      "expected" : 1,
+      "input" : {
+        "xp" : 99
       },
-      "name": "xp-99"
+      "name" : "xp-99"
     },
     {
-      "input": {
-        "xp": 100
+      "expected" : 2,
+      "input" : {
+        "xp" : 100
       },
-      "name": "xp-100"
+      "name" : "xp-100"
     },
     {
-      "input": {
-        "xp": 249
+      "expected" : 2,
+      "input" : {
+        "xp" : 249
       },
-      "name": "xp-249"
+      "name" : "xp-249"
     },
     {
-      "input": {
-        "xp": 250
+      "expected" : 3,
+      "input" : {
+        "xp" : 250
       },
-      "name": "xp-250"
+      "name" : "xp-250"
     },
     {
-      "input": {
-        "xp": 449
+      "expected" : 3,
+      "input" : {
+        "xp" : 449
       },
-      "name": "xp-449"
+      "name" : "xp-449"
     },
     {
-      "input": {
-        "xp": 450
+      "expected" : 4,
+      "input" : {
+        "xp" : 450
       },
-      "name": "xp-450"
+      "name" : "xp-450"
     },
     {
-      "input": {
-        "xp": 699
+      "expected" : 4,
+      "input" : {
+        "xp" : 699
       },
-      "name": "xp-699"
+      "name" : "xp-699"
     },
     {
-      "input": {
-        "xp": 700
+      "expected" : 5,
+      "input" : {
+        "xp" : 700
       },
-      "name": "xp-700"
+      "name" : "xp-700"
     },
     {
-      "input": {
-        "xp": 999
+      "expected" : 5,
+      "input" : {
+        "xp" : 999
       },
-      "name": "xp-999"
+      "name" : "xp-999"
     },
     {
-      "input": {
-        "xp": 1000
+      "expected" : 6,
+      "input" : {
+        "xp" : 1000
       },
-      "name": "xp-1000"
+      "name" : "xp-1000"
     },
     {
-      "input": {
-        "xp": 3700
+      "expected" : 15,
+      "input" : {
+        "xp" : 3700
       },
-      "name": "xp-3700"
+      "name" : "xp-3700"
     }
   ],
-  "kind": "GameRules.level"
+  "kind" : "GameRules.level"
 }

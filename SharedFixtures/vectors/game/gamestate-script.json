@@ -1,711 +1,1542 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "state": {},
-        "steps": [
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 240,
+          "collected" : {
+
+          },
+          "counts" : {
+            "monthlyDCA" : 2,
+            "questDone" : 1
+          },
+          "dcaMonths" : [
+            {
+              "month" : 8,
+              "year" : 2026
+            },
+            {
+              "month" : 10,
+              "year" : 2026
+            },
+            {
+              "month" : 11,
+              "year" : 2026
+            }
+          ],
+          "lastAward" : "monthlyDCA",
+          "longestStreak" : 2,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-11" : [
+              "dcaLogged"
+            ]
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 240,
+          "xpByMonth" : {
+            "2026-11" : 240
+          }
+        },
+        "steps" : [
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+            "monthlyDCA"
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          2
+        ]
+      },
+      "input" : {
+        "state" : {
+
+        },
+        "steps" : [
           {
-            "do": "logBuy",
-            "now": "2026-11-05T12:00:00+08:00",
-            "on": "2026-11-05T12:00:00+08:00"
+            "do" : "logBuy",
+            "now" : "2026-11-05T12:00:00+08:00",
+            "on" : "2026-11-05T12:00:00+08:00"
           },
           {
-            "do": "logBuy",
-            "now": "2026-11-20T12:00:00+08:00",
-            "on": "2026-11-20T12:00:00+08:00"
+            "do" : "logBuy",
+            "now" : "2026-11-20T12:00:00+08:00",
+            "on" : "2026-11-20T12:00:00+08:00"
           },
           {
-            "do": "recordDCA",
-            "on": "2026-11-25T12:00:00+08:00"
+            "do" : "recordDCA",
+            "on" : "2026-11-25T12:00:00+08:00"
           },
           {
-            "do": "logBuy",
-            "now": "2026-11-26T12:00:00+08:00",
-            "on": "2026-10-05T12:00:00+08:00"
+            "do" : "logBuy",
+            "now" : "2026-11-26T12:00:00+08:00",
+            "on" : "2026-10-05T12:00:00+08:00"
           },
           {
-            "do": "logBuy",
-            "now": "2026-11-26T12:00:00+08:00",
-            "on": "2026-08-05T12:00:00+08:00"
+            "do" : "logBuy",
+            "now" : "2026-11-26T12:00:00+08:00",
+            "on" : "2026-08-05T12:00:00+08:00"
           },
           {
-            "do": "logBuy",
-            "now": "2026-11-26T12:00:00+08:00",
-            "on": "2026-12-05T12:00:00+08:00"
+            "do" : "logBuy",
+            "now" : "2026-11-26T12:00:00+08:00",
+            "on" : "2026-12-05T12:00:00+08:00"
           },
           {
-            "do": "streak",
-            "now": "2026-11-26T12:00:00+08:00"
+            "do" : "streak",
+            "now" : "2026-11-26T12:00:00+08:00"
           }
         ]
       },
-      "name": "same-month-dca-pays-once"
+      "name" : "same-month-dca-pays-once"
     },
     {
-      "input": {
-        "state": {
-          "dcaMonths": [
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 190,
+          "collected" : {
+            "0050" : 815198400,
+            "0056" : 815284800,
+            "00679B" : 815457600,
+            "00713" : 817876800,
+            "00878" : 815371200,
+            "00919" : 817790400,
+            "00929" : 815544000
+          },
+          "counts" : {
+            "firstDexCard" : 5,
+            "questDone" : 1
+          },
+          "dcaMonths" : [
             {
-              "month": 10,
-              "year": 2026
+              "month" : 10,
+              "year" : 2026
+            }
+          ],
+          "lastAward" : "firstDexCard",
+          "longestStreak" : 0,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-12" : [
+              "newETFResearched"
+            ]
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 190,
+          "xpByMonth" : {
+            "2026-11" : 90,
+            "2026-12" : 100
+          }
+        },
+        "steps" : [
+          {
+            "cardXP" : 30,
+            "new" : true
+          },
+          {
+            "cardXP" : 30,
+            "new" : true
+          },
+          {
+            "cardXP" : 30,
+            "new" : true
+          },
+          {
+            "cardXP" : 0,
+            "new" : true
+          },
+          {
+            "cardXP" : 0,
+            "new" : true
+          },
+          {
+            "cardXP" : 0,
+            "new" : false
+          },
+          {
+            "cardXP" : 30,
+            "new" : true
+          },
+          [
+            "firstDexCard"
+          ]
+        ]
+      },
+      "input" : {
+        "state" : {
+          "dcaMonths" : [
+            {
+              "month" : 10,
+              "year" : 2026
             }
           ]
         },
-        "steps": [
+        "steps" : [
           {
-            "do": "visitFund",
-            "now": "2026-11-01T12:00:00+08:00",
-            "symbol": "0050"
+            "do" : "visitFund",
+            "now" : "2026-11-01T12:00:00+08:00",
+            "symbol" : "0050"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-02T12:00:00+08:00",
-            "symbol": "0056"
+            "do" : "visitFund",
+            "now" : "2026-11-02T12:00:00+08:00",
+            "symbol" : "0056"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-03T12:00:00+08:00",
-            "symbol": "00878"
+            "do" : "visitFund",
+            "now" : "2026-11-03T12:00:00+08:00",
+            "symbol" : "00878"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-04T12:00:00+08:00",
-            "symbol": "00679B"
+            "do" : "visitFund",
+            "now" : "2026-11-04T12:00:00+08:00",
+            "symbol" : "00679B"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-05T12:00:00+08:00",
-            "symbol": "00929"
+            "do" : "visitFund",
+            "now" : "2026-11-05T12:00:00+08:00",
+            "symbol" : "00929"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-20T12:00:00+08:00",
-            "symbol": "0050"
+            "do" : "visitFund",
+            "now" : "2026-11-20T12:00:00+08:00",
+            "symbol" : "0050"
           },
           {
-            "do": "visitFund",
-            "now": "2026-12-01T12:00:00+08:00",
-            "symbol": "00919"
+            "do" : "visitFund",
+            "now" : "2026-12-01T12:00:00+08:00",
+            "symbol" : "00919"
           },
           {
-            "do": "collect",
-            "now": "2026-12-02T12:00:00+08:00",
-            "symbol": "00713"
+            "do" : "collect",
+            "now" : "2026-12-02T12:00:00+08:00",
+            "symbol" : "00713"
           }
         ]
       },
-      "name": "dex-cards-capped-per-month"
+      "name" : "dex-cards-capped-per-month"
     },
     {
-      "input": {
-        "state": {
-          "dcaMonths": [
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 80,
+          "collected" : {
+
+          },
+          "counts" : {
+            "dividendLogged" : 4
+          },
+          "dcaMonths" : [
             {
-              "month": 9,
-              "year": 2026
+              "month" : 9,
+              "year" : 2026
             }
           ],
-          "migratedAt": 813308400.0,
-          "migration": 1
+          "lastAward" : "dividendLogged",
+          "longestStreak" : 0,
+          "migratedAt" : 813308400,
+          "migration" : 1,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+            "dividendPaidIn|2026-11|0056|2026-11",
+            "dividendPaidIn|2026-11|00878|2026-10",
+            "dividendPaidIn|2026-11|00919|2026-10",
+            "dividendPaidIn|2026-12|00713|2026-12",
+            "dividend|0056|2026-11",
+            "dividend|00713|2026-12",
+            "dividend|00878|2026-10",
+            "dividend|00919|2026-10"
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 80,
+          "xpByMonth" : {
+            "2026-11" : 60,
+            "2026-12" : 20
+          }
         },
-        "steps": [
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-05T12:00:00+08:00",
-            "paid": "2026-11-01T12:00:00+08:00",
-            "symbol": "0056"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-05T12:00:00+08:00",
-            "paid": "2026-11-03T12:00:00+08:00",
-            "symbol": "0056"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-05T12:00:00+08:00",
-            "paid": "2026-10-20T12:00:00+08:00",
-            "symbol": "00878"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-05T12:00:00+08:00",
-            "paid": "2026-10-10T08:00:00+08:00",
-            "symbol": "00919"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-05T12:00:00+08:00",
-            "paid": "2026-10-11T12:00:00+08:00",
-            "symbol": "00929"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-06T12:00:00+08:00",
-            "paid": "2026-11-02T12:00:00+08:00",
-            "symbol": "00713"
-          },
-          {
-            "do": "logDividend",
-            "held": false,
-            "now": "2026-11-06T12:00:00+08:00",
-            "paid": "2026-11-02T12:00:00+08:00",
-            "symbol": "0050"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-06T12:00:00+08:00",
-            "paid": "2026-11-30T12:00:00+08:00",
-            "symbol": "006208"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-11-06T12:00:00+08:00",
-            "paid": "2026-09-30T12:00:00+08:00",
-            "symbol": "00757"
-          },
-          {
-            "do": "logDividend",
-            "held": true,
-            "now": "2026-12-06T12:00:00+08:00",
-            "paid": "2026-12-02T12:00:00+08:00",
-            "symbol": "00713"
-          }
+        "steps" : [
+          [
+            "dividendLogged"
+          ],
+          [
+
+          ],
+          [
+            "dividendLogged"
+          ],
+          [
+            "dividendLogged"
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+            "dividendLogged"
+          ]
         ]
       },
-      "name": "dividends-capped-and-keyed"
-    },
-    {
-      "input": {
-        "state": {},
-        "steps": [
-          {
-            "do": "logBuy",
-            "now": "2026-01-05T12:00:00+08:00",
-            "on": "2026-01-05T12:00:00+08:00"
-          },
-          {
-            "do": "logBuy",
-            "now": "2026-02-05T12:00:00+08:00",
-            "on": "2026-02-05T12:00:00+08:00"
-          },
-          {
-            "do": "logBuy",
-            "now": "2026-03-05T12:00:00+08:00",
-            "on": "2026-03-05T12:00:00+08:00"
-          },
-          {
-            "do": "streak",
-            "now": "2026-04-15T12:00:00+08:00"
-          },
-          {
-            "do": "logBuy",
-            "now": "2026-06-05T12:00:00+08:00",
-            "on": "2026-06-05T12:00:00+08:00"
-          },
-          {
-            "do": "streak",
-            "now": "2026-06-15T12:00:00+08:00"
-          },
-          {
-            "do": "streak",
-            "now": "2026-07-15T12:00:00+08:00"
-          },
-          {
-            "do": "streak",
-            "now": "2026-08-15T12:00:00+08:00"
-          },
-          {
-            "do": "logBuy",
-            "now": "2026-06-20T12:00:00+08:00",
-            "on": "2026-05-05T12:00:00+08:00"
-          },
-          {
-            "do": "streak",
-            "now": "2026-06-21T12:00:00+08:00"
-          }
-        ]
-      },
-      "name": "break-resets-and-keeps-longest"
-    },
-    {
-      "input": {
-        "state": {
-          "habit": "dca"
+      "input" : {
+        "state" : {
+          "dcaMonths" : [
+            {
+              "month" : 9,
+              "year" : 2026
+            }
+          ],
+          "migratedAt" : 813308400,
+          "migration" : 1
         },
-        "steps": [
+        "steps" : [
           {
-            "do": "complete",
-            "now": "2026-11-02T12:00:00+08:00",
-            "trigger": "firstPlanSet"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-05T12:00:00+08:00",
+            "paid" : "2026-11-01T12:00:00+08:00",
+            "symbol" : "0056"
           },
           {
-            "do": "complete",
-            "now": "2026-11-03T12:00:00+08:00",
-            "trigger": "firstPlanSet"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-05T12:00:00+08:00",
+            "paid" : "2026-11-03T12:00:00+08:00",
+            "symbol" : "0056"
           },
           {
-            "do": "complete",
-            "now": "2026-11-03T12:00:00+08:00",
-            "trigger": "reminderSet"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-05T12:00:00+08:00",
+            "paid" : "2026-10-20T12:00:00+08:00",
+            "symbol" : "00878"
           },
           {
-            "do": "visitFund",
-            "now": "2026-11-04T12:00:00+08:00",
-            "symbol": "0050"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-05T12:00:00+08:00",
+            "paid" : "2026-10-10T08:00:00+08:00",
+            "symbol" : "00919"
           },
           {
-            "do": "complete",
-            "now": "2026-11-05T12:00:00+08:00",
-            "trigger": "firstDexCard"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-05T12:00:00+08:00",
+            "paid" : "2026-10-11T12:00:00+08:00",
+            "symbol" : "00929"
           },
           {
-            "do": "logBuy",
-            "now": "2026-11-06T12:00:00+08:00",
-            "on": "2026-11-06T12:00:00+08:00"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-06T12:00:00+08:00",
+            "paid" : "2026-11-02T12:00:00+08:00",
+            "symbol" : "00713"
           },
           {
-            "do": "complete",
-            "now": "2026-12-02T12:00:00+08:00",
-            "trigger": "firstPlanSet"
+            "do" : "logDividend",
+            "held" : false,
+            "now" : "2026-11-06T12:00:00+08:00",
+            "paid" : "2026-11-02T12:00:00+08:00",
+            "symbol" : "0050"
           },
           {
-            "do": "complete",
-            "now": "2026-12-02T12:00:00+08:00",
-            "trigger": "dcaLogged"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-06T12:00:00+08:00",
+            "paid" : "2026-11-30T12:00:00+08:00",
+            "symbol" : "006208"
           },
           {
-            "do": "lobby",
-            "now": "2026-12-03T12:00:00+08:00"
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-11-06T12:00:00+08:00",
+            "paid" : "2026-09-30T12:00:00+08:00",
+            "symbol" : "00757"
+          },
+          {
+            "do" : "logDividend",
+            "held" : true,
+            "now" : "2026-12-06T12:00:00+08:00",
+            "paid" : "2026-12-02T12:00:00+08:00",
+            "symbol" : "00713"
           }
         ]
       },
-      "name": "newbie-quests"
+      "name" : "dividends-capped-and-keyed"
     },
     {
-      "input": {
-        "state": {},
-        "steps": [
-          {
-            "do": "logBuy",
-            "now": "2026-12-10T12:00:00+08:00",
-            "on": "2026-12-10T12:00:00+08:00"
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 660,
+          "collected" : {
+
           },
-          {
-            "do": "logBuy",
-            "now": "2026-12-31T16:30:00Z",
-            "on": "2026-12-31T16:30:00Z"
+          "counts" : {
+            "monthlyDCA" : 5,
+            "questDone" : 4
           },
-          {
-            "do": "streak",
-            "now": "2027-01-15T12:00:00+08:00"
+          "dcaMonths" : [
+            {
+              "month" : 1,
+              "year" : 2026
+            },
+            {
+              "month" : 2,
+              "year" : 2026
+            },
+            {
+              "month" : 3,
+              "year" : 2026
+            },
+            {
+              "month" : 5,
+              "year" : 2026
+            },
+            {
+              "month" : 6,
+              "year" : 2026
+            }
+          ],
+          "lastAward" : "monthlyDCA",
+          "longestStreak" : 3,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-01" : [
+              "dcaLogged"
+            ],
+            "2026-02" : [
+              "dcaLogged"
+            ],
+            "2026-03" : [
+              "dcaLogged"
+            ],
+            "2026-06" : [
+              "dcaLogged"
+            ]
           },
-          {
-            "do": "logBuy",
-            "now": "2027-02-10T12:00:00+08:00",
-            "on": "2027-02-10T12:00:00+08:00"
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
           },
-          {
-            "do": "streak",
-            "now": "2027-02-15T12:00:00+08:00"
+          "xp" : 660,
+          "xpByMonth" : {
+            "2026-01" : 140,
+            "2026-02" : 140,
+            "2026-03" : 140,
+            "2026-06" : 240
           }
-        ]
-      },
-      "name": "streak-across-new-year"
-    },
-    {
-      "input": {
-        "state": {},
-        "steps": [
-          {
-            "do": "refreshAchievements",
-            "now": "2029-02-27T12:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [
-                {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000012",
-                  "name": "0050 基金",
-                  "purchaseDate": 857095200.0,
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "0050",
-                  "unitCost": 50
-                }
-              ],
-              "quotes": {},
-              "schema": 1
-            }
-          },
-          {
-            "do": "refreshAchievements",
-            "now": "2029-02-28T09:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [
-                {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000012",
-                  "name": "0050 基金",
-                  "purchaseDate": 857095200.0,
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "0050",
-                  "unitCost": 50
-                }
-              ],
-              "quotes": {},
-              "schema": 1
-            }
-          },
-          {
-            "do": "refreshAchievements",
-            "now": "2029-02-28T10:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [
-                {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000012",
-                  "name": "0050 基金",
-                  "purchaseDate": 857095200.0,
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "0050",
-                  "unitCost": 50
-                }
-              ],
-              "quotes": {},
-              "schema": 1
-            }
-          },
-          {
-            "do": "refreshAchievements",
-            "now": "2029-03-01T12:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [
-                {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000012",
-                  "name": "0050 基金",
-                  "purchaseDate": 857095200.0,
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "0050",
-                  "unitCost": 50
-                }
-              ],
-              "quotes": {},
-              "schema": 1
-            }
-          },
-          {
-            "do": "achievementsSinceCelebration"
-          },
-          {
-            "do": "celebrate",
-            "level": 1
-          },
-          {
-            "do": "achievementsSinceCelebration"
-          }
-        ]
-      },
-      "name": "leap-day-anniversary"
-    },
-    {
-      "input": {
-        "state": {
-          "coins": 120,
-          "unlocked": {
-            "dcaPunchCard": 788932800.0
-          },
-          "xp": 120
         },
-        "steps": [
+        "steps" : [
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          3,
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          1,
+          1,
+          0,
+          [
+            "monthlyDCA"
+          ],
+          2
+        ]
+      },
+      "input" : {
+        "state" : {
+
+        },
+        "steps" : [
           {
-            "do": "migrate",
-            "now": "2026-11-22T12:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [
+            "do" : "logBuy",
+            "now" : "2026-01-05T12:00:00+08:00",
+            "on" : "2026-01-05T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-02-05T12:00:00+08:00",
+            "on" : "2026-02-05T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-03-05T12:00:00+08:00",
+            "on" : "2026-03-05T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2026-04-15T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-06-05T12:00:00+08:00",
+            "on" : "2026-06-05T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2026-06-15T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2026-07-15T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2026-08-15T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-06-20T12:00:00+08:00",
+            "on" : "2026-05-05T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2026-06-21T12:00:00+08:00"
+          }
+        ]
+      },
+      "name" : "break-resets-and-keeps-longest"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 290,
+          "collected" : {
+            "0050" : 815457600
+          },
+          "counts" : {
+            "firstDexCard" : 1,
+            "monthlyDCA" : 1,
+            "questDone" : 4
+          },
+          "dcaMonths" : [
+            {
+              "month" : 11,
+              "year" : 2026
+            }
+          ],
+          "habit" : "dca",
+          "lastAward" : "questDone",
+          "longestStreak" : 1,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-11" : [
+              "dcaLogged",
+              "firstDexCard",
+              "firstPlanSet"
+            ],
+            "2026-12" : [
+              "dcaLogged"
+            ]
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 290,
+          "xpByMonth" : {
+            "2026-11" : 250,
+            "2026-12" : 40
+          }
+        },
+        "steps" : [
+          [
+            "questDone"
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          {
+            "cardXP" : 30,
+            "new" : true
+          },
+          [
+
+          ],
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          [
+
+          ],
+          [
+            "questDone"
+          ],
+          {
+            "coins" : 290,
+            "month" : "2026-12",
+            "quests" : [
+              "dcaLogged"
+            ],
+            "xp" : 290
+          }
+        ]
+      },
+      "input" : {
+        "state" : {
+          "habit" : "dca"
+        },
+        "steps" : [
+          {
+            "do" : "complete",
+            "now" : "2026-11-02T12:00:00+08:00",
+            "trigger" : "firstPlanSet"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-11-03T12:00:00+08:00",
+            "trigger" : "firstPlanSet"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-11-03T12:00:00+08:00",
+            "trigger" : "reminderSet"
+          },
+          {
+            "do" : "visitFund",
+            "now" : "2026-11-04T12:00:00+08:00",
+            "symbol" : "0050"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-11-05T12:00:00+08:00",
+            "trigger" : "firstDexCard"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-11-06T12:00:00+08:00",
+            "on" : "2026-11-06T12:00:00+08:00"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-12-02T12:00:00+08:00",
+            "trigger" : "firstPlanSet"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-12-02T12:00:00+08:00",
+            "trigger" : "dcaLogged"
+          },
+          {
+            "do" : "lobby",
+            "now" : "2026-12-03T12:00:00+08:00"
+          }
+        ]
+      },
+      "name" : "newbie-quests"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 420,
+          "collected" : {
+
+          },
+          "counts" : {
+            "monthlyDCA" : 3,
+            "questDone" : 3
+          },
+          "dcaMonths" : [
+            {
+              "month" : 12,
+              "year" : 2026
+            },
+            {
+              "month" : 1,
+              "year" : 2027
+            },
+            {
+              "month" : 2,
+              "year" : 2027
+            }
+          ],
+          "lastAward" : "questDone",
+          "longestStreak" : 3,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-12" : [
+              "dcaLogged"
+            ],
+            "2027-01" : [
+              "dcaLogged"
+            ],
+            "2027-02" : [
+              "dcaLogged"
+            ]
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 420,
+          "xpByMonth" : {
+            "2026-12" : 140,
+            "2027-01" : 140,
+            "2027-02" : 140
+          }
+        },
+        "steps" : [
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          2,
+          [
+            "monthlyDCA",
+            "questDone"
+          ],
+          3
+        ]
+      },
+      "input" : {
+        "state" : {
+
+        },
+        "steps" : [
+          {
+            "do" : "logBuy",
+            "now" : "2026-12-10T12:00:00+08:00",
+            "on" : "2026-12-10T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2026-12-31T16:30:00Z",
+            "on" : "2026-12-31T16:30:00Z"
+          },
+          {
+            "do" : "streak",
+            "now" : "2027-01-15T12:00:00+08:00"
+          },
+          {
+            "do" : "logBuy",
+            "now" : "2027-02-10T12:00:00+08:00",
+            "on" : "2027-02-10T12:00:00+08:00"
+          },
+          {
+            "do" : "streak",
+            "now" : "2027-02-15T12:00:00+08:00"
+          }
+        ]
+      },
+      "name" : "streak-across-new-year"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+            "holdingAnniversary",
+            "steadyYear"
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 0,
+          "collected" : {
+
+          },
+          "counts" : {
+
+          },
+          "dcaMonths" : [
+
+          ],
+          "longestStreak" : 0,
+          "migration" : 0,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+            "holdingAnniversary" : 888631200,
+            "steadyYear" : 888631200
+          },
+          "xp" : 0,
+          "xpByMonth" : {
+
+          }
+        },
+        "steps" : [
+          [
+
+          ],
+          [
+
+          ],
+          [
+            "holdingAnniversary",
+            "steadyYear"
+          ],
+          [
+
+          ],
+          [
+            "holdingAnniversary",
+            "steadyYear"
+          ],
+          null,
+          [
+
+          ]
+        ]
+      },
+      "input" : {
+        "state" : {
+
+        },
+        "steps" : [
+          {
+            "do" : "refreshAchievements",
+            "now" : "2029-02-27T12:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
                 {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000035",
-                  "name": "0050 基金",
-                  "purchaseDate": 763272000.0,
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "0050",
-                  "unitCost": 50
-                },
-                {
-                  "broker": "測試券商",
-                  "id": "00000000-0000-4000-8000-000000000034",
-                  "name": "00878 基金",
-                  "shares": 1000,
-                  "strategy": "存錢筒",
-                  "symbol": "00878",
-                  "unitCost": 50
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000012",
+                  "name" : "0050 基金",
+                  "purchaseDate" : 857095200,
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "0050",
+                  "unitCost" : 50
                 }
               ],
-              "quotes": {},
-              "schema": 1,
-              "trades": [
+              "quotes" : {
+
+              },
+              "schema" : 1
+            }
+          },
+          {
+            "do" : "refreshAchievements",
+            "now" : "2029-02-28T09:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 765518400.0,
-                  "id": "00000000-0000-4000-8000-000000000036",
-                  "name": "00878 基金",
-                  "shares": 100,
-                  "symbol": "00878",
-                  "unitCost": 50
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000012",
+                  "name" : "0050 基金",
+                  "purchaseDate" : 857095200,
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "0050",
+                  "unitCost" : 50
+                }
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1
+            }
+          },
+          {
+            "do" : "refreshAchievements",
+            "now" : "2029-02-28T10:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
+                {
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000012",
+                  "name" : "0050 基金",
+                  "purchaseDate" : 857095200,
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "0050",
+                  "unitCost" : 50
+                }
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1
+            }
+          },
+          {
+            "do" : "refreshAchievements",
+            "now" : "2029-03-01T12:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
+                {
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000012",
+                  "name" : "0050 基金",
+                  "purchaseDate" : 857095200,
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "0050",
+                  "unitCost" : 50
+                }
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1
+            }
+          },
+          {
+            "do" : "achievementsSinceCelebration"
+          },
+          {
+            "do" : "celebrate",
+            "level" : 1
+          },
+          {
+            "do" : "achievementsSinceCelebration"
+          }
+        ]
+      },
+      "name" : "leap-day-anniversary"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+            "dcaPunchCard"
+          ],
+          "celebratedCoins" : 120,
+          "celebratedLevel" : 2,
+          "coins" : 120,
+          "collected" : {
+
+          },
+          "counts" : {
+
+          },
+          "dcaMonths" : [
+            {
+              "month" : 3,
+              "year" : 2025
+            },
+            {
+              "month" : 6,
+              "year" : 2025
+            },
+            {
+              "month" : 9,
+              "year" : 2025
+            },
+            {
+              "month" : 10,
+              "year" : 2025
+            }
+          ],
+          "longestStreak" : 2,
+          "migratedAt" : 817012800,
+          "migration" : 1,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+            "dcaPunchCard" : 788932800
+          },
+          "xp" : 120,
+          "xpByMonth" : {
+
+          }
+        },
+        "steps" : [
+          null,
+          null,
+          2,
+          null
+        ]
+      },
+      "input" : {
+        "state" : {
+          "coins" : 120,
+          "unlocked" : {
+            "dcaPunchCard" : 788932800
+          },
+          "xp" : 120
+        },
+        "steps" : [
+          {
+            "do" : "migrate",
+            "now" : "2026-11-22T12:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
+                {
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000035",
+                  "name" : "0050 基金",
+                  "purchaseDate" : 763272000,
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "0050",
+                  "unitCost" : 50
                 },
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 770788800.0,
-                  "id": "00000000-0000-4000-8000-000000000037",
-                  "name": "00878 基金",
-                  "shares": 100,
-                  "symbol": "00878",
-                  "unitCost": 50
+                  "broker" : "測試券商",
+                  "id" : "00000000-0000-4000-8000-000000000034",
+                  "name" : "00878 基金",
+                  "shares" : 1000,
+                  "strategy" : "存錢筒",
+                  "symbol" : "00878",
+                  "unitCost" : 50
+                }
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1,
+              "trades" : [
+                {
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 765518400,
+                  "id" : "00000000-0000-4000-8000-000000000036",
+                  "name" : "00878 基金",
+                  "shares" : 100,
+                  "symbol" : "00878",
+                  "unitCost" : 50
                 },
                 {
-                  "action": "賣出",
-                  "broker": "測試券商",
-                  "date": 776059200.0,
-                  "id": "00000000-0000-4000-8000-000000000038",
-                  "name": "0050 基金",
-                  "shares": 100,
-                  "symbol": "0050",
-                  "unitCost": 50
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 770788800,
+                  "id" : "00000000-0000-4000-8000-000000000037",
+                  "name" : "00878 基金",
+                  "shares" : 100,
+                  "symbol" : "00878",
+                  "unitCost" : 50
                 },
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 778737600.0,
-                  "id": "00000000-0000-4000-8000-000000000039",
-                  "name": "0056 基金",
-                  "shares": 100,
-                  "symbol": "0056",
-                  "unitCost": 50
+                  "action" : "賣出",
+                  "broker" : "測試券商",
+                  "date" : 776059200,
+                  "id" : "00000000-0000-4000-8000-000000000038",
+                  "name" : "0050 基金",
+                  "shares" : 100,
+                  "symbol" : "0050",
+                  "unitCost" : 50
                 },
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 781329600.0,
-                  "id": "00000000-0000-4000-8000-000000000040",
-                  "name": "0056 基金",
-                  "shares": 100,
-                  "symbol": "0056",
-                  "unitCost": 50
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 778737600,
+                  "id" : "00000000-0000-4000-8000-000000000039",
+                  "name" : "0056 基金",
+                  "shares" : 100,
+                  "symbol" : "0056",
+                  "unitCost" : 50
+                },
+                {
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 781329600,
+                  "id" : "00000000-0000-4000-8000-000000000040",
+                  "name" : "0056 基金",
+                  "shares" : 100,
+                  "symbol" : "0056",
+                  "unitCost" : 50
                 }
               ]
             }
           },
           {
-            "do": "migrate",
-            "now": "2026-11-23T12:00:00+08:00",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [],
-              "quotes": {},
-              "schema": 1,
-              "trades": [
+            "do" : "migrate",
+            "now" : "2026-11-23T12:00:00+08:00",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
+
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1,
+              "trades" : [
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 789278400.0,
-                  "id": "00000000-0000-4000-8000-000000000041",
-                  "name": "0050 基金",
-                  "shares": 100,
-                  "symbol": "0050",
-                  "unitCost": 50
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 789278400,
+                  "id" : "00000000-0000-4000-8000-000000000041",
+                  "name" : "0050 基金",
+                  "shares" : 100,
+                  "symbol" : "0050",
+                  "unitCost" : 50
                 }
               ]
             }
           },
           {
-            "do": "streak",
-            "now": "2025-10-20T12:00:00+08:00"
+            "do" : "streak",
+            "now" : "2025-10-20T12:00:00+08:00"
           },
           {
-            "do": "levelUpDue"
+            "do" : "levelUpDue"
           }
         ]
       },
-      "name": "old-save-migration"
+      "name" : "old-save-migration"
     },
     {
-      "input": {
-        "state": {
-          "dcaMonths": [
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 120,
+          "collected" : {
+
+          },
+          "counts" : {
+            "feeCompared" : 2,
+            "questDone" : 2,
+            "reconciled" : 2
+          },
+          "dcaMonths" : [
             {
-              "month": 10,
-              "year": 2026
+              "month" : 10,
+              "year" : 2026
             }
           ],
-          "habit": "savingGoal"
+          "habit" : "savingGoal",
+          "lastAward" : "questDone",
+          "longestStreak" : 0,
+          "migration" : 0,
+          "questsDone" : {
+            "2026-11" : [
+              "reconciled"
+            ],
+            "2026-12" : [
+              "newETFResearched"
+            ]
+          },
+          "rewardKeys" : [
+            "feeCompared|2026-12-01",
+            "feeCompared|2026-12-02",
+            "reconciled|2026-11",
+            "reconciled|2026-12"
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 120,
+          "xpByMonth" : {
+            "2026-11" : 60,
+            "2026-12" : 60
+          }
         },
-        "steps": [
-          {
-            "do": "reconcile",
-            "now": "2026-11-05T12:00:00+08:00"
-          },
-          {
-            "do": "reconcile",
-            "now": "2026-11-25T12:00:00+08:00"
-          },
-          {
-            "do": "reconcile",
-            "now": "2026-12-01T12:00:00+08:00"
-          },
-          {
-            "do": "compareFees",
-            "now": "2026-12-01T09:00:00+08:00"
-          },
-          {
-            "do": "compareFees",
-            "now": "2026-12-01T21:00:00+08:00"
-          },
-          {
-            "do": "compareFees",
-            "now": "2026-12-01T16:30:00Z"
-          },
-          {
-            "do": "complete",
-            "now": "2026-12-02T12:00:00+08:00",
-            "trigger": "newETFResearched"
-          }
+        "steps" : [
+          [
+            "reconciled",
+            "questDone"
+          ],
+          [
+
+          ],
+          [
+            "reconciled"
+          ],
+          true,
+          false,
+          true,
+          [
+            "questDone"
+          ]
         ]
       },
-      "name": "reconcile-once-a-month"
-    },
-    {
-      "input": {
-        "state": {},
-        "steps": [
-          {
-            "at": "2026-10-01T12:00:00+08:00",
-            "do": "award",
-            "event": "monthlyDCA"
-          },
-          {
-            "at": "2026-11-01T12:00:00+08:00",
-            "do": "award",
-            "event": "questDone"
-          },
-          {
-            "at": "2026-11-01T12:00:00+08:00",
-            "do": "award",
-            "event": "questDone"
-          },
-          {
-            "at": "2026-11-01T12:00:00+08:00",
-            "do": "award",
-            "event": "questDone"
-          },
-          {
-            "do": "levelUpDue"
-          },
-          {
-            "do": "coinsSinceCelebration"
-          },
-          {
-            "do": "celebrate",
-            "level": 2
-          },
-          {
-            "do": "levelUpDue"
-          },
-          {
-            "at": "2026-11-02T12:00:00+08:00",
-            "do": "award",
-            "event": "dividendLogged"
-          },
-          {
-            "do": "coinsSinceCelebration"
-          },
-          {
-            "do": "celebrate",
-            "level": 1
-          }
-        ]
-      },
-      "name": "levels-and-celebration"
-    },
-    {
-      "input": {
-        "state": {
-          "dcaMonths": [
+      "input" : {
+        "state" : {
+          "dcaMonths" : [
             {
-              "month": 1,
-              "year": 2026
-            },
-            {
-              "month": 2,
-              "year": 2026
-            },
-            {
-              "month": 4,
-              "year": 2026
-            },
-            {
-              "month": 5,
-              "year": 2026
+              "month" : 10,
+              "year" : 2026
             }
           ],
-          "longestStreak": 2
+          "habit" : "savingGoal"
         },
-        "steps": [
+        "steps" : [
           {
-            "do": "backfillDCA",
-            "portfolio": {
-              "dividends": [],
-              "favorites": [],
-              "holdings": [],
-              "quotes": {},
-              "schema": 1,
-              "trades": [
+            "do" : "reconcile",
+            "now" : "2026-11-05T12:00:00+08:00"
+          },
+          {
+            "do" : "reconcile",
+            "now" : "2026-11-25T12:00:00+08:00"
+          },
+          {
+            "do" : "reconcile",
+            "now" : "2026-12-01T12:00:00+08:00"
+          },
+          {
+            "do" : "compareFees",
+            "now" : "2026-12-01T09:00:00+08:00"
+          },
+          {
+            "do" : "compareFees",
+            "now" : "2026-12-01T21:00:00+08:00"
+          },
+          {
+            "do" : "compareFees",
+            "now" : "2026-12-01T16:30:00Z"
+          },
+          {
+            "do" : "complete",
+            "now" : "2026-12-02T12:00:00+08:00",
+            "trigger" : "newETFResearched"
+          }
+        ]
+      },
+      "name" : "reconcile-once-a-month"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 240,
+          "celebratedLevel" : 2,
+          "coins" : 240,
+          "collected" : {
+
+          },
+          "counts" : {
+            "dividendLogged" : 1,
+            "monthlyDCA" : 1,
+            "questDone" : 3
+          },
+          "dcaMonths" : [
+
+          ],
+          "lastAward" : "dividendLogged",
+          "longestStreak" : 0,
+          "migration" : 0,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 240,
+          "xpByMonth" : {
+            "2026-10" : 100,
+            "2026-11" : 140
+          }
+        },
+        "steps" : [
+          null,
+          null,
+          null,
+          null,
+          2,
+          220,
+          null,
+          null,
+          null,
+          20,
+          null
+        ]
+      },
+      "input" : {
+        "state" : {
+
+        },
+        "steps" : [
+          {
+            "at" : "2026-10-01T12:00:00+08:00",
+            "do" : "award",
+            "event" : "monthlyDCA"
+          },
+          {
+            "at" : "2026-11-01T12:00:00+08:00",
+            "do" : "award",
+            "event" : "questDone"
+          },
+          {
+            "at" : "2026-11-01T12:00:00+08:00",
+            "do" : "award",
+            "event" : "questDone"
+          },
+          {
+            "at" : "2026-11-01T12:00:00+08:00",
+            "do" : "award",
+            "event" : "questDone"
+          },
+          {
+            "do" : "levelUpDue"
+          },
+          {
+            "do" : "coinsSinceCelebration"
+          },
+          {
+            "do" : "celebrate",
+            "level" : 2
+          },
+          {
+            "do" : "levelUpDue"
+          },
+          {
+            "at" : "2026-11-02T12:00:00+08:00",
+            "do" : "award",
+            "event" : "dividendLogged"
+          },
+          {
+            "do" : "coinsSinceCelebration"
+          },
+          {
+            "do" : "celebrate",
+            "level" : 1
+          }
+        ]
+      },
+      "name" : "levels-and-celebration"
+    },
+    {
+      "expected" : {
+        "state" : {
+          "celebratedAchievements" : [
+
+          ],
+          "celebratedCoins" : 0,
+          "celebratedLevel" : 1,
+          "coins" : 0,
+          "collected" : {
+
+          },
+          "counts" : {
+
+          },
+          "dcaMonths" : [
+            {
+              "month" : 1,
+              "year" : 2026
+            },
+            {
+              "month" : 2,
+              "year" : 2026
+            },
+            {
+              "month" : 3,
+              "year" : 2026
+            },
+            {
+              "month" : 4,
+              "year" : 2026
+            },
+            {
+              "month" : 5,
+              "year" : 2026
+            }
+          ],
+          "longestStreak" : 5,
+          "migration" : 0,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+
+          },
+          "xp" : 0,
+          "xpByMonth" : {
+
+          }
+        },
+        "steps" : [
+          null,
+          5
+        ]
+      },
+      "input" : {
+        "state" : {
+          "dcaMonths" : [
+            {
+              "month" : 1,
+              "year" : 2026
+            },
+            {
+              "month" : 2,
+              "year" : 2026
+            },
+            {
+              "month" : 4,
+              "year" : 2026
+            },
+            {
+              "month" : 5,
+              "year" : 2026
+            }
+          ],
+          "longestStreak" : 2
+        },
+        "steps" : [
+          {
+            "do" : "backfillDCA",
+            "portfolio" : {
+              "dividends" : [
+
+              ],
+              "favorites" : [
+
+              ],
+              "holdings" : [
+
+              ],
+              "quotes" : {
+
+              },
+              "schema" : 1,
+              "trades" : [
                 {
-                  "action": "買進",
-                  "broker": "測試券商",
-                  "date": 794376000.0,
-                  "id": "00000000-0000-4000-8000-000000000042",
-                  "name": "0050 基金",
-                  "shares": 100,
-                  "symbol": "0050",
-                  "unitCost": 50
+                  "action" : "買進",
+                  "broker" : "測試券商",
+                  "date" : 794376000,
+                  "id" : "00000000-0000-4000-8000-000000000042",
+                  "name" : "0050 基金",
+                  "shares" : 100,
+                  "symbol" : "0050",
+                  "unitCost" : 50
                 }
               ]
             }
           },
           {
-            "do": "streak",
-            "now": "2026-05-20T12:00:00+08:00"
+            "do" : "streak",
+            "now" : "2026-05-20T12:00:00+08:00"
           }
         ]
       },
-      "name": "backfill-joins-two-runs"
+      "name" : "backfill-joins-two-runs"
     }
   ],
-  "kind": "GameState.script"
+  "kind" : "GameState.script"
 }
