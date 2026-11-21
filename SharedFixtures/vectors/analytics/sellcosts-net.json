@@ -1,174 +1,187 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "bond": false,
-        "gross": 34700,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 34653,
+      "input" : {
+        "bond" : false,
+        "gross" : 34700,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "cathay-etf"
+      "name" : "cathay-etf"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 100000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 99661,
+      "input" : {
+        "bond" : false,
+        "gross" : 100000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": true
+        "stock" : true
       },
-      "name": "stock"
+      "name" : "stock"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 100000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 10,
-          "minimum": 20
+      "expected" : 99758,
+      "input" : {
+        "bond" : false,
+        "gross" : 100000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "list-price"
+      "name" : "list-price"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 1000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 10,
-          "minimum": 20
+      "expected" : 979,
+      "input" : {
+        "bond" : false,
+        "gross" : 1000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "small-sale-minimum"
+      "name" : "small-sale-minimum"
     },
     {
-      "input": {
-        "bond": true,
-        "gross": 50000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 49981,
+      "input" : {
+        "bond" : true,
+        "gross" : 50000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "bond-exempt-2026"
+      "name" : "bond-exempt-2026"
     },
     {
-      "input": {
-        "bond": true,
-        "gross": 50000,
-        "on": "2027-01-02T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 49931,
+      "input" : {
+        "bond" : true,
+        "gross" : 50000,
+        "on" : "2027-01-02T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "bond-taxed-2027"
+      "name" : "bond-taxed-2027"
     },
     {
-      "input": {
-        "bond": true,
-        "gross": 50000,
-        "on": "2026-12-31T23:59:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 49981,
+      "input" : {
+        "bond" : true,
+        "gross" : 50000,
+        "on" : "2026-12-31T23:59:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "bond-last-moment"
+      "name" : "bond-last-moment"
     },
     {
-      "input": {
-        "bond": true,
-        "gross": 50000,
-        "on": "2027-01-01T00:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 49931,
+      "input" : {
+        "bond" : true,
+        "gross" : 50000,
+        "on" : "2027-01-01T00:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "bond-first-moment"
+      "name" : "bond-first-moment"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 0,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 10,
-          "minimum": 20
+      "expected" : 0,
+      "input" : {
+        "bond" : false,
+        "gross" : 0,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "zero"
+      "name" : "zero"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": -100,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 10,
-          "minimum": 20
+      "expected" : -100,
+      "input" : {
+        "bond" : false,
+        "gross" : -100,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "negative"
+      "name" : "negative"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 100000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 30,
-          "minimum": 5000
+      "expected" : 98900,
+      "input" : {
+        "bond" : false,
+        "gross" : 100000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 30,
+          "minimum" : 5000
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "rate-clamped"
+      "name" : "rate-clamped"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 1000000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 998601,
+      "input" : {
+        "bond" : false,
+        "gross" : 1000000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": false
+        "stock" : false
       },
-      "name": "fee-hair"
+      "name" : "fee-hair"
     },
     {
-      "input": {
-        "bond": false,
-        "gross": 300000,
-        "on": "2026-10-17T12:00:00+08:00",
-        "rate": {
-          "discount": 2.8,
-          "minimum": 1
+      "expected" : 298981,
+      "input" : {
+        "bond" : false,
+        "gross" : 300000,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
         },
-        "stock": true
+        "stock" : true
       },
-      "name": "tax-rounding-hair"
+      "name" : "tax-rounding-hair"
     }
   ],
-  "kind": "SellCosts.net"
+  "kind" : "SellCosts.net"
 }
