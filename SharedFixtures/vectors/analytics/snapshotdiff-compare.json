@@ -1,837 +1,1355 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+          {
+            "name" : "名稱D",
+            "symbol" : "D",
+            "weight" : 4
+          }
+        ],
+        "changed" : [
+          {
+            "delta" : 2,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 12
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+          {
+            "name" : "名稱C",
+            "symbol" : "C",
+            "weight" : 3
+          }
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 12
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 12
             },
             {
-              "name": "名稱B",
-              "symbol": "B",
-              "weight": 5
+              "name" : "名稱B",
+              "symbol" : "B",
+              "weight" : 5
             },
             {
-              "name": "名稱D",
-              "symbol": "D",
-              "weight": 4
+              "name" : "名稱D",
+              "symbol" : "D",
+              "weight" : 4
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             },
             {
-              "name": "名稱B",
-              "symbol": "B",
-              "weight": 5
+              "name" : "名稱B",
+              "symbol" : "B",
+              "weight" : 5
             },
             {
-              "name": "名稱C",
-              "symbol": "C",
-              "weight": 3
+              "name" : "名稱C",
+              "symbol" : "C",
+              "weight" : 3
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "diff"
+      "name" : "diff"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : true,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10.005
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10.005
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "tiny-change"
+      "name" : "tiny-change"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : 0.009999999999999787,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 10.01
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10.01
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10.01
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "hundredth-up"
+      "name" : "hundredth-up"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : -0.009999999999999787,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 10
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10.01
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10.01
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "hundredth-down"
+      "name" : "hundredth-down"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : 1.5,
+            "name" : "名稱S15",
+            "symbol" : "S15",
+            "weight" : 6.5
+          },
+          {
+            "delta" : -1.4000000000000004,
+            "name" : "名稱S14",
+            "symbol" : "S14",
+            "weight" : 3.5999999999999996
+          },
+          {
+            "delta" : 1.2999999999999998,
+            "name" : "名稱S13",
+            "symbol" : "S13",
+            "weight" : 6.3
+          },
+          {
+            "delta" : -1.2000000000000002,
+            "name" : "名稱S12",
+            "symbol" : "S12",
+            "weight" : 3.8
+          },
+          {
+            "delta" : 1.0999999999999996,
+            "name" : "名稱S11",
+            "symbol" : "S11",
+            "weight" : 6.1
+          },
+          {
+            "delta" : -1,
+            "name" : "名稱S10",
+            "symbol" : "S10",
+            "weight" : 4
+          },
+          {
+            "delta" : 0.9000000000000004,
+            "name" : "名稱S09",
+            "symbol" : "S09",
+            "weight" : 5.9
+          },
+          {
+            "delta" : -0.7999999999999998,
+            "name" : "名稱S08",
+            "symbol" : "S08",
+            "weight" : 4.2
+          },
+          {
+            "delta" : 0.7000000000000002,
+            "name" : "名稱S07",
+            "symbol" : "S07",
+            "weight" : 5.7
+          },
+          {
+            "delta" : -0.5999999999999996,
+            "name" : "名稱S06",
+            "symbol" : "S06",
+            "weight" : 4.4
+          }
+        ],
+        "changedCut" : true,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5.1
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5.1
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 4.8
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 4.8
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5.3
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5.3
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 4.6
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 4.6
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5.5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5.5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 4.4
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 4.4
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5.7
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5.7
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 4.2
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 4.2
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5.9
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5.9
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 4.0
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 4
             },
             {
-              "name": "名稱S11",
-              "symbol": "S11",
-              "weight": 6.1
+              "name" : "名稱S11",
+              "symbol" : "S11",
+              "weight" : 6.1
             },
             {
-              "name": "名稱S12",
-              "symbol": "S12",
-              "weight": 3.8
+              "name" : "名稱S12",
+              "symbol" : "S12",
+              "weight" : 3.8
             },
             {
-              "name": "名稱S13",
-              "symbol": "S13",
-              "weight": 6.3
+              "name" : "名稱S13",
+              "symbol" : "S13",
+              "weight" : 6.3
             },
             {
-              "name": "名稱S14",
-              "symbol": "S14",
-              "weight": 3.5999999999999996
+              "name" : "名稱S14",
+              "symbol" : "S14",
+              "weight" : 3.5999999999999996
             },
             {
-              "name": "名稱S15",
-              "symbol": "S15",
-              "weight": 6.5
+              "name" : "名稱S15",
+              "symbol" : "S15",
+              "weight" : 6.5
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 5
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 5
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 5
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 5
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 5
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 5
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 5
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 5
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 5
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 5
             },
             {
-              "name": "名稱S11",
-              "symbol": "S11",
-              "weight": 5
+              "name" : "名稱S11",
+              "symbol" : "S11",
+              "weight" : 5
             },
             {
-              "name": "名稱S12",
-              "symbol": "S12",
-              "weight": 5
+              "name" : "名稱S12",
+              "symbol" : "S12",
+              "weight" : 5
             },
             {
-              "name": "名稱S13",
-              "symbol": "S13",
-              "weight": 5
+              "name" : "名稱S13",
+              "symbol" : "S13",
+              "weight" : 5
             },
             {
-              "name": "名稱S14",
-              "symbol": "S14",
-              "weight": 5
+              "name" : "名稱S14",
+              "symbol" : "S14",
+              "weight" : 5
             },
             {
-              "name": "名稱S15",
-              "symbol": "S15",
-              "weight": 5
+              "name" : "名稱S15",
+              "symbol" : "S15",
+              "weight" : 5
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "top-ten-of-fifteen"
+      "name" : "top-ten-of-fifteen"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : -1,
+            "name" : "名稱S10",
+            "symbol" : "S10",
+            "weight" : 4
+          },
+          {
+            "delta" : 0.9000000000000004,
+            "name" : "名稱S09",
+            "symbol" : "S09",
+            "weight" : 5.9
+          },
+          {
+            "delta" : -0.7999999999999998,
+            "name" : "名稱S08",
+            "symbol" : "S08",
+            "weight" : 4.2
+          },
+          {
+            "delta" : 0.7000000000000002,
+            "name" : "名稱S07",
+            "symbol" : "S07",
+            "weight" : 5.7
+          },
+          {
+            "delta" : -0.5999999999999996,
+            "name" : "名稱S06",
+            "symbol" : "S06",
+            "weight" : 4.4
+          },
+          {
+            "delta" : 0.5,
+            "name" : "名稱S05",
+            "symbol" : "S05",
+            "weight" : 5.5
+          },
+          {
+            "delta" : -0.40000000000000036,
+            "name" : "名稱S04",
+            "symbol" : "S04",
+            "weight" : 4.6
+          },
+          {
+            "delta" : 0.2999999999999998,
+            "name" : "名稱S03",
+            "symbol" : "S03",
+            "weight" : 5.3
+          },
+          {
+            "delta" : -0.20000000000000018,
+            "name" : "名稱S02",
+            "symbol" : "S02",
+            "weight" : 4.8
+          },
+          {
+            "delta" : 0.09999999999999964,
+            "name" : "名稱S01",
+            "symbol" : "S01",
+            "weight" : 5.1
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5.1
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5.1
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 4.8
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 4.8
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5.3
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5.3
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 4.6
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 4.6
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5.5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5.5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 4.4
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 4.4
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5.7
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5.7
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 4.2
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 4.2
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5.9
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5.9
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 4.0
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 4
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 5
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 5
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 5
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 5
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 5
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 5
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 5
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 5
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 5
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 5
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "exactly-ten"
+      "name" : "exactly-ten"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : 1.0999999999999996,
+            "name" : "名稱S11",
+            "symbol" : "S11",
+            "weight" : 6.1
+          },
+          {
+            "delta" : -1,
+            "name" : "名稱S10",
+            "symbol" : "S10",
+            "weight" : 4
+          },
+          {
+            "delta" : 0.9000000000000004,
+            "name" : "名稱S09",
+            "symbol" : "S09",
+            "weight" : 5.9
+          },
+          {
+            "delta" : -0.7999999999999998,
+            "name" : "名稱S08",
+            "symbol" : "S08",
+            "weight" : 4.2
+          },
+          {
+            "delta" : 0.7000000000000002,
+            "name" : "名稱S07",
+            "symbol" : "S07",
+            "weight" : 5.7
+          },
+          {
+            "delta" : -0.5999999999999996,
+            "name" : "名稱S06",
+            "symbol" : "S06",
+            "weight" : 4.4
+          },
+          {
+            "delta" : 0.5,
+            "name" : "名稱S05",
+            "symbol" : "S05",
+            "weight" : 5.5
+          },
+          {
+            "delta" : -0.40000000000000036,
+            "name" : "名稱S04",
+            "symbol" : "S04",
+            "weight" : 4.6
+          },
+          {
+            "delta" : 0.2999999999999998,
+            "name" : "名稱S03",
+            "symbol" : "S03",
+            "weight" : 5.3
+          },
+          {
+            "delta" : -0.20000000000000018,
+            "name" : "名稱S02",
+            "symbol" : "S02",
+            "weight" : 4.8
+          }
+        ],
+        "changedCut" : true,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5.1
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5.1
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 4.8
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 4.8
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5.3
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5.3
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 4.6
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 4.6
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5.5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5.5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 4.4
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 4.4
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5.7
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5.7
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 4.2
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 4.2
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5.9
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5.9
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 4.0
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 4
             },
             {
-              "name": "名稱S11",
-              "symbol": "S11",
-              "weight": 6.1
+              "name" : "名稱S11",
+              "symbol" : "S11",
+              "weight" : 6.1
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱S01",
-              "symbol": "S01",
-              "weight": 5
+              "name" : "名稱S01",
+              "symbol" : "S01",
+              "weight" : 5
             },
             {
-              "name": "名稱S02",
-              "symbol": "S02",
-              "weight": 5
+              "name" : "名稱S02",
+              "symbol" : "S02",
+              "weight" : 5
             },
             {
-              "name": "名稱S03",
-              "symbol": "S03",
-              "weight": 5
+              "name" : "名稱S03",
+              "symbol" : "S03",
+              "weight" : 5
             },
             {
-              "name": "名稱S04",
-              "symbol": "S04",
-              "weight": 5
+              "name" : "名稱S04",
+              "symbol" : "S04",
+              "weight" : 5
             },
             {
-              "name": "名稱S05",
-              "symbol": "S05",
-              "weight": 5
+              "name" : "名稱S05",
+              "symbol" : "S05",
+              "weight" : 5
             },
             {
-              "name": "名稱S06",
-              "symbol": "S06",
-              "weight": 5
+              "name" : "名稱S06",
+              "symbol" : "S06",
+              "weight" : 5
             },
             {
-              "name": "名稱S07",
-              "symbol": "S07",
-              "weight": 5
+              "name" : "名稱S07",
+              "symbol" : "S07",
+              "weight" : 5
             },
             {
-              "name": "名稱S08",
-              "symbol": "S08",
-              "weight": 5
+              "name" : "名稱S08",
+              "symbol" : "S08",
+              "weight" : 5
             },
             {
-              "name": "名稱S09",
-              "symbol": "S09",
-              "weight": 5
+              "name" : "名稱S09",
+              "symbol" : "S09",
+              "weight" : 5
             },
             {
-              "name": "名稱S10",
-              "symbol": "S10",
-              "weight": 5
+              "name" : "名稱S10",
+              "symbol" : "S10",
+              "weight" : 5
             },
             {
-              "name": "名稱S11",
-              "symbol": "S11",
-              "weight": 5
+              "name" : "名稱S11",
+              "symbol" : "S11",
+              "weight" : 5
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "eleven"
+      "name" : "eleven"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : -1,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 0
+          },
+          {
+            "delta" : 1,
+            "name" : "名稱B",
+            "symbol" : "B",
+            "weight" : 2
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱B",
-              "symbol": "B",
-              "weight": 2
+              "name" : "名稱B",
+              "symbol" : "B",
+              "weight" : 2
             },
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 0
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 0
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱B",
-              "symbol": "B",
-              "weight": 1
+              "name" : "名稱B",
+              "symbol" : "B",
+              "weight" : 1
             },
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 1
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 1
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "equal-moves-by-code"
+      "name" : "equal-moves-by-code"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+          {
+            "name" : "名稱Y",
+            "symbol" : "Y",
+            "weight" : 9
+          },
+          {
+            "name" : "名稱X",
+            "symbol" : "X",
+            "weight" : 2
+          },
+          {
+            "name" : "名稱Z",
+            "symbol" : "Z",
+            "weight" : 2
+          }
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+          {
+            "name" : "名稱B",
+            "symbol" : "B",
+            "weight" : 7
+          },
+          {
+            "name" : "名稱C",
+            "symbol" : "C",
+            "weight" : 3
+          },
+          {
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 1
+          }
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱X",
-              "symbol": "X",
-              "weight": 2
+              "name" : "名稱X",
+              "symbol" : "X",
+              "weight" : 2
             },
             {
-              "name": "名稱Y",
-              "symbol": "Y",
-              "weight": 9
+              "name" : "名稱Y",
+              "symbol" : "Y",
+              "weight" : 9
             },
             {
-              "name": "名稱Z",
-              "symbol": "Z",
-              "weight": 2
+              "name" : "名稱Z",
+              "symbol" : "Z",
+              "weight" : 2
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 1
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 1
             },
             {
-              "name": "名稱B",
-              "symbol": "B",
-              "weight": 7
+              "name" : "名稱B",
+              "symbol" : "B",
+              "weight" : 7
             },
             {
-              "name": "名稱C",
-              "symbol": "C",
-              "weight": 3
+              "name" : "名稱C",
+              "symbol" : "C",
+              "weight" : 3
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "heaviest-first"
+      "name" : "heaviest-first"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : true,
+        "mixedSources" : true,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 12
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 12
             }
           ],
-          "date": "2026-11-13",
-          "source": "富果／投信揭露資料",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "富果／投信揭露資料",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-11-11",
-          "source": "群益投信",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "群益投信",
+          "symbol" : "00982A"
         }
       },
-      "name": "mixed-sources"
+      "name" : "mixed-sources"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : true,
+        "mixedSources" : true,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 12
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 12
             }
           ],
-          "date": "2026-11-13",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-11-11",
-          "source": "群益投信",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "群益投信",
+          "symbol" : "00982A"
         }
       },
-      "name": "one-source-missing"
+      "name" : "one-source-missing"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+          {
+            "name" : "名稱D",
+            "symbol" : "D",
+            "weight" : 4
+          }
+        ],
+        "changed" : [
+          {
+            "delta" : 2,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 12
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+          {
+            "name" : "名稱C",
+            "symbol" : "C",
+            "weight" : 3
+          }
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 12
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 12
             },
             {
-              "name": "名稱D",
-              "symbol": "D",
-              "weight": 4
+              "name" : "名稱D",
+              "symbol" : "D",
+              "weight" : 4
             }
           ],
-          "date": "2026-11-13",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             },
             {
-              "name": "名稱C",
-              "symbol": "C",
-              "weight": 3
+              "name" : "名稱C",
+              "symbol" : "C",
+              "weight" : 3
             }
           ],
-          "date": "2026-11-11",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "symbol" : "00982A"
         }
       },
-      "name": "both-sources-missing"
+      "name" : "both-sources-missing"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+          {
+            "delta" : 20,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 30
+          },
+          {
+            "delta" : 1,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 11
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 11
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 11
             },
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 30
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 30
             }
           ],
-          "date": "2026-11-13",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-13",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             },
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 20
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 20
             }
           ],
-          "date": "2026-11-11",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-11-11",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "duplicate-codes"
+      "name" : "duplicate-codes"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2025-12-30",
+        "isEmpty" : true,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "2026/1/2 與 2025/12/30 相比",
+        "to" : "2026-01-02"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-01-02",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-01-02",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2025-12-30",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2025-12-30",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "across-years"
+      "name" : "across-years"
     },
     {
-      "input": {
-        "new": {
-          "components": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "somewhen",
+        "isEmpty" : true,
+        "mixedSources" : false,
+        "removed" : [
+
+        ],
+        "title" : "2026/1/2 與 somewhen 相比",
+        "to" : "2026-01-02"
+      },
+      "input" : {
+        "new" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "2026-01-02",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "2026-01-02",
+          "source" : "test",
+          "symbol" : "00982A"
         },
-        "old": {
-          "components": [
+        "old" : {
+          "components" : [
             {
-              "name": "名稱A",
-              "symbol": "A",
-              "weight": 10
+              "name" : "名稱A",
+              "symbol" : "A",
+              "weight" : 10
             }
           ],
-          "date": "somewhen",
-          "source": "test",
-          "symbol": "00982A"
+          "date" : "somewhen",
+          "source" : "test",
+          "symbol" : "00982A"
         }
       },
-      "name": "odd-days"
+      "name" : "odd-days"
     }
   ],
-  "kind": "SnapshotDiff.compare"
+  "kind" : "SnapshotDiff.compare"
 }

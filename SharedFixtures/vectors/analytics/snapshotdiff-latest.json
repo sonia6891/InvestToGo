@@ -1,145 +1,197 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "history": []
+      "expected" : null,
+      "input" : {
+        "history" : [
+
+        ]
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "history": [
+      "expected" : null,
+      "input" : {
+        "history" : [
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 10
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 10
               }
             ],
-            "date": "2026-11-13",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-13",
+            "source" : "test",
+            "symbol" : "00982A"
           }
         ]
       },
-      "name": "one-day"
+      "name" : "one-day"
     },
     {
-      "input": {
-        "history": [
+      "expected" : null,
+      "input" : {
+        "history" : [
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 10
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 10
               }
             ],
-            "date": "2026-11-13",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-13",
+            "source" : "test",
+            "symbol" : "00982A"
           },
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 11
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 11
               }
             ],
-            "date": "2026-11-13",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-13",
+            "source" : "test",
+            "symbol" : "00982A"
           }
         ]
       },
-      "name": "same-day-twice"
+      "name" : "same-day-twice"
     },
     {
-      "input": {
-        "history": [
+      "expected" : {
+        "added" : [
           {
-            "components": [
+            "name" : "名稱D",
+            "symbol" : "D",
+            "weight" : 4
+          }
+        ],
+        "changed" : [
+          {
+            "delta" : 2,
+            "name" : "名稱A",
+            "symbol" : "A",
+            "weight" : 12
+          }
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : false,
+        "mixedSources" : false,
+        "removed" : [
+          {
+            "name" : "名稱C",
+            "symbol" : "C",
+            "weight" : 3
+          }
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "history" : [
+          {
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 1
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 1
               }
             ],
-            "date": "2026-11-10",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-10",
+            "source" : "test",
+            "symbol" : "00982A"
           },
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 12
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 12
               },
               {
-                "name": "名稱D",
-                "symbol": "D",
-                "weight": 4
+                "name" : "名稱D",
+                "symbol" : "D",
+                "weight" : 4
               }
             ],
-            "date": "2026-11-13",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-13",
+            "source" : "test",
+            "symbol" : "00982A"
           },
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 10
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 10
               },
               {
-                "name": "名稱C",
-                "symbol": "C",
-                "weight": 3
+                "name" : "名稱C",
+                "symbol" : "C",
+                "weight" : 3
               }
             ],
-            "date": "2026-11-11",
-            "source": "test",
-            "symbol": "00982A"
+            "date" : "2026-11-11",
+            "source" : "test",
+            "symbol" : "00982A"
           }
         ]
       },
-      "name": "two-newest-any-order"
+      "name" : "two-newest-any-order"
     },
     {
-      "input": {
-        "history": [
+      "expected" : {
+        "added" : [
+
+        ],
+        "changed" : [
+
+        ],
+        "changedCut" : false,
+        "from" : "2026-11-11",
+        "isEmpty" : true,
+        "mixedSources" : true,
+        "removed" : [
+
+        ],
+        "title" : "11/13 與 11/11 相比",
+        "to" : "2026-11-13"
+      },
+      "input" : {
+        "history" : [
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 12
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 12
               }
             ],
-            "date": "2026-11-13",
-            "source": "富果／投信揭露資料",
-            "symbol": "00982A"
+            "date" : "2026-11-13",
+            "source" : "富果／投信揭露資料",
+            "symbol" : "00982A"
           },
           {
-            "components": [
+            "components" : [
               {
-                "name": "名稱A",
-                "symbol": "A",
-                "weight": 10
+                "name" : "名稱A",
+                "symbol" : "A",
+                "weight" : 10
               }
             ],
-            "date": "2026-11-11",
-            "source": "群益投信",
-            "symbol": "00982A"
+            "date" : "2026-11-11",
+            "source" : "群益投信",
+            "symbol" : "00982A"
           }
         ]
       },
-      "name": "mixed-sources"
+      "name" : "mixed-sources"
     }
   ],
-  "kind": "SnapshotDiff.latest"
+  "kind" : "SnapshotDiff.latest"
 }

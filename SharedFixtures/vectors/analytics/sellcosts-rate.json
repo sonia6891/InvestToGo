@@ -1,118 +1,196 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "broker": "國泰證券",
-        "stored": {
-          "": {
-            "discount": 5,
-            "minimum": 10
+      "expected" : {
+        "isSet" : true,
+        "note" : "你為國泰證券設定的折扣，用來估算市值。",
+        "rate" : {
+          "discount" : 3.5,
+          "minimum" : 5
+        }
+      },
+      "input" : {
+        "broker" : "國泰證券",
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
           },
-          "國泰證券": {
-            "discount": 3.5,
-            "minimum": 5
+          "國泰證券" : {
+            "discount" : 3.5,
+            "minimum" : 5
           }
         }
       },
-      "name": "own-rate"
+      "name" : "own-rate"
     },
     {
-      "input": {
-        "broker": "國泰證券（融資）",
-        "stored": {
-          "": {
-            "discount": 5,
-            "minimum": 10
+      "expected" : {
+        "isSet" : true,
+        "note" : "你為國泰證券設定的折扣，用來估算市值。",
+        "rate" : {
+          "discount" : 3.5,
+          "minimum" : 5
+        }
+      },
+      "input" : {
+        "broker" : "國泰證券（融資）",
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
           },
-          "國泰證券": {
-            "discount": 3.5,
-            "minimum": 5
+          "國泰證券" : {
+            "discount" : 3.5,
+            "minimum" : 5
           }
         }
       },
-      "name": "own-rate-margin"
+      "name" : "own-rate-margin"
     },
     {
-      "input": {
-        "broker": "元大證券",
-        "stored": {
-          "": {
-            "discount": 5,
-            "minimum": 10
+      "expected" : {
+        "isSet" : true,
+        "note" : "元大證券常見的電子下單優惠，實際以你的帳戶為準，可直接修改。",
+        "rate" : {
+          "discount" : 6,
+          "minimum" : 20
+        }
+      },
+      "input" : {
+        "broker" : "元大證券",
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
           },
-          "國泰證券": {
-            "discount": 3.5,
-            "minimum": 5
+          "國泰證券" : {
+            "discount" : 3.5,
+            "minimum" : 5
           }
         }
       },
-      "name": "preset-beats-default"
+      "name" : "preset-beats-default"
     },
     {
-      "input": {
-        "broker": "統一證券",
-        "stored": {
-          "": {
-            "discount": 5,
-            "minimum": 10
+      "expected" : {
+        "isSet" : true,
+        "note" : "用你在設定裡的預設折扣；這家的優惠不同可直接修改。",
+        "rate" : {
+          "discount" : 5,
+          "minimum" : 10
+        }
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
           },
-          "國泰證券": {
-            "discount": 3.5,
-            "minimum": 5
+          "國泰證券" : {
+            "discount" : 3.5,
+            "minimum" : 5
           }
         }
       },
-      "name": "default"
+      "name" : "default"
     },
     {
-      "input": {
-        "broker": "統一證券",
-        "stored": {}
+      "expected" : {
+        "isSet" : false,
+        "note" : "沒有這家的常見優惠，先用原價（不打折、最低 20 元）；請改成你的折扣。",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
+        }
       },
-      "name": "list-price"
-    },
-    {
-      "input": {
-        "broker": "永豐金證券",
-        "stored": {}
+      "input" : {
+        "broker" : "統一證券",
+        "stored" : {
+
+        }
       },
-      "name": "preset-no-store"
+      "name" : "list-price"
     },
     {
-      "input": {
-        "broker": "統一證券",
-        "stored": {
-          "統一證券": {
-            "discount": 12,
-            "minimum": -1
+      "expected" : {
+        "isSet" : true,
+        "note" : "永豐金證券常見的電子下單優惠，實際以你的帳戶為準，可直接修改。",
+        "rate" : {
+          "discount" : 2,
+          "minimum" : 1
+        }
+      },
+      "input" : {
+        "broker" : "永豐金證券",
+        "stored" : {
+
+        }
+      },
+      "name" : "preset-no-store"
+    },
+    {
+      "expected" : {
+        "isSet" : true,
+        "note" : "你為統一證券設定的折扣，用來估算市值。",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 0
+        }
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "stored" : {
+          "統一證券" : {
+            "discount" : 12,
+            "minimum" : -1
           }
         }
       },
-      "name": "own-rate-clamped"
+      "name" : "own-rate-clamped"
     },
     {
-      "input": {
-        "broker": "",
-        "stored": {
-          "": {
-            "discount": 5,
-            "minimum": 10
+      "expected" : {
+        "isSet" : true,
+        "note" : "你為設定的折扣，用來估算市值。",
+        "rate" : {
+          "discount" : 5,
+          "minimum" : 10
+        }
+      },
+      "input" : {
+        "broker" : "",
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
           },
-          "國泰證券": {
-            "discount": 3.5,
-            "minimum": 5
+          "國泰證券" : {
+            "discount" : 3.5,
+            "minimum" : 5
           }
         }
       },
-      "name": "empty-broker-uses-default"
+      "name" : "empty-broker-uses-default"
     },
     {
-      "input": {
-        "broker": "",
-        "stored": {}
+      "expected" : {
+        "isSet" : false,
+        "note" : "沒有這家的常見優惠，先用原價（不打折、最低 20 元）；請改成你的折扣。",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
+        }
       },
-      "name": "empty-broker-list"
+      "input" : {
+        "broker" : "",
+        "stored" : {
+
+        }
+      },
+      "name" : "empty-broker-list"
     }
   ],
-  "kind": "SellCosts.rate"
+  "kind" : "SellCosts.rate"
 }

@@ -1,46 +1,53 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "values": [
+      "expected" : 0.25,
+      "input" : {
+        "values" : [
           100,
           120,
           90,
           130
         ]
       },
-      "name": "peak-trough"
+      "name" : "peak-trough"
     },
     {
-      "input": {
-        "values": []
+      "expected" : 0,
+      "input" : {
+        "values" : [
+
+        ]
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "values": [
+      "expected" : 0,
+      "input" : {
+        "values" : [
           1,
           2,
           3
         ]
       },
-      "name": "rising"
+      "name" : "rising"
     },
     {
-      "input": {
-        "values": [
+      "expected" : 0.5,
+      "input" : {
+        "values" : [
           0,
           0,
           50,
           25
         ]
       },
-      "name": "zeros-then-value"
+      "name" : "zeros-then-value"
     },
     {
-      "input": {
-        "values": [
+      "expected" : 0.8,
+      "input" : {
+        "values" : [
           100,
           50,
           200,
@@ -48,8 +55,8 @@
           300
         ]
       },
-      "name": "two-falls"
+      "name" : "two-falls"
     }
   ],
-  "kind": "Backtest.maxDrawdown"
+  "kind" : "Backtest.maxDrawdown"
 }
