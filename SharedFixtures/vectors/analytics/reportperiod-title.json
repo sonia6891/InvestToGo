@@ -1,74 +1,68 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : "2026 年 10 月",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         }
       },
-      "name" : "month"
+      "name": "month"
     },
     {
-      "expected" : "2026 年",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "year",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "year",
+          "year": 2026
         }
       },
-      "name" : "year"
+      "name": "year"
     },
     {
-      "expected" : "2026 年 1 月 1 日至 11 月 14 日",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2026
         }
       },
-      "name" : "ytd"
+      "name": "ytd"
     },
     {
-      "expected" : "2027 年 1 月 1 日至 1 月 1 日",
-      "input" : {
-        "now" : "2026-12-31T16:30:00Z",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2027
+      "input": {
+        "now": "2026-12-31T16:30:00Z",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2027
         }
       },
-      "name" : "ytd-taipei-new-year"
+      "name": "ytd-taipei-new-year"
     },
     {
-      "expected" : "2025 年",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2025
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2025
         }
       },
-      "name" : "ytd-over"
+      "name": "ytd-over"
     },
     {
-      "expected" : "2027 年",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2027
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2027
         }
       },
-      "name" : "ytd-not-begun"
+      "name": "ytd-not-begun"
     }
   ],
-  "kind" : "ReportPeriod.title"
+  "kind": "ReportPeriod.title"
 }

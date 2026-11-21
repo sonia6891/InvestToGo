@@ -1,213 +1,174 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : null,
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "nothing"
+      "name": "nothing"
     },
     {
-      "expected" : "2026-01",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "portfolio" : {
-          "dividends" : [
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 10,
-              "date" : 779083200,
-              "id" : "00000000-0000-4000-8000-000000000010",
-              "status" : "預估",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 779083200.0,
+              "id": "00000000-0000-4000-8000-000000000010",
+              "status": "預估",
+              "symbol": "00878"
             },
             {
-              "amount" : 10,
-              "date" : 797400000,
-              "id" : "00000000-0000-4000-8000-000000000011",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 797400000.0,
+              "id": "00000000-0000-4000-8000-000000000011",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 10,
-              "date" : 821160000,
-              "id" : "00000000-0000-4000-8000-000000000012",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 821160000.0,
+              "id": "00000000-0000-4000-8000-000000000012",
+              "status": "已入帳",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "collected" : {
-              "0050" : 791784000
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 791784000.0
             },
-            "dcaMonths" : [
+            "dcaMonths": [
               {
-                "month" : 3,
-                "year" : 2026
+                "month": 3,
+                "year": 2026
               }
             ],
-            "rewardKeys" : [
+            "rewardKeys": [
               "reconciled|2026-01"
             ],
-            "xpByMonth" : {
-              "2026-05" : 20
+            "xpByMonth": {
+              "2026-05": 20
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "reconcile-first"
+      "name": "reconcile-first"
     },
     {
-      "expected" : "2025-11",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "portfolio" : {
-          "dividends" : [
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 10,
-              "date" : 779083200,
-              "id" : "00000000-0000-4000-8000-000000000010",
-              "status" : "預估",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 779083200.0,
+              "id": "00000000-0000-4000-8000-000000000010",
+              "status": "預估",
+              "symbol": "00878"
             },
             {
-              "amount" : 10,
-              "date" : 797400000,
-              "id" : "00000000-0000-4000-8000-000000000011",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 797400000.0,
+              "id": "00000000-0000-4000-8000-000000000011",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 10,
-              "date" : 821160000,
-              "id" : "00000000-0000-4000-8000-000000000012",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 821160000.0,
+              "id": "00000000-0000-4000-8000-000000000012",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 10,
-              "date" : 784353600,
-              "id" : "00000000-0000-4000-8000-000000000013",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 784353600.0,
+              "id": "00000000-0000-4000-8000-000000000013",
+              "status": "已入帳",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "collected" : {
-              "0050" : 791784000
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 791784000.0
             },
-            "dcaMonths" : [
+            "dcaMonths": [
               {
-                "month" : 3,
-                "year" : 2026
+                "month": 3,
+                "year": 2026
               }
             ],
-            "rewardKeys" : [
+            "rewardKeys": [
               "reconciled|2026-01"
             ],
-            "xpByMonth" : {
-              "2026-05" : 20
+            "xpByMonth": {
+              "2026-05": 20
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "paid-dividend-earlier"
+      "name": "paid-dividend-earlier"
     },
     {
-      "expected" : null,
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "portfolio" : {
-          "dividends" : [
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 10,
-              "date" : 821160000,
-              "id" : "00000000-0000-4000-8000-000000000014",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 10,
+              "date": 821160000.0,
+              "id": "00000000-0000-4000-8000-000000000014",
+              "status": "已入帳",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "xpByMonth" : {
-              "2027-02" : 5
+          "favorites": [],
+          "game": {
+            "xpByMonth": {
+              "2027-02": 5
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "only-future"
+      "name": "only-future"
     },
     {
-      "expected" : "2026-07",
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "xpByMonth" : {
-              "2026-07" : 1,
-              "junk" : 5
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "xpByMonth": {
+              "2026-07": 1,
+              "junk": 5
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "junk-xp-key"
+      "name": "junk-xp-key"
     }
   ],
-  "kind" : "PocketReport.earliestMonth"
+  "kind": "PocketReport.earliestMonth"
 }

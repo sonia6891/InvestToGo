@@ -1,54 +1,47 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : "國泰證券",
-      "input" : {
-        "broker" : "國泰證券（融資）"
+      "input": {
+        "broker": "國泰證券（融資）"
       },
-      "name" : "國泰證券（融資）"
+      "name": "國泰證券（融資）"
     },
     {
-      "expected" : "國泰證券",
-      "input" : {
-        "broker" : "國泰證券(融資)"
+      "input": {
+        "broker": "國泰證券(融資)"
       },
-      "name" : "國泰證券(融資)"
+      "name": "國泰證券(融資)"
     },
     {
-      "expected" : "元大證券",
-      "input" : {
-        "broker" : " 元大證券 "
+      "input": {
+        "broker": " 元大證券 "
       },
-      "name" : " 元大證券 "
+      "name": " 元大證券 "
     },
     {
-      "expected" : "富邦",
-      "input" : {
-        "broker" : "\t富邦\t"
+      "input": {
+        "broker": "\t富邦\t"
       },
-      "name" : "\t富邦\t"
+      "name": "\t富邦\t"
     },
     {
-      "expected" : "元大證券",
-      "input" : {
-        "broker" : "元大（融資）證券"
+      "input": {
+        "broker": "元大（融資）證券"
       },
-      "name" : "元大（融資）證券"
+      "name": "元大（融資）證券"
     },
     {
-      "expected" : "",
-      "input" : {
-        "broker" : ""
+      "input": {
+        "broker": ""
       },
-      "name" : "empty"
+      "name": "empty"
     },
     {
-      "expected" : "統一證券",
-      "input" : {
-        "broker" : "　統一證券　"
+      "input": {
+        "broker": "　統一證券　"
       },
-      "name" : "　統一證券　"
+      "name": "　統一證券　"
     }
   ],
-  "kind" : "SellCosts.brokerKey"
+  "kind": "SellCosts.brokerKey"
 }

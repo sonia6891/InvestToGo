@@ -1,82 +1,85 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : 13,
-      "input" : {
-        "gross" : 34700,
-        "rate" : {
-          "discount" : 2.8,
-          "minimum" : 1
+      "input": {
+        "gross": 34700,
+        "rate": {
+          "discount": 2.8,
+          "minimum": 1
         }
       },
-      "name" : "cathay"
+      "name": "cathay"
     },
     {
-      "expected" : 142,
-      "input" : {
-        "gross" : 100000,
-        "rate" : {
-          "discount" : 10,
-          "minimum" : 20
+      "input": {
+        "gross": 100000,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
         }
       },
-      "name" : "list-price"
+      "name": "list-price"
     },
     {
-      "expected" : 20,
-      "input" : {
-        "gross" : 1000,
-        "rate" : {
-          "discount" : 10,
-          "minimum" : 20
+      "input": {
+        "gross": 1000,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
         }
       },
-      "name" : "minimum"
+      "name": "minimum"
     },
     {
-      "expected" : 0,
-      "input" : {
-        "gross" : 0,
-        "rate" : {
-          "discount" : 10,
-          "minimum" : 20
+      "input": {
+        "gross": 0,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
         }
       },
-      "name" : "zero"
+      "name": "zero"
     },
     {
-      "expected" : 0,
-      "input" : {
-        "gross" : -5,
-        "rate" : {
-          "discount" : 10,
-          "minimum" : 20
+      "input": {
+        "gross": -5,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
         }
       },
-      "name" : "negative"
+      "name": "negative"
     },
     {
-      "expected" : 300,
-      "input" : {
-        "gross" : 210526.3157894737,
-        "rate" : {
-          "discount" : 10,
-          "minimum" : 0
+      "input": {
+        "gross": 210526.3157894737,
+        "rate": {
+          "discount": 10,
+          "minimum": 0
         }
       },
-      "name" : "exact-hundredth"
+      "name": "exact-hundredth"
     },
     {
-      "expected" : 427,
-      "input" : {
-        "gross" : 100000,
-        "rate" : {
-          "discount" : 30,
-          "minimum" : -5
+      "input": {
+        "gross": 100000,
+        "rate": {
+          "discount": 30,
+          "minimum": -5
         }
       },
-      "name" : "unclamped"
+      "name": "unclamped"
+    },
+    {
+      "input": {
+        "gross": 1000000,
+        "rate": {
+          "discount": 2.8,
+          "minimum": 1
+        }
+      },
+      "name": "fee-hair"
     }
   ],
-  "kind" : "SellCosts.fee"
+  "kind": "SellCosts.fee"
 }

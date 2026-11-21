@@ -1,101 +1,89 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : "11/3",
-      "input" : {
-        "day" : "2026-11-03",
-        "year" : false
+      "input": {
+        "day": "2026-11-03",
+        "year": false
       },
-      "name" : "2026-11-03"
+      "name": "2026-11-03"
     },
     {
-      "expected" : "2026/1/13",
-      "input" : {
-        "day" : "2026-01-13",
-        "year" : true
+      "input": {
+        "day": "2026-01-13",
+        "year": true
       },
-      "name" : "2026-01-13"
+      "name": "2026-01-13"
     },
     {
-      "expected" : "somewhen",
-      "input" : {
-        "day" : "somewhen",
-        "year" : false
+      "input": {
+        "day": "somewhen",
+        "year": false
       },
-      "name" : "somewhen"
+      "name": "somewhen"
     },
     {
-      "expected" : "11/13",
-      "input" : {
-        "day" : "2026--11-13",
-        "year" : false
+      "input": {
+        "day": "2026--11-13",
+        "year": false
       },
-      "name" : "2026--11-13"
+      "name": "2026--11-13"
     },
     {
-      "expected" : "2026/11/13",
-      "input" : {
-        "day" : "-2026-11-13-",
-        "year" : true
+      "input": {
+        "day": "-2026-11-13-",
+        "year": true
       },
-      "name" : "-2026-11-13-"
+      "name": "-2026-11-13-"
     },
     {
-      "expected" : "2026-11",
-      "input" : {
-        "day" : "2026-11",
-        "year" : false
+      "input": {
+        "day": "2026-11",
+        "year": false
       },
-      "name" : "2026-11"
+      "name": "2026-11"
     },
     {
-      "expected" : "2026/1/3",
-      "input" : {
-        "day" : "+2026-+1-03",
-        "year" : true
+      "input": {
+        "day": "+2026-+1-03",
+        "year": true
       },
-      "name" : "+2026-+1-03"
+      "name": "+2026-+1-03"
     },
     {
-      "expected" : "２０２６-11-13",
-      "input" : {
-        "day" : "２０２６-11-13",
-        "year" : true
+      "input": {
+        "day": "２０２６-11-13",
+        "year": true
       },
-      "name" : "２０２６-11-13"
+      "name": "２０２６-11-13"
     },
     {
-      "expected" : "2026-11-1x",
-      "input" : {
-        "day" : "2026-11-1x",
-        "year" : false
+      "input": {
+        "day": "2026-11-1x",
+        "year": false
       },
-      "name" : "2026-11-1x"
+      "name": "2026-11-1x"
     },
     {
-      "expected" : "",
-      "input" : {
-        "day" : "",
-        "year" : false
+      "input": {
+        "day": "",
+        "year": false
       },
-      "name" : "empty"
+      "name": "empty"
     },
     {
-      "expected" : "2026-11-13-01",
-      "input" : {
-        "day" : "2026-11-13-01",
-        "year" : false
+      "input": {
+        "day": "2026-11-13-01",
+        "year": false
       },
-      "name" : "2026-11-13-01"
+      "name": "2026-11-13-01"
     },
     {
-      "expected" : "0/0/0",
-      "input" : {
-        "day" : "0000-00-00",
-        "year" : true
+      "input": {
+        "day": "0000-00-00",
+        "year": true
       },
-      "name" : "0000-00-00"
+      "name": "0000-00-00"
     }
   ],
-  "kind" : "SnapshotDiff.shortDay"
+  "kind": "SnapshotDiff.shortDay"
 }

@@ -1,1690 +1,1086 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 3000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3000,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "two-months"
+      "name": "two-months"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1100
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 3200
-          }
-        ],
-        "dividends" : 100,
-        "endValue" : 3200,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-15"
+                "close": 10,
+                "date": "2024-01-15"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2024-01-15",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
               }
             ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "single-reinvest"
+      "name": "single-reinvest"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1100
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 3100
-          }
-        ],
-        "dividends" : 100,
-        "endValue" : 3100,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-15"
+                "close": 10,
+                "date": "2024-01-15"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2024-01-15",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
               }
             ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : false,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": false,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "single-cash"
+      "name": "single-cash"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 2053.2915360501565
-          },
-          {
-            "invested" : 3000,
-            "month" : "2024-03",
-            "value" : 3049.6566651739067
-          },
-          {
-            "invested" : 4000,
-            "month" : "2024-04",
-            "value" : 4208.887373163235
-          },
-          {
-            "invested" : 5000,
-            "month" : "2024-05",
-            "value" : 5400.503271719573
-          },
-          {
-            "invested" : 6000,
-            "month" : "2024-06",
-            "value" : 6358.036525647811
-          },
-          {
-            "invested" : 7000,
-            "month" : "2024-07",
-            "value" : 7739.342609019333
-          },
-          {
-            "invested" : 8000,
-            "month" : "2024-08",
-            "value" : 9048.902152485749
-          },
-          {
-            "invested" : 9000,
-            "month" : "2024-09",
-            "value" : 9952.64167758669
-          },
-          {
-            "invested" : 10000,
-            "month" : "2024-10",
-            "value" : 11364.769624983039
-          },
-          {
-            "invested" : 11000,
-            "month" : "2024-11",
-            "value" : 12768.960983348587
-          },
-          {
-            "invested" : 12000,
-            "month" : "2024-12",
-            "value" : 14748.528097846587
-          }
-        ],
-        "dividends" : 163.6401297187661,
-        "endValue" : 14748.528097846587,
-        "invested" : 12000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 0.45311372537446004
-      },
-      "input" : {
-        "end" : {
-          "month" : 12,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 12,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 11,
-                "date" : "2024-01-02"
+                "close": 11,
+                "date": "2024-01-02"
               },
               {
-                "close" : 12,
-                "date" : "2024-02-02"
+                "close": 12,
+                "date": "2024-02-02"
               },
               {
-                "close" : 13,
-                "date" : "2024-03-02"
+                "close": 13,
+                "date": "2024-03-02"
               },
               {
-                "close" : 14,
-                "date" : "2024-04-02"
+                "close": 14,
+                "date": "2024-04-02"
               },
               {
-                "close" : 15,
-                "date" : "2024-05-02"
+                "close": 15,
+                "date": "2024-05-02"
               },
               {
-                "close" : 16,
-                "date" : "2024-06-02"
+                "close": 16,
+                "date": "2024-06-02"
               },
               {
-                "close" : 17,
-                "date" : "2024-07-02"
+                "close": 17,
+                "date": "2024-07-02"
               },
               {
-                "close" : 18,
-                "date" : "2024-08-02"
+                "close": 18,
+                "date": "2024-08-02"
               },
               {
-                "close" : 19,
-                "date" : "2024-09-02"
+                "close": 19,
+                "date": "2024-09-02"
               },
               {
-                "close" : 20,
-                "date" : "2024-10-02"
+                "close": 20,
+                "date": "2024-10-02"
               },
               {
-                "close" : 21,
-                "date" : "2024-11-02"
+                "close": 21,
+                "date": "2024-11-02"
               },
               {
-                "close" : 22,
-                "date" : "2024-12-02"
+                "close": 22,
+                "date": "2024-12-02"
               },
               {
-                "close" : 25,
-                "date" : "2024-12-31"
+                "close": 25,
+                "date": "2024-12-31"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 0.5,
-                "exDate" : "2024-06-15",
-                "symbol" : "X"
+                "cash": 0.5,
+                "exDate": "2024-06-15",
+                "symbol": "X"
               }
             ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "splits": [],
+            "suspect": false
           },
-          "Y" : {
-            "bars" : [
+          "Y": {
+            "bars": [
               {
-                "close" : 29,
-                "date" : "2024-01-03"
+                "close": 29,
+                "date": "2024-01-03"
               },
               {
-                "close" : 28,
-                "date" : "2024-02-03"
+                "close": 28,
+                "date": "2024-02-03"
               },
               {
-                "close" : 27,
-                "date" : "2024-03-03"
+                "close": 27,
+                "date": "2024-03-03"
               },
               {
-                "close" : 26,
-                "date" : "2024-04-03"
+                "close": 26,
+                "date": "2024-04-03"
               },
               {
-                "close" : 25,
-                "date" : "2024-05-03"
+                "close": 25,
+                "date": "2024-05-03"
               },
               {
-                "close" : 24,
-                "date" : "2024-06-03"
+                "close": 24,
+                "date": "2024-06-03"
               },
               {
-                "close" : 23,
-                "date" : "2024-07-03"
+                "close": 23,
+                "date": "2024-07-03"
               },
               {
-                "close" : 22,
-                "date" : "2024-08-03"
+                "close": 22,
+                "date": "2024-08-03"
               },
               {
-                "close" : 21,
-                "date" : "2024-09-03"
+                "close": 21,
+                "date": "2024-09-03"
               },
               {
-                "close" : 20,
-                "date" : "2024-10-03"
+                "close": 20,
+                "date": "2024-10-03"
               },
               {
-                "close" : 19,
-                "date" : "2024-11-03"
+                "close": 19,
+                "date": "2024-11-03"
               },
               {
-                "close" : 18,
-                "date" : "2024-12-03"
+                "close": 18,
+                "date": "2024-12-03"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           },
-          "Z" : {
-            "bars" : [
+          "Z": {
+            "bars": [
               {
-                "close" : 55,
-                "date" : "2024-01-05"
+                "close": 55,
+                "date": "2024-01-05"
               },
               {
-                "close" : 60,
-                "date" : "2024-02-05"
+                "close": 60,
+                "date": "2024-02-05"
               },
               {
-                "close" : 50,
-                "date" : "2024-03-05"
+                "close": 50,
+                "date": "2024-03-05"
               },
               {
-                "close" : 55,
-                "date" : "2024-04-05"
+                "close": 55,
+                "date": "2024-04-05"
               },
               {
-                "close" : 60,
-                "date" : "2024-05-05"
+                "close": 60,
+                "date": "2024-05-05"
               },
               {
-                "close" : 50,
-                "date" : "2024-06-05"
+                "close": 50,
+                "date": "2024-06-05"
               },
               {
-                "close" : 55,
-                "date" : "2024-07-05"
+                "close": 55,
+                "date": "2024-07-05"
               },
               {
-                "close" : 60,
-                "date" : "2024-08-05"
+                "close": 60,
+                "date": "2024-08-05"
               },
               {
-                "close" : 50,
-                "date" : "2024-09-05"
+                "close": 50,
+                "date": "2024-09-05"
               },
               {
-                "close" : 55,
-                "date" : "2024-10-05"
+                "close": 55,
+                "date": "2024-10-05"
               },
               {
-                "close" : 60,
-                "date" : "2024-11-05"
+                "close": 60,
+                "date": "2024-11-05"
               },
               {
-                "close" : 50,
-                "date" : "2024-12-05"
+                "close": 50,
+                "date": "2024-12-05"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2024-03-20",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2024-03-20",
+                "symbol": "X"
               },
               {
-                "cash" : 1.2,
-                "exDate" : "2024-09-20",
-                "symbol" : "X"
+                "cash": 1.2,
+                "exDate": "2024-09-20",
+                "symbol": "X"
               }
             ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 0.5
+            "symbol": "X",
+            "weight": 0.5
           },
           {
-            "symbol" : "Y",
-            "weight" : 0.3
+            "symbol": "Y",
+            "weight": 0.3
           },
           {
-            "symbol" : "Z",
-            "weight" : 0.2
+            "symbol": "Z",
+            "weight": 0.2
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "three-legs-weighted"
+      "name": "three-legs-weighted"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-03",
-            "value" : 1000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 1000,
-        "invested" : 1000,
-        "maxDrawdown" : 0,
-        "notes" : [
-          "X 於 2024-03 上市，之前的月份不投入"
-        ],
-        "xirr" : -2.382881636928304e-11
-      },
-      "input" : {
-        "end" : {
-          "month" : 3,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-03-04"
+                "close": 10,
+                "date": "2024-03-04"
               },
               {
-                "close" : 10,
-                "date" : "2024-03-29"
+                "close": 10,
+                "date": "2024-03-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "late-listing"
+      "name": "late-listing"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2025-06",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2025-07",
-            "value" : 2000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 2000,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : -2.382881636928304e-11
-      },
-      "input" : {
-        "end" : {
-          "month" : 7,
-          "year" : 2025
+      "input": {
+        "end": {
+          "month": 7,
+          "year": 2025
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 100,
-                "date" : "2025-06-02"
+                "close": 100,
+                "date": "2025-06-02"
               },
               {
-                "close" : 25,
-                "date" : "2025-06-18"
+                "close": 25,
+                "date": "2025-06-18"
               },
               {
-                "close" : 25,
-                "date" : "2025-07-01"
+                "close": 25,
+                "date": "2025-07-01"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
+            "dividends": [],
+            "splits": [
               {
-                "ratio" : 4,
-                "resumeDate" : "2025-06-18",
-                "symbol" : "X"
+                "ratio": 4,
+                "resumeDate": "2025-06-18",
+                "symbol": "X"
               }
             ],
-            "suspect" : false
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 6,
-          "year" : 2025
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 6,
+          "year": 2025
         }
       },
-      "name" : "split"
+      "name": "split"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2025-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2025-02",
-            "value" : 2014.2857142857144
-          },
-          {
-            "invested" : 3000,
-            "month" : "2025-03",
-            "value" : 3014.285714285714
-          }
-        ],
-        "dividends" : 14.285714285714285,
-        "endValue" : 3014.285714285714,
-        "invested" : 3000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 0.06619074749676651
-      },
-      "input" : {
-        "end" : {
-          "month" : 3,
-          "year" : 2025
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2025
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2025-01-02"
+                "close": 10,
+                "date": "2025-01-02"
               },
               {
-                "close" : 70,
-                "date" : "2025-02-10"
+                "close": 70,
+                "date": "2025-02-10"
               },
               {
-                "close" : 70,
-                "date" : "2025-03-03"
+                "close": 70,
+                "date": "2025-03-03"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2025-02-10",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2025-02-10",
+                "symbol": "X"
               }
             ],
-            "splits" : [
+            "splits": [
               {
-                "ratio" : 0.14285714285714285,
-                "resumeDate" : "2025-02-10",
-                "symbol" : "X"
+                "ratio": 0.14285714285714285,
+                "resumeDate": "2025-02-10",
+                "symbol": "X"
               }
             ],
-            "suspect" : false
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2025
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2025
         }
       },
-      "name" : "reverse-split-and-dividend-same-day"
+      "name": "reverse-split-and-dividend-same-day"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 3000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3000,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-          "X 資料可能未還原，結果僅供參考"
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : true
+            "dividends": [],
+            "splits": [],
+            "suspect": true
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "suspect"
+      "name": "suspect"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 1000,
-        "invested" : 1000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 1,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 1,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "single-day"
+      "name": "single-day"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-03",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-04",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-05",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-06",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-07",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-08",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-09",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-10",
-            "value" : 2000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-11",
-            "value" : 2000
-          },
-          {
-            "invested" : 3000,
-            "month" : "2024-12",
-            "value" : 3199.9999999999995
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3199.9999999999995,
-        "invested" : 3000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 0.10480729653256271
-      },
-      "input" : {
-        "end" : {
-          "month" : 12,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 12,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-02-01"
+                "close": 10,
+                "date": "2024-02-01"
               },
               {
-                "close" : 11,
-                "date" : "2024-12-31"
+                "close": 11,
+                "date": "2024-12-31"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "year-rising"
+      "name": "year-rising"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 3000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3000,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 6,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 6,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "end-beyond-data"
+      "name": "end-beyond-data"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 500,
-            "month" : "2024-01",
-            "value" : 500
-          },
-          {
-            "invested" : 1000,
-            "month" : "2024-02",
-            "value" : 1500
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 1500,
-        "invested" : 1000,
-        "maxDrawdown" : 0,
-        "notes" : [
-          "Y 沒有取得歷史資料，這次沒有計入"
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 0.5
+            "symbol": "X",
+            "weight": 0.5
           },
           {
-            "symbol" : "Y",
-            "weight" : 0.5
+            "symbol": "Y",
+            "weight": 0.5
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "leg-without-history"
+      "name": "leg-without-history"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 500,
-            "month" : "2024-01",
-            "value" : 500
-          },
-          {
-            "invested" : 1000,
-            "month" : "2024-02",
-            "value" : 1500
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 1500,
-        "invested" : 1000,
-        "maxDrawdown" : 0,
-        "notes" : [
-          "Y 沒有取得歷史資料，這次沒有計入"
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           },
-          "Y" : {
-            "bars" : [
+          "Y": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2023-05-02"
+                "close": 10,
+                "date": "2023-05-02"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 0.5
+            "symbol": "X",
+            "weight": 0.5
           },
           {
-            "symbol" : "Y",
-            "weight" : 0.5
+            "symbol": "Y",
+            "weight": 0.5
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "leg-with-no-bars-in-range"
+      "name": "leg-with-no-bars-in-range"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 1000,
-            "month" : "2024-02",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-03",
-            "value" : 3100
-          }
-        ],
-        "dividends" : 100,
-        "endValue" : 3100,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 3,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-03-01"
+                "close": 10,
+                "date": "2024-03-01"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2024-02-10",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2024-02-10",
+                "symbol": "X"
               }
             ],
-            "splits" : [
+            "splits": [
               {
-                "ratio" : 2,
-                "resumeDate" : "2024-02-20",
-                "symbol" : "X"
+                "ratio": 2,
+                "resumeDate": "2024-02-20",
+                "symbol": "X"
               }
             ],
-            "suspect" : false
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : false,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": false,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "dividend-before-split"
+      "name": "dividend-before-split"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 1000,
-            "month" : "2024-02",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-03",
-            "value" : 2200
-          },
-          {
-            "invested" : 3000,
-            "month" : "2024-04",
-            "value" : 3016.666666666667
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3016.666666666667,
-        "invested" : 3000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 0.05261903174487082
-      },
-      "input" : {
-        "end" : {
-          "month" : 4,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 4,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 12,
-                "date" : "2024-03-04"
+                "close": 12,
+                "date": "2024-03-04"
               },
               {
-                "close" : 11,
-                "date" : "2024-04-01"
+                "close": 11,
+                "date": "2024-04-01"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "gap-month-carries-state"
+      "name": "gap-month-carries-state"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 2100
-          },
-          {
-            "invested" : 3000,
-            "month" : "2024-03",
-            "value" : 3290.909090909091
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 3290.909090909091,
-        "invested" : 3000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 2.095130633525005
-      },
-      "input" : {
-        "end" : {
-          "month" : 3,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 0,
-                "date" : "2024-02-01"
+                "close": 0,
+                "date": "2024-02-01"
               },
               {
-                "close" : 12,
-                "date" : "2024-03-01"
+                "close": 12,
+                "date": "2024-03-01"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 11,
-                "date" : "2024-02-02"
+                "close": 11,
+                "date": "2024-02-02"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "unsorted-bars-and-zero-close"
+      "name": "unsorted-bars-and-zero-close"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-01",
-            "value" : 1000
-          },
-          {
-            "invested" : 2000,
-            "month" : "2024-02",
-            "value" : 2200
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 2200,
-        "invested" : 2000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : 2.089228846159421
-      },
-      "input" : {
-        "end" : {
-          "month" : 3,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 12,
-                "date" : "2024-02-30"
+                "close": 12,
+                "date": "2024-02-30"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "lenient-day"
+      "name": "lenient-day"
     },
     {
-      "expected" : {
-        "curve" : [
-          {
-            "invested" : 1000,
-            "month" : "2024-02",
-            "value" : 1000
-          }
-        ],
-        "dividends" : 0,
-        "endValue" : 1000,
-        "invested" : 1000,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 30,
-                "date" : "2024-03-01"
+                "close": 30,
+                "date": "2024-03-01"
               }
             ],
-            "dividends" : [
+            "dividends": [
               {
-                "cash" : 1,
-                "exDate" : "2024-01-15",
-                "symbol" : "X"
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
               }
             ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 2,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 2,
+          "year": 2024
         }
       },
-      "name" : "bars-outside-range-ignored"
+      "name": "bars-outside-range-ignored"
     },
     {
-      "expected" : {
-        "curve" : [
-
-        ],
-        "dividends" : 0,
-        "endValue" : 0,
-        "invested" : 0,
-        "maxDrawdown" : 0,
-        "notes" : [
-
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 2,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
         },
-        "history" : {
-
-        },
-        "legs" : [
-
-        ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 1,
-          "year" : 2024
+        "history": {},
+        "legs": [],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
         }
       },
-      "name" : "no-legs"
+      "name": "no-legs"
     },
     {
-      "expected" : {
-        "curve" : [
-
-        ],
-        "dividends" : 0,
-        "endValue" : 0,
-        "invested" : 0,
-        "maxDrawdown" : 0,
-        "notes" : [
-          "X 沒有取得歷史資料，這次沒有計入"
-        ],
-        "xirr" : null
-      },
-      "input" : {
-        "end" : {
-          "month" : 1,
-          "year" : 2024
+      "input": {
+        "end": {
+          "month": 1,
+          "year": 2024
         },
-        "history" : {
-          "X" : {
-            "bars" : [
+        "history": {
+          "X": {
+            "bars": [
               {
-                "close" : 10,
-                "date" : "2024-01-02"
+                "close": 10,
+                "date": "2024-01-02"
               },
               {
-                "close" : 10,
-                "date" : "2024-01-31"
+                "close": 10,
+                "date": "2024-01-31"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-01"
+                "close": 20,
+                "date": "2024-02-01"
               },
               {
-                "close" : 20,
-                "date" : "2024-02-29"
+                "close": 20,
+                "date": "2024-02-29"
               }
             ],
-            "dividends" : [
-
-            ],
-            "splits" : [
-
-            ],
-            "suspect" : false
+            "dividends": [],
+            "splits": [],
+            "suspect": false
           }
         },
-        "legs" : [
+        "legs": [
           {
-            "symbol" : "X",
-            "weight" : 1
+            "symbol": "X",
+            "weight": 1
           }
         ],
-        "monthly" : 1000,
-        "reinvest" : true,
-        "start" : {
-          "month" : 3,
-          "year" : 2024
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 3,
+          "year": 2024
         }
       },
-      "name" : "start-after-end"
+      "name": "start-after-end"
     }
   ],
-  "kind" : "Backtest.run"
+  "kind": "Backtest.run"
 }

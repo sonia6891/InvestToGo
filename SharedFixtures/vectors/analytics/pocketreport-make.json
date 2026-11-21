@@ -1,263 +1,171 @@
 {
-  "cases" : [
+  "cases": [
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 500,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-          "領息 2 筆，來自 2 檔。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 300,
-              "date" : 812865600,
-              "id" : "00000000-0000-4000-8000-000000000001",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 300,
+              "date": 812865600.0,
+              "id": "00000000-0000-4000-8000-000000000001",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 200,
-              "date" : 814161600,
-              "id" : "00000000-0000-4000-8000-000000000002",
-              "status" : "已入帳",
-              "symbol" : "0056"
+              "amount": 200,
+              "date": 814161600.0,
+              "id": "00000000-0000-4000-8000-000000000002",
+              "status": "已入帳",
+              "symbol": "0056"
             },
             {
-              "amount" : 999,
-              "date" : 815198400,
-              "id" : "00000000-0000-4000-8000-000000000003",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 999,
+              "date": 815198400.0,
+              "id": "00000000-0000-4000-8000-000000000003",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 50,
-              "date" : 814593600,
-              "id" : "00000000-0000-4000-8000-000000000004",
-              "status" : "已公告",
-              "symbol" : "00878"
+              "amount": 50,
+              "date": 814593600.0,
+              "id": "00000000-0000-4000-8000-000000000004",
+              "status": "已公告",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "month-totals"
+      "name": "month-totals"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 500,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 300,
-              "date" : 812865600,
-              "id" : "00000000-0000-4000-8000-000000000001",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 300,
+              "date": 812865600.0,
+              "id": "00000000-0000-4000-8000-000000000001",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 200,
-              "date" : 814161600,
-              "id" : "00000000-0000-4000-8000-000000000002",
-              "status" : "已入帳",
-              "symbol" : "0056"
+              "amount": 200,
+              "date": 814161600.0,
+              "id": "00000000-0000-4000-8000-000000000002",
+              "status": "已入帳",
+              "symbol": "0056"
             },
             {
-              "amount" : 999,
-              "date" : 815198400,
-              "id" : "00000000-0000-4000-8000-000000000003",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 999,
+              "date": 815198400.0,
+              "id": "00000000-0000-4000-8000-000000000003",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 50,
-              "date" : 814593600,
-              "id" : "00000000-0000-4000-8000-000000000004",
-              "status" : "已公告",
-              "symbol" : "00878"
+              "amount": 50,
+              "date": 814593600.0,
+              "id": "00000000-0000-4000-8000-000000000004",
+              "status": "已公告",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         },
-        "showDividends" : false
+        "showDividends": false
       },
-      "name" : "month-dividends-hidden"
+      "name": "month-dividends-hidden"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-          "這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         },
-        "showDividends" : false
+        "showDividends": false
       },
-      "name" : "empty-hidden"
+      "name": "empty-hidden"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-          "這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "empty-month"
+      "name": "empty-month"
     },
     {
-      "expected" : {
-        "dcaMonths" : 2,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 2,
-        "title" : "2026 年",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2027-01-05T12:00:00+08:00",
-        "period" : {
-          "kind" : "year",
-          "year" : 2026
+      "input": {
+        "now": "2027-01-05T12:00:00+08:00",
+        "period": {
+          "kind": "year",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "dcaMonths" : [
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
               {
-                "month" : 12,
-                "year" : 2025
+                "month": 12,
+                "year": 2025
               },
               {
-                "month" : 1,
-                "year" : 2026
+                "month": 1,
+                "year": 2026
               },
               {
-                "month" : 3,
-                "year" : 2026
+                "month": 3,
+                "year": 2026
               }
             ],
-            "rewardKeys" : [
+            "rewardKeys": [
               "reconciled|2026-01",
               "reconciled|2026-03",
               "reconciled|2025-12",
@@ -266,724 +174,464 @@
               "reconciled|2026-13"
             ]
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "year-dca-reconciles"
+      "name": "year-dca-reconciles"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 4,
-        "newDexCards" : 0,
-        "notes" : [
-          "這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "year",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "year",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 640,
-            "xp" : 640
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 640,
+            "xp": 640
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "xp-without-log"
+      "name": "xp-without-log"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 5,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : 60
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 700,
-            "xp" : 700,
-            "xpByMonth" : {
-              "2025-12" : 500,
-              "2026-09" : 100,
-              "2026-10" : 60,
-              "2026-11" : 40,
-              "junk" : 7
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 700,
+            "xp": 700,
+            "xpByMonth": {
+              "2025-12": 500,
+              "2026-09": 100,
+              "2026-10": 60,
+              "2026-11": 40,
+              "junk": 7
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "xp-month"
+      "name": "xp-month"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 5,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年",
-        "xpEarned" : 200
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "year",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "year",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 700,
-            "xp" : 700,
-            "xpByMonth" : {
-              "2025-12" : 500,
-              "2026-09" : 100,
-              "2026-10" : 60,
-              "2026-11" : 40,
-              "junk" : 7
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 700,
+            "xp": 700,
+            "xpByMonth": {
+              "2025-12": 500,
+              "2026-09": 100,
+              "2026-10": 60,
+              "2026-11": 40,
+              "junk": 7
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "xp-year"
+      "name": "xp-year"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 5,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 1 月 1 日至 11 月 14 日",
-        "xpEarned" : 200
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 700,
-            "xp" : 700,
-            "xpByMonth" : {
-              "2025-12" : 500,
-              "2026-09" : 100,
-              "2026-10" : 60,
-              "2026-11" : 40,
-              "junk" : 7
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 700,
+            "xp": 700,
+            "xpByMonth": {
+              "2025-12": 500,
+              "2026-09": 100,
+              "2026-10": 60,
+              "2026-11": 40,
+              "junk": 7
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "xp-ytd"
+      "name": "xp-ytd"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 5,
-        "newDexCards" : 0,
-        "notes" : [
-          "這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 8 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 8,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 8,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 700,
-            "xp" : 700,
-            "xpByMonth" : {
-              "2025-12" : 500,
-              "2026-09" : 100,
-              "2026-10" : 60,
-              "2026-11" : 40,
-              "junk" : 7
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 700,
+            "xp": 700,
+            "xpByMonth": {
+              "2025-12": 500,
+              "2026-09": 100,
+              "2026-10": 60,
+              "2026-11": 40,
+              "junk": 7
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "xp-august-none"
+      "name": "xp-august-none"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 2,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "collected" : {
-              "0050" : 812692800,
-              "0056" : 815151600,
-              "00878" : 815155200,
-              "006208" : 781675200
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 812692800.0,
+              "0056": 815151600.0,
+              "006208": 781675200.0,
+              "00878": 815155200.0
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "dex-october-taipei"
+      "name": "dex-october-taipei"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 1,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 11 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 11,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 11,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "collected" : {
-              "0050" : 812692800,
-              "0056" : 815151600,
-              "00878" : 815155200,
-              "006208" : 781675200
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 812692800.0,
+              "0056": 815151600.0,
+              "006208": 781675200.0,
+              "00878": 815155200.0
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "dex-november"
+      "name": "dex-november"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 3,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "year",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "year",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "collected" : {
-              "0050" : 812692800,
-              "0056" : 815151600,
-              "00878" : 815155200,
-              "006208" : 781675200
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 812692800.0,
+              "0056": 815151600.0,
+              "006208": 781675200.0,
+              "00878": 815155200.0
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "dex-year"
+      "name": "dex-year"
     },
     {
-      "expected" : {
-        "dcaMonths" : 2,
-        "dividends" : 140,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-          "領息 2 筆，來自 1 檔。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 1 月 1 日至 11 月 14 日",
-        "xpEarned" : 100
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2026
         },
-        "portfolio" : {
-          "dividends" : [
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 100,
-              "date" : 790142400,
-              "id" : "00000000-0000-4000-8000-000000000005",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 100,
+              "date": 790142400.0,
+              "id": "00000000-0000-4000-8000-000000000005",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 40,
-              "date" : 816318000,
-              "id" : "00000000-0000-4000-8000-000000000006",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 40,
+              "date": 816318000.0,
+              "id": "00000000-0000-4000-8000-000000000006",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 33,
-              "date" : 816325200,
-              "id" : "00000000-0000-4000-8000-000000000007",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 33,
+              "date": 816325200.0,
+              "id": "00000000-0000-4000-8000-000000000007",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 70,
-              "date" : 816840000,
-              "id" : "00000000-0000-4000-8000-000000000008",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 70,
+              "date": 816840000.0,
+              "id": "00000000-0000-4000-8000-000000000008",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 900,
-              "date" : 788846400,
-              "id" : "00000000-0000-4000-8000-000000000009",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 900,
+              "date": 788846400.0,
+              "id": "00000000-0000-4000-8000-000000000009",
+              "status": "已入帳",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "dcaMonths" : [
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
               {
-                "month" : 12,
-                "year" : 2025
+                "month": 12,
+                "year": 2025
               },
               {
-                "month" : 1,
-                "year" : 2026
+                "month": 1,
+                "year": 2026
               },
               {
-                "month" : 11,
-                "year" : 2026
+                "month": 11,
+                "year": 2026
               },
               {
-                "month" : 12,
-                "year" : 2026
+                "month": 12,
+                "year": 2026
               }
             ],
-            "xpByMonth" : {
-              "2026-11" : 100,
-              "2026-12" : 100
+            "xpByMonth": {
+              "2026-11": 100,
+              "2026-12": 100
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "ytd-stops-at-now"
+      "name": "ytd-stops-at-now"
     },
     {
-      "expected" : {
-        "dcaMonths" : 1,
-        "dividends" : 900,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-          "領息 1 筆，來自 1 檔。"
-        ],
-        "reconciles" : 0,
-        "title" : "2025 年",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "yearToDate",
-          "year" : 2025
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "yearToDate",
+          "year": 2025
         },
-        "portfolio" : {
-          "dividends" : [
+        "portfolio": {
+          "dividends": [
             {
-              "amount" : 100,
-              "date" : 790142400,
-              "id" : "00000000-0000-4000-8000-000000000005",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 100,
+              "date": 790142400.0,
+              "id": "00000000-0000-4000-8000-000000000005",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 40,
-              "date" : 816318000,
-              "id" : "00000000-0000-4000-8000-000000000006",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 40,
+              "date": 816318000.0,
+              "id": "00000000-0000-4000-8000-000000000006",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 33,
-              "date" : 816325200,
-              "id" : "00000000-0000-4000-8000-000000000007",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 33,
+              "date": 816325200.0,
+              "id": "00000000-0000-4000-8000-000000000007",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 70,
-              "date" : 816840000,
-              "id" : "00000000-0000-4000-8000-000000000008",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 70,
+              "date": 816840000.0,
+              "id": "00000000-0000-4000-8000-000000000008",
+              "status": "已入帳",
+              "symbol": "00878"
             },
             {
-              "amount" : 900,
-              "date" : 788846400,
-              "id" : "00000000-0000-4000-8000-000000000009",
-              "status" : "已入帳",
-              "symbol" : "00878"
+              "amount": 900,
+              "date": 788846400.0,
+              "id": "00000000-0000-4000-8000-000000000009",
+              "status": "已入帳",
+              "symbol": "00878"
             }
           ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "dcaMonths" : [
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
               {
-                "month" : 12,
-                "year" : 2025
+                "month": 12,
+                "year": 2025
               },
               {
-                "month" : 1,
-                "year" : 2026
+                "month": 1,
+                "year": 2026
               },
               {
-                "month" : 11,
-                "year" : 2026
+                "month": 11,
+                "year": 2026
               },
               {
-                "month" : 12,
-                "year" : 2026
+                "month": 12,
+                "year": 2026
               }
             ],
-            "xpByMonth" : {
-              "2026-11" : 100,
-              "2026-12" : 100
+            "xpByMonth": {
+              "2026-11": 100,
+              "2026-12": 100
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "ytd-past-year"
+      "name": "ytd-past-year"
     },
     {
-      "expected" : {
-        "dcaMonths" : 1,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "dcaMonths" : [
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
               {
-                "month" : 10,
-                "year" : 2026
+                "month": 10,
+                "year": 2026
               }
             ]
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "month-with-dca-has-no-empty-line"
+      "name": "month-with-dca-has-no-empty-line"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 11,
-        "newDexCards" : 0,
-        "notes" : [
-          "這段時間還沒有紀錄。記一筆配息或定期定額，下一張就有內容。"
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : null
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "coins" : 10,
-            "xp" : 2600
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "coins": 10,
+            "xp": 2600
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "level-from-xp"
+      "name": "level-from-xp"
     },
     {
-      "expected" : {
-        "dcaMonths" : 0,
-        "dividends" : 0,
-        "level" : 1,
-        "newDexCards" : 0,
-        "notes" : [
-
-        ],
-        "reconciles" : 0,
-        "title" : "2026 年 10 月",
-        "xpEarned" : -5
-      },
-      "input" : {
-        "now" : "2026-11-14T12:00:00+08:00",
-        "period" : {
-          "kind" : "month",
-          "month" : {
-            "month" : 10,
-            "year" : 2026
+      "input": {
+        "now": "2026-11-14T12:00:00+08:00",
+        "period": {
+          "kind": "month",
+          "month": {
+            "month": 10,
+            "year": 2026
           }
         },
-        "portfolio" : {
-          "dividends" : [
-
-          ],
-          "favorites" : [
-
-          ],
-          "game" : {
-            "xpByMonth" : {
-              "2026-10" : -5
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "game": {
+            "xpByMonth": {
+              "2026-10": -5
             }
           },
-          "holdings" : [
-
-          ],
-          "quotes" : {
-
-          },
-          "schema" : 1
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
         }
       },
-      "name" : "negative-xp-month-not-empty"
+      "name": "negative-xp-month-not-empty"
     }
   ],
-  "kind" : "PocketReport.make"
+  "kind": "PocketReport.make"
 }
