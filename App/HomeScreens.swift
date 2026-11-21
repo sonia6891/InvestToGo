@@ -344,7 +344,7 @@ struct SettingsView: View {
                 Divider()
                 link("key.fill", Palette.purple, "富果行情連線", "使用你自己的 API Key", .connection)
                 Divider()
-                link("checkmark.shield.fill", Palette.green, "隱私與安全", "資料存放與金鑰保存", .privacy)
+                link("checkmark.shield.fill", Palette.green, "隱私與安全", "App 上鎖・資料存放與金鑰保存", .privacy)
                 Divider()
                 link("info.circle.fill", Palette.deepBlue, "關於 投資袋著走", "版本・使用說明", .about)
             }
@@ -472,7 +472,8 @@ struct PrivacyView: View {
             }
             .accessibilityIdentifier("privacy-crash-reports")
             Card { Text("富果金鑰").font(.headline).foregroundStyle(Palette.ink); Text("使用 iOS Keychain 保存，只傳給富果官方 API，不寫入備份。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
-            Card { Text("Face ID・應用程式鎖定").font(.headline).foregroundStyle(Palette.ink); Text("目前未提供 App 內上鎖；可用 iPhone 設定的「螢幕使用時間」限制，或使用 iOS 18 以上的「鎖定 App」。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
+            // App 上鎖 (2026-11-22 design): the passcode, Face ID and 變更密碼.
+            AppLockSettingsCard()
             Link("隱私權政策", destination: MemberView.privacy).font(.subheadline.bold()).accessibilityIdentifier("privacy-policy")
         }
         .navigationTitle("隱私與安全").navigationBarTitleDisplayMode(.inline)
