@@ -195,7 +195,7 @@ final class AppLockRulesTests: XCTestCase {
 }
 
 /// The lock's state: what the settings switch does, and the scene's phases at a cold launch and on returns.
-@MainActor final class AppLockStateTests: XCTestCase {
+final class AppLockStateTests: XCTestCase {
     private var suite: String!
     private var defaults: UserDefaults!
 
@@ -210,11 +210,11 @@ final class AppLockRulesTests: XCTestCase {
         super.tearDown()
     }
 
-    private func makeLock(vault: MemoryPasscodeVault = MemoryPasscodeVault()) -> AppLock {
+    @MainActor private func makeLock(vault: MemoryPasscodeVault = MemoryPasscodeVault()) -> AppLock {
         AppLock(vault: vault, authenticator: StubAuthenticator(), defaults: defaults, testing: false)
     }
 
-    func testOffByDefaultAndTheLobbyIsReleasedAtOnce() {
+    @MainActor func testOffByDefaultAndTheLobbyIsReleasedAtOnce() {
         let lock = makeLock()
         XCTAssertFalse(lock.isOn)
         lock.scene(.active)
@@ -223,7 +223,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertTrue(lock.lobbyReleased)
     }
 
-    func testTurningOnStoresOnlyAHashAndAFlag() throws {
+    @MainActor func testTurningOnStoresOnlyAHashAndAFlag() throws {
         let vault = MemoryPasscodeVault()
         let lock = makeLock(vault: vault)
         try lock.turnOn(passcode: "123456")
@@ -237,7 +237,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertEqual(lock.check("654321"), .wrong)
     }
 
-    func testAColdLaunchLocksOnceTheOpeningHasGone() throws {
+    @MainActor func testAColdLaunchLocksOnceTheOpeningHasGone() throws {
         let vault = MemoryPasscodeVault()
         try makeLock(vault: vault).turnOn(passcode: "123456")
         let lock = makeLock(vault: vault)
@@ -255,7 +255,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertTrue(lock.lobbyReleased)
     }
 
-    func testOnboardingIsNeverLocked() throws {
+    @MainActor func testOnboardingIsNeverLocked() throws {
         let vault = MemoryPasscodeVault()
         try makeLock(vault: vault).turnOn(passcode: "123456")
         let lock = makeLock(vault: vault)
@@ -265,7 +265,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertTrue(lock.lobbyReleased)
     }
 
-    func testReturningLocksOnlyAfterAMinuteAway() throws {
+    @MainActor func testReturningLocksOnlyAfterAMinuteAway() throws {
         let lock = makeLock()
         lock.scene(.active)
         lock.openingEnded(onboarding: false)
@@ -285,7 +285,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertTrue(lock.locked, "100 s away")
     }
 
-    func testTheCoverWaitsForTheFirstActive() throws {
+    @MainActor func testTheCoverWaitsForTheFirstActive() throws {
         let vault = MemoryPasscodeVault()
         try makeLock(vault: vault).turnOn(passcode: "123456")
         let lock = makeLock(vault: vault)
@@ -298,7 +298,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertFalse(lock.covered)
     }
 
-    func testTurningOffForgetsThePasscode() throws {
+    @MainActor func testTurningOffForgetsThePasscode() throws {
         let vault = MemoryPasscodeVault()
         let lock = makeLock(vault: vault)
         try lock.turnOn(passcode: "123456")
@@ -308,7 +308,7 @@ final class AppLockRulesTests: XCTestCase {
         guard case .missing = vault.read() else { return XCTFail("The hash is removed") }
     }
 
-    func testChangingThePasscode() throws {
+    @MainActor func testChangingThePasscode() throws {
         let lock = makeLock()
         try lock.turnOn(passcode: "123456")
         try lock.change(to: "987654")
@@ -316,7 +316,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertEqual(lock.check("987654"), .right)
     }
 
-    func testABlockRefusesEvenTheRightCode() throws {
+    @MainActor func testABlockRefusesEvenTheRightCode() throws {
         let lock = makeLock()
         try lock.turnOn(passcode: "123456")
         let now = Date()
@@ -325,7 +325,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertEqual(lock.check("123456", now: now.addingTimeInterval(31)), .right)
     }
 
-    func testAFlagWithoutItsHashIsOff() {
+    @MainActor func testAFlagWithoutItsHashIsOff() {
         // A phone restored from a backup carries UserDefaults but not this-device-only Keychain items.
         defaults.set(true, forKey: AppLock.onKey)
         let lock = makeLock()
@@ -335,7 +335,7 @@ final class AppLockRulesTests: XCTestCase {
         XCTAssertFalse(lock.locked)
     }
 
-    func testForgottenPasscodeIsReplacedAndUnlocks() async throws {
+    @MainActor func testForgottenPasscodeIsReplacedAndUnlocks() async throws {
         let vault = MemoryPasscodeVault()
         try makeLock(vault: vault).turnOn(passcode: "123456")
         let lock = makeLock(vault: vault)
