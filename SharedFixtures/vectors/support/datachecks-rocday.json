@@ -48,6 +48,18 @@
       "input": {
         "text": ""
       }
+    },
+    {
+      "name": "fullwidth-digits",
+      "input": {
+        "text": "１１５１１１０"
+      }
+    },
+    {
+      "name": "chinese-around",
+      "input": {
+        "text": "民國115年11月10日"
+      }
     }
   ]
 }
