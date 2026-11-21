@@ -88,7 +88,7 @@ object BackupImport {
 
     fun decode(bytes: ByteArray): Portfolio {
         if (bytes.size > 5_000_000) throw StoreError.UnsupportedBackup
-        val text = bytes.decodeToString(throwOnInvalidSequence = true)
+        val text = CoreJson.utf8(bytes)
         val root = CoreJson.json.parseToJsonElement(text) as? JsonObject ?: throw StoreError.UnsupportedBackup
         if ("schema" in root) return Portfolio.decodeBackup(bytes)
         var result = Portfolio()

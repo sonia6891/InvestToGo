@@ -17,6 +17,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
+import java.nio.charset.CharacterCodingException
 import java.time.Instant
 import java.util.UUID
 
@@ -43,7 +44,14 @@ object CoreJson {
         return json.decodeFromJsonElement(serializer, element)
     }
 
-    fun <T> decode(serializer: KSerializer<T>, bytes: ByteArray): T = decode(serializer, bytes.decodeToString(throwOnInvalidSequence = true))
+    fun <T> decode(serializer: KSerializer<T>, bytes: ByteArray): T = decode(serializer, utf8(bytes))
+
+    /** Strict UTF-8, as iPhone reads a backup: bytes that are not UTF-8 are a SerializationException like any other unreadable JSON. */
+    fun utf8(bytes: ByteArray): String = try {
+        bytes.decodeToString(throwOnInvalidSequence = true)
+    } catch (error: CharacterCodingException) {
+        throw SerializationException("not UTF-8", error)
+    }
 }
 
 /**

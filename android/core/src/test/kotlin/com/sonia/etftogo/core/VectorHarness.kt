@@ -40,11 +40,15 @@ object VectorHarness {
         .sortedBy { it.file.path }
         .toList()
 
+    /**
+     * An AppDataError gives its text, unreadable JSON (SerializationException, bytes that are not UTF-8 included) gives
+     * "*", and any other exception fails the run: the app screens catch only those two types.
+     */
     fun output(handler: VectorHandler, input: JsonElement): JsonElement = try {
         handler(input)
     } catch (error: AppDataError) {
         JsonObject(mapOf("error" to JsonPrimitive(error.text)))
-    } catch (error: Exception) {
+    } catch (error: kotlinx.serialization.SerializationException) {
         JsonObject(mapOf("error" to JsonPrimitive("*")))
     }
 }
