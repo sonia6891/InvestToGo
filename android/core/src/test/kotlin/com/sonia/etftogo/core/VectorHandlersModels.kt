@@ -41,15 +41,7 @@ fun normalizedPortfolio(value: Portfolio): JsonElement {
     val root = CoreJson.json.parseToJsonElement(value.encode().decodeToString()).jsonObject.toMutableMap()
     fun sortedStrings(element: JsonElement) = JsonArray(element.jsonArray.sortedBy { it.jsonPrimitive.content })
     root["favorites"]?.let { root["favorites"] = sortedStrings(it) }
-    root["game"]?.let { element ->
-        val game = element.jsonObject.toMutableMap()
-        for (key in listOf("celebratedAchievements", "rewardKeys")) game[key]?.let { game[key] = sortedStrings(it) }
-        game["dcaMonths"]?.let { months ->
-            game["dcaMonths"] = JsonArray(months.jsonArray.sortedBy { it.jsonObject.getValue("year").jsonPrimitive.int * 100 + it.jsonObject.getValue("month").jsonPrimitive.int })
-        }
-        game["questsDone"]?.let { done -> game["questsDone"] = JsonObject(done.jsonObject.mapValues { sortedStrings(it.value) }) }
-        root["game"] = JsonObject(game)
-    }
+    root["game"]?.let { root["game"] = normalizedGameJson(it) }
     return JsonObject(root)
 }
 

@@ -57,4 +57,5 @@ val vectorHandlers: Map<String, VectorHandler> = buildMap {
     putAll(formatHandlers)
     putAll(modelHandlers)
     putAll(sourceHandlers)
+    putAll(gameHandlers)
 }
