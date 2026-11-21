@@ -419,16 +419,16 @@ final class ETFToGoUITests: XCTestCase {
 
     // MARK: Tools, membership and skins (spec 5.9, 5.10, 5.13)
 
-    /// 工具 → 會員・換膚 → 換膚.
+    /// 工具 → 會員・外觀主題 → 外觀主題.
     private func openSkins(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         let member = app.buttons["tool-member"]
-        XCTAssertTrue(member.waitForExistence(timeout: 10), "工具 has 會員・換膚", file: file, line: line)
+        XCTAssertTrue(member.waitForExistence(timeout: 10), "工具 has 會員・外觀主題", file: file, line: line)
         reveal(app, member, file: file, line: line)
         let skins = app.buttons["member-skins"]
-        XCTAssertTrue(skins.waitForExistence(timeout: 5), "會員 opens with a way to 換膚", file: file, line: line)
+        XCTAssertTrue(skins.waitForExistence(timeout: 5), "會員 opens with a way to 外觀主題", file: file, line: line)
         sleep(1); capture(app, "member")
         reveal(app, skins, file: file, line: line)
-        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 5), "換膚 opens the carousel", file: file, line: line)
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 5), "外觀主題 opens the carousel", file: file, line: line)
     }
     private func waitForLabel(_ element: XCUIElement, containing text: String, file: StaticString = #filePath, line: UInt = #line) {
         let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS %@", text), object: element)
@@ -531,7 +531,7 @@ final class ETFToGoUITests: XCTestCase {
     func testTryOnChangesNothing() {
         let app = launch(["--demo-level", "7", "--open", "skins"])
         let status = app.descendants(matching: .any)["skin-status"]
-        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "換膚 opens")
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "外觀主題 opens")
         waitForLabel(status, containing: "使用中")
         app.buttons["skin-badge-sketch"].tap()
         waitForLabel(status, containing: "已解鎖")

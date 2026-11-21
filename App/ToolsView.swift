@@ -12,7 +12,7 @@ struct ToolsView: View {
         (.pocketIcon, "券商匯入", "CSV 帶進口袋", .broker, "tool-broker"),
         (.reminder, "除息提醒", "入帳、除息前通知你", .reminders, "tool-reminders"),
         (.goal, "存錢目標", "離目標還差多少", .goal, "tool-goal"),
-        (.crown, "會員・換膚", "四套世界任你換", .member, "tool-member"),
+        (.crown, "會員・外觀主題", "四套世界任你換", .member, "tool-member"),
     ]
     private let more: [(title: String, subtitle: String, route: AppRoute, id: String, member: Bool)] = [
         ("ETF 組合試算", "3、5、10 年資產預估", .combo, "tool-combo", false),

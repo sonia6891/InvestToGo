@@ -33,9 +33,9 @@ enum LevelUp {
             return nil
         }
         if let now = levelSkins.first(where: { $0.0 == level }) {
-            list.append("解鎖「\(now.1)」皮膚")
+            list.append("解鎖「\(now.1)」外觀主題")
         } else if let next = levelSkins.filter({ $0.0 > level }).min(by: { $0.0 < $1.0 }) {
-            list.append("LV.\(next.0) 解鎖「\(next.1)」皮膚，還差 \(next.0 - level) 級")
+            list.append("LV.\(next.0) 解鎖「\(next.1)」外觀主題，還差 \(next.0 - level) 級")
         }
         return list
     }
