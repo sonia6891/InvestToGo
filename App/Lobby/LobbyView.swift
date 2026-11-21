@@ -45,6 +45,8 @@ struct LobbyView: View {
     @State private var opensAgain = false
     /// Taps on each object, to play its ring.
     @State private var taps: [Feature: Int] = [:]
+    /// The object the viewer just came back from, while it gives its one small bounce.
+    @State private var bouncing: Feature?
     /// LEVEL×UP covers the lobby (a full-screen cover from the root view: no `onDisappear` here).
     @Environment(\.lobbyCovered) private var covered
     @Environment(\.celebrateIfDue) private var celebrateIfDue
@@ -116,6 +118,7 @@ struct LobbyView: View {
             onScreen = true
             let opening = (!opened || opensAgain) && !reduceMotion && !AmbientMotion.uiTesting
             playOpening()
+            if !opening { bounceReturning() }
             arrive(lead: opening ? 0.5 : 0.15)
         }
         .onDisappear { onScreen = false; replayer.cancel() }
@@ -127,6 +130,14 @@ struct LobbyView: View {
         .onChange(of: covered) { _, isCovered in
             if isCovered { replayer.coverOpened() } else { replayer.coverClosed(); arrive(lead: 0.15) }
         }
+    }
+
+    /// Back from a feature: its object swells once and settles, as the coins start to fly from it. Still under Reduce
+    /// Motion and `--ui-testing`.
+    private func bounceReturning() {
+        guard let feature = returningFrom, !reduceMotion, !AmbientMotion.uiTesting else { return }
+        bouncing = feature
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) { bouncing = nil }
     }
 
     // MARK: Replay (spec 5.3, 5.4)
@@ -315,6 +326,8 @@ struct LobbyView: View {
             .animation(LobbyOpening.animation(skin, delay: LobbyOpening.delay(feature)), value: opened)
         }
         .buttonStyle(PressableStyle())
+        .scaleEffect(bouncing == feature ? 1.12 : 1)
+        .animation(SkinMotion.of(skin).spring, value: bouncing)
         .modifier(ZoomSource(feature: feature, namespace: namespace))
         .marksSpot(in: Self.space) { spots[.feature(feature)] = $0 }
         .accessibilityLabel(feature.title)

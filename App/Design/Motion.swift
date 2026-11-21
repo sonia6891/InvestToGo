@@ -62,6 +62,20 @@ struct PressableStyle: ButtonStyle {
     }
 }
 
+/// A button style's own look, plus the same press squash as `PressableStyle` (for buttons that already have skin visuals).
+struct PressableOver<Base: ButtonStyle>: ButtonStyle {
+    var base: Base
+    @Environment(\.skin) private var skin
+    @Environment(\.motionReduced) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
+        return base.makeBody(configuration: configuration)
+            .scaleEffect(x: pressed && !reduceMotion ? 1.12 : 1, y: pressed && !reduceMotion ? 0.88 : 1)
+            .animation(reduceMotion ? nil : SkinMotion.of(skin).spring, value: pressed)
+    }
+}
+
 private struct EnterStagger: ViewModifier {
     var index: Int
     @Environment(\.motionReduced) private var reduceMotion

@@ -29,7 +29,7 @@ struct PlanView: View {
                     FieldRow(title: "配息扣費比例") { UnitField(placeholder: "%", text: $deductionPercent, unit: "%") }
                 }.font(.caption.bold()).foregroundStyle(Palette.muted).padding(.top, 6)
             }
-            Button { run() } label: { PrimaryButtonLabel(title: "開始試算", icon: "function") }.buttonStyle(.plain)
+            Button { run() } label: { PrimaryButtonLabel(title: "開始試算", icon: "function") }.buttonStyle(PressableStyle())
             if let rows = try? PlanMath.project(plan), let last = rows.last {
                 Card {
                     HStack { Label("試算結果", systemImage: "target").font(.headline).foregroundStyle(Palette.ink); Spacer(); TintPill(title: "假設試算") }

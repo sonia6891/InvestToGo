@@ -33,10 +33,13 @@ struct ToolsView: View {
                 Text("TOOLS").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
                 Text("工具箱").skinFont(.title(34)).skinForeground(\.ink)
             }
+            .enterStagger(0)
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                 ForEach(tiles.indices, id: \.self) { i in tile(tiles[i], highlight: i == tiles.count - 1) }
             }
+            .enterStagger(1)
             Text("更多工具").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub).padding(.top, 6)
+                .enterStagger(2)
             SkinCard {
                 VStack(spacing: 0) {
                     ForEach(more.indices, id: \.self) { i in
@@ -284,7 +287,7 @@ struct GoalView: View {
                 FieldRow(title: "預計投入資金", bar: true) { UnitField(placeholder: "資金", text: $capitalText, unit: "元") }
                 FieldRow(title: "預估殖利率", bar: true) { UnitField(placeholder: "%", text: $yieldText, unit: "%") }
             }
-            Button { apply() } label: { PrimaryButtonLabel(title: "開始試算", icon: "function") }.buttonStyle(.plain)
+            Button { apply() } label: { PrimaryButtonLabel(title: "開始試算", icon: "function") }.buttonStyle(PressableStyle())
             Card {
                 HStack { Label("假設試算結果", systemImage: "target").font(.headline).foregroundStyle(Palette.ink); Spacer(); Text("不代表未來報酬").font(.caption2).foregroundStyle(Palette.muted) }
                 HStack(spacing: 8) {

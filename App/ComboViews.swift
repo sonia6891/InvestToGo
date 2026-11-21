@@ -282,7 +282,7 @@ struct ComboSettingsView: View {
                 HStack(spacing: 8) { ForEach([ComboScenario.conservative, .base, .optimistic]) { item in scenarioButton(item, current: draft) } }.padding(.top, 10)
             }
             if let error { Text(error).font(.caption).foregroundStyle(Palette.red) }
-            Button { run() } label: { PrimaryButtonLabel(title: "開始試算", icon: "arrow.right") }.buttonStyle(.plain).accessibilityIdentifier("combo-run")
+            Button { run() } label: { PrimaryButtonLabel(title: "開始試算", icon: "arrow.right") }.buttonStyle(PressableStyle()).accessibilityIdentifier("combo-run")
         }
         .navigationTitle("試算設定").navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: load)

@@ -23,13 +23,13 @@ struct HomeView: View {
         let summary = PocketSummary.of(holdings) { store.marketValue(of: $0) }
         let count = Set(holdings.map(\.symbol)).count
         Page {
-            topBar(count: count, filled: !holdings.isEmpty)
+            topBar(count: count, filled: !holdings.isEmpty).enterStagger(0)
             if holdings.isEmpty {
-                newbie
+                newbie.enterStagger(1)
             } else {
-                hero(summary, count: count)
-                list(summary)
-                more(holdings)
+                hero(summary, count: count).enterStagger(1)
+                list(summary).enterStagger(2)
+                more(holdings).enterStagger(3)
             }
         }
         .toolbar(.hidden, for: .navigationBar)
