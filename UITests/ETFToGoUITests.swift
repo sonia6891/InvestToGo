@@ -571,7 +571,8 @@ final class ETFToGoUITests: XCTestCase {
         let splash = app.buttons["splash"]
         XCTAssertTrue(splash.waitForExistence(timeout: 10), "A first launch opens on the splash", file: file, line: line)
         if capturing {
-            XCTAssertTrue(app.staticTexts["SKN×001"].exists, "The splash shows the worn skin's code", file: file, line: line)
+            // The opening design (2026-11-21) took the code line off: the tag already names the 外觀主題.
+            XCTAssertFalse(app.staticTexts["SKN×001"].exists, "The splash no longer shows the skin's code", file: file, line: line)
             XCTAssertTrue(app.staticTexts["存 ETF，也存下好習慣。"].exists, file: file, line: line)
             XCTAssertFalse(app.buttons["lobby-find"].exists, "Not the lobby yet", file: file, line: line)
             sleep(1); capture(app, "splash")
@@ -616,6 +617,17 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "The next launch goes straight to the lobby")
         XCTAssertFalse(app.buttons["splash"].exists, "No splash once onboarded")
         XCTAssertFalse(app.buttons["habit-dca"].exists, "No onboarding once onboarded")
+    }
+
+    /// 開場動畫: a later launch forced to play it (`--opening`) offers 略過, which goes straight to the lobby.
+    func testOpeningSkips() {
+        let app = launch(["--opening"])
+        let skip = app.buttons["opening-skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 10), "The opening offers 略過")
+        skip.tap()
+        let find = app.buttons["lobby-find"]
+        let hittable = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: find)
+        XCTAssertEqual(XCTWaiter().wait(for: [hittable], timeout: 2), .completed, "略過 goes straight to the lobby")
     }
 
     /// 工具 › 提醒 has the debit-day reminder chosen in onboarding: on or off, the day and the time (final review I5).
