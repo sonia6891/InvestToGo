@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "headers": [
+          "代碼",
+          "名稱",
+          "股數",
+          "總成本",
+          "備註"
+        ],
+        "rows": [
+          [
+            "0050",
+            "元大台灣50",
+            "1000",
+            "150000",
+            "碁峰"
+          ]
+        ]
+      },
+      "input": {
+        "file": "vectors/importing/csv/big5.csv"
+      },
+      "name": "big5-cp950"
+    }
+  ],
+  "kind": "CSVTable.parseLegacyEncoding",
+  "platforms": [
+    "kotlin"
+  ]
+}

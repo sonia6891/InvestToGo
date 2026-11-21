@@ -1,0 +1,377 @@
+{
+  "cases": [
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 42000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 2000,
+              "symbol": "00878"
+            }
+          ],
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 42000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 2000,
+              "symbol": "00878"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 105000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 3000,
+              "symbol": "0056"
+            }
+          ]
+        ]
+      },
+      "name": "overlap-appears-once"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "same-page-twice-kept"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ],
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "repeat-matched-once"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 42000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 2000,
+              "symbol": "00878"
+            }
+          ],
+          [
+            {
+              "basis": null,
+              "choices": [],
+              "cost": null,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 2000,
+              "symbol": "00878"
+            },
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 105000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 3000,
+              "symbol": "0056"
+            }
+          ]
+        ]
+      },
+      "name": "cut-off-row-noted"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ],
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": null,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "cut-off-cost-only"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ],
+          [
+            {
+              "basis": null,
+              "choices": [],
+              "cost": null,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 500,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "different-shares-not-noted"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": null,
+              "choices": [],
+              "cost": null,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "same-page-partial-not-noted"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            },
+            {
+              "basis": "perShare",
+              "choices": [],
+              "cost": 21,
+              "kind": "融券",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "00878"
+            }
+          ],
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 105000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 3000,
+              "symbol": "0056"
+            }
+          ]
+        ]
+      },
+      "name": "short-apart"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ],
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "融資",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "margin-not-same-as-cash"
+    },
+    {
+      "input": {
+        "pages": [
+          [
+            {
+              "basis": "total",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": 1000,
+              "symbol": "0050"
+            }
+          ],
+          [
+            {
+              "basis": "perShare",
+              "choices": [],
+              "cost": 150000,
+              "kind": "現股",
+              "name": null,
+              "note": null,
+              "shares": null,
+              "symbol": "0050"
+            }
+          ]
+        ]
+      },
+      "name": "basis-differs-not-covered"
+    },
+    {
+      "input": {
+        "pages": []
+      },
+      "name": "empty"
+    }
+  ],
+  "kind": "ScreenshotImport.review"
+}

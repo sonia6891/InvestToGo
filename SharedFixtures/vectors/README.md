@@ -13,7 +13,7 @@
 ```
 
 - `kind`：被測的 Swift 函式完整名稱（`型別.成員`）。同一個 kind 只能有一個檔案。
-- `platforms`：省略時兩邊都要跑。只有 `format.*` 是 `["kotlin"]`：數字格式依裝置語系，Linux 記錄器的語系不能代表 iPhone，所以預期值依 iPhone 在繁體中文（台灣）設定下的顯示手寫。
+- `platforms`：省略時兩邊都要跑。只有 `format.*` 是 `["kotlin"]`：數字格式依裝置語系，Linux 記錄器的語系不能代表 iPhone，所以預期值依 iPhone 在繁體中文（台灣）設定下的顯示手寫。`CSVTable.parseLegacyEncoding` 也是 `["kotlin"]`：Linux 的 Foundation 不能解 Big5，所以 Windows Excel 存出的 CP950 樣本（含「碁」這類倚天擴充字）由 iPhone 的解讀手寫預期值；同一份樣本在 iPhone 上用 `CSVTable.parse` 讀。
 - `expected`：由 Swift 記錄（`RECORD_VECTORS=1 swift test --package-path PocketCore --filter VectorTests`）。這一步在 GitHub Actions 的 `record-vectors` 工作執行，結果放在 artifact `vectors`。新增 case 時只寫 `input`。
 - 會丟錯時，`expected` 是 `{"error": "<錯誤文字>"}`。錯誤文字是 iPhone 給人看的那句；不是給人看的錯誤（例如 JSON 解不開）寫成 `{"error": "*"}`。
 - 輸入要讀檔時寫 `{"file": "<相對 SharedFixtures 的路徑>"}`。

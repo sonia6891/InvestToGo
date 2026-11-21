@@ -12,6 +12,7 @@ let vectorHandlers: [String: VectorHandler] = [
     sourceHandlers,
     gameHandlers,
     analyticsHandlers,
+    importHandlers,
 ].reduce(into: [:]) { all, group in all.merge(group) { first, _ in first } }
 
 /// `nil` as JSON null.

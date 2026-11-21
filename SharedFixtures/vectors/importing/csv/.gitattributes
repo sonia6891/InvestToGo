@@ -1,0 +1,2 @@
+# The samples are byte-exact: line endings and encodings are what is tested.
+*.csv -text

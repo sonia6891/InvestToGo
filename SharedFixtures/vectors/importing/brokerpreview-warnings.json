@@ -1,0 +1,215 @@
+{
+  "cases": [
+    {
+      "input": {
+        "account": "主要",
+        "broker": "國泰證券",
+        "funds": [
+          {
+            "id": "0050",
+            "name": "元大台灣50",
+            "strategy": "存錢筒"
+          },
+          {
+            "id": "00878",
+            "name": "國泰永續高股息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00919",
+            "name": "群益台灣精選高息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00991A",
+            "name": "主動測試",
+            "strategy": "待分類"
+          },
+          {
+            "id": "00953B",
+            "name": "群益優選非投等債",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00757C",
+            "name": "外幣測試",
+            "strategy": "待分類"
+          }
+        ],
+        "mapping": {
+          "cost": 2,
+          "lots": false,
+          "name": -1,
+          "shares": 1,
+          "symbol": 0,
+          "totalCost": true
+        },
+        "prices": {
+          "00991A": 17.5
+        },
+        "text": "code,shares,cost\n00991A,1000,17.35"
+      },
+      "name": "ported-csv-per-share-as-total"
+    },
+    {
+      "input": {
+        "account": "主要",
+        "broker": "國泰證券",
+        "funds": [
+          {
+            "id": "0050",
+            "name": "元大台灣50",
+            "strategy": "存錢筒"
+          },
+          {
+            "id": "00878",
+            "name": "國泰永續高股息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00919",
+            "name": "群益台灣精選高息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00991A",
+            "name": "主動測試",
+            "strategy": "待分類"
+          },
+          {
+            "id": "00953B",
+            "name": "群益優選非投等債",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00757C",
+            "name": "外幣測試",
+            "strategy": "待分類"
+          }
+        ],
+        "mapping": {
+          "cost": 2,
+          "lots": false,
+          "name": -1,
+          "shares": 1,
+          "symbol": 0,
+          "totalCost": true
+        },
+        "prices": {},
+        "text": "code,shares,cost\n00991A,1000,17.35"
+      },
+      "name": "no-price-no-warning"
+    },
+    {
+      "input": {
+        "account": "主要",
+        "broker": "國泰證券",
+        "drafts": [
+          {
+            "cost": "1500000",
+            "kind": "融資",
+            "perShare": false,
+            "shares": "1000",
+            "symbol": "0050"
+          },
+          {
+            "cost": "21000",
+            "kind": "現股",
+            "perShare": false,
+            "shares": "1000",
+            "symbol": "00878"
+          }
+        ],
+        "funds": [
+          {
+            "id": "0050",
+            "name": "元大台灣50",
+            "strategy": "存錢筒"
+          },
+          {
+            "id": "00878",
+            "name": "國泰永續高股息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00919",
+            "name": "群益台灣精選高息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00991A",
+            "name": "主動測試",
+            "strategy": "待分類"
+          },
+          {
+            "id": "00953B",
+            "name": "群益優選非投等債",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00757C",
+            "name": "外幣測試",
+            "strategy": "待分類"
+          }
+        ],
+        "prices": {
+          "0050": 150,
+          "00878": 21
+        }
+      },
+      "name": "margin-says-so"
+    },
+    {
+      "input": {
+        "account": "主要",
+        "broker": "國泰證券",
+        "drafts": [
+          {
+            "cost": "15000000",
+            "kind": "現股",
+            "perShare": false,
+            "shares": "1000",
+            "symbol": "0050"
+          }
+        ],
+        "funds": [
+          {
+            "id": "0050",
+            "name": "元大台灣50",
+            "strategy": "存錢筒"
+          },
+          {
+            "id": "00878",
+            "name": "國泰永續高股息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00919",
+            "name": "群益台灣精選高息",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00991A",
+            "name": "主動測試",
+            "strategy": "待分類"
+          },
+          {
+            "id": "00953B",
+            "name": "群益優選非投等債",
+            "strategy": "印鈔機"
+          },
+          {
+            "id": "00757C",
+            "name": "外幣測試",
+            "strategy": "待分類"
+          }
+        ],
+        "prices": {
+          "0050": 150
+        }
+      },
+      "name": "ten-times"
+    }
+  ],
+  "kind": "BrokerPreview.warnings"
+}

@@ -1,0 +1,88 @@
+{
+  "cases": [
+    {
+      "input": {
+        "average": 0.017,
+        "price": 17.5
+      },
+      "name": "ported-far-under"
+    },
+    {
+      "input": {
+        "average": 17.35,
+        "price": 17.5
+      },
+      "name": "close"
+    },
+    {
+      "input": {
+        "average": 0.017
+      },
+      "name": "no-price"
+    },
+    {
+      "input": {
+        "average": 0.017,
+        "price": 0
+      },
+      "name": "zero-price"
+    },
+    {
+      "input": {
+        "average": 0.3,
+        "price": 1
+      },
+      "name": "edge-low"
+    },
+    {
+      "input": {
+        "average": 0.2999,
+        "price": 1
+      },
+      "name": "just-under"
+    },
+    {
+      "input": {
+        "average": 3,
+        "price": 1
+      },
+      "name": "edge-high"
+    },
+    {
+      "input": {
+        "average": 3.0001,
+        "price": 1
+      },
+      "name": "just-over"
+    },
+    {
+      "input": {
+        "average": 1234.5,
+        "price": 123.45
+      },
+      "name": "ten-times"
+    },
+    {
+      "input": {
+        "average": 0.25,
+        "price": 1
+      },
+      "name": "rounds-half"
+    },
+    {
+      "input": {
+        "average": 0.0125,
+        "price": 1
+      },
+      "name": "rounds-up"
+    },
+    {
+      "input": {
+        "average": 12,
+        "price": 1234.567
+      },
+      "name": "big-price"
+    }
+  ],
+  "kind": "BrokerPreview.costWarning"
+}
