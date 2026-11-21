@@ -268,7 +268,8 @@ jobs:
             local recorder=$!
             sleep 1
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview "$@" || echo "::warning::launch failed for $name"
-            sleep 5
+            # A cold launch takes one to two seconds before the first frame: 7 s reaches the 3 s opening's end.
+            sleep 7
             kill -INT "$recorder" || true
             wait "$recorder" || true
           }
