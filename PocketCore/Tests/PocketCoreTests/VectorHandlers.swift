@@ -5,8 +5,11 @@ import Foundation
 typealias VectorHandler = (Any) throws -> Any
 
 /// Every shared vector kind Swift answers, keyed by the vector's `kind`.
-let vectorHandlers: [String: VectorHandler] = supportHandlers
-    .merging(["Vector.echo": { input in try VectorIO.object(input)["value"] ?? NSNull() }]) { first, _ in first }
+let vectorHandlers: [String: VectorHandler] = [
+    ["Vector.echo": { input in try VectorIO.object(input)["value"] ?? NSNull() }],
+    supportHandlers,
+    modelHandlers,
+].reduce(into: [:]) { all, group in all.merge(group) { first, _ in first } }
 
 /// `nil` as JSON null.
 func orNull(_ value: Any?) -> Any { value ?? NSNull() }

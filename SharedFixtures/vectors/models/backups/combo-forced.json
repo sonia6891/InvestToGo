@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "holdings": [],
+  "dividends": [],
+  "favorites": [],
+  "quotes": {},
+  "combo": {
+    "includeStocks": true,
+    "includeETFs": false,
+    "scenario": "未來情境",
+    "years": 3
+  }
+}

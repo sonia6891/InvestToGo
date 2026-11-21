@@ -1,0 +1,300 @@
+{
+  "schema": 1,
+  "holdings": [
+    {
+      "id": "5FEF0885-6A6B-555C-8BEC-451862548983",
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "shares": 2000,
+      "unitCost": 50,
+      "broker": "富邦證券",
+      "strategy": "存錢筒",
+      "sourceAccount": "主帳戶",
+      "purchaseDate": 780000000.5
+    },
+    {
+      "id": "11111111-2222-4333-8444-555555555555",
+      "symbol": "00878",
+      "name": "國泰永續高股息",
+      "shares": 6000,
+      "unitCost": 20.35,
+      "broker": "國泰證券（融資）",
+      "strategy": "印鈔機"
+    }
+  ],
+  "dividends": [
+    {
+      "id": "A1B2C3D4-0000-4000-8000-000000000002",
+      "symbol": "00878",
+      "date": 815184000,
+      "amount": 2390,
+      "status": "已公告",
+      "exDate": 814000000,
+      "shares": 6000,
+      "perShare": 0.4,
+      "deduction": 10,
+      "source": "投信公告",
+      "note": "季配",
+      "holdingID": "11111111-2222-4333-8444-555555555555"
+    }
+  ],
+  "favorites": [
+    "00919",
+    "0050"
+  ],
+  "quotes": {
+    "0050": {
+      "symbol": "0050",
+      "price": 55.2,
+      "changePercent": 0.42,
+      "date": "2026-10-30",
+      "fetchedAt": 815100000,
+      "currency": "TWD",
+      "change": 0.25,
+      "open": 55,
+      "high": 55.5,
+      "low": 54.8,
+      "volume": 12345,
+      "source": "open-data"
+    }
+  },
+  "comparison": [
+    "0050",
+    "00878"
+  ],
+  "legacyPlan": {
+    "principal": 100000,
+    "monthly": 5000,
+    "years": 10,
+    "totalReturn": 0.06,
+    "distributionRate": 0.04,
+    "frequency": 4,
+    "reinvest": 1,
+    "deductionRate": 0
+  },
+  "legacyPrices": {
+    "pwa-001": {
+      "symbol": "0050",
+      "price": 55,
+      "date": "2026-10-01"
+    }
+  },
+  "legacyDividends": {
+    "pwa-dividend-1": {
+      "id": "pwa-dividend-1",
+      "code": "0050",
+      "name": "元大台灣50",
+      "paymentDate": "2026-10-10",
+      "exDate": "2026-10-01",
+      "eligibleShares": 2000,
+      "perShare": 1.2,
+      "deductions": 10,
+      "status": "received",
+      "actualReceived": 2385,
+      "sourceUrl": "https://example.com/dividend"
+    }
+  },
+  "components": {
+    "0050": {
+      "symbol": "0050",
+      "date": "2026-10-01",
+      "components": [
+        {
+          "symbol": "2330",
+          "name": "台積電",
+          "weight": 50
+        },
+        {
+          "symbol": "2317",
+          "weight": 5.5
+        }
+      ],
+      "source": "test"
+    }
+  },
+  "componentHistory": {
+    "00982A": [
+      {
+        "symbol": "00982A",
+        "date": "2026-10-02",
+        "components": [
+          {
+            "symbol": "2330",
+            "name": "台積電",
+            "weight": 60
+          },
+          {
+            "symbol": "2317",
+            "weight": 5.5
+          }
+        ],
+        "source": "test"
+      },
+      {
+        "symbol": "00982A",
+        "date": "2026-10-01",
+        "components": [
+          {
+            "symbol": "2330",
+            "name": "台積電",
+            "weight": 50
+          },
+          {
+            "symbol": "2317",
+            "weight": 5.5
+          }
+        ],
+        "source": "test"
+      }
+    ]
+  },
+  "histories": {
+    "0050": {
+      "symbol": "0050",
+      "adjusted": true,
+      "points": [
+        {
+          "date": "2026-01-02",
+          "close": 100
+        },
+        {
+          "date": "2026-06-01",
+          "close": 120.5
+        }
+      ],
+      "fetchedDay": "2026-10-30",
+      "source": "test"
+    }
+  },
+  "fees": {
+    "0050": {
+      "symbol": "0050",
+      "effectiveDate": "2026-01-01",
+      "management": "0.15%",
+      "custody": "0.035%",
+      "annualExpensePercent": 0.22,
+      "expenseYear": 2025,
+      "sourceURL": "https://example.com/fee",
+      "note": ""
+    }
+  },
+  "trades": [
+    {
+      "id": "22222222-0000-4000-8000-000000000001",
+      "date": 815000000,
+      "action": "買進",
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "shares": 1000,
+      "unitCost": 50,
+      "broker": "富邦證券",
+      "amount": 50071
+    },
+    {
+      "id": "22222222-0000-4000-8000-000000000002",
+      "date": 815000100,
+      "action": "賣出",
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "shares": 500,
+      "unitCost": 55,
+      "broker": "富邦證券",
+      "amount": 27400,
+      "realized": 2400.5
+    }
+  ],
+  "game": {
+    "xp": 930,
+    "coins": 930,
+    "dcaMonths": [
+      {
+        "year": 2026,
+        "month": 11
+      },
+      {
+        "year": 2026,
+        "month": 9
+      },
+      {
+        "year": 2026,
+        "month": 10
+      }
+    ],
+    "longestStreak": 3,
+    "collected": {
+      "0050": 815000000
+    },
+    "unlocked": {
+      "dcaPunchCard": 815000050
+    },
+    "questsDone": {
+      "2026-11": [
+        "reconciled",
+        "dcaLogged"
+      ]
+    },
+    "habit": "dividends",
+    "counts": {
+      "monthlyDCA": 3,
+      "feeCompared": 1
+    },
+    "celebratedLevel": 5,
+    "lastAward": "reconciled",
+    "celebratedCoins": 800,
+    "celebratedAchievements": [
+      "dcaPunchCard"
+    ],
+    "rewardKeys": [
+      "reconciled|2026-11",
+      "dividend|00878|2026-11"
+    ],
+    "xpByMonth": {
+      "2026-11": 120
+    },
+    "migration": 2,
+    "migratedAt": 800000000
+  },
+  "combo": {
+    "source": 1,
+    "simulated": [
+      {
+        "symbol": "0050",
+        "amount": 100000
+      }
+    ],
+    "excluded": [
+      "00919"
+    ],
+    "includeStocks": false,
+    "includeETFs": true,
+    "snapshotAt": 815000000,
+    "monthly": 12000,
+    "stockPercent": 0,
+    "startOfMonth": true,
+    "years": 10,
+    "stockReturn": 5,
+    "etfReturn": 6.5,
+    "reinvest": false,
+    "stockYield": 2,
+    "etfYield": 4,
+    "buyFee": true,
+    "scenario": "樂觀"
+  },
+  "alerts": [
+    {
+      "id": "33333333-0000-4000-8000-000000000001",
+      "symbol": "0050",
+      "above": true,
+      "price": 200,
+      "enabled": true
+    },
+    {
+      "id": "33333333-0000-4000-8000-000000000002",
+      "symbol": "00679B",
+      "above": false,
+      "price": 27.5,
+      "enabled": false,
+      "firedAt": 815000200
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "kind": "FeeRecord.validate",
+  "cases": [
+    {
+      "name": "good",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "rate-without-year",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "year-without-rate",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "expenseYear": 2025,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "javascript-url",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "javascript:alert(1)",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "http-url",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "http://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "no-url",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "user-in-url",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "https://a:b@example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "year-1989",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 1989,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "future-date",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2099-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "empty-management",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "",
+          "custody": "級距費率",
+          "annualExpensePercent": 0.2,
+          "expenseYear": 2025,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    },
+    {
+      "name": "rate-over-100",
+      "input": {
+        "fee": {
+          "symbol": "0050",
+          "effectiveDate": "2026-01-01",
+          "management": "級距費率",
+          "custody": "級距費率",
+          "annualExpensePercent": 101,
+          "expenseYear": 2025,
+          "sourceURL": "https://example.com",
+          "note": ""
+        }
+      }
+    }
+  ]
+}

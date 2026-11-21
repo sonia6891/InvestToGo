@@ -1,0 +1,23 @@
+{
+  "kind": "GoalPlanner.scenarios",
+  "cases": [
+    {
+      "name": "six-percent",
+      "input": {
+        "target": 3000000,
+        "years": 10,
+        "current": 0,
+        "annualReturn": 6
+      }
+    },
+    {
+      "name": "clamped-at-minus-99",
+      "input": {
+        "target": 3000000,
+        "years": 10,
+        "current": 0,
+        "annualReturn": -95
+      }
+    }
+  ]
+}

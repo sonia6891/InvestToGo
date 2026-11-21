@@ -1,0 +1,201 @@
+{
+  "kind": "PriceHistory.validate",
+  "cases": [
+    {
+      "name": "good",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2024-01-01",
+              "close": 100
+            },
+            {
+              "date": "2024-06-01",
+              "close": 120
+            },
+            {
+              "date": "2024-08-01",
+              "close": 90
+            },
+            {
+              "date": "2025-01-01",
+              "close": 110
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "unordered",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2025-01-02",
+              "close": 100
+            },
+            {
+              "date": "2025-01-01",
+              "close": 101
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "duplicate-date",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2025-01-01",
+              "close": 100
+            },
+            {
+              "date": "2025-01-01",
+              "close": 101
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "not-adjusted",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": false,
+          "points": [
+            {
+              "date": "2024-01-01",
+              "close": 100
+            },
+            {
+              "date": "2024-06-01",
+              "close": 120
+            },
+            {
+              "date": "2024-08-01",
+              "close": 90
+            },
+            {
+              "date": "2025-01-01",
+              "close": 110
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "one-point",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2025-01-01",
+              "close": 100
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "zero-close",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2025-01-01",
+              "close": 100
+            },
+            {
+              "date": "2025-01-02",
+              "close": 0
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "bad-fetched-day",
+      "input": {
+        "history": {
+          "symbol": "0050",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2024-01-01",
+              "close": 100
+            },
+            {
+              "date": "2024-06-01",
+              "close": 120
+            },
+            {
+              "date": "2024-08-01",
+              "close": 90
+            },
+            {
+              "date": "2025-01-01",
+              "close": 110
+            }
+          ],
+          "fetchedDay": "2025-13-01",
+          "source": "t"
+        }
+      }
+    },
+    {
+      "name": "bad-code",
+      "input": {
+        "history": {
+          "symbol": "AAPL",
+          "adjusted": true,
+          "points": [
+            {
+              "date": "2024-01-01",
+              "close": 100
+            },
+            {
+              "date": "2024-06-01",
+              "close": 120
+            },
+            {
+              "date": "2024-08-01",
+              "close": 90
+            },
+            {
+              "date": "2025-01-01",
+              "close": 110
+            }
+          ],
+          "fetchedDay": "2025-01-02",
+          "source": "t"
+        }
+      }
+    }
+  ]
+}

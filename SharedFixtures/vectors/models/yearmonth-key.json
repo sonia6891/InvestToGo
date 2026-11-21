@@ -1,0 +1,65 @@
+{
+  "kind": "YearMonth.fromKey",
+  "cases": [
+    {
+      "name": "good",
+      "input": {
+        "key": "2026-11"
+      }
+    },
+    {
+      "name": "december",
+      "input": {
+        "key": "2026-12"
+      }
+    },
+    {
+      "name": "month-13",
+      "input": {
+        "key": "2026-13"
+      }
+    },
+    {
+      "name": "month-0",
+      "input": {
+        "key": "2026-00"
+      }
+    },
+    {
+      "name": "one-digit-month",
+      "input": {
+        "key": "2026-1"
+      }
+    },
+    {
+      "name": "slash",
+      "input": {
+        "key": "2026/11"
+      }
+    },
+    {
+      "name": "extra-part",
+      "input": {
+        "key": "2026-11-01"
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "key": ""
+      }
+    },
+    {
+      "name": "plus-sign",
+      "input": {
+        "key": "+026-11"
+      }
+    },
+    {
+      "name": "fullwidth",
+      "input": {
+        "key": "２０２６-11"
+      }
+    }
+  ]
+}

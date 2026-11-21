@@ -1,0 +1,266 @@
+{
+  "kind": "ResearchMath.exposures",
+  "cases": [
+    {
+      "name": "etfs-only",
+      "input": {
+        "portfolio": {
+          "schema": 1,
+          "holdings": [
+            {
+              "id": "11111111-2222-4333-8444-000000001000",
+              "symbol": "0050",
+              "name": "元大台灣50",
+              "shares": 1000,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000002000",
+              "symbol": "0056",
+              "name": "元大高股息",
+              "shares": 2000,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000010",
+              "symbol": "2330",
+              "name": "台積電",
+              "shares": 10,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000300",
+              "symbol": "00919",
+              "name": "n",
+              "shares": 300,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000005",
+              "symbol": "VOO",
+              "name": "n",
+              "shares": 5,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            }
+          ],
+          "dividends": [],
+          "favorites": [],
+          "quotes": {
+            "0050": {
+              "symbol": "0050",
+              "price": 100,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "0056": {
+              "symbol": "0056",
+              "price": 40,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "2330": {
+              "symbol": "2330",
+              "price": 1000,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "VOO": {
+              "symbol": "VOO",
+              "price": 500,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "USD"
+            }
+          },
+          "components": {
+            "0050": {
+              "symbol": "0050",
+              "date": "2026-10-01",
+              "components": [
+                {
+                  "symbol": "2330",
+                  "name": "台積電",
+                  "weight": 50
+                },
+                {
+                  "symbol": "2317",
+                  "name": "鴻海",
+                  "weight": 5
+                }
+              ],
+              "source": "t"
+            },
+            "0056": {
+              "symbol": "0056",
+              "date": "2026-10-01",
+              "components": [
+                {
+                  "symbol": "2317",
+                  "weight": 4
+                },
+                {
+                  "symbol": "2454",
+                  "name": "聯發科",
+                  "weight": 3
+                }
+              ],
+              "source": "t"
+            }
+          }
+        },
+        "stocks": []
+      }
+    },
+    {
+      "name": "with-direct-stock",
+      "input": {
+        "portfolio": {
+          "schema": 1,
+          "holdings": [
+            {
+              "id": "11111111-2222-4333-8444-000000001000",
+              "symbol": "0050",
+              "name": "元大台灣50",
+              "shares": 1000,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000002000",
+              "symbol": "0056",
+              "name": "元大高股息",
+              "shares": 2000,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000010",
+              "symbol": "2330",
+              "name": "台積電",
+              "shares": 10,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000300",
+              "symbol": "00919",
+              "name": "n",
+              "shares": 300,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            },
+            {
+              "id": "11111111-2222-4333-8444-000000000005",
+              "symbol": "VOO",
+              "name": "n",
+              "shares": 5,
+              "unitCost": 10,
+              "broker": "b",
+              "strategy": "待分類"
+            }
+          ],
+          "dividends": [],
+          "favorites": [],
+          "quotes": {
+            "0050": {
+              "symbol": "0050",
+              "price": 100,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "0056": {
+              "symbol": "0056",
+              "price": 40,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "2330": {
+              "symbol": "2330",
+              "price": 1000,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "TWD"
+            },
+            "VOO": {
+              "symbol": "VOO",
+              "price": 500,
+              "date": "2026-10-30",
+              "fetchedAt": 815100000,
+              "currency": "USD"
+            }
+          },
+          "components": {
+            "0050": {
+              "symbol": "0050",
+              "date": "2026-10-01",
+              "components": [
+                {
+                  "symbol": "2330",
+                  "name": "台積電",
+                  "weight": 50
+                },
+                {
+                  "symbol": "2317",
+                  "name": "鴻海",
+                  "weight": 5
+                }
+              ],
+              "source": "t"
+            },
+            "0056": {
+              "symbol": "0056",
+              "date": "2026-10-01",
+              "components": [
+                {
+                  "symbol": "2317",
+                  "weight": 4
+                },
+                {
+                  "symbol": "2454",
+                  "name": "聯發科",
+                  "weight": 3
+                }
+              ],
+              "source": "t"
+            }
+          }
+        },
+        "stocks": [
+          "2330"
+        ]
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "portfolio": {
+          "schema": 1,
+          "holdings": [],
+          "dividends": [],
+          "favorites": [],
+          "quotes": {}
+        },
+        "stocks": []
+      }
+    }
+  ]
+}

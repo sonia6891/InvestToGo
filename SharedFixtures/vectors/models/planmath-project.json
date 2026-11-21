@@ -1,0 +1,80 @@
+{
+  "kind": "PlanMath.project",
+  "cases": [
+    {
+      "name": "reinvest-one-year",
+      "input": {
+        "plan": {
+          "principal": 100000,
+          "monthly": 0,
+          "years": 1,
+          "totalReturn": 0.06,
+          "distributionRate": 0.04,
+          "frequency": 4,
+          "reinvest": 1,
+          "deductionRate": 0
+        }
+      }
+    },
+    {
+      "name": "cash-zero-return",
+      "input": {
+        "plan": {
+          "principal": 100000,
+          "monthly": 0,
+          "years": 1,
+          "totalReturn": 0,
+          "distributionRate": 0.04,
+          "frequency": 4,
+          "reinvest": 0,
+          "deductionRate": 0
+        }
+      }
+    },
+    {
+      "name": "deduction-monthly-pay",
+      "input": {
+        "plan": {
+          "principal": 100000,
+          "monthly": 5000,
+          "years": 3,
+          "totalReturn": 0.05,
+          "distributionRate": 0.06,
+          "frequency": 12,
+          "reinvest": 0.5,
+          "deductionRate": 0.1
+        }
+      }
+    },
+    {
+      "name": "yearly-pay-negative-return",
+      "input": {
+        "plan": {
+          "principal": 50000,
+          "monthly": 1000,
+          "years": 2,
+          "totalReturn": -0.2,
+          "distributionRate": 0.02,
+          "frequency": 1,
+          "reinvest": 1,
+          "deductionRate": 0.02
+        }
+      }
+    },
+    {
+      "name": "invalid-years",
+      "input": {
+        "plan": {
+          "principal": 1,
+          "monthly": 1,
+          "years": 0,
+          "totalReturn": 0,
+          "distributionRate": 0,
+          "frequency": 4,
+          "reinvest": 0,
+          "deductionRate": 0
+        }
+      }
+    }
+  ]
+}

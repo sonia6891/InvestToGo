@@ -1,0 +1,47 @@
+{
+  "kind": "ComponentSnapshot.imported",
+  "cases": [
+    {
+      "name": "good",
+      "input": {
+        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
+        "symbol": "0050"
+      }
+    },
+    {
+      "name": "no-source",
+      "input": {
+        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"\\u53f0\\u7a4d\\u96fb\", \"weight\": 50}]}",
+        "symbol": "0050"
+      }
+    },
+    {
+      "name": "other-code",
+      "input": {
+        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
+        "symbol": "0056"
+      }
+    },
+    {
+      "name": "future-date",
+      "input": {
+        "text": "{\"symbol\": \"0050\", \"date\": \"2099-01-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
+        "symbol": "0050"
+      }
+    },
+    {
+      "name": "no-components",
+      "input": {
+        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [], \"source\": \"投信\"}",
+        "symbol": "0050"
+      }
+    },
+    {
+      "name": "not-json",
+      "input": {
+        "text": "nope",
+        "symbol": "0050"
+      }
+    }
+  ]
+}

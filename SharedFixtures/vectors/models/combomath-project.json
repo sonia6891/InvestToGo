@@ -1,0 +1,176 @@
+{
+  "kind": "ComboMath.project",
+  "cases": [
+    {
+      "name": "base-3y",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 3,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "base-5y",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "base-10y",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 10,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "conservative",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "保守"
+      }
+    },
+    {
+      "name": "optimistic",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "樂觀"
+      }
+    },
+    {
+      "name": "stress",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "壓力測試"
+      }
+    },
+    {
+      "name": "flat-10y",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 0,
+          "etfReturn": 0
+        },
+        "stockShare": 0.4,
+        "years": 10,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "cash-yield",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5,
+          "reinvest": false,
+          "stockYield": 2,
+          "etfYield": 4
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "start-of-month-with-fee",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5,
+          "startOfMonth": true,
+          "buyFee": true
+        },
+        "stockShare": 0.4,
+        "years": 5,
+        "scenario": "基準"
+      }
+    },
+    {
+      "name": "stress-start-of-month",
+      "input": {
+        "stockStart": 120000,
+        "etfStart": 180000,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5,
+          "startOfMonth": true
+        },
+        "stockShare": 0.4,
+        "years": 3,
+        "scenario": "壓力測試"
+      }
+    },
+    {
+      "name": "one-year-zero-start",
+      "input": {
+        "stockStart": 0,
+        "etfStart": 0,
+        "settings": {
+          "monthly": 10000,
+          "stockReturn": 5,
+          "etfReturn": 5
+        },
+        "stockShare": 0.4,
+        "years": 1,
+        "scenario": "基準"
+      }
+    }
+  ]
+}
