@@ -118,7 +118,7 @@ struct XPFloat: Equatable {
     private var grown: (level: Int, fraction: Double)?
 
     /// How full the bar is at `xp`, within its level.
-    static func fraction(xp: Int) -> Double {
+    nonisolated static func fraction(xp: Int) -> Double {
         let p = GameRules.progress(xp: xp)
         return Double(p.into) / Double(max(p.needed, 1))
     }
