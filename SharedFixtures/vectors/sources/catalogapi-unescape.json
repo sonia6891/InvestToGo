@@ -1,59 +1,68 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "S&amp;P 500"
+      "expected" : "S&P 500",
+      "input" : {
+        "text" : "S&amp;P 500"
       },
-      "name": "amp"
+      "name" : "amp"
     },
     {
-      "input": {
-        "text": "&#63754;融"
+      "expected" : "金融",
+      "input" : {
+        "text" : "&#63754;融"
       },
-      "name": "numeric-compat-ideograph"
+      "name" : "numeric-compat-ideograph"
     },
     {
-      "input": {
-        "text": "&lt;A&gt; &quot;B&quot; &#39;C&#39;"
+      "expected" : "<A> \"B\" 'C'",
+      "input" : {
+        "text" : "&lt;A&gt; &quot;B&quot; &#39;C&#39;"
       },
-      "name": "named"
+      "name" : "named"
     },
     {
-      "input": {
-        "text": "&amp;lt;"
+      "expected" : "&lt;",
+      "input" : {
+        "text" : "&amp;lt;"
       },
-      "name": "amp-last"
+      "name" : "amp-last"
     },
     {
-      "input": {
-        "text": "元大台灣50"
+      "expected" : "元大台灣50",
+      "input" : {
+        "text" : "元大台灣50"
       },
-      "name": "plain"
+      "name" : "plain"
     },
     {
-      "input": {
-        "text": "金"
+      "expected" : "金",
+      "input" : {
+        "text" : "金"
       },
-      "name": "plain-compat-ideograph"
+      "name" : "plain-compat-ideograph"
     },
     {
-      "input": {
-        "text": "&#9999999;&#65;"
+      "expected" : "&#9999999;&#65;",
+      "input" : {
+        "text" : "&#9999999;&#65;"
       },
-      "name": "invalid-scalar-stops"
+      "name" : "invalid-scalar-stops"
     },
     {
-      "input": {
-        "text": "&#55296;&#65;"
+      "expected" : "&#55296;&#65;",
+      "input" : {
+        "text" : "&#55296;&#65;"
       },
-      "name": "surrogate-stops"
+      "name" : "surrogate-stops"
     },
     {
-      "input": {
-        "text": "&#65;&#66;"
+      "expected" : "AB",
+      "input" : {
+        "text" : "&#65;&#66;"
       },
-      "name": "two-numeric"
+      "name" : "two-numeric"
     }
   ],
-  "kind": "CatalogAPI.unescape"
+  "kind" : "CatalogAPI.unescape"
 }

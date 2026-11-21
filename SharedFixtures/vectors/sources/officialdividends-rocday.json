@@ -1,71 +1,82 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "115年10月22日"
+      "expected" : "2026-10-22",
+      "input" : {
+        "text" : "115年10月22日"
       },
-      "name": "roc-words"
+      "name" : "roc-words"
     },
     {
-      "input": {
-        "text": "1151016"
+      "expected" : "2026-10-16",
+      "input" : {
+        "text" : "1151016"
       },
-      "name": "seven-digits"
+      "name" : "seven-digits"
     },
     {
-      "input": {
-        "text": " 1151016 "
+      "expected" : "2026-10-16",
+      "input" : {
+        "text" : " 1151016 "
       },
-      "name": "padded"
+      "name" : "padded"
     },
     {
-      "input": {
-        "text": "115年1月2日"
+      "expected" : "2026-01-02",
+      "input" : {
+        "text" : "115年1月2日"
       },
-      "name": "single-digit-parts"
+      "name" : "single-digit-parts"
     },
     {
-      "input": {
-        "text": "115年13月01日"
+      "expected" : null,
+      "input" : {
+        "text" : "115年13月01日"
       },
-      "name": "bad-month"
+      "name" : "bad-month"
     },
     {
-      "input": {
-        "text": "abc"
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
       },
-      "name": "letters"
+      "name" : "letters"
     },
     {
-      "input": {
-        "text": "11510160"
+      "expected" : null,
+      "input" : {
+        "text" : "11510160"
       },
-      "name": "eight-digits"
+      "name" : "eight-digits"
     },
     {
-      "input": {
-        "text": "115/10/22"
+      "expected" : null,
+      "input" : {
+        "text" : "115/10/22"
       },
-      "name": "slashes"
+      "name" : "slashes"
     },
     {
-      "input": {
-        "text": "115年10月22日extra"
+      "expected" : null,
+      "input" : {
+        "text" : "115年10月22日extra"
       },
-      "name": "trailing-text"
+      "name" : "trailing-text"
     },
     {
-      "input": {
-        "text": "1151032"
+      "expected" : null,
+      "input" : {
+        "text" : "1151032"
       },
-      "name": "bad-day"
+      "name" : "bad-day"
     },
     {
-      "input": {
-        "text": "１１５１０１６"
+      "expected" : null,
+      "input" : {
+        "text" : "１１５１０１６"
       },
-      "name": "fullwidth-digits"
+      "name" : "fullwidth-digits"
     }
   ],
-  "kind": "OfficialDividends.rocDay"
+  "kind" : "OfficialDividends.rocDay"
 }

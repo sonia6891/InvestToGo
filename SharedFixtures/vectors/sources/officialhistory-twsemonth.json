@@ -1,59 +1,107 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/official/A_twse_STOCK_DAY_0050_202506.json"
+      "expected" : [
+        {
+          "close" : 175.9,
+          "date" : "2025-06-02"
+        },
+        {
+          "close" : 188.65,
+          "date" : "2025-06-10"
+        },
+        {
+          "close" : 47.57,
+          "date" : "2025-06-18"
+        },
+        {
+          "close" : 47.1,
+          "date" : "2025-06-19"
+        }
+      ],
+      "input" : {
+        "file" : "member/official/A_twse_STOCK_DAY_0050_202506.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "{\"stat\": \"很抱歉，沒有符合條件的資料!\"}"
+      "expected" : [
+
+      ],
+      "input" : {
+        "text" : "{\"stat\": \"很抱歉，沒有符合條件的資料!\"}"
       },
-      "name": "no-match"
+      "name" : "no-match"
     },
     {
-      "input": {
-        "text": "{\"stat\": \"查詢日期錯誤\"}"
+      "expected" : {
+        "error" : "證交所日成交回應異常：查詢日期錯誤"
       },
-      "name": "error-stat"
+      "input" : {
+        "text" : "{\"stat\": \"查詢日期錯誤\"}"
+      },
+      "name" : "error-stat"
     },
     {
-      "input": {
-        "text": "{}"
+      "expected" : {
+        "error" : "證交所日成交回應異常：缺少 stat"
       },
-      "name": "missing-stat"
+      "input" : {
+        "text" : "{}"
+      },
+      "name" : "missing-stat"
     },
     {
-      "input": {
-        "text": "[]"
+      "expected" : {
+        "error" : "官方資料格式不符（不是 JSON 物件）"
       },
-      "name": "not-object"
+      "input" : {
+        "text" : "[]"
+      },
+      "name" : "not-object"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"Date\",\"Close\"],\"data\":[[\"114/06/02\",\"1\"]]}"
+      "expected" : {
+        "error" : "證交所日成交資料欄位不符（缺少「日期」）"
       },
-      "name": "renamed-fields"
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"Date\",\"Close\"],\"data\":[[\"114/06/02\",\"1\"]]}"
+      },
+      "name" : "renamed-fields"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"bad\",\"--\"]]}"
+      "expected" : {
+        "error" : "證交所日成交資料無法解析（1 列皆無效）"
       },
-      "name": "all-rows-bad"
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"bad\",\"--\"]]}"
+      },
+      "name" : "all-rows-bad"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\",175.9],[\"114/06/03\",null]]}"
+      "expected" : [
+        {
+          "close" : 175.9,
+          "date" : "2025-06-02"
+        }
+      ],
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\",175.9],[\"114/06/03\",null]]}"
       },
-      "name": "number-cells"
+      "name" : "number-cells"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\"],[\"114/06/03\",\"1,180.5\"]]}"
+      "expected" : [
+        {
+          "close" : 1180.5,
+          "date" : "2025-06-03"
+        }
+      ],
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\"],[\"114/06/03\",\"1,180.5\"]]}"
       },
-      "name": "short-row-skipped"
+      "name" : "short-row-skipped"
     }
   ],
-  "kind": "OfficialHistory.twseMonth"
+  "kind" : "OfficialHistory.twseMonth"
 }

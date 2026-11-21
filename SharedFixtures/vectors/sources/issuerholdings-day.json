@@ -1,83 +1,96 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "value": "20261111"
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "20261111"
       },
-      "name": "compact"
+      "name" : "compact"
     },
     {
-      "input": {
-        "value": "2026/11/11"
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026/11/11"
       },
-      "name": "slashes"
+      "name" : "slashes"
     },
     {
-      "input": {
-        "value": "2026-11-11"
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026-11-11"
       },
-      "name": "dashes"
+      "name" : "dashes"
     },
     {
-      "input": {
-        "value": " 2026-11-11 "
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : " 2026-11-11 "
       },
-      "name": "padded"
+      "name" : "padded"
     },
     {
-      "input": {
-        "value": "115/11/11"
+      "expected" : null,
+      "input" : {
+        "value" : "115/11/11"
       },
-      "name": "roc"
+      "name" : "roc"
     },
     {
-      "input": {
-        "value": "2026/13/01"
+      "expected" : null,
+      "input" : {
+        "value" : "2026/13/01"
       },
-      "name": "bad-month"
+      "name" : "bad-month"
     },
     {
-      "input": {
-        "value": "abc"
+      "expected" : null,
+      "input" : {
+        "value" : "abc"
       },
-      "name": "letters"
+      "name" : "letters"
     },
     {
-      "input": {
-        "value": null
+      "expected" : null,
+      "input" : {
+        "value" : null
       },
-      "name": "null"
+      "name" : "null"
     },
     {
-      "input": {
-        "value": 20261111
+      "expected" : null,
+      "input" : {
+        "value" : 20261111
       },
-      "name": "number"
+      "name" : "number"
     },
     {
-      "input": {
-        "value": "2026/1/5"
+      "expected" : "2026-01-05",
+      "input" : {
+        "value" : "2026/1/5"
       },
-      "name": "short-parts"
+      "name" : "short-parts"
     },
     {
-      "input": {
-        "value": "２０２６-11-11"
+      "expected" : null,
+      "input" : {
+        "value" : "２０２６-11-11"
       },
-      "name": "fullwidth"
+      "name" : "fullwidth"
     },
     {
-      "input": {
-        "value": "2026/11-11"
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026/11-11"
       },
-      "name": "mixed-separators"
+      "name" : "mixed-separators"
     },
     {
-      "input": {
-        "value": "2026//11"
+      "expected" : null,
+      "input" : {
+        "value" : "2026//11"
       },
-      "name": "empty-part"
+      "name" : "empty-part"
     }
   ],
-  "kind": "IssuerHoldings.day"
+  "kind" : "IssuerHoldings.day"
 }

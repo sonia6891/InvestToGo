@@ -1,29 +1,60 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/official/C_twse_TWT49U_2025_sample.json"
+      "expected" : [
+        {
+          "cash" : 2.7,
+          "exDate" : "2025-01-17",
+          "symbol" : "0050"
+        },
+        {
+          "cash" : 0.5,
+          "exDate" : "2025-02-20",
+          "symbol" : "00878"
+        },
+        {
+          "cash" : 0.47,
+          "exDate" : "2025-05-19",
+          "symbol" : "00878"
+        },
+        {
+          "cash" : 0.989,
+          "exDate" : "2025-07-16",
+          "symbol" : "006208"
+        }
+      ],
+      "input" : {
+        "file" : "member/official/C_twse_TWT49U_2025_sample.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "{\"stat\": \"error\"}"
+      "expected" : {
+        "error" : "證交所除權息回應異常：error"
       },
-      "name": "error-stat"
+      "input" : {
+        "text" : "{\"stat\": \"error\"}"
+      },
+      "name" : "error-stat"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"x\"],\"data\":[[\"1\"]]}"
+      "expected" : {
+        "error" : "證交所除權息資料欄位不符（缺少「資料日期」）"
       },
-      "name": "renamed"
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"x\"],\"data\":[[\"1\"]]}"
+      },
+      "name" : "renamed"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"資料日期\",\"股票代號\",\"權值+息值\",\"權/息\"],\"data\":[[\"114/01/17\",\"4562\",\"1.0\",\"權\"]]}"
+      "expected" : [
+
+      ],
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"資料日期\",\"股票代號\",\"權值+息值\",\"權/息\"],\"data\":[[\"114/01/17\",\"4562\",\"1.0\",\"權\"]]}"
       },
-      "name": "only-rights-rows"
+      "name" : "only-rights-rows"
     }
   ],
-  "kind": "OfficialHistory.twseDividends"
+  "kind" : "OfficialHistory.twseDividends"
 }

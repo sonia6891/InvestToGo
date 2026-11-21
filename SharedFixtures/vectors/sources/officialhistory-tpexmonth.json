@@ -1,41 +1,73 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/official/B_tpex_tradingStock_00679B_202506.json"
+      "expected" : [
+        {
+          "close" : 25.21,
+          "date" : "2025-06-02"
+        },
+        {
+          "close" : 25.23,
+          "date" : "2025-06-03"
+        },
+        {
+          "close" : 25.15,
+          "date" : "2025-06-04"
+        }
+      ],
+      "input" : {
+        "file" : "member/official/B_tpex_tradingStock_00679B_202506.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"ok\",\"tables\":[{\"data\":[],\"fields\":[]}]}"
+      "expected" : [
+
+      ],
+      "input" : {
+        "text" : "{\"stat\":\"ok\",\"tables\":[{\"data\":[],\"fields\":[]}]}"
       },
-      "name": "empty-data"
+      "name" : "empty-data"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"ok\"}"
+      "expected" : {
+        "error" : "櫃買日成交資料格式不符（缺少 tables）"
       },
-      "name": "no-tables"
+      "input" : {
+        "text" : "{\"stat\":\"ok\"}"
+      },
+      "name" : "no-tables"
     },
     {
-      "input": {
-        "text": "{\"tables\":[{\"fields\":[]}]}"
+      "expected" : {
+        "error" : "櫃買日成交資料格式不符（缺少 data）"
       },
-      "name": "no-data"
+      "input" : {
+        "text" : "{\"tables\":[{\"fields\":[]}]}"
+      },
+      "name" : "no-data"
     },
     {
-      "input": {
-        "text": "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"114/06/02\",\"25.21\"]]}]}"
+      "expected" : [
+        {
+          "close" : 25.21,
+          "date" : "2025-06-02"
+        }
+      ],
+      "input" : {
+        "text" : "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"114/06/02\",\"25.21\"]]}]}"
       },
-      "name": "spaced-field-names"
+      "name" : "spaced-field-names"
     },
     {
-      "input": {
-        "text": "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"bad\",\"--\"]]}]}"
+      "expected" : {
+        "error" : "櫃買日成交資料無法解析（1 列皆無效）"
       },
-      "name": "all-rows-bad"
+      "input" : {
+        "text" : "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"bad\",\"--\"]]}]}"
+      },
+      "name" : "all-rows-bad"
     }
   ],
-  "kind": "OfficialHistory.tpexMonth"
+  "kind" : "OfficialHistory.tpexMonth"
 }

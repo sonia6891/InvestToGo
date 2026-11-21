@@ -1,23 +1,40 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "[{\"Date\":\"20261110\",\"Close\":\"300.12\",\"Change\":\"-1.5\",\"Open\":\"301\",\"High\":\"302\",\"Low\":\"299\"},{\"Date\":\"20261111\",\"Close\":\"302.00\",\"Change\":\"1.88\",\"Open\":\"300\",\"High\":\"303\",\"Low\":\"299.5\"},{\"Date\":\"2026111\",\"Close\":\"999\"}]"
+      "expected" : {
+        "change" : 1.88,
+        "changePercent" : 0.63,
+        "currency" : "TWD",
+        "date" : "2026-11-11",
+        "fetchedAt" : 1794375000,
+        "high" : 303,
+        "low" : 299.5,
+        "open" : 300,
+        "price" : 302,
+        "source" : "收盤",
+        "symbol" : "IX0043",
+        "trial" : null,
+        "volume" : null
       },
-      "name": "latest-row"
+      "input" : {
+        "text" : "[{\"Date\":\"20261110\",\"Close\":\"300.12\",\"Change\":\"-1.5\",\"Open\":\"301\",\"High\":\"302\",\"Low\":\"299\"},{\"Date\":\"20261111\",\"Close\":\"302.00\",\"Change\":\"1.88\",\"Open\":\"300\",\"High\":\"303\",\"Low\":\"299.5\"},{\"Date\":\"2026111\",\"Close\":\"999\"}]"
+      },
+      "name" : "latest-row"
     },
     {
-      "input": {
-        "text": "[{\"Date\":\"20261111\",\"Close\":\"--\"}]"
+      "expected" : null,
+      "input" : {
+        "text" : "[{\"Date\":\"20261111\",\"Close\":\"--\"}]"
       },
-      "name": "no-close"
+      "name" : "no-close"
     },
     {
-      "input": {
-        "text": "[]"
+      "expected" : null,
+      "input" : {
+        "text" : "[]"
       },
-      "name": "empty"
+      "name" : "empty"
     }
   ],
-  "kind": "OpenData.decodeTPExIndex"
+  "kind" : "OpenData.decodeTPExIndex"
 }

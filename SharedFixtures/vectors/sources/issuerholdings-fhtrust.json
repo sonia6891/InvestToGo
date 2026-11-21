@@ -1,33 +1,64 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/issuers/E_fhtrust_assets_00929.json",
-        "symbol": "00929"
+      "expected" : {
+        "components" : [
+          {
+            "name" : "華碩電腦",
+            "symbol" : "2357",
+            "weight" : 4.123
+          },
+          {
+            "name" : "聯詠科技",
+            "symbol" : "3034",
+            "weight" : 3.829
+          },
+          {
+            "name" : "台灣大哥",
+            "symbol" : "3045",
+            "weight" : 3.624
+          }
+        ],
+        "date" : "2026-11-11",
+        "source" : "復華投信",
+        "symbol" : "00929"
       },
-      "name": "fixture"
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_assets_00929.json",
+        "symbol" : "00929"
+      },
+      "name" : "fixture"
     },
     {
-      "input": {
-        "file": "member/issuers/E_fhtrust_assets_00929.json",
-        "symbol": "00927"
+      "expected" : {
+        "error" : "復華投信持股資料與查詢的 ETF 不符（回應為 00929）"
       },
-      "name": "wrong-fund"
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_assets_00929.json",
+        "symbol" : "00927"
+      },
+      "name" : "wrong-fund"
     },
     {
-      "input": {
-        "symbol": "00929",
-        "text": "{\"result\":[],\"status\":0}"
+      "expected" : {
+        "error" : "復華投信持股資料格式不符（缺少 result）"
       },
-      "name": "empty-result"
+      "input" : {
+        "symbol" : "00929",
+        "text" : "{\"result\":[],\"status\":0}"
+      },
+      "name" : "empty-result"
     },
     {
-      "input": {
-        "symbol": "00929",
-        "text": "{\"result\":[{\"etf002\":\"00929\",\"dDate\":\"2026/11/11\"}]}"
+      "expected" : {
+        "error" : "復華投信持股資料格式不符（缺少 detail）"
       },
-      "name": "no-detail"
+      "input" : {
+        "symbol" : "00929",
+        "text" : "{\"result\":[{\"etf002\":\"00929\",\"dDate\":\"2026/11/11\"}]}"
+      },
+      "name" : "no-detail"
     }
   ],
-  "kind": "IssuerHoldings.fhtrust"
+  "kind" : "IssuerHoldings.fhtrust"
 }

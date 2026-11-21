@@ -1,101 +1,127 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "bars": [
+      "expected" : [
+        "2025-06-18"
+      ],
+      "input" : {
+        "bars" : [
           {
-            "close": 100,
-            "date": "2025-06-17"
+            "close" : 100,
+            "date" : "2025-06-17"
           },
           {
-            "close": 25,
-            "date": "2025-06-18"
+            "close" : 25,
+            "date" : "2025-06-18"
           }
         ],
-        "dividends": [],
-        "known": []
+        "dividends" : [
+
+        ],
+        "known" : [
+
+        ]
       },
-      "name": "flagged"
+      "name" : "flagged"
     },
     {
-      "input": {
-        "bars": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "bars" : [
           {
-            "close": 100,
-            "date": "2025-06-17"
+            "close" : 100,
+            "date" : "2025-06-17"
           },
           {
-            "close": 25,
-            "date": "2025-06-18"
+            "close" : 25,
+            "date" : "2025-06-18"
           }
         ],
-        "dividends": [],
-        "known": [
+        "dividends" : [
+
+        ],
+        "known" : [
           {
-            "ratio": 4,
-            "resumeDate": "2025-06-18",
-            "symbol": "0050"
+            "ratio" : 4,
+            "resumeDate" : "2025-06-18",
+            "symbol" : "0050"
           }
         ]
       },
-      "name": "known-split"
+      "name" : "known-split"
     },
     {
-      "input": {
-        "bars": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "bars" : [
           {
-            "close": 100,
-            "date": "2025-06-17"
+            "close" : 100,
+            "date" : "2025-06-17"
           },
           {
-            "close": 30,
-            "date": "2025-06-18"
+            "close" : 30,
+            "date" : "2025-06-18"
           }
         ],
-        "dividends": [
+        "dividends" : [
           {
-            "cash": 70,
-            "exDate": "2025-06-18",
-            "symbol": "x"
+            "cash" : 70,
+            "exDate" : "2025-06-18",
+            "symbol" : "x"
           }
         ],
-        "known": []
+        "known" : [
+
+        ]
       },
-      "name": "dividend-day"
+      "name" : "dividend-day"
     },
     {
-      "input": {
-        "bars": [
+      "expected" : [
+        "2025-01-03",
+        "2025-01-04",
+        "2025-01-05"
+      ],
+      "input" : {
+        "bars" : [
           {
-            "close": 10,
-            "date": "2025-01-01"
+            "close" : 10,
+            "date" : "2025-01-01"
           },
           {
-            "close": 25,
-            "date": "2025-01-02"
+            "close" : 25,
+            "date" : "2025-01-02"
           },
           {
-            "close": 63,
-            "date": "2025-01-03"
+            "close" : 63,
+            "date" : "2025-01-03"
           },
           {
-            "close": 25.2,
-            "date": "2025-01-04"
+            "close" : 25.2,
+            "date" : "2025-01-04"
           },
           {
-            "close": 0,
-            "date": "2025-01-05"
+            "close" : 0,
+            "date" : "2025-01-05"
           },
           {
-            "close": 5,
-            "date": "2025-01-06"
+            "close" : 5,
+            "date" : "2025-01-06"
           }
         ],
-        "dividends": [],
-        "known": []
+        "dividends" : [
+
+        ],
+        "known" : [
+
+        ]
       },
-      "name": "jump-up-and-edges"
+      "name" : "jump-up-and-edges"
     }
   ],
-  "kind": "OfficialHistory.suspectedSplits"
+  "kind" : "OfficialHistory.suspectedSplits"
 }

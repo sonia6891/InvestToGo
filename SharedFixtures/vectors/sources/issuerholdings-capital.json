@@ -1,40 +1,74 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/issuers/E_capital_buyback_00919.json",
-        "symbol": "00919"
+      "expected" : {
+        "components" : [
+          {
+            "name" : "富邦金",
+            "symbol" : "2881",
+            "weight" : 16.1341
+          },
+          {
+            "name" : "國泰金",
+            "symbol" : "2882",
+            "weight" : 13.0977
+          },
+          {
+            "name" : "中信金",
+            "symbol" : "2891",
+            "weight" : 12.0427
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "群益投信",
+        "symbol" : "00919"
       },
-      "name": "fixture"
+      "input" : {
+        "file" : "member/issuers/E_capital_buyback_00919.json",
+        "symbol" : "00919"
+      },
+      "name" : "fixture"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "{\"code\":500,\"data\":null,\"message\":\"系統忙碌\"}"
+      "expected" : {
+        "error" : "群益投信持股資料回應異常：系統忙碌"
       },
-      "name": "error-body"
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{\"code\":500,\"data\":null,\"message\":\"系統忙碌\"}"
+      },
+      "name" : "error-body"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "{\"code\":\"404\"}"
+      "expected" : {
+        "error" : "群益投信持股資料回應異常：code 404"
       },
-      "name": "error-without-message"
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{\"code\":\"404\"}"
+      },
+      "name" : "error-without-message"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "{\"code\":200,\"data\":{\"pcf\":{\"date2\":\"2026/11/13\"}}}"
+      "expected" : {
+        "error" : "群益投信持股資料格式不符（缺少 stocks）"
       },
-      "name": "no-stocks"
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{\"code\":200,\"data\":{\"pcf\":{\"date2\":\"2026/11/13\"}}}"
+      },
+      "name" : "no-stocks"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "{}"
+      "expected" : {
+        "error" : "群益投信持股資料格式不符（缺少 data）"
       },
-      "name": "empty-object"
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{}"
+      },
+      "name" : "empty-object"
     }
   ],
-  "kind": "IssuerHoldings.capital"
+  "kind" : "IssuerHoldings.capital"
 }

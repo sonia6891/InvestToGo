@@ -1,65 +1,75 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "114/06/18"
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "114/06/18"
       },
-      "name": "slashes"
+      "name" : "slashes"
     },
     {
-      "input": {
-        "text": "114年01月17日"
+      "expected" : "2025-01-17",
+      "input" : {
+        "text" : "114年01月17日"
       },
-      "name": "words"
+      "name" : "words"
     },
     {
-      "input": {
-        "text": "abc"
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
       },
-      "name": "letters"
+      "name" : "letters"
     },
     {
-      "input": {
-        "text": " 114/6/1 "
+      "expected" : "2025-06-01",
+      "input" : {
+        "text" : " 114/6/1 "
       },
-      "name": "padded-short"
+      "name" : "padded-short"
     },
     {
-      "input": {
-        "text": "114/13/01"
+      "expected" : null,
+      "input" : {
+        "text" : "114/13/01"
       },
-      "name": "bad-month"
+      "name" : "bad-month"
     },
     {
-      "input": {
-        "text": "0/01/01"
+      "expected" : null,
+      "input" : {
+        "text" : "0/01/01"
       },
-      "name": "year-zero"
+      "name" : "year-zero"
     },
     {
-      "input": {
-        "text": "114/06"
+      "expected" : null,
+      "input" : {
+        "text" : "114/06"
       },
-      "name": "two-parts"
+      "name" : "two-parts"
     },
     {
-      "input": {
-        "text": "114//06/18"
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "114//06/18"
       },
-      "name": "double-slash"
+      "name" : "double-slash"
     },
     {
-      "input": {
-        "text": "\t114/06/18\t"
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "\t114/06/18\t"
       },
-      "name": "tab-padded"
+      "name" : "tab-padded"
     },
     {
-      "input": {
-        "text": "+114/06/18"
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "+114/06/18"
       },
-      "name": "signed"
+      "name" : "signed"
     }
   ],
-  "kind": "OfficialHistory.rocDate"
+  "kind" : "OfficialHistory.rocDate"
 }

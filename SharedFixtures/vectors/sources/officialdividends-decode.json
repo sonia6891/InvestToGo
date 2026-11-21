@@ -1,83 +1,131 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "official/twse-twt48u.json",
-        "market": "TWSE",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
+      "expected" : {
+        "0051" : [
+          {
+            "amount" : null,
+            "ex" : "2026-11-20",
+            "pay" : ""
+          }
+        ],
+        "00690" : [
+          {
+            "amount" : 2,
+            "ex" : "2026-11-17",
+            "pay" : ""
+          }
+        ]
+      },
+      "input" : {
+        "file" : "official/twse-twt48u.json",
+        "market" : "TWSE",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
         }
       },
-      "name": "twse-fixture"
+      "name" : "twse-fixture"
     },
     {
-      "input": {
-        "market": "TPEx",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
-        },
-        "text": "[{\"SecuritiesCompanyCode\":\"00679B\",\"ExRrightsExDividendDate\":\"1151120\",\"ExRrightsExDividend\":\"息\",\"CashDividend\":\"0.52\"},{\"SecuritiesCompanyCode\":\"0051\",\"ExRrightsExDividendDate\":\"1151120\",\"ExRrightsExDividend\":\"息\",\"CashDividend\":\"1\"},{\"SecuritiesCompanyCode\":\"00679B\",\"ExRrightsExDividendDate\":\"1151220\",\"ExRrightsExDividend\":\"權息\",\"CashDividend\":\"1,000.5\"}]"
+      "expected" : {
+        "00679B" : [
+          {
+            "amount" : 0.52,
+            "ex" : "2026-11-20",
+            "pay" : ""
+          },
+          {
+            "amount" : 1000.5,
+            "ex" : "2026-12-20",
+            "pay" : ""
+          }
+        ]
       },
-      "name": "tpex-only-tpex-codes"
+      "input" : {
+        "market" : "TPEx",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
+        },
+        "text" : "[{\"SecuritiesCompanyCode\":\"00679B\",\"ExRrightsExDividendDate\":\"1151120\",\"ExRrightsExDividend\":\"息\",\"CashDividend\":\"0.52\"},{\"SecuritiesCompanyCode\":\"0051\",\"ExRrightsExDividendDate\":\"1151120\",\"ExRrightsExDividend\":\"息\",\"CashDividend\":\"1\"},{\"SecuritiesCompanyCode\":\"00679B\",\"ExRrightsExDividendDate\":\"1151220\",\"ExRrightsExDividend\":\"權息\",\"CashDividend\":\"1,000.5\"}]"
+      },
+      "name" : "tpex-only-tpex-codes"
     },
     {
-      "input": {
-        "market": "TWSE",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
-        },
-        "text": "[{\"Code\":\"00690\",\"Date\":\"1151117\",\"Exdividend\":\"息\",\"CashDividend\":\"0\"}]"
+      "expected" : {
+        "00690" : [
+          {
+            "amount" : null,
+            "ex" : "2026-11-17",
+            "pay" : ""
+          }
+        ]
       },
-      "name": "zero-amount-is-unknown"
+      "input" : {
+        "market" : "TWSE",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
+        },
+        "text" : "[{\"Code\":\"00690\",\"Date\":\"1151117\",\"Exdividend\":\"息\",\"CashDividend\":\"0\"}]"
+      },
+      "name" : "zero-amount-is-unknown"
     },
     {
-      "input": {
-        "market": "TWSE",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
-        },
-        "text": "[{\"code\":\"00690\",\"date\":\"1151117\"}]"
+      "expected" : {
+        "error" : "上市配息資料格式不符。"
       },
-      "name": "renamed-fields"
+      "input" : {
+        "market" : "TWSE",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
+        },
+        "text" : "[{\"code\":\"00690\",\"date\":\"1151117\"}]"
+      },
+      "name" : "renamed-fields"
     },
     {
-      "input": {
-        "market": "TPEx",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
-        },
-        "text": "{}"
+      "expected" : {
+        "error" : "上櫃配息資料格式不符。"
       },
-      "name": "tpex-not-array"
+      "input" : {
+        "market" : "TPEx",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
+        },
+        "text" : "{}"
+      },
+      "name" : "tpex-not-array"
     },
     {
-      "input": {
-        "market": "TWSE",
-        "markets": {
-          "0051": "TWSE",
-          "00679B": "TPEx",
-          "00690": "TWSE",
-          "4562": "TWSE"
-        },
-        "text": "[]"
+      "expected" : {
+
       },
-      "name": "empty"
+      "input" : {
+        "market" : "TWSE",
+        "markets" : {
+          "0051" : "TWSE",
+          "00679B" : "TPEx",
+          "00690" : "TWSE",
+          "4562" : "TWSE"
+        },
+        "text" : "[]"
+      },
+      "name" : "empty"
     }
   ],
-  "kind": "OfficialDividends.decode"
+  "kind" : "OfficialDividends.decode"
 }

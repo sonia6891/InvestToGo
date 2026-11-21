@@ -1,40 +1,45 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/issuers/E_capital_items_sample.json",
-        "symbol": "00919"
+      "expected" : "195",
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "00919"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "file": "member/issuers/E_capital_items_sample.json",
-        "symbol": "00982A"
+      "expected" : "399",
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "00982A"
       },
-      "name": "fixture-active"
+      "name" : "fixture-active"
     },
     {
-      "input": {
-        "file": "member/issuers/E_capital_items_sample.json",
-        "symbol": "0050"
+      "expected" : null,
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "0050"
       },
-      "name": "fixture-missing"
+      "name" : "fixture-missing"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "{}"
+      "expected" : null,
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{}"
       },
-      "name": "empty-object"
+      "name" : "empty-object"
     },
     {
-      "input": {
-        "symbol": "00919",
-        "text": "oops"
+      "expected" : null,
+      "input" : {
+        "symbol" : "00919",
+        "text" : "oops"
       },
-      "name": "not-json"
+      "name" : "not-json"
     }
   ],
-  "kind": "IssuerHoldings.capitalFundNo"
+  "kind" : "IssuerHoldings.capitalFundNo"
 }

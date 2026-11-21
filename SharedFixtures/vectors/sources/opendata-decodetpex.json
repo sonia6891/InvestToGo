@@ -1,23 +1,54 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "official/tpex-daily-close.json"
+      "expected" : [
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-11",
+          "price" : 9.28,
+          "symbol" : "00411A"
+        },
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-11",
+          "price" : 26.39,
+          "symbol" : "00679B"
+        },
+        {
+          "currency" : "UNKNOWN",
+          "date" : "2026-11-11",
+          "price" : 9.01,
+          "symbol" : "00687C"
+        }
+      ],
+      "input" : {
+        "file" : "official/tpex-daily-close.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "<html>"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "not-json"
+      "input" : {
+        "text" : "<html>"
+      },
+      "name" : "not-json"
     },
     {
-      "input": {
-        "text": "[{\"SecuritiesCompanyCode\":\" 00679B \",\"Date\":\"1151111\",\"Close\":\"26.39\",\"Change\":\"+0.10\",\"Open\":\"26\",\"High\":\"27\",\"Low\":\"25\",\"TradingShares\":\"1500\"}]"
+      "expected" : [
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-11",
+          "price" : 26.39,
+          "symbol" : "00679B"
+        }
+      ],
+      "input" : {
+        "text" : "[{\"SecuritiesCompanyCode\":\" 00679B \",\"Date\":\"1151111\",\"Close\":\"26.39\",\"Change\":\"+0.10\",\"Open\":\"26\",\"High\":\"27\",\"Low\":\"25\",\"TradingShares\":\"1500\"}]"
       },
-      "name": "trimmed-code-and-plus"
+      "name" : "trimmed-code-and-plus"
     }
   ],
-  "kind": "OpenData.decodeTPEx"
+  "kind" : "OpenData.decodeTPEx"
 }

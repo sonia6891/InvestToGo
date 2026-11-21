@@ -1,75 +1,138 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      "expected" : {
+        "change" : 1.15,
+        "changePercent" : 1.2,
+        "currency" : null,
+        "date" : "2026-11-11",
+        "high" : 100.1,
+        "low" : 98.2,
+        "open" : 98.5,
+        "price" : 99.7,
+        "source" : null,
+        "symbol" : "0050",
+        "trial" : null,
+        "volume" : 12345
       },
-      "name": "close-price"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      },
+      "name" : "close-price"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1,\"isTrial\":true}"
+      "expected" : {
+        "change" : 1.15,
+        "changePercent" : 1.2,
+        "currency" : null,
+        "date" : "2026-11-11",
+        "high" : 100.1,
+        "low" : 98.2,
+        "open" : 98.5,
+        "price" : 99.8,
+        "source" : null,
+        "symbol" : "0050",
+        "trial" : true,
+        "volume" : 12345
       },
-      "name": "trial-uses-last-price"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1,\"isTrial\":true}"
+      },
+      "name" : "trial-uses-last-price"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"lastPrice\":99.8}"
+      "expected" : {
+        "change" : null,
+        "changePercent" : null,
+        "currency" : null,
+        "date" : "2026-11-11",
+        "high" : null,
+        "low" : null,
+        "open" : null,
+        "price" : 99.8,
+        "source" : null,
+        "symbol" : "0050",
+        "trial" : null,
+        "volume" : null
       },
-      "name": "last-price-only"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"lastPrice\":99.8}"
+      },
+      "name" : "last-price-only"
     },
     {
-      "input": {
-        "expectedSymbol": "0056",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "wrong-symbol"
+      "input" : {
+        "expectedSymbol" : "0056",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      },
+      "name" : "wrong-symbol"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\"}"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "no-price"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\"}"
+      },
+      "name" : "no-price"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":0}"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "zero-price"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":0}"
+      },
+      "name" : "zero-price"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":1,\"total\":{\"tradeVolume\":-1}}"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "negative-volume"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":1,\"total\":{\"tradeVolume\":-1}}"
+      },
+      "name" : "negative-volume"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":\"99.7\"}"
+      "expected" : {
+        "error" : "*"
       },
-      "name": "string-price"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":\"99.7\"}"
+      },
+      "name" : "string-price"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "{\"symbol\":\"0050\",\"closePrice\":99.7}"
+      "expected" : {
+        "error" : "*"
       },
-      "name": "missing-date"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"closePrice\":99.7}"
+      },
+      "name" : "missing-date"
     },
     {
-      "input": {
-        "expectedSymbol": "0050",
-        "text": "oops"
+      "expected" : {
+        "error" : "*"
       },
-      "name": "not-json"
+      "input" : {
+        "expectedSymbol" : "0050",
+        "text" : "oops"
+      },
+      "name" : "not-json"
     }
   ],
-  "kind": "Fugle.decode"
+  "kind" : "Fugle.decode"
 }

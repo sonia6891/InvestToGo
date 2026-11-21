@@ -1,41 +1,47 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "{\"result\":{\"preDate\":\"2026/11/13\",\"fundPerNav\":\"33.51\"},\"returnCode\":\"2000\",\"success\":true}"
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026/11/13\",\"fundPerNav\":\"33.51\"},\"returnCode\":\"2000\",\"success\":true}"
       },
-      "name": "real"
+      "name" : "real"
     },
     {
-      "input": {
-        "text": "{\"result\":{\"preDate\":\"2026-11-13T00:00:00\"}}"
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026-11-13T00:00:00\"}}"
       },
-      "name": "with-time"
+      "name" : "with-time"
     },
     {
-      "input": {
-        "text": "{\"result\":{\"preDate\":\"2026/11/13 08:00\"}}"
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026/11/13 08:00\"}}"
       },
-      "name": "with-space-time"
+      "name" : "with-space-time"
     },
     {
-      "input": {
-        "text": "{\"result\":{\"preDate\":\"\"}}"
+      "expected" : null,
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"\"}}"
       },
-      "name": "blank"
+      "name" : "blank"
     },
     {
-      "input": {
-        "text": "{\"result\":null,\"returnCode\":\"9999\",\"success\":false}"
+      "expected" : null,
+      "input" : {
+        "text" : "{\"result\":null,\"returnCode\":\"9999\",\"success\":false}"
       },
-      "name": "null-result"
+      "name" : "null-result"
     },
     {
-      "input": {
-        "text": "oops"
+      "expected" : null,
+      "input" : {
+        "text" : "oops"
       },
-      "name": "not-json"
+      "name" : "not-json"
     }
   ],
-  "kind": "IssuerHoldings.cathayAssetsDate"
+  "kind" : "IssuerHoldings.cathayAssetsDate"
 }

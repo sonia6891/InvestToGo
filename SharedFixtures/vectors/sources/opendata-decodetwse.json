@@ -1,29 +1,75 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "official/twse-stock-day-all.json"
+      "expected" : [
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "price" : 99.7,
+          "symbol" : "0050"
+        },
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "price" : 42.31,
+          "symbol" : "00635U"
+        },
+        {
+          "currency" : "UNKNOWN",
+          "date" : "2026-11-10",
+          "price" : 7.71,
+          "symbol" : "00636K"
+        },
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "price" : 32.95,
+          "symbol" : "00878"
+        },
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "price" : 2285,
+          "symbol" : "2330"
+        }
+      ],
+      "input" : {
+        "file" : "official/twse-stock-day-all.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "{}"
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
       },
-      "name": "not-an-array"
+      "input" : {
+        "text" : "{}"
+      },
+      "name" : "not-an-array"
     },
     {
-      "input": {
-        "text": "[]"
+      "expected" : [
+
+      ],
+      "input" : {
+        "text" : "[]"
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "text": "[{\"Code\":\"0050\",\"Date\":\"bad\",\"ClosingPrice\":\"1\"},{\"Code\":\"00x\",\"Date\":\"1151110\",\"ClosingPrice\":\"1\"},{\"Code\":\"0056\",\"Date\":\"1151110\",\"ClosingPrice\":\"5d\"},{\"Code\":\"006208\",\"Date\":\"1151110\",\"ClosingPrice\":\" 1,234.5 \"}]"
+      "expected" : [
+        {
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "price" : 1234.5,
+          "symbol" : "006208"
+        }
+      ],
+      "input" : {
+        "text" : "[{\"Code\":\"0050\",\"Date\":\"bad\",\"ClosingPrice\":\"1\"},{\"Code\":\"00x\",\"Date\":\"1151110\",\"ClosingPrice\":\"1\"},{\"Code\":\"0056\",\"Date\":\"1151110\",\"ClosingPrice\":\"5d\"},{\"Code\":\"006208\",\"Date\":\"1151110\",\"ClosingPrice\":\" 1,234.5 \"}]"
       },
-      "name": "bad-rows-skipped"
+      "name" : "bad-rows-skipped"
     }
   ],
-  "kind": "OpenData.decodeTWSE"
+  "kind" : "OpenData.decodeTWSE"
 }

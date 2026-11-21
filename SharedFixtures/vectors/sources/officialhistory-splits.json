@@ -1,23 +1,91 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "file": "member/official/D_twse_TWTCAU_2015_2026.json"
+      "expected" : [
+        {
+          "ratio" : 0.14285714285714285,
+          "resumeDate" : "2024-12-11",
+          "symbol" : "00632R"
+        },
+        {
+          "ratio" : 0.16666666666666666,
+          "resumeDate" : "2025-02-19",
+          "symbol" : "00676R"
+        },
+        {
+          "ratio" : 7,
+          "resumeDate" : "2025-06-11",
+          "symbol" : "00663L"
+        },
+        {
+          "ratio" : 4,
+          "resumeDate" : "2025-06-18",
+          "symbol" : "0050"
+        },
+        {
+          "ratio" : 0.25,
+          "resumeDate" : "2025-10-22",
+          "symbol" : "00673R"
+        },
+        {
+          "ratio" : 0.25,
+          "resumeDate" : "2025-10-22",
+          "symbol" : "00706L"
+        },
+        {
+          "ratio" : 7,
+          "resumeDate" : "2025-11-26",
+          "symbol" : "0052"
+        },
+        {
+          "ratio" : 0.5,
+          "resumeDate" : "2025-12-10",
+          "symbol" : "00715L"
+        },
+        {
+          "ratio" : 22,
+          "resumeDate" : "2026-03-31",
+          "symbol" : "00631L"
+        },
+        {
+          "ratio" : 0.2,
+          "resumeDate" : "2026-04-22",
+          "symbol" : "00674R"
+        },
+        {
+          "ratio" : 24,
+          "resumeDate" : "2026-07-07",
+          "symbol" : "00685L"
+        },
+        {
+          "ratio" : 5,
+          "resumeDate" : "2026-11-17",
+          "symbol" : "00662"
+        }
+      ],
+      "input" : {
+        "file" : "member/official/D_twse_TWTCAU_2015_2026.json"
       },
-      "name": "fixture"
+      "name" : "fixture"
     },
     {
-      "input": {
-        "text": "{\"stat\": \"error\"}"
+      "expected" : {
+        "error" : "ETF 分割回應異常：error"
       },
-      "name": "error-stat"
+      "input" : {
+        "text" : "{\"stat\": \"error\"}"
+      },
+      "name" : "error-stat"
     },
     {
-      "input": {
-        "text": "{\"stat\":\"OK\",\"fields\":[\"恢復買賣日期\",\"ETF代號\",\"停止買賣前收盤價格\",\"恢復買賣參考價\"],\"data\":[[\"bad\",\"0050\",\"x\",\"y\"]]}"
+      "expected" : {
+        "error" : "ETF 分割資料無法解析（1 列皆無效）"
       },
-      "name": "all-rows-bad"
+      "input" : {
+        "text" : "{\"stat\":\"OK\",\"fields\":[\"恢復買賣日期\",\"ETF代號\",\"停止買賣前收盤價格\",\"恢復買賣參考價\"],\"data\":[[\"bad\",\"0050\",\"x\",\"y\"]]}"
+      },
+      "name" : "all-rows-bad"
     }
   ],
-  "kind": "OfficialHistory.splits"
+  "kind" : "OfficialHistory.splits"
 }
