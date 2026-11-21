@@ -331,7 +331,7 @@ import SwiftUI
     /// A buy adds to the holding of the same ETF and broker (re-averaging its cost) or creates one;
     /// a sell reduces it at its average cost, records the realised result and removes it at zero.
     /// With `logBuy` (新增交易紀錄's 儲存紀錄), a buy also records the DCA month and its capped experience in the same write.
-    func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String, logBuy: Bool = false, now: Date = Date()) throws {
+    func applyTrade(_ action: TradeAction, symbol: String, date: Date, shares: Double, amount: Double, broker: String, logBuy: Bool = false, now: Date = Date(), quickDCA: QuickDCAPreset? = nil) throws {
         guard action == .buy || action == .sell else { return }
         guard DataChecks.code(symbol) else { throw AppDataError("請輸入正確的 ETF 代號。") }
         guard shares.isFinite, shares > 0, shares <= 1e10, amount.isFinite, amount >= 0, amount <= 1e12 else { throw AppDataError("請填寫股數與成交金額。") }
@@ -364,6 +364,7 @@ import SwiftUI
             _ = game.logBuy(on: date, now: now)
             next.game = game
         }
+        if let quickDCA { next.quickDCA = quickDCA }
         try commit(next)
     }
     func removeTrade(_ trade: Trade) throws { var next = data; next.trades?.removeAll { $0.id == trade.id }; try commit(next) }
@@ -443,6 +444,7 @@ import SwiftUI
         next.favorites.formUnion(incoming.favorites)
         next.combo = incoming.combo ?? next.combo
         next.comparison = incoming.comparison ?? next.comparison
+        next.quickDCA = incoming.quickDCA ?? next.quickDCA
         next.legacyPlan = incoming.legacyPlan ?? next.legacyPlan
         next.legacyPrices = (next.legacyPrices ?? [:]).merging(incoming.legacyPrices ?? [:]) { _, new in new }
         next.legacyDividends = (next.legacyDividends ?? [:]).merging(incoming.legacyDividends ?? [:]) { _, new in new }
