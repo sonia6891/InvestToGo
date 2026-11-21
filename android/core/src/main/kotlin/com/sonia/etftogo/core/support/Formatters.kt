@@ -56,3 +56,13 @@ fun monthDay(at: Instant, zone: ZoneId = ZoneId.systemDefault()): String =
 
 /** Swift's `Double.rounded()`: halves away from zero (Kotlin's `round` is half-even). */
 fun swiftRounded(value: Double): Double = if (value < 0) -Math.floor(-value + 0.5) else Math.floor(value + 0.5)
+
+/**
+ * Swift's `String(format: "%.Nf")`: C's printf rounds the double's exact binary value, ties to even (0.25 → "0.2"),
+ * where Java's `%.1f` rounds its shortest decimal half up ("0.3"). Always "." as the decimal point, no grouping.
+ */
+fun cFixed(value: Double, digits: Int): String {
+    if (!value.isFinite()) return if (value.isNaN()) "nan" else if (value > 0) "inf" else "-inf"
+    val text = java.math.BigDecimal(value).setScale(digits, RoundingMode.HALF_EVEN).toPlainString()
+    return if (value < 0 && text.trimStart('-').all { it == '0' || it == '.' } && !text.startsWith("-")) "-$text" else text
+}
