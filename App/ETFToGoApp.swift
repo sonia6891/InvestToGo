@@ -72,7 +72,12 @@ struct LaunchGate: View {
     init() {
         let arguments = ProcessInfo.processInfo.arguments
         let start = Onboarding.start(arguments, onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey))
-        let play = Opening.play(firstLaunch: start == .splash, arguments: arguments, fromNotification: OpeningLaunch.shared.fromNotification)
+        let launch = OpeningLaunch.shared
+        // `didReceive` usually arrives after this init, so `fromNotification` is mostly still false here: the real
+        // handling is in SplashView (its onChange, and the check in `begin()`). `played`: a scene iOS builds again while
+        // the process lives does not replay the opening.
+        let play = Opening.play(firstLaunch: start == .splash, arguments: arguments, fromNotification: launch.fromNotification,
+                                alreadyPlayed: launch.played)
         _start = State(initialValue: start)
         _play = State(initialValue: play)
         _opening = State(initialValue: start == nil && play == .animated)

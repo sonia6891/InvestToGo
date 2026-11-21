@@ -39,7 +39,8 @@ struct SplashView: View {
     private var running: Bool { animated && began != nil && !ended && !reduceMotion }
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !running)) { timeline in
+        // At the display's rate; the stepped (pixel) skin redraws once a step.
+        TimelineView(.animation(minimumInterval: motion.stepped ? motion.frameInterval : nil, paused: !running)) { timeline in
             content(pose(at: timeline.date))
         }
         .padding(.horizontal, 20).padding(.bottom, 12)
@@ -53,7 +54,7 @@ struct SplashView: View {
         .onChange(of: phase) { _, value in
             if value == .active { begin() }
             // Sent to the background part-way: it never replays on return, so it ends here.
-            if value == .background, began != nil { finishNow() }
+            if value == .background, began != nil { finishNow(background: true) }
         }
         // A scene that never reports itself active (it should) still starts after a second.
         .task {
@@ -155,6 +156,9 @@ struct SplashView: View {
 
     private func begin() {
         guard animated, began == nil, !ended else { return }
+        // The notification may have been heard after the launch decided, before this first start.
+        if launch.fromNotification { finishNow(); return }
+        launch.markPlayed()
         began = Date()
         if reduceMotion {
             // No movement: everything fades in together; the first launch's 輕點開始 with it.
@@ -205,12 +209,16 @@ struct SplashView: View {
     }
 
     /// Ends at once, without the fade (sent to the background, or a launch from a notification).
-    private func finishNow() {
+    private func finishNow(background: Bool = false) {
         guard animated else { return }
         shown = 1
         switch ending {
         case .tapToStart: ended = true
-        case .continues: leave()
+        case .continues:
+            leave()
+            // The lobby is built already in the background and never hears it go there: the 到價提醒 background check
+            // it would have asked for is asked for here (`RootView` does the same on going to the background).
+            if background { PriceAlertMonitor.scheduleNext() }
         }
     }
 

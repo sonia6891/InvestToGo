@@ -85,4 +85,47 @@ final class OpeningTests: XCTestCase {
         XCTAssertEqual(start, .splash)
         XCTAssertEqual(Opening.play(firstLaunch: start == .splash, arguments: arguments, fromNotification: false), .still)
     }
+
+    /// Once begun in this process, a scene built again does not replay it.
+    func testPlaysOncePerProcess() {
+        XCTAssertEqual(Opening.play(firstLaunch: false, arguments: [], fromNotification: false, alreadyPlayed: true), .off)
+        XCTAssertEqual(Opening.play(firstLaunch: true, arguments: [], fromNotification: false, alreadyPlayed: true), .still)
+        XCTAssertEqual(Opening.play(firstLaunch: false, arguments: ["--ui-testing", "--opening"], fromNotification: false, alreadyPlayed: true), .off)
+    }
+
+    /// The design's table, the one source the poses, the landing and `step(at:)` read.
+    func testTimelineIsTheDesignTable() {
+        XCTAssertEqual(Opening.window(.ring), OpeningWindow(start: 0, length: 0.6))
+        XCTAssertEqual(Opening.window(.dollar), OpeningWindow(start: 0.4, length: 0.6))
+        XCTAssertEqual(Opening.window(.rays), OpeningWindow(start: 0.9, length: 0.7))
+        XCTAssertEqual(Opening.window(.title), OpeningWindow(start: 1.4, length: 0.8))
+        XCTAssertEqual(Opening.window(.line), OpeningWindow(start: 2.0, length: 0.6))
+        XCTAssertEqual(Opening.length, 3.0)
+        let dollar = Opening.window(.dollar)
+        XCTAssertEqual(Opening.landing(SkinMotion.of(Skins.named("blackgold"))), dollar.start + dollar.length * Opening.fallShare, accuracy: 0.0001)
+    }
+
+    /// Each part is still hidden just before its step begins and moving just after: the poses follow the table that
+    /// `step(at:)` reads.
+    func testEachPartMovesInItsOwnStep() {
+        let motion = SkinMotion.of(Skins.named("blackgold"))
+        let parts: [(OpeningStep, (OpeningPose) -> Double)] = [
+            (.dollar, { $0.dollarOpacity }), (.rays, { $0.raysOpacity }), (.title, { $0.titleOpacity }), (.line, { $0.lineOpacity }),
+        ]
+        for (step, value) in parts {
+            let start = Opening.window(step).start
+            XCTAssertEqual(value(OpeningPose.at(start - 0.01, motion: motion)), 0, "\(step) is hidden before it begins")
+            XCTAssertGreaterThan(value(OpeningPose.at(start + 0.05, motion: motion)), 0, "\(step) moves once it begins")
+            XCTAssertEqual(Opening.step(at: start + 0.05, reduceMotion: false), step)
+        }
+        XCTAssertGreaterThan(OpeningPose.at(0.05, motion: motion).ringOpacity, 0, "The ring opens at once")
+        // Everything has settled by the end of the last moving step.
+        XCTAssertEqual(OpeningPose.at(Opening.window(.line).end, motion: motion), .final)
+    }
+
+    /// The pixel skin has no bounce: its springs never pass their mark.
+    func testSettleWithoutBounceNeverOvershoots() {
+        for i in 0...100 { XCTAssertLessThanOrEqual(Opening.settle(Double(i) / 100, bounce: 0), 1) }
+        XCTAssertGreaterThan((0...100).map { Opening.settle(Double($0) / 100, bounce: 0.55) }.max() ?? 0, 1, "Stitch still overshoots")
+    }
 }
