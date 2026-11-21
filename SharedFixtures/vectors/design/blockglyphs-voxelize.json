@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "input": {
+        "cell": 0.23,
+        "text": "12"
+      },
+      "name": "12-half-stroke"
+    },
+    {
+      "input": {
+        "cell": 0.25,
+        "text": "12"
+      },
+      "name": "12-quarter"
+    },
+    {
+      "input": {
+        "cell": 0.23,
+        "text": "8"
+      },
+      "name": "8-half-stroke"
+    },
+    {
+      "input": {
+        "cell": 0.25,
+        "text": "0.42%"
+      },
+      "name": "percent-passes-rings"
+    },
+    {
+      "input": {
+        "cell": 0,
+        "text": "12"
+      },
+      "name": "zero-cell-unchanged"
+    },
+    {
+      "input": {
+        "cell": 1.0,
+        "text": "7"
+      },
+      "name": "big-cell"
+    }
+  ],
+  "kind": "BlockGlyphs.voxelize"
+}

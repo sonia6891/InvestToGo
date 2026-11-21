@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "input": {
+        "a": 16777215,
+        "b": 0
+      },
+      "name": "white-black"
+    },
+    {
+      "input": {
+        "a": 8421504,
+        "b": 8421504
+      },
+      "name": "same"
+    },
+    {
+      "input": {
+        "a": 15906354,
+        "b": 1710621
+      },
+      "name": "gold-page"
+    },
+    {
+      "input": {
+        "a": 657930,
+        "b": 16777215
+      },
+      "name": "dark-channel"
+    },
+    {
+      "input": {
+        "a": 1710621,
+        "b": 16052712
+      },
+      "name": "order"
+    }
+  ],
+  "kind": "contrastRatio"
+}

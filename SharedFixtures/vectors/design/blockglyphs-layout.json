@@ -1,0 +1,89 @@
+{
+  "cases": [
+    {
+      "input": {
+        "text": "1"
+      },
+      "name": "1"
+    },
+    {
+      "input": {
+        "text": "12"
+      },
+      "name": "12"
+    },
+    {
+      "input": {
+        "text": "100"
+      },
+      "name": "100"
+    },
+    {
+      "input": {
+        "text": "$"
+      },
+      "name": "$"
+    },
+    {
+      "input": {
+        "text": "0123456789"
+      },
+      "name": "0123456789"
+    },
+    {
+      "input": {
+        "text": "88"
+      },
+      "name": "88"
+    },
+    {
+      "input": {
+        "text": "0.42%"
+      },
+      "name": "0.42%"
+    },
+    {
+      "input": {
+        "text": "−0.02%"
+      },
+      "name": "−0.02%"
+    },
+    {
+      "input": {
+        "text": "-5"
+      },
+      "name": "-5"
+    },
+    {
+      "input": {
+        "text": "1,240"
+      },
+      "name": "1,240"
+    },
+    {
+      "input": {
+        "text": "A1 2"
+      },
+      "name": "A1 2"
+    },
+    {
+      "input": {
+        "text": ""
+      },
+      "name": "empty"
+    },
+    {
+      "input": {
+        "text": "."
+      },
+      "name": "."
+    },
+    {
+      "input": {
+        "text": "%"
+      },
+      "name": "%"
+    }
+  ],
+  "kind": "BlockGlyphs.layout"
+}
