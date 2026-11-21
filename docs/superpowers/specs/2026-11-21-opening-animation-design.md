@@ -24,8 +24,8 @@ The timeline runs about 3.0 s, using the skin's `SkinMotion` easing.
 | Time | What happens |
 |---|---|
 | 0.0–0.6 s | The gold stage ring springs open from 0.6 scale. |
-| 0.4–1.0 s | The 3D 「$」 drops in from above and lands with a small squash. A light haptic plays on landing (`Feedback`). |
-| 0.9–1.6 s | The skin's rays (`SkinDecor(page: .splash)`) sweep out from the centre, rotating and scaling from 0. |
+| 0.4–1.15 s | The 3D 「$」 drops in from 180 pt above, seen falling (it moves at once and gathers speed), and lands at 0.91 s with a small squash. A light haptic plays on landing (`Feedback`). |
+| 0.95–1.65 s | Just after the landing, the skin's rays (`SkinDecor(page: .splash)`) sweep out from the centre, rotating and scaling from 0. |
 | 1.4–2.2 s | 「ETF 袋著走」 rises and fades in. The 外觀主題 tag (`SkinTag`) pops. |
 | 2.0–2.6 s | 「存 ETF，也存下好習慣。」 fades in. |
 | 2.6–3.0 s | Hold. |

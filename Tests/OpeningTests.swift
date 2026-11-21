@@ -37,13 +37,30 @@ final class OpeningTests: XCTestCase {
     func testDollarLandsWithASquash() {
         let motion = SkinMotion.of(Skins.named("blackgold"))
         let landing = Opening.landing(motion)
-        XCTAssertEqual(landing, 0.76, accuracy: 0.0001)
+        XCTAssertEqual(landing, 0.91, accuracy: 0.0001)
         XCTAssertGreaterThan(OpeningPose.at(0.5, motion: motion).dollarDrop, 0, "Still falling at 0.5 s")
         let squashed = OpeningPose.at(landing + 0.08, motion: motion)
         XCTAssertEqual(squashed.dollarDrop, 0, "Landed")
         XCTAssertGreaterThan(squashed.dollarSquash, 0, "Squashes as it lands")
         // The pixel skin lands on a whole step.
-        XCTAssertEqual(Opening.landing(SkinMotion.of(Skins.named("voxel"))), 0.875, accuracy: 0.0001)
+        XCTAssertEqual(Opening.landing(SkinMotion.of(Skins.named("voxel"))), 1.0, accuracy: 0.0001)
+    }
+
+    /// The owner's drop (2026-11-21): 180 pt, seen falling from the first frame of its step, 0.35 f + 0.65 f².
+    func testDollarIsSeenFalling() {
+        let motion = SkinMotion.of(Skins.named("blackgold"))
+        XCTAssertEqual(Opening.dropHeight, 180)
+        XCTAssertEqual(Opening.fallShare, 0.68)
+        XCTAssertEqual(Opening.squash, 0.14)
+        XCTAssertEqual(OpeningPose.at(0.39, motion: motion).dollarOpacity, 0, "Invisible before 0.4 s")
+        let early = OpeningPose.at(0.45, motion: motion)
+        XCTAssertLessThan(early.dollarDrop, 1, "Moving at once, not hanging at the top")
+        XCTAssertGreaterThan(early.dollarOpacity, 0)
+        XCTAssertEqual(OpeningPose.at(0.4 + 0.75 * 0.2, motion: motion).dollarOpacity, 1, accuracy: 0.0001, "Faded in over the first 20%")
+        let f = 0.5, u = f * Opening.fallShare
+        XCTAssertEqual(OpeningPose.at(0.4 + 0.75 * u, motion: motion).dollarDrop, 1 - (0.35 * f + 0.65 * f * f), accuracy: 0.0001)
+        XCTAssertEqual(Opening.step(at: 0.92, reduceMotion: false), .dollar, "The rays open just after the landing")
+        XCTAssertEqual(Opening.step(at: 0.96, reduceMotion: false), .rays)
     }
 
     func testOnlySketchDrawsItsRaysOn() {
@@ -96,8 +113,8 @@ final class OpeningTests: XCTestCase {
     /// The design's table, the one source the poses, the landing and `step(at:)` read.
     func testTimelineIsTheDesignTable() {
         XCTAssertEqual(Opening.window(.ring), OpeningWindow(start: 0, length: 0.6))
-        XCTAssertEqual(Opening.window(.dollar), OpeningWindow(start: 0.4, length: 0.6))
-        XCTAssertEqual(Opening.window(.rays), OpeningWindow(start: 0.9, length: 0.7))
+        XCTAssertEqual(Opening.window(.dollar), OpeningWindow(start: 0.4, length: 0.75))
+        XCTAssertEqual(Opening.window(.rays), OpeningWindow(start: 0.95, length: 0.7))
         XCTAssertEqual(Opening.window(.title), OpeningWindow(start: 1.4, length: 0.8))
         XCTAssertEqual(Opening.window(.line), OpeningWindow(start: 2.0, length: 0.6))
         XCTAssertEqual(Opening.length, 3.0)

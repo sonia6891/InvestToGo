@@ -33,8 +33,8 @@ enum Opening {
     /// `.done` at 3.0 s is when the first launch shows 輕點開始 and later launches leave.
     static let timeline: [(step: OpeningStep, window: OpeningWindow)] = [
         (.ring, OpeningWindow(start: 0, length: 0.6)),
-        (.dollar, OpeningWindow(start: 0.4, length: 0.6)),
-        (.rays, OpeningWindow(start: 0.9, length: 0.7)),
+        (.dollar, OpeningWindow(start: 0.4, length: 0.75)),
+        (.rays, OpeningWindow(start: 0.95, length: 0.7)),
         (.title, OpeningWindow(start: 1.4, length: 0.8)),
         (.line, OpeningWindow(start: 2.0, length: 0.6)),
         (.done, OpeningWindow(start: 3.0, length: 0)),
@@ -73,13 +73,13 @@ enum Opening {
     static func holds(_ arguments: [String]) -> Bool { arguments.contains("--ui-testing") && arguments.contains("--opening") }
 
     /// The share of the 「$」's step spent falling; the rest is the landing squash.
-    static let fallShare = 0.6
+    static let fallShare = 0.68
     /// How far above its place the 「$」 starts, in points.
-    static let dropHeight: Double = 320
+    static let dropHeight: Double = 180
     /// The landing squash at its widest (a fraction of the size).
-    static let squash = 0.12
+    static let squash = 0.14
 
-    /// When the 「$」 lands (the light haptic): 0.76 s, or the next whole step for the stepped (pixel) skin.
+    /// When the 「$」 lands (the light haptic): 0.91 s, or the next whole step for the stepped (pixel) skin (1.0 s).
     static func landing(_ motion: SkinMotion) -> Double {
         let drop = window(.dollar)
         let time = drop.start + drop.length * fallShare
@@ -128,15 +128,16 @@ struct OpeningPose: Equatable {
         let ring = moving(.ring)
         pose.ringScale = 1 - 0.4 * (1 - Opening.settle(ring, bounce: bounce))
         pose.ringOpacity = fade(ring, 0.25)
-        // .dollar (0.4–1.0): the 「$」 falls (gathering speed), then squashes as it lands.
-        let drop = moving(.dollar), fall = min(drop / Opening.fallShare, 1)
-        pose.dollarDrop = 1 - fall * fall
-        pose.dollarOpacity = fade(drop, 0.15)
+        // .dollar (0.4–1.15): the 「$」 is seen falling, moving at once and gathering speed (the fall is
+        // 0.35 f + 0.65 f², written so it lands on exactly 0), then squashes as it lands. It fades in over the first 20%.
+        let drop = moving(.dollar), f = min(drop / Opening.fallShare, 1)
+        pose.dollarDrop = (1 - f) * (1 + 0.65 * f)
+        pose.dollarOpacity = fade(drop, 0.2)
         if drop > Opening.fallShare {
             let v = (drop - Opening.fallShare) / (1 - Opening.fallShare)
             pose.dollarSquash = Opening.squash * sin(.pi * (1 + bounce) * v) * (1 - v)
         }
-        // .rays (0.9–1.6): the rays sweep out from the centre, turning and growing from 0.
+        // .rays (0.95–1.65), just after the landing: the rays sweep out from the centre, turning and growing from 0.
         let rays = moving(.rays), spread = Opening.settle(rays, bounce: bounce)
         pose.raysScale = spread
         pose.raysTurn = -45 * (1 - spread)
