@@ -1,95 +1,110 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "1000"
+      "expected" : 1000,
+      "input" : {
+        "text" : "1000"
       },
-      "name": "1000"
+      "name" : "1000"
     },
     {
-      "input": {
-        "text": "1,000"
+      "expected" : 1000,
+      "input" : {
+        "text" : "1,000"
       },
-      "name": "1,000"
+      "name" : "1,000"
     },
     {
-      "input": {
-        "text": "1,000股"
+      "expected" : 1000,
+      "input" : {
+        "text" : "1,000股"
       },
-      "name": "1,000股"
+      "name" : "1,000股"
     },
     {
-      "input": {
-        "text": "2張"
+      "expected" : 2000,
+      "input" : {
+        "text" : "2張"
       },
-      "name": "2張"
+      "name" : "2張"
     },
     {
-      "input": {
-        "text": " 3張 "
+      "expected" : 3000,
+      "input" : {
+        "text" : " 3張 "
       },
-      "name": " 3張 "
+      "name" : " 3張 "
     },
     {
-      "input": {
-        "text": "1.5張"
+      "expected" : 1500,
+      "input" : {
+        "text" : "1.5張"
       },
-      "name": "1.5張"
+      "name" : "1.5張"
     },
     {
-      "input": {
-        "text": "張"
+      "expected" : null,
+      "input" : {
+        "text" : "張"
       },
-      "name": "張"
+      "name" : "張"
     },
     {
-      "input": {
-        "text": ""
+      "expected" : null,
+      "input" : {
+        "text" : ""
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "text": "abc"
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
       },
-      "name": "abc"
+      "name" : "abc"
     },
     {
-      "input": {
-        "text": "1 000"
+      "expected" : 1000,
+      "input" : {
+        "text" : "1 000"
       },
-      "name": "1 000"
+      "name" : "1 000"
     },
     {
-      "input": {
-        "text": "-2"
+      "expected" : -2,
+      "input" : {
+        "text" : "-2"
       },
-      "name": "-2"
+      "name" : "-2"
     },
     {
-      "input": {
-        "text": "1e3"
+      "expected" : 1000,
+      "input" : {
+        "text" : "1e3"
       },
-      "name": "1e3"
+      "name" : "1e3"
     },
     {
-      "input": {
-        "text": "２張"
+      "expected" : null,
+      "input" : {
+        "text" : "２張"
       },
-      "name": "２張"
+      "name" : "２張"
     },
     {
-      "input": {
-        "text": "nan"
+      "expected" : "nan",
+      "input" : {
+        "text" : "nan"
       },
-      "name": "nan"
+      "name" : "nan"
     },
     {
-      "input": {
-        "text": "2 張"
+      "expected" : 2000,
+      "input" : {
+        "text" : "2 張"
       },
-      "name": "2 張"
+      "name" : "2 張"
     }
   ],
-  "kind": "BrokerPreview.shareCount"
+  "kind" : "BrokerPreview.shareCount"
 }

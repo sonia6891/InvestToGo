@@ -1,8 +1,37 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+          [
+            "0050"
+          ],
+          [
+            "0050"
+          ],
+          [
+            "0050"
+          ],
+          [
+            "00991A"
+          ],
+          [
+
+          ],
+          [
+
+          ]
+        ],
+        "knows" : [
+          true,
+          false
+        ],
+        "near" : [
+
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "0050",
             "元大台灣50"
@@ -36,7 +65,7 @@
             "凱基優選高股息30"
           ]
         ],
-        "exact": [
+        "exact" : [
           "元大 台灣50",
           "元大臺灣50",
           "元大台灣５０",
@@ -44,17 +73,36 @@
           "沒有",
           ""
         ],
-        "knows": [
+        "knows" : [
           "0050",
           "2330"
         ],
-        "near": []
+        "near" : [
+
+        ]
       },
-      "name": "exact-ignores-spaces-width-tai"
+      "name" : "exact-ignores-spaces-width-tai"
     },
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+          [
+            "0050",
+            "00999"
+          ]
+        ],
+        "knows" : [
+          true
+        ],
+        "near" : [
+          [
+            "0050",
+            "00999"
+          ]
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "0050",
             "元大台灣50"
@@ -92,21 +140,56 @@
             "元大台灣50"
           ]
         ],
-        "exact": [
+        "exact" : [
           "元大台灣50"
         ],
-        "knows": [
+        "knows" : [
           "00999"
         ],
-        "near": [
+        "near" : [
           "元大台灣5"
         ]
       },
-      "name": "duplicate-name"
+      "name" : "duplicate-name"
     },
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+
+        ],
+        "knows" : [
+
+        ],
+        "near" : [
+          [
+            "0050"
+          ],
+          [
+            "0056"
+          ],
+          [
+            "0056"
+          ],
+          [
+            "00878"
+          ],
+          [
+            "00878"
+          ],
+          [
+
+          ],
+          [
+            "0050",
+            "00713"
+          ],
+          [
+            "00919"
+          ]
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "0050",
             "元大台灣50"
@@ -140,9 +223,13 @@
             "凱基優選高股息30"
           ]
         ],
-        "exact": [],
-        "knows": [],
-        "near": [
+        "exact" : [
+
+        ],
+        "knows" : [
+
+        ],
+        "near" : [
           "元大台彎50",
           "元大高股",
           "元大高股息息",
@@ -153,11 +240,32 @@
           "群益台灣精選高"
         ]
       },
-      "name": "near-one-edit"
+      "name" : "near-one-edit"
     },
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+          [
+
+          ],
+          [
+
+          ],
+          [
+            "0050"
+          ]
+        ],
+        "knows" : [
+          false,
+          true,
+          true
+        ],
+        "near" : [
+
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "50",
             "短碼"
@@ -175,23 +283,45 @@
             "  "
           ]
         ],
-        "exact": [
+        "exact" : [
           "短碼",
           "重複",
           "元大台灣50"
         ],
-        "knows": [
+        "knows" : [
           "50",
           "0050",
           "0056"
         ],
-        "near": []
+        "near" : [
+
+        ]
       },
-      "name": "bad-codes-and-repeats-dropped"
+      "name" : "bad-codes-and-repeats-dropped"
     },
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+
+        ],
+        "knows" : [
+
+        ],
+        "near" : [
+          [
+            "1000",
+            "1001",
+            "1002",
+            "1003",
+            "1004",
+            "1005",
+            "1006",
+            "1007"
+          ]
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "1000",
             "測試基金0"
@@ -241,31 +371,55 @@
             "測試基金11"
           ]
         ],
-        "exact": [],
-        "knows": [],
-        "near": [
+        "exact" : [
+
+        ],
+        "knows" : [
+
+        ],
+        "near" : [
           "測試基金"
         ]
       },
-      "name": "at-most-eight"
+      "name" : "at-most-eight"
     },
     {
-      "input": {
-        "entries": [
+      "expected" : {
+        "exact" : [
+          [
+            "00991A"
+          ],
+          [
+            "00991A"
+          ]
+        ],
+        "knows" : [
+
+        ],
+        "near" : [
+
+        ]
+      },
+      "input" : {
+        "entries" : [
           [
             "00991A",
             "Active abc"
           ]
         ],
-        "exact": [
+        "exact" : [
           "ACTIVE ABC",
           "active abc"
         ],
-        "knows": [],
-        "near": []
+        "knows" : [
+
+        ],
+        "near" : [
+
+        ]
       },
-      "name": "lowercase-letters-upcased"
+      "name" : "lowercase-letters-upcased"
     }
   ],
-  "kind": "ScreenshotImport.Listing"
+  "kind" : "ScreenshotImport.Listing"
 }

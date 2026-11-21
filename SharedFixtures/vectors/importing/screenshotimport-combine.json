@@ -1,301 +1,424 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.6,
+            0.03
+          ],
+          "text" : "元大合灣5O 股數 1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "元大台灣50 股數 1,000"
+            "text" : "元大台灣50 股數 1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "元大合灣5O 股數 1,000"
+            "text" : "元大合灣5O 股數 1,000"
           }
         ]
       },
-      "name": "digits-from-raw"
+      "name" : "digits-from-raw"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.8,
+            0.6,
+            0.03
+          ],
+          "text" : "付出成本 580,385"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.8,
               0.6,
               0.03
             ],
-            "text": "付出成本 580,365"
+            "text" : "付出成本 580,365"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.11,
               0.8,
               0.6,
               0.03
             ],
-            "text": "付出戊本 580,385"
+            "text" : "付出戊本 580,385"
           }
         ]
       },
-      "name": "words-without-digits-kept"
+      "name" : "words-without-digits-kept"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.6,
+            0.03
+          ],
+          "text" : "0050 元大台灣50"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "0050元大台灣50"
+            "text" : "0050元大台灣50"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "0050 元大台灣50"
+            "text" : "0050 元大台灣50"
           }
         ]
       },
-      "name": "count-differs-raw-has-digit"
+      "name" : "count-differs-raw-has-digit"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.6,
+            0.03
+          ],
+          "text" : "國泰 永續"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "國泰 永續"
+            "text" : "國泰 永續"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "國泰永續"
+            "text" : "國泰永續"
           }
         ]
       },
-      "name": "count-differs-no-digit"
+      "name" : "count-differs-no-digit"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.6,
+            0.03
+          ],
+          "text" : "股數 １０００"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "股數 一千"
+            "text" : "股數 一千"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "股數 １０００"
+            "text" : "股數 １０００"
           }
         ]
       },
-      "name": "full-width-digit-counts"
+      "name" : "full-width-digit-counts"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.3,
+            0.03
+          ],
+          "text" : "股數 1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.3,
               0.03
             ],
-            "text": "股數 1,000"
+            "text" : "股數 1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.5,
               0.5,
               0.3,
               0.03
             ],
-            "text": "股數 7,000"
+            "text" : "股數 7,000"
           }
         ]
       },
-      "name": "no-overlap-keeps-corrected"
+      "name" : "no-overlap-keeps-corrected"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.4,
+            0.03
+          ],
+          "text" : "股數 1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.4,
               0.03
             ],
-            "text": "股數 1,000"
+            "text" : "股數 1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.3,
               0.9,
               0.4,
               0.03
             ],
-            "text": "股數 7,000"
+            "text" : "股數 7,000"
           }
         ]
       },
-      "name": "under-half-overlap-keeps-corrected"
+      "name" : "under-half-overlap-keeps-corrected"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.4,
+            0.03
+          ],
+          "text" : "1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.4,
               0.03
             ],
-            "text": "1,000"
+            "text" : "1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.15,
               0.9,
               0.4,
               0.03
             ],
-            "text": "7,000"
+            "text" : "7,000"
           },
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.4,
               0.03
             ],
-            "text": "1,000"
+            "text" : "1,000"
           }
         ]
       },
-      "name": "best-twin-chosen"
+      "name" : "best-twin-chosen"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.4,
+            0.03
+          ],
+          "text" : "1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.4,
               0.03
             ],
-            "text": "1,000"
+            "text" : "1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.5,
               0.9,
               0.4,
               0.03
             ],
-            "text": "7,000"
+            "text" : "7,000"
           }
         ]
       },
-      "name": "touching-edges-no-overlap"
+      "name" : "touching-edges-no-overlap"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.2,
+            0.03
+          ],
+          "text" : "1,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.03
             ],
-            "text": "1,000"
+            "text" : "1,000"
           }
         ],
-        "raw": []
+        "raw" : [
+
+        ]
       },
-      "name": "no-raw"
+      "name" : "no-raw"
     },
     {
-      "input": {
-        "corrected": [
+      "expected" : [
+        {
+          "box" : [
+            0.1,
+            0.9,
+            0.6,
+            0.03
+          ],
+          "text" : "股數 7,000"
+        }
+      ],
+      "input" : {
+        "corrected" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "股數  1,000"
+            "text" : "股數  1,000"
           }
         ],
-        "raw": [
+        "raw" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.6,
               0.03
             ],
-            "text": "股數 7,000"
+            "text" : "股數 7,000"
           }
         ]
       },
-      "name": "double-spaces"
+      "name" : "double-spaces"
     }
   ],
-  "kind": "ScreenshotImport.combine"
+  "kind" : "ScreenshotImport.combine"
 }

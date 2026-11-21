@@ -1,13 +1,27 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "主動測試 00991A",
           "股數 1,000",
           "成本價 17.35"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -42,16 +56,30 @@
           ]
         ]
       },
-      "name": "ported-per-share"
+      "name" : "ported-per-share"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "主動測試 00991A",
           "現股庫存 1,000",
           "成交價 17.35"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -86,16 +114,30 @@
           ]
         ]
       },
-      "name": "ported-cathay-price-paid"
+      "name" : "ported-cathay-price-paid"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "主動測試 00991A",
           "現股庫存 成交價",
           "1,000 17.35"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -130,16 +172,30 @@
           ]
         ]
       },
-      "name": "ported-titles-above"
+      "name" : "ported-titles-above"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "主動測試 00991A",
           "股數 1,000",
           "成本 17.35"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -174,11 +230,25 @@
           ]
         ]
       },
-      "name": "ported-plain-cost"
+      "name" : "ported-plain-cost"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台灣50 0050",
           "現股",
           "股數 1,000",
@@ -186,7 +256,7 @@
           "損益 +9,500",
           "報酬率 6.31%"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -221,17 +291,31 @@
           ]
         ]
       },
-      "name": "card-with-total"
+      "name" : "card-with-total"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "成本價 150.5",
           "付出成本 150,500",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -266,17 +350,31 @@
           ]
         ]
       },
-      "name": "total-beats-per-share"
+      "name" : "total-beats-per-share"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 150.4,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "成本 150.5",
           "均價 150.4",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -311,17 +409,43 @@
           ]
         ]
       },
-      "name": "per-share-beats-plain"
+      "name" : "per-share-beats-plain"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        },
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 42600,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 2000,
+          "symbol" : "00878"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "股票名稱 庫存股數 成本價 付出成本",
           "元大台灣50 1,000 150.5 150,500",
           "國泰永續高股息 2,000 21.3 42,600",
           "合計 192,100"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -356,16 +480,42 @@
           ]
         ]
       },
-      "name": "table-of-titles"
+      "name" : "table-of-titles"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        },
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 42600,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 2000,
+          "symbol" : "00878"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "代號 名稱 股數 付出成本",
           "0050 元大台灣50 1,000 150,500",
           "00878 國泰永續高股息 2,000 42,600"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -400,16 +550,30 @@
           ]
         ]
       },
-      "name": "table-with-code-column"
+      "name" : "table-with-code-column"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 150.5,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "名稱 股數 成本價",
           "某某科技 1,000 25.5",
           "元大台灣50 1,000 150.5"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -444,15 +608,29 @@
           ]
         ]
       },
-      "name": "table-name-not-listed"
+      "name" : "table-name-not-listed"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "名稱 股數 成本價 付出成本",
           "元大台灣50 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -487,17 +665,31 @@
           ]
         ]
       },
-      "name": "table-short-line-left-alone"
+      "name" : "table-short-line-left-alone"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台灣50",
           "0050 元大台灣50",
           "股數 1,000",
           "付出成本 150,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -532,11 +724,37 @@
           ]
         ]
       },
-      "name": "same-holding-named-twice"
+      "name" : "same-holding-named-twice"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        },
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 80000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 500,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 1,000",
           "付出成本 150,000",
@@ -544,7 +762,7 @@
           "股數 500",
           "付出成本 80,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -579,11 +797,37 @@
           ]
         ]
       },
-      "name": "two-lots-same-fund"
+      "name" : "two-lots-same-fund"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 105000,
+          "kind" : "融資",
+          "name" : null,
+          "note" : null,
+          "shares" : 3000,
+          "symbol" : "0056"
+        },
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 21,
+          "kind" : "融券",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00878"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大高股息 0056 融資",
           "股數 3,000",
           "付出成本 105,000",
@@ -592,7 +836,7 @@
           "股數 1,000",
           "成本價 21"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -627,11 +871,37 @@
           ]
         ]
       },
-      "name": "margin-and-short"
+      "name" : "margin-and-short"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "融資",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0056"
+        },
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "融券",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00878"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0056 元大高股息",
           "資",
           "股數 1,000",
@@ -639,7 +909,7 @@
           "券賣",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -674,16 +944,30 @@
           ]
         ]
       },
-      "name": "lone-zi-and-quan"
+      "name" : "lone-zi-and-quan"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "融券",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0056"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0056 元大高股息 融資",
           "融券",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -718,16 +1002,30 @@
           ]
         ]
       },
-      "name": "short-wins-over-margin"
+      "name" : "short-wins-over-margin"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "融券",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0056"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0056 元大高股息 融券",
           "融資",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -762,15 +1060,30 @@
           ]
         ]
       },
-      "name": "margin-does-not-undo-short"
+      "name" : "margin-does-not-undo-short"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+            "0050",
+            "00999"
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : "元大台灣50",
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : ""
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台灣50",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -809,15 +1122,29 @@
           ]
         ]
       },
-      "name": "ambiguous-name"
+      "name" : "ambiguous-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+            "0050"
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : "元大台彎50",
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : ""
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台彎50",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -852,15 +1179,29 @@
           ]
         ]
       },
-      "name": "near-name"
+      "name" : "near-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+            "00878"
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : "國泰永續高…",
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : ""
+        }
+      ],
+      "input" : {
+        "lines" : [
           "國泰永續高…",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -895,18 +1236,32 @@
           ]
         ]
       },
-      "name": "cut-off-name"
+      "name" : "cut-off-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 1,000",
           "台積電 2330",
           "股數 2,000",
           "付出成本 1,160,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -941,16 +1296,30 @@
           ]
         ]
       },
-      "name": "unlisted-code-stops-lot"
+      "name" : "unlisted-code-stops-lot"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "合計",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -985,16 +1354,30 @@
           ]
         ]
       },
-      "name": "totals-reset"
+      "name" : "totals-reset"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "００５０　元大台灣50",
           "股數：１，０００",
           "付出成本：１５０，５００"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1029,16 +1412,30 @@
           ]
         ]
       },
-      "name": "full-width"
+      "name" : "full-width"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台灣50(0050)",
           "股數 1,000",
           "付出成本 150,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1073,16 +1470,30 @@
           ]
         ]
       },
-      "name": "code-in-brackets"
+      "name" : "code-in-brackets"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 150000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050元大台灣50",
           "股數1,000",
           "付出成本150,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1117,15 +1528,29 @@
           ]
         ]
       },
-      "name": "code-glued-before-name"
+      "name" : "code-glued-before-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 2000,
+          "symbol" : "00878"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "國泰永續高股息00878",
           "股數 2,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1160,16 +1585,30 @@
           ]
         ]
       },
-      "name": "code-glued-after-name"
+      "name" : "code-glued-after-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 300000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 2000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "庫存張數 2",
           "付出成本 300,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1204,16 +1643,30 @@
           ]
         ]
       },
-      "name": "lots-label"
+      "name" : "lots-label"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 450000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 3000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數(張) 3",
           "成本(元) 450,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1248,16 +1701,30 @@
           ]
         ]
       },
-      "name": "unit-in-brackets"
+      "name" : "unit-in-brackets"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 300000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 2000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 2張",
           "付出成本 300,000元"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1292,15 +1759,29 @@
           ]
         ]
       },
-      "name": "amount-with-unit"
+      "name" : "amount-with-unit"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1500,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 1,500股"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1335,16 +1816,30 @@
           ]
         ]
       },
-      "name": "share-suffix"
+      "name" : "share-suffix"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 1,00",
           "付出成本 15,0000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1379,16 +1874,30 @@
           ]
         ]
       },
-      "name": "bad-thousands-ignored"
+      "name" : "bad-thousands-ignored"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 1500,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 10.5",
           "付出成本 1,500"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1423,16 +1932,30 @@
           ]
         ]
       },
-      "name": "fractional-shares-refused"
+      "name" : "fractional-shares-refused"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 0",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1467,16 +1990,30 @@
           ]
         ]
       },
-      "name": "zero-shares-refused"
+      "name" : "zero-shares-refused"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數 1,000",
           "持有股數 2,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1511,15 +2048,29 @@
           ]
         ]
       },
-      "name": "first-share-count-kept"
+      "name" : "first-share-count-kept"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大台灣50(現股)",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1554,15 +2105,29 @@
           ]
         ]
       },
-      "name": "name-with-note-in-brackets"
+      "name" : "name-with-note-in-brackets"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 100,
+          "symbol" : "00991A"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "主動測試 ００９９１Ａ",
           "股數 100"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1597,15 +2162,29 @@
           ]
         ]
       },
-      "name": "full-width-letter-and-tai"
+      "name" : "full-width-letter-and-tai"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "元大臺灣50",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1640,15 +2219,29 @@
           ]
         ]
       },
-      "name": "tai-variant-name"
+      "name" : "tai-variant-name"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00919"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "群益台灣 精選高息",
           "股數 1,000"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1683,16 +2276,30 @@
           ]
         ]
       },
-      "name": "name-of-two-words"
+      "name" : "name-of-two-words"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "股數 1,000",
           "付出成本 150,000",
           "0050 元大台灣50"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1727,16 +2334,30 @@
           ]
         ]
       },
-      "name": "figures-before-any-holding"
+      "name" : "figures-before-any-holding"
     },
     {
-      "input": {
-        "lines": [
+      "expected" : [
+        {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 150.5,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
+        }
+      ],
+      "input" : {
+        "lines" : [
           "0050 元大台灣50",
           "股數:1,000",
           "成本價: 150.5"
         ],
-        "listing": [
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1771,12 +2392,17 @@
           ]
         ]
       },
-      "name": "colon-separated"
+      "name" : "colon-separated"
     },
     {
-      "input": {
-        "lines": [],
-        "listing": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "lines" : [
+
+        ],
+        "listing" : [
           [
             "0050",
             "元大台灣50"
@@ -1811,8 +2437,8 @@
           ]
         ]
       },
-      "name": "empty"
+      "name" : "empty"
     }
   ],
-  "kind": "ScreenshotImport.parse"
+  "kind" : "ScreenshotImport.parse"
 }

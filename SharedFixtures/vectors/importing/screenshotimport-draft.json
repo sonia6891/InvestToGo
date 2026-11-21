@@ -1,193 +1,396 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "price": 17.5,
-        "row": {
-          "basis": "perShare",
-          "choices": [],
-          "cost": 17.35,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : 17.35,
+        "choices" : [
+
+        ],
+        "cost" : "17.35",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : true,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "00991A",
+        "totalCost" : 17350
+      },
+      "input" : {
+        "price" : 17.5,
+        "row" : {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
         }
       },
-      "name": "labelled-per-share"
+      "name" : "labelled-per-share"
     },
     {
-      "input": {
-        "price": 17.5,
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": 17.35,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : 17.35,
+        "choices" : [
+
+        ],
+        "cost" : "17.35",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : true,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "00991A",
+        "totalCost" : 17350
+      },
+      "input" : {
+        "price" : 17.5,
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
         }
       },
-      "name": "near-price-per-share"
+      "name" : "near-price-per-share"
     },
     {
-      "input": {
-        "price": 17.5,
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": 17350,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : 17.35,
+        "choices" : [
+
+        ],
+        "cost" : "17350",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "00991A",
+        "totalCost" : 17350
+      },
+      "input" : {
+        "price" : 17.5,
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 17350,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
         }
       },
-      "name": "near-price-total"
+      "name" : "near-price-total"
     },
     {
-      "input": {
-        "price": 17.5,
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": 3,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : null,
+        "choices" : [
+
+        ],
+        "cost" : "",
+        "costNote" : "截圖讀到成本 3，當每股價格或總金額都跟現價對不起來，看不出是每股價格還是總金額，請確認後填入。",
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "00991A",
+        "totalCost" : null
+      },
+      "input" : {
+        "price" : 17.5,
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 3,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
         }
       },
-      "name": "neither-fits"
+      "name" : "neither-fits"
     },
     {
-      "input": {
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": 17.35,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : null,
+        "choices" : [
+
+        ],
+        "cost" : "",
+        "costNote" : "截圖讀到成本 17.35，沒有現價可比對，看不出是每股價格還是總金額，請確認後填入。",
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "00991A",
+        "totalCost" : null
+      },
+      "input" : {
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "00991A"
         }
       },
-      "name": "no-price"
+      "name" : "no-price"
     },
     {
-      "input": {
-        "price": 17.5,
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": 17.35,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": null,
-          "symbol": "00991A"
+      "expected" : {
+        "averageCost" : null,
+        "choices" : [
+
+        ],
+        "cost" : "",
+        "costNote" : "截圖讀到成本 17.35，沒有股數可換算，看不出是每股價格還是總金額，請確認後填入。",
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "",
+        "symbol" : "00991A",
+        "totalCost" : null
+      },
+      "input" : {
+        "price" : 17.5,
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : 17.35,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : null,
+          "symbol" : "00991A"
         }
       },
-      "name": "no-shares"
+      "name" : "no-shares"
     },
     {
-      "input": {
-        "row": {
-          "basis": null,
-          "choices": [],
-          "cost": null,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "0050"
+      "expected" : {
+        "averageCost" : null,
+        "choices" : [
+
+        ],
+        "cost" : "",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "0050",
+        "totalCost" : null
+      },
+      "input" : {
+        "row" : {
+          "basis" : null,
+          "choices" : [
+
+          ],
+          "cost" : null,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
         }
       },
-      "name": "no-cost"
+      "name" : "no-cost"
     },
     {
-      "input": {
-        "row": {
-          "basis": "total",
-          "choices": [
+      "expected" : {
+        "averageCost" : 150,
+        "choices" : [
+          "0050",
+          "00999"
+        ],
+        "cost" : "150000",
+        "costNote" : null,
+        "kind" : "融資",
+        "note" : "n",
+        "perShare" : false,
+        "seen" : "元大台灣50",
+        "shares" : "1000",
+        "symbol" : "",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "row" : {
+          "basis" : "total",
+          "choices" : [
             "0050",
             "00999"
           ],
-          "cost": 150000,
-          "kind": "融資",
-          "name": "元大台灣50",
-          "note": "n",
-          "shares": 1000,
-          "symbol": ""
+          "cost" : 150000,
+          "kind" : "融資",
+          "name" : "元大台灣50",
+          "note" : "n",
+          "shares" : 1000,
+          "symbol" : ""
         }
       },
-      "name": "name-and-choices"
+      "name" : "name-and-choices"
     },
     {
-      "input": {
-        "row": {
-          "basis": "perShare",
-          "choices": [],
-          "cost": 150.25,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "0050"
+      "expected" : {
+        "averageCost" : 150.25,
+        "choices" : [
+
+        ],
+        "cost" : "150.25",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : true,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "0050",
+        "totalCost" : 150250
+      },
+      "input" : {
+        "row" : {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 150.25,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
         }
       },
-      "name": "fraction-text"
+      "name" : "fraction-text"
     },
     {
-      "input": {
-        "row": {
-          "basis": "total",
-          "choices": [],
-          "cost": 2000000000000000.0,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000000000000000.0,
-          "symbol": "0050"
+      "expected" : {
+        "averageCost" : 2,
+        "choices" : [
+
+        ],
+        "cost" : "2000000000000000.0",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000000000000000.0",
+        "symbol" : "0050",
+        "totalCost" : 2000000000000000
+      },
+      "input" : {
+        "row" : {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 2000000000000000,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000000000000000,
+          "symbol" : "0050"
         }
       },
-      "name": "big-number"
+      "name" : "big-number"
     },
     {
-      "input": {
-        "row": {
-          "basis": "perShare",
-          "choices": [],
-          "cost": 1e-05,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "0050"
+      "expected" : {
+        "averageCost" : 1e-05,
+        "choices" : [
+
+        ],
+        "cost" : "1e-05",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : true,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "0050",
+        "totalCost" : 0.01
+      },
+      "input" : {
+        "row" : {
+          "basis" : "perShare",
+          "choices" : [
+
+          ],
+          "cost" : 1e-05,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
         }
       },
-      "name": "tiny-number"
+      "name" : "tiny-number"
     },
     {
-      "input": {
-        "row": {
-          "basis": "total",
-          "choices": [],
-          "cost": 12345678.5,
-          "kind": "現股",
-          "name": null,
-          "note": null,
-          "shares": 1000,
-          "symbol": "0050"
+      "expected" : {
+        "averageCost" : 12345.6785,
+        "choices" : [
+
+        ],
+        "cost" : "12345678.5",
+        "costNote" : null,
+        "kind" : "現股",
+        "note" : null,
+        "perShare" : false,
+        "seen" : "",
+        "shares" : "1000",
+        "symbol" : "0050",
+        "totalCost" : 12345678.5
+      },
+      "input" : {
+        "row" : {
+          "basis" : "total",
+          "choices" : [
+
+          ],
+          "cost" : 12345678.5,
+          "kind" : "現股",
+          "name" : null,
+          "note" : null,
+          "shares" : 1000,
+          "symbol" : "0050"
         }
       },
-      "name": "large-fraction"
+      "name" : "large-fraction"
     }
   ],
-  "kind": "ScreenshotImport.Draft"
+  "kind" : "ScreenshotImport.Draft"
 }

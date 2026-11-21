@@ -1,47 +1,53 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "average": 0.3,
-        "price": 1
+      "expected" : true,
+      "input" : {
+        "average" : 0.3,
+        "price" : 1
       },
-      "name": "low-edge"
+      "name" : "low-edge"
     },
     {
-      "input": {
-        "average": 0.29,
-        "price": 1
+      "expected" : false,
+      "input" : {
+        "average" : 0.29,
+        "price" : 1
       },
-      "name": "under"
+      "name" : "under"
     },
     {
-      "input": {
-        "average": 3,
-        "price": 1
+      "expected" : true,
+      "input" : {
+        "average" : 3,
+        "price" : 1
       },
-      "name": "high-edge"
+      "name" : "high-edge"
     },
     {
-      "input": {
-        "average": 3.01,
-        "price": 1
+      "expected" : false,
+      "input" : {
+        "average" : 3.01,
+        "price" : 1
       },
-      "name": "over"
+      "name" : "over"
     },
     {
-      "input": {
-        "average": 17.35,
-        "price": 17.5
+      "expected" : true,
+      "input" : {
+        "average" : 17.35,
+        "price" : 17.5
       },
-      "name": "middle"
+      "name" : "middle"
     },
     {
-      "input": {
-        "average": 0.6,
-        "price": 2
+      "expected" : true,
+      "input" : {
+        "average" : 0.6,
+        "price" : 2
       },
-      "name": "float-edge"
+      "name" : "float-edge"
     }
   ],
-  "kind": "ScreenshotImport.plausible"
+  "kind" : "ScreenshotImport.plausible"
 }

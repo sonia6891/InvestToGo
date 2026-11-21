@@ -1,222 +1,253 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "0050 元大台灣50",
+        "股數 1,000"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.8,
               0.2,
               0.03
             ],
-            "text": "股數"
+            "text" : "股數"
           },
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.03
             ],
-            "text": "0050"
+            "text" : "0050"
           },
           {
-            "box": [
+            "box" : [
               0.4,
               0.901,
               0.2,
               0.03
             ],
-            "text": "元大台灣50"
+            "text" : "元大台灣50"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.802,
               0.2,
               0.03
             ],
-            "text": "1,000"
+            "text" : "1,000"
           }
         ]
       },
-      "name": "rows-top-to-bottom-left-to-right"
+      "name" : "rows-top-to-bottom-left-to-right"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "x"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.03
             ],
-            "text": "  "
+            "text" : "  "
           },
           {
-            "box": [
+            "box" : [
               0.3,
               0.9,
               0.2,
               0.03
             ],
-            "text": "\t"
+            "text" : "\t"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.9,
               0.2,
               0.03
             ],
-            "text": "x"
+            "text" : "x"
           }
         ]
       },
-      "name": "blank-boxes-dropped"
+      "name" : "blank-boxes-dropped"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "\n x"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.03
             ],
-            "text": "\n"
+            "text" : "\n"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.9,
               0.2,
               0.03
             ],
-            "text": "x"
+            "text" : "x"
           }
         ]
       },
-      "name": "newline-box-kept"
+      "name" : "newline-box-kept"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "a",
+        "c",
+        "b"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.03
             ],
-            "text": "a"
+            "text" : "a"
           },
           {
-            "box": [
+            "box" : [
               0.1,
               0.86,
               0.2,
               0.03
             ],
-            "text": "b"
+            "text" : "b"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.885,
               0.2,
               0.03
             ],
-            "text": "c"
+            "text" : "c"
           }
         ]
       },
-      "name": "tilted-row-joins-nearest"
+      "name" : "tilted-row-joins-nearest"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "b",
+        "a"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.04
             ],
-            "text": "a"
+            "text" : "a"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.92,
               0.2,
               0.04
             ],
-            "text": "b"
+            "text" : "b"
           }
         ]
       },
-      "name": "half-height-apart-is-new-line"
+      "name" : "half-height-apart-is-new-line"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "a b"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.04
             ],
-            "text": "a"
+            "text" : "a"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.919,
               0.2,
               0.04
             ],
-            "text": "b"
+            "text" : "b"
           }
         ]
       },
-      "name": "just-inside-half-height"
+      "name" : "just-inside-half-height"
     },
     {
-      "input": {
-        "boxes": [
+      "expected" : [
+        "big",
+        "tiny"
+      ],
+      "input" : {
+        "boxes" : [
           {
-            "box": [
+            "box" : [
               0.1,
               0.9,
               0.2,
               0.08
             ],
-            "text": "big"
+            "text" : "big"
           },
           {
-            "box": [
+            "box" : [
               0.5,
               0.912,
               0.2,
               0.02
             ],
-            "text": "tiny"
+            "text" : "tiny"
           }
         ]
       },
-      "name": "small-text-uses-smaller-height"
+      "name" : "small-text-uses-smaller-height"
     },
     {
-      "input": {
-        "boxes": []
+      "expected" : [
+
+      ],
+      "input" : {
+        "boxes" : [
+
+        ]
       },
-      "name": "empty"
+      "name" : "empty"
     }
   ],
-  "kind": "ScreenshotImport.lines"
+  "kind" : "ScreenshotImport.lines"
 }

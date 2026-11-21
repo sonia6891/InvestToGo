@@ -1,60 +1,67 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "cost": 17350,
-        "price": 17.5,
-        "shares": 1000
+      "expected" : "total",
+      "input" : {
+        "cost" : 17350,
+        "price" : 17.5,
+        "shares" : 1000
       },
-      "name": "total"
+      "name" : "total"
     },
     {
-      "input": {
-        "cost": 17.35,
-        "price": 17.5,
-        "shares": 1000
+      "expected" : "perShare",
+      "input" : {
+        "cost" : 17.35,
+        "price" : 17.5,
+        "shares" : 1000
       },
-      "name": "per-share"
+      "name" : "per-share"
     },
     {
-      "input": {
-        "cost": 3,
-        "price": 17.5,
-        "shares": 1000
+      "expected" : null,
+      "input" : {
+        "cost" : 3,
+        "price" : 17.5,
+        "shares" : 1000
       },
-      "name": "neither"
+      "name" : "neither"
     },
     {
-      "input": {
-        "cost": 17.35,
-        "shares": 1000
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "shares" : 1000
       },
-      "name": "no-price"
+      "name" : "no-price"
     },
     {
-      "input": {
-        "cost": 17.35,
-        "price": 0,
-        "shares": 1000
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "price" : 0,
+        "shares" : 1000
       },
-      "name": "zero-price"
+      "name" : "zero-price"
     },
     {
-      "input": {
-        "cost": 17.35,
-        "price": 17.5,
-        "shares": 0
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "price" : 17.5,
+        "shares" : 0
       },
-      "name": "zero-shares"
+      "name" : "zero-shares"
     },
     {
-      "input": {
-        "cost": 17,
-        "price": 17.5,
-        "shares": 1
+      "expected" : "total",
+      "input" : {
+        "cost" : 17,
+        "price" : 17.5,
+        "shares" : 1
       },
-      "name": "one-share-total-first"
+      "name" : "one-share-total-first"
     }
   ],
-  "kind": "ScreenshotImport.basis"
+  "kind" : "ScreenshotImport.basis"
 }
