@@ -1,0 +1,17 @@
+{
+  "cases": [
+    {
+      "input": {
+        "upcoming": false
+      },
+      "name": "hidden"
+    },
+    {
+      "input": {
+        "upcoming": true
+      },
+      "name": "visible"
+    }
+  ],
+  "kind": "Achievements.shown"
+}

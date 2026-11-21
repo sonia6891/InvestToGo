@@ -1,0 +1,158 @@
+{
+  "cases": [
+    {
+      "input": {
+        "now": "2030-01-01T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000013",
+              "name": "0050 基金",
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "no-date-never"
+    },
+    {
+      "input": {
+        "now": "2029-02-27T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000012",
+              "name": "0050 基金",
+              "purchaseDate": 857095200.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "leap-day-a-day-early"
+    },
+    {
+      "input": {
+        "now": "2029-02-28T10:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000012",
+              "name": "0050 基金",
+              "purchaseDate": 857095200.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "leap-day-365-days"
+    },
+    {
+      "input": {
+        "now": "2029-02-28T09:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000012",
+              "name": "0050 基金",
+              "purchaseDate": 857095200.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "leap-day-an-hour-short"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000014",
+              "name": "0050 基金",
+              "purchaseDate": 784872000.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "exactly-a-year"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000015",
+              "name": "0050 基金",
+              "purchaseDate": 812520000.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            },
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000016",
+              "name": "0056 基金",
+              "purchaseDate": 725774400.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0056",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "one-of-several"
+    }
+  ],
+  "kind": "Achievements.hasAnniversary"
+}

@@ -1,0 +1,128 @@
+{
+  "cases": [
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "state": {}
+      },
+      "name": "none"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 9,
+              "year": 2026
+            },
+            {
+              "month": 10,
+              "year": 2026
+            },
+            {
+              "month": 11,
+              "year": 2026
+            }
+          ]
+        }
+      },
+      "name": "this-month-run"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 9,
+              "year": 2026
+            },
+            {
+              "month": 10,
+              "year": 2026
+            }
+          ]
+        }
+      },
+      "name": "current-missing-is-not-a-break"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 9,
+              "year": 2026
+            }
+          ]
+        }
+      },
+      "name": "two-months-gap"
+    },
+    {
+      "input": {
+        "now": "2027-01-03T12:00:00+08:00",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 11,
+              "year": 2026
+            },
+            {
+              "month": 12,
+              "year": 2026
+            },
+            {
+              "month": 1,
+              "year": 2027
+            }
+          ]
+        }
+      },
+      "name": "across-new-year"
+    },
+    {
+      "input": {
+        "now": "2026-12-31T16:30:00Z",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 12,
+              "year": 2026
+            }
+          ]
+        }
+      },
+      "name": "taipei-month"
+    },
+    {
+      "input": {
+        "now": "2026-11-01T12:00:00+08:00",
+        "state": {
+          "dcaMonths": [
+            {
+              "month": 7,
+              "year": 2026
+            },
+            {
+              "month": 9,
+              "year": 2026
+            },
+            {
+              "month": 10,
+              "year": 2026
+            },
+            {
+              "month": 11,
+              "year": 2026
+            }
+          ]
+        }
+      },
+      "name": "gap-inside"
+    }
+  ],
+  "kind": "GameState.streak"
+}

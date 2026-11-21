@@ -1,0 +1,94 @@
+{
+  "cases": [
+    {
+      "input": {
+        "celebratedLevel": 1,
+        "now": {
+          "coins": 130,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 130
+        },
+        "questOrder": [
+          "dcaLogged",
+          "reminderSet",
+          "reconciled"
+        ],
+        "shown": {
+          "coins": 90,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 90
+        }
+      },
+      "name": "no-level-due"
+    },
+    {
+      "input": {
+        "celebratedLevel": 1,
+        "levelUpDue": 4,
+        "now": {
+          "coins": 460,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 460
+        },
+        "questOrder": [
+          "dcaLogged",
+          "reminderSet",
+          "reconciled"
+        ]
+      },
+      "name": "first-launch-due"
+    },
+    {
+      "input": {
+        "celebratedLevel": 2,
+        "levelUpDue": 4,
+        "now": {
+          "coins": 460,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 460
+        },
+        "questOrder": [
+          "dcaLogged",
+          "reminderSet",
+          "reconciled"
+        ],
+        "shown": {
+          "coins": 460,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 460
+        }
+      },
+      "name": "due-nothing-grew"
+    },
+    {
+      "input": {
+        "celebratedLevel": 2,
+        "levelUpDue": 4,
+        "now": {
+          "coins": 460,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 460
+        },
+        "questOrder": [
+          "dcaLogged",
+          "reminderSet",
+          "reconciled"
+        ],
+        "shown": {
+          "coins": 300,
+          "month": "2026-11",
+          "quests": [],
+          "xp": 300
+        }
+      },
+      "name": "due-and-grew"
+    }
+  ],
+  "kind": "LobbyReplay.arrival"
+}

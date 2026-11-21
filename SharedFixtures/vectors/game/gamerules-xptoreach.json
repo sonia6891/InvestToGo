@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "input": {
+        "level": -1
+      },
+      "name": "level--1"
+    },
+    {
+      "input": {
+        "level": 0
+      },
+      "name": "level-0"
+    },
+    {
+      "input": {
+        "level": 1
+      },
+      "name": "level-1"
+    },
+    {
+      "input": {
+        "level": 2
+      },
+      "name": "level-2"
+    },
+    {
+      "input": {
+        "level": 3
+      },
+      "name": "level-3"
+    },
+    {
+      "input": {
+        "level": 4
+      },
+      "name": "level-4"
+    },
+    {
+      "input": {
+        "level": 5
+      },
+      "name": "level-5"
+    },
+    {
+      "input": {
+        "level": 6
+      },
+      "name": "level-6"
+    },
+    {
+      "input": {
+        "level": 10
+      },
+      "name": "level-10"
+    }
+  ],
+  "kind": "GameRules.xpToReach"
+}

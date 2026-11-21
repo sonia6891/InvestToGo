@@ -1,0 +1,170 @@
+{
+  "cases": [
+    {
+      "input": {
+        "habit": "dca",
+        "isNewbie": false,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "dca-2026-11"
+    },
+    {
+      "input": {
+        "habit": "dca",
+        "isNewbie": true,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "dca-2026-11-newbie"
+    },
+    {
+      "input": {
+        "habit": "dca",
+        "isNewbie": false,
+        "month": {
+          "month": 12,
+          "year": 2026
+        }
+      },
+      "name": "dca-2026-12"
+    },
+    {
+      "input": {
+        "habit": "dca",
+        "isNewbie": false,
+        "month": {
+          "month": 1,
+          "year": 2027
+        }
+      },
+      "name": "dca-2027-01"
+    },
+    {
+      "input": {
+        "habit": "dca",
+        "isNewbie": false,
+        "month": {
+          "month": 2,
+          "year": 2027
+        }
+      },
+      "name": "dca-2027-02"
+    },
+    {
+      "input": {
+        "habit": "dividends",
+        "isNewbie": false,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "dividends-2026-11"
+    },
+    {
+      "input": {
+        "habit": "dividends",
+        "isNewbie": true,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "dividends-2026-11-newbie"
+    },
+    {
+      "input": {
+        "habit": "dividends",
+        "isNewbie": false,
+        "month": {
+          "month": 12,
+          "year": 2026
+        }
+      },
+      "name": "dividends-2026-12"
+    },
+    {
+      "input": {
+        "habit": "dividends",
+        "isNewbie": false,
+        "month": {
+          "month": 1,
+          "year": 2027
+        }
+      },
+      "name": "dividends-2027-01"
+    },
+    {
+      "input": {
+        "habit": "dividends",
+        "isNewbie": false,
+        "month": {
+          "month": 2,
+          "year": 2027
+        }
+      },
+      "name": "dividends-2027-02"
+    },
+    {
+      "input": {
+        "habit": "savingGoal",
+        "isNewbie": false,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "savingGoal-2026-11"
+    },
+    {
+      "input": {
+        "habit": "savingGoal",
+        "isNewbie": true,
+        "month": {
+          "month": 11,
+          "year": 2026
+        }
+      },
+      "name": "savingGoal-2026-11-newbie"
+    },
+    {
+      "input": {
+        "habit": "savingGoal",
+        "isNewbie": false,
+        "month": {
+          "month": 12,
+          "year": 2026
+        }
+      },
+      "name": "savingGoal-2026-12"
+    },
+    {
+      "input": {
+        "habit": "savingGoal",
+        "isNewbie": false,
+        "month": {
+          "month": 1,
+          "year": 2027
+        }
+      },
+      "name": "savingGoal-2027-01"
+    },
+    {
+      "input": {
+        "habit": "savingGoal",
+        "isNewbie": false,
+        "month": {
+          "month": 2,
+          "year": 2027
+        }
+      },
+      "name": "savingGoal-2027-02"
+    }
+  ],
+  "kind": "Quests.forMonth"
+}

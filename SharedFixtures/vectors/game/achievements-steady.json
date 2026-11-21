@@ -1,0 +1,161 @@
+{
+  "cases": [
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000017",
+              "name": "0050 基金",
+              "purchaseDate": 725774400.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1,
+          "trades": [
+            {
+              "action": "買進",
+              "broker": "測試券商",
+              "date": 725774400.0,
+              "id": "00000000-0000-4000-8000-000000000018",
+              "name": "0050 基金",
+              "shares": 100,
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ]
+        }
+      },
+      "name": "held-no-sells"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000017",
+              "name": "0050 基金",
+              "purchaseDate": 725774400.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1,
+          "trades": [
+            {
+              "action": "賣出",
+              "broker": "測試券商",
+              "date": 799300800.0,
+              "id": "00000000-0000-4000-8000-000000000019",
+              "name": "0050 基金",
+              "shares": 100,
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ]
+        }
+      },
+      "name": "sold-this-year"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000017",
+              "name": "0050 基金",
+              "purchaseDate": 725774400.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1,
+          "trades": [
+            {
+              "action": "賣出",
+              "broker": "測試券商",
+              "date": 783662400.0,
+              "id": "00000000-0000-4000-8000-000000000020",
+              "name": "0050 基金",
+              "shares": 100,
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ]
+        }
+      },
+      "name": "sold-before-the-year"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000021",
+              "name": "0050 基金",
+              "purchaseDate": 788932800.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "not-a-year-yet"
+    },
+    {
+      "input": {
+        "now": "2026-11-15T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [
+            {
+              "broker": "測試券商",
+              "id": "00000000-0000-4000-8000-000000000017",
+              "name": "0050 基金",
+              "purchaseDate": 725774400.0,
+              "shares": 1000,
+              "strategy": "存錢筒",
+              "symbol": "0050",
+              "unitCost": 50
+            }
+          ],
+          "quotes": {},
+          "schema": 1
+        }
+      },
+      "name": "no-trade-log"
+    }
+  ],
+  "kind": "Achievements.steady"
+}
