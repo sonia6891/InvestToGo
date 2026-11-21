@@ -1210,6 +1210,8 @@ final class ETFToGoUITests: XCTestCase {
         let app = launch(["--open", "privacy"])
         let toggle = app.switches["lock-toggle"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 10), "隱私與安全 has 「App 上鎖」")
+        // The card is where 「目前未提供 App 內上鎖」 was, below the crash-report card: scrolled into view.
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
         XCTAssertEqual(toggle.value as? String, "0", "Off by default")
         XCTAssertFalse(app.buttons["lock-change"].exists, "No 變更密碼 before a passcode is set")
         sleep(1); capture(app, "lock-settings-off")
