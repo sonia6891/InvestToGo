@@ -178,7 +178,7 @@ struct MemberView: View {
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
     private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
-    static let privacy = URL(string: "https://sonia6891.github.io/etftogo/privacy")!
+    static let privacy = URL(string: "https://investtogo.pocketjoystudio.com/privacy/")!
 
     enum Plan: String, CaseIterable, Identifiable {
         case free, pocket, ai

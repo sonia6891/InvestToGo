@@ -183,6 +183,6 @@ final class GameTriggerStoreTests: XCTestCase {
         XCTAssertTrue(MembershipProducts.all.contains(MembershipProducts.aiMonthly), "An AI purchase already held still counts")
         XCTAssertTrue(MemberView.Plan.ai.comingSoon)
         XCTAssertNil(MemberView.Plan.allCases.first { $0.detail.contains("無限") || $0.detail.contains("1 個") }, "No unenforced limits or absent features")
-        XCTAssertEqual(MemberView.privacy.absoluteString, "https://sonia6891.github.io/etftogo/privacy")
+        XCTAssertEqual(MemberView.privacy.absoluteString, "https://investtogo.pocketjoystudio.com/privacy/")
     }
 }
