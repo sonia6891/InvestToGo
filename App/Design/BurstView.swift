@@ -42,6 +42,43 @@ struct BurstView: View {
     }
 }
 
+/// One ring of light spreading out from the centre and fading (0.5 s), for a tap on a lobby object (spec 5.2). Give it
+/// a frame about twice the object's size. The pixel skin steps it; Reduce Motion plays nothing. Changing `trigger`
+/// plays it once; the first value plays nothing.
+struct RingBurst: View {
+    var trigger: Int
+    var color: Color
+    @Environment(\.skin) private var skin
+    @Environment(\.motionReduced) private var reduceMotion
+    @State private var start: Date?
+    private static let duration = 0.5
+
+    var body: some View {
+        let motion = SkinMotion.of(skin)
+        TimelineView(.animation(paused: start == nil)) { timeline in
+            Canvas { context, size in
+                guard let start else { return }
+                var p = timeline.date.timeIntervalSince(start) / Self.duration
+                guard p >= 0, p < 1 else { return }
+                if motion.stepped { p = (p * 6).rounded(.down) / 6 }
+                let eased = 1 - pow(1 - p, 3)
+                let r = min(size.width, size.height) / 2 * (0.5 + 0.48 * eased)
+                context.opacity = 1 - p
+                let ring = Path(ellipseIn: CGRect(x: size.width / 2 - r, y: size.height / 2 - r, width: 2 * r, height: 2 * r))
+                context.stroke(ring, with: .color(color), lineWidth: 1 + 4 * (1 - p))
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+        .onChange(of: trigger) { _, _ in
+            guard !reduceMotion else { return }
+            let now = Date()
+            start = now
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.duration + 0.05) { if start == now { start = nil } }
+        }
+    }
+}
+
 /// How a skin plays the coin drop, from its art kind and never its id (spec 7.1 投幣動畫, first version): the 3D skins
 /// drop a coin with shards, the vector skins pop their picture with 「+1」. (Stitch's 「縫進口袋」 and sketch's 「正字多一筆」
 /// come later.)

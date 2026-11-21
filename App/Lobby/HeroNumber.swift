@@ -12,6 +12,9 @@ struct HeroNumber: View {
     var label: String? = nil
     /// Tapping the numeral (the lobby opens the DCA history).
     var action: (() -> Void)? = nil
+    /// The living lobby (spec 5.1): the numeral floats gently and a band of light crosses it now and then. Still when
+    /// false (everywhere but an idle lobby).
+    var ambient = false
     @Environment(\.skin) private var skin
 
     /// The numeral's zone. The lobby draws `SkinDecor` behind exactly this height, never behind the caption.
@@ -20,6 +23,7 @@ struct HeroNumber: View {
     var body: some View {
         VStack(spacing: 2) {
             numeral
+                .ambientBob(phase: 0.6, enabled: ambient)
                 .frame(height: Self.numeralHeight)
                 .contentShape(Rectangle())
                 // Simultaneous: the 3D numeral tilts under a drag that starts at a touch, which would swallow a tap.
@@ -41,6 +45,11 @@ struct HeroNumber: View {
             // The 3D scene scales its blocks to 70% of its frame, so any count fits.
             PocketHero(value: "\(value)", skin: skin)
                 .frame(maxWidth: .infinity)
+                // The 3D scene cannot mask the band, so it is fainter and fades out towards the zone's edges.
+                .overlay {
+                    HeroShine(enabled: ambient, peak: 0.28)
+                        .mask(RadialGradient(colors: [.white, .white.opacity(0)], center: .center, startRadius: 30, endRadius: 150))
+                }
         case .vector:
             ViewThatFits(in: .horizontal) {
                 digits(height: 170)
@@ -50,6 +59,9 @@ struct HeroNumber: View {
                 digits(height: 56)
                 digits(height: 40)
             }
+            // Only where the digits (and their patch or stroke) are drawn.
+            .overlay { HeroShine(enabled: ambient).blendMode(.sourceAtop) }
+            .compositingGroup()
         }
     }
 
