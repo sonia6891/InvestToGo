@@ -1,6 +1,7 @@
 package com.sonia.etftogo.core.sources
 
 import com.sonia.etftogo.core.game.YearMonth
+import java.util.Locale
 import com.sonia.etftogo.core.support.AppDataError
 import com.sonia.etftogo.core.support.TAIPEI
 import com.sonia.etftogo.core.support.swiftDouble
@@ -43,7 +44,7 @@ object OfficialHistory {
         val m = swiftInt(parts[1]) ?: return null
         val d = swiftInt(parts[2]) ?: return null
         if (m !in 1..12 || d !in 1..31 || y <= 0) return null
-        return "%04d-%02d-%02d".format(y + 1911, m, d)
+        return "%04d-%02d-%02d".format(Locale.ROOT, y + 1911, m, d)
     }
 
     private fun number(s: String): Double? = swiftDouble(s.replace(",", "").swiftTrim())
@@ -185,14 +186,14 @@ object OfficialHistory {
 
     private fun ymd(date: Instant, separator: String): String {
         val c = date.atZone(TAIPEI)
-        return listOf("%04d".format(c.year), "%02d".format(c.monthValue), "%02d".format(c.dayOfMonth)).joinToString(separator)
+        return listOf("%04d".format(Locale.ROOT, c.year), "%02d".format(Locale.ROOT, c.monthValue), "%02d".format(Locale.ROOT, c.dayOfMonth)).joinToString(separator)
     }
 
     fun twseMonthURL(symbol: String, month: YearMonth): URI =
-        URI("https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=${"%04d%02d".format(month.year, month.month)}01&stockNo=$symbol&response=json")
+        URI("https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=${"%04d%02d".format(Locale.ROOT, month.year, month.month)}01&stockNo=$symbol&response=json")
 
     fun tpexMonthURL(symbol: String, month: YearMonth): URI =
-        URI("https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?code=$symbol&date=${"%04d/%02d".format(month.year, month.month)}/01&response=json")
+        URI("https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?code=$symbol&date=${"%04d/%02d".format(Locale.ROOT, month.year, month.month)}/01&response=json")
 
     fun twseDividendsURL(from: Instant, to: Instant): URI =
         URI("https://www.twse.com.tw/rwd/zh/exRight/TWT49U?startDate=${ymd(from, "")}&endDate=${ymd(to, "")}&response=json")

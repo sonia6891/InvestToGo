@@ -1,6 +1,7 @@
 package com.sonia.etftogo.core.support
 
 import java.text.BreakIterator
+import java.util.Locale
 import java.text.Normalizer
 import java.util.UUID
 
@@ -79,7 +80,7 @@ fun swiftDescription(value: Double): String {
         val exponent = digits.length - 1 - exact.scale()
         val mantissa = digits.take(1) + (if (digits.length > 1) "." + digits.drop(1) else "")
         val sign = if (exponent < 0) "-" else "+"
-        return (if (value < 0) "-" else "") + mantissa + "e" + sign + "%02d".format(Math.abs(exponent))
+        return (if (value < 0) "-" else "") + mantissa + "e" + sign + "%02d".format(Locale.ROOT, Math.abs(exponent))
     }
     val text = exact.toPlainString()
     return if ('.' in text) text else "$text.0"

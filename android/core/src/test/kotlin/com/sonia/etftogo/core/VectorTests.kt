@@ -9,7 +9,25 @@ import kotlin.test.fail
 
 /** Runs every shared vector against :core; the Swift side is PocketCore's VectorTests. */
 class VectorTests {
-    @Test fun allVectors() {
+    @Test fun allVectors() = runAll()
+
+    /**
+     * A phone set to Arabic, Persian, Marathi or Burmese formats numbers with its own digits; every key, day and request
+     * address must still be written in ASCII digits, as iPhone writes them, or months and rewards stop matching.
+     */
+    @Test fun allVectorsUnderNonAsciiDigitLocales() {
+        val saved = java.util.Locale.getDefault()
+        try {
+            for (tag in listOf("ar-EG", "fa-IR", "mr-IN", "my-MM")) {
+                java.util.Locale.setDefault(java.util.Locale.forLanguageTag(tag))
+                runAll(tag)
+            }
+        } finally {
+            java.util.Locale.setDefault(saved)
+        }
+    }
+
+    private fun runAll(locale: String? = null) {
         val failures = mutableListOf<String>()
         for (vector in VectorHarness.files().filter { it.runsOnKotlin }) {
             val handler = vectorHandlers[vector.kind] ?: continue
@@ -24,7 +42,7 @@ class VectorTests {
                 if (!JsonCompare.equal(expected, actual)) failures += "${vector.kind} / $name: expected $expected, got $actual"
             }
         }
-        if (failures.isNotEmpty()) fail(failures.joinToString("\n"))
+        if (failures.isNotEmpty()) fail((if (locale != null) "[$locale] " else "") + failures.take(20).joinToString("\n"))
     }
 
     @Test fun everyKindHasKotlinHandler() {

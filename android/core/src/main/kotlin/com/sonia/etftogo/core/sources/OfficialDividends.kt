@@ -3,6 +3,7 @@
 package com.sonia.etftogo.core.sources
 
 import com.sonia.etftogo.core.support.AppDataError
+import java.util.Locale
 import com.sonia.etftogo.core.support.CoreJson
 import com.sonia.etftogo.core.support.CoreResources
 import com.sonia.etftogo.core.support.DataChecks
@@ -117,7 +118,7 @@ data class OfficialDividends(
                 return null
             }
             if (parts.size != 3 || parts[1] !in 1..12 || parts[2] !in 1..31) return null
-            return "%04d-%02d-%02d".format(parts[0] + 1911, parts[1], parts[2])
+            return "%04d-%02d-%02d".format(Locale.ROOT, parts[0] + 1911, parts[1], parts[2])
         }
 
         val twseURL = URI("https://openapi.twse.com.tw/v1/exchangeReport/TWT48U_ALL")

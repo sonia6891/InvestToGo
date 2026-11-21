@@ -1,8 +1,10 @@
 package com.sonia.etftogo.core.sources
 
 import com.sonia.etftogo.core.models.ComponentSnapshot
+import java.util.Locale
 import com.sonia.etftogo.core.models.FundComponent
 import com.sonia.etftogo.core.support.AppDataError
+import com.sonia.etftogo.core.support.icuPattern
 import com.sonia.etftogo.core.support.swiftDouble
 import com.sonia.etftogo.core.support.swiftInt
 import com.sonia.etftogo.core.support.swiftTrimAll
@@ -89,7 +91,7 @@ object IssuerHoldings {
         val m = swiftInt(parts[1]) ?: return null
         val d = swiftInt(parts[2]) ?: return null
         if (m !in 1..12 || d !in 1..31) return null
-        return "%04d-%02d-%02d".format(y, m, d)
+        return "%04d-%02d-%02d".format(Locale.ROOT, y, m, d)
     }
 
     /** The response names its own ETF; a different one must not be filed under `symbol`. */
@@ -170,7 +172,7 @@ object IssuerHoldings {
         val issuer = Issuer.CAPITAL
         val o = obj(data, issuer)
         val code = number(o["code"])
-        if (code != null && code != 200.0) throw fail(issuer, "回應異常：" + (filled(o["message"]) ?: "code %.0f".format(code)))
+        if (code != null && code != 200.0) throw fail(issuer, "回應異常：" + (filled(o["message"]) ?: "code %.0f".format(Locale.ROOT, code)))
         val body = o["data"].obj ?: throw fail(issuer, "格式不符（缺少 data）")
         val rows = body["stocks"].objects ?: throw fail(issuer, "格式不符（缺少 stocks）")
         return snapshot(issuer, symbol, day(body["pcf"].obj?.get("date2")), rows, "stocNo", "stocName", "weight")
@@ -195,7 +197,7 @@ object IssuerHoldings {
         val issuer = Issuer.CTBC
         val o = obj(data, issuer)
         val code = number(o["ResultCode"])
-        if (code != null && code != 0.0) throw fail(issuer, "回應異常：" + (filled(o["ResultMsg"]) ?: "ResultCode %.0f".format(code)))
+        if (code != null && code != 0.0) throw fail(issuer, "回應異常：" + (filled(o["ResultMsg"]) ?: "ResultCode %.0f".format(Locale.ROOT, code)))
         val body = o["Data"].obj ?: throw fail(issuer, "格式不符（缺少 Data）")
         checkFund(issuer, body["Fund"].objects?.firstOrNull()?.get("ETF_ID"), symbol)
         val groups = body["FundAssetsDetail"].objects ?: throw fail(issuer, "格式不符（缺少 FundAssetsDetail）")
@@ -264,7 +266,7 @@ object IssuerHoldings {
 
     /** NSRegularExpression (ICU) semantics: `\d`, `\s` and `\b` are Unicode-aware. */
     private fun compile(pattern: String, dotAll: Boolean = true): Pattern =
-        Pattern.compile(pattern, Pattern.UNICODE_CHARACTER_CLASS or if (dotAll) Pattern.DOTALL else 0)
+        icuPattern(pattern, if (dotAll) Pattern.DOTALL else 0)
 
     /** Capture groups of every match; `.` also matches newlines. */
     private fun matches(pattern: String, text: String): List<List<String>> {

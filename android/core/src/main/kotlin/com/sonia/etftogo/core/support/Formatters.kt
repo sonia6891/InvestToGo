@@ -45,7 +45,7 @@ private val weekdays = listOf("週一", "週二", "週三", "週四", "週五", 
 fun weekdayText(at: Instant, zone: ZoneId = ZoneId.systemDefault()): String = weekdays[at.atZone(zone).dayOfWeek.value - 1]
 
 fun ymdText(at: Instant, zone: ZoneId = ZoneId.systemDefault()): String =
-    at.atZone(zone).let { "%04d/%02d/%02d".format(it.year, it.monthValue, it.dayOfMonth) }
+    at.atZone(zone).let { "%04d/%02d/%02d".format(Locale.ROOT, it.year, it.monthValue, it.dayOfMonth) }
 
 /** Large totals in 萬 so they fit inside a donut. */
 fun wanText(value: Double): String =

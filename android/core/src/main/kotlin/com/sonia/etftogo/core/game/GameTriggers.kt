@@ -1,6 +1,7 @@
 package com.sonia.etftogo.core.game
 
 import com.sonia.etftogo.core.models.Portfolio
+import java.util.Locale
 import com.sonia.etftogo.core.models.TradeAction
 import java.time.Instant
 
@@ -126,5 +127,5 @@ fun GameState.awardOnce(event: XPEvent, key: String, now: Instant): Pair<GameSta
 /** 「2026-11-12」 in Taipei time (Swift `GameState.day`). */
 fun gameDay(date: Instant): String {
     val d = date.atZone(GameRules.taipei)
-    return "%04d-%02d-%02d".format(d.year, d.monthValue, d.dayOfMonth)
+    return "%04d-%02d-%02d".format(Locale.ROOT, d.year, d.monthValue, d.dayOfMonth)
 }

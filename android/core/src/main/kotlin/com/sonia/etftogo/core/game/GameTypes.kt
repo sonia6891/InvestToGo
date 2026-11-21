@@ -3,6 +3,7 @@
 package com.sonia.etftogo.core.game
 
 import com.sonia.etftogo.core.support.CoreJson
+import java.util.Locale
 import com.sonia.etftogo.core.support.SwiftDate
 import com.sonia.etftogo.core.support.TAIPEI
 import com.sonia.etftogo.core.support.swiftInstant
@@ -31,7 +32,7 @@ data class YearMonth(val year: Int, val month: Int) : Comparable<YearMonth> {
     fun previous(): YearMonth = if (month == 1) YearMonth(year - 1, 12) else YearMonth(year, month - 1)
 
     /** "2026-11", the key used by `GameState.questsDone`. */
-    val key: String get() = "%04d-%02d".format(year, month)
+    val key: String get() = "%04d-%02d".format(Locale.ROOT, year, month)
 
     override fun compareTo(other: YearMonth): Int = compareValuesBy(this, other, { it.year }, { it.month })
 

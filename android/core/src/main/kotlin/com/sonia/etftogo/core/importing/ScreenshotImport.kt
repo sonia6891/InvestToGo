@@ -1,11 +1,11 @@
 package com.sonia.etftogo.core.importing
 
 import com.sonia.etftogo.core.support.DataChecks
+import com.sonia.etftogo.core.support.icuPattern
 import com.sonia.etftogo.core.support.isUnicodeWhiteSpace
 import com.sonia.etftogo.core.support.swiftDescription
 import com.sonia.etftogo.core.support.swiftTrim
 import java.util.UUID
-import java.util.regex.Pattern
 
 /** A rectangle in Vision's normalised coordinates (origin at the bottom left), as CGRect. */
 data class Box(val x: Double, val y: Double, val width: Double, val height: Double) {
@@ -402,8 +402,8 @@ object ScreenshotImport {
 
     private fun ideographs(text: String): Int = text.codePoints().filter { Character.isIdeographic(it) }.count().toInt()
 
-    /** ICU's patterns as iPhone writes them; Java spells the Han script \p{IsHan} and needs Unicode classes for \s. */
-    private fun icu(pattern: String): Regex = Pattern.compile(pattern.replace("\\p{Han}", "\\p{IsHan}"), Pattern.UNICODE_CHARACTER_CLASS).toRegex()
+    /** ICU's patterns as iPhone writes them, read the same on the test JVM and on Android. */
+    private fun icu(pattern: String): Regex = icuPattern(pattern).toRegex()
 
     private val rewrites: List<Pair<Regex, String>> by lazy {
         val labels = (shareLabels + lotLabels + costLabels + unitCostLabels + setOf("成本")).sortedByDescending { it.length }.joinToString("|")
