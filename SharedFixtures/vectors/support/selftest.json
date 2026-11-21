@@ -1,7 +1,27 @@
 {
-  "kind": "Vector.echo",
-  "cases": [
-    { "name": "number", "input": { "value": 1.5 } },
-    { "name": "array-keeps-order", "input": { "value": [3, 1, 2] } }
-  ]
+  "cases" : [
+    {
+      "expected" : 1.5,
+      "input" : {
+        "value" : 1.5
+      },
+      "name" : "number"
+    },
+    {
+      "expected" : [
+        3,
+        1,
+        2
+      ],
+      "input" : {
+        "value" : [
+          3,
+          1,
+          2
+        ]
+      },
+      "name" : "array-keeps-order"
+    }
+  ],
+  "kind" : "Vector.echo"
 }
