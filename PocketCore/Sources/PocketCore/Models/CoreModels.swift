@@ -177,6 +177,8 @@ struct Portfolio: Codable {
     var combo: ComboSettings? = nil
     /// 到價提醒, at most `AlertEngine.limit`; absent in older files.
     var alerts: [PriceAlert]? = nil
+    /// 快速記一筆 remembers the last fund, amount and broker; absent in older files.
+    var quickDCA: QuickDCAPreset? = nil
     var cost: Double { holdings.reduce(0) { $0 + $1.cost } }
     /// Days of holdings kept for one ETF.
     static let historyLimit = 12
@@ -215,7 +217,8 @@ struct Portfolio: Codable {
     /// size with price histories; the first save then moves those out.
     static func decodeBackup(_ data: Data, limit: Int = 5_000_000) throws -> Portfolio {
         guard data.count <= limit else { throw StoreError.unsupportedBackup }
-        let value = try JSONDecoder().decode(Portfolio.self, from: data)
+        var value = try JSONDecoder().decode(Portfolio.self, from: data)
+        if value.quickDCA?.isValid == false { value.quickDCA = nil }
         guard value.schema == 1, value.holdings.count <= 10000, value.dividends.count <= 50000, value.favorites.count <= 2000 else { throw StoreError.unsupportedBackup }
         for holding in value.holdings { try holding.validate() }
         guard Set(value.holdings.map(\.id)).count == value.holdings.count,
