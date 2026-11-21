@@ -1,84 +1,107 @@
 {
-  "kind": "ResearchMath.overlap",
-  "cases": [
+  "cases" : [
     {
-      "name": "three-shared",
-      "input": {
-        "left": {
-          "symbol": "0050",
-          "date": "2026-10-01",
-          "components": [
-            {
-              "symbol": "2330",
-              "name": "台積電",
-              "weight": 50
-            },
-            {
-              "symbol": "2317",
-              "weight": 5
-            },
-            {
-              "symbol": "2454",
-              "name": "聯發科",
-              "weight": 3
-            }
-          ]
+      "expected" : [
+        {
+          "left" : 50,
+          "name" : "台積電",
+          "right" : 48,
+          "symbol" : "2330"
         },
-        "right": {
-          "symbol": "006208",
-          "date": "2026-10-01",
-          "components": [
-            {
-              "symbol": "2454",
-              "weight": 4
-            },
-            {
-              "symbol": "2317",
-              "name": "鴻海",
-              "weight": 6
-            },
-            {
-              "symbol": "2330",
-              "weight": 48
-            }
-          ]
+        {
+          "left" : 5,
+          "name" : "鴻海",
+          "right" : 6,
+          "symbol" : "2317"
+        },
+        {
+          "left" : 3,
+          "name" : "聯發科",
+          "right" : 4,
+          "symbol" : "2454"
         }
-      }
+      ],
+      "input" : {
+        "left" : {
+          "components" : [
+            {
+              "name" : "台積電",
+              "symbol" : "2330",
+              "weight" : 50
+            },
+            {
+              "symbol" : "2317",
+              "weight" : 5
+            },
+            {
+              "name" : "聯發科",
+              "symbol" : "2454",
+              "weight" : 3
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "0050"
+        },
+        "right" : {
+          "components" : [
+            {
+              "symbol" : "2454",
+              "weight" : 4
+            },
+            {
+              "name" : "鴻海",
+              "symbol" : "2317",
+              "weight" : 6
+            },
+            {
+              "symbol" : "2330",
+              "weight" : 48
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "006208"
+        }
+      },
+      "name" : "three-shared"
     },
     {
-      "name": "none-shared",
-      "input": {
-        "left": {
-          "symbol": "0050",
-          "date": "2026-10-01",
-          "components": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "left" : {
+          "components" : [
             {
-              "symbol": "2330",
-              "name": "台積電",
-              "weight": 50
+              "name" : "台積電",
+              "symbol" : "2330",
+              "weight" : 50
             },
             {
-              "symbol": "2317",
-              "weight": 5
+              "symbol" : "2317",
+              "weight" : 5
             },
             {
-              "symbol": "2454",
-              "name": "聯發科",
-              "weight": 3
+              "name" : "聯發科",
+              "symbol" : "2454",
+              "weight" : 3
             }
-          ]
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "0050"
         },
-        "right": {
-          "symbol": "00679B",
-          "date": "2026-10-01",
-          "components": [
+        "right" : {
+          "components" : [
             {
-              "symbol": "T1",
-              "weight": 100
+              "symbol" : "T1",
+              "weight" : 100
             }
-          ]
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "00679B"
         }
-      }
+      },
+      "name" : "none-shared"
     }
-  ]
+  ],
+  "kind" : "ResearchMath.overlap"
 }

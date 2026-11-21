@@ -1,29 +1,49 @@
 {
-  "kind": "YearMonth.init",
-  "cases": [
+  "cases" : [
     {
-      "name": "taipei-not-utc",
-      "input": {
-        "at": "2026-10-31T16:30:00Z"
-      }
+      "expected" : {
+        "key" : "2026-11",
+        "month" : 11,
+        "year" : 2026
+      },
+      "input" : {
+        "at" : "2026-10-31T16:30:00Z"
+      },
+      "name" : "taipei-not-utc"
     },
     {
-      "name": "year-end-rollover",
-      "input": {
-        "at": "2026-12-31T16:00:00Z"
-      }
+      "expected" : {
+        "key" : "2027-01",
+        "month" : 1,
+        "year" : 2027
+      },
+      "input" : {
+        "at" : "2026-12-31T16:00:00Z"
+      },
+      "name" : "year-end-rollover"
     },
     {
-      "name": "leap-day",
-      "input": {
-        "at": "2028-02-29T12:00:00+08:00"
-      }
+      "expected" : {
+        "key" : "2028-02",
+        "month" : 2,
+        "year" : 2028
+      },
+      "input" : {
+        "at" : "2028-02-29T12:00:00+08:00"
+      },
+      "name" : "leap-day"
     },
     {
-      "name": "just-before-midnight",
-      "input": {
-        "at": "2026-11-30T23:59:59+08:00"
-      }
+      "expected" : {
+        "key" : "2026-11",
+        "month" : 11,
+        "year" : 2026
+      },
+      "input" : {
+        "at" : "2026-11-30T23:59:59+08:00"
+      },
+      "name" : "just-before-midnight"
     }
-  ]
+  ],
+  "kind" : "YearMonth.init"
 }

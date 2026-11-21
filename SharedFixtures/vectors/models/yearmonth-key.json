@@ -1,65 +1,81 @@
 {
-  "kind": "YearMonth.fromKey",
-  "cases": [
+  "cases" : [
     {
-      "name": "good",
-      "input": {
-        "key": "2026-11"
-      }
+      "expected" : {
+        "month" : 11,
+        "year" : 2026
+      },
+      "input" : {
+        "key" : "2026-11"
+      },
+      "name" : "good"
     },
     {
-      "name": "december",
-      "input": {
-        "key": "2026-12"
-      }
+      "expected" : {
+        "month" : 12,
+        "year" : 2026
+      },
+      "input" : {
+        "key" : "2026-12"
+      },
+      "name" : "december"
     },
     {
-      "name": "month-13",
-      "input": {
-        "key": "2026-13"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "2026-13"
+      },
+      "name" : "month-13"
     },
     {
-      "name": "month-0",
-      "input": {
-        "key": "2026-00"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "2026-00"
+      },
+      "name" : "month-0"
     },
     {
-      "name": "one-digit-month",
-      "input": {
-        "key": "2026-1"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "2026-1"
+      },
+      "name" : "one-digit-month"
     },
     {
-      "name": "slash",
-      "input": {
-        "key": "2026/11"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "2026/11"
+      },
+      "name" : "slash"
     },
     {
-      "name": "extra-part",
-      "input": {
-        "key": "2026-11-01"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "2026-11-01"
+      },
+      "name" : "extra-part"
     },
     {
-      "name": "empty",
-      "input": {
-        "key": ""
-      }
+      "expected" : null,
+      "input" : {
+        "key" : ""
+      },
+      "name" : "empty"
     },
     {
-      "name": "plus-sign",
-      "input": {
-        "key": "+026-11"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "+026-11"
+      },
+      "name" : "plus-sign"
     },
     {
-      "name": "fullwidth",
-      "input": {
-        "key": "２０２６-11"
-      }
+      "expected" : null,
+      "input" : {
+        "key" : "２０２６-11"
+      },
+      "name" : "fullwidth"
     }
-  ]
+  ],
+  "kind" : "YearMonth.fromKey"
 }

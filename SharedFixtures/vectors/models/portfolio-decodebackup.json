@@ -1,246 +1,977 @@
 {
-  "kind": "Portfolio.decodeBackup",
-  "cases": [
+  "cases" : [
     {
-      "name": "empty",
-      "input": {
-        "file": "vectors/models/backups/empty.json"
-      }
+      "expected" : {
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/empty.json"
+      },
+      "name" : "empty"
     },
     {
-      "name": "full",
-      "input": {
-        "file": "vectors/models/backups/full.json"
-      }
+      "expected" : {
+        "alerts" : [
+          {
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 200,
+            "symbol" : "0050"
+          },
+          {
+            "above" : false,
+            "enabled" : false,
+            "firedAt" : 815000200,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 27.5,
+            "symbol" : "00679B"
+          }
+        ],
+        "combo" : {
+          "buyFee" : true,
+          "etfReturn" : 6.5,
+          "etfYield" : 4,
+          "excluded" : [
+            "00919"
+          ],
+          "includeETFs" : true,
+          "includeStocks" : false,
+          "monthly" : 12000,
+          "reinvest" : false,
+          "scenario" : "樂觀",
+          "simulated" : [
+            {
+              "amount" : 100000,
+              "symbol" : "0050"
+            }
+          ],
+          "snapshotAt" : 815000000,
+          "source" : 1,
+          "startOfMonth" : true,
+          "stockPercent" : 0,
+          "stockReturn" : 5,
+          "stockYield" : 2,
+          "years" : 10
+        },
+        "comparison" : [
+          "0050",
+          "00878"
+        ],
+        "componentHistory" : {
+          "00982A" : [
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 60
+                },
+                {
+                  "symbol" : "2317",
+                  "weight" : 5.5
+                }
+              ],
+              "date" : "2026-10-02",
+              "source" : "test",
+              "symbol" : "00982A"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                },
+                {
+                  "symbol" : "2317",
+                  "weight" : 5.5
+                }
+              ],
+              "date" : "2026-10-01",
+              "source" : "test",
+              "symbol" : "00982A"
+            }
+          ]
+        },
+        "components" : {
+          "0050" : {
+            "components" : [
+              {
+                "name" : "台積電",
+                "symbol" : "2330",
+                "weight" : 50
+              },
+              {
+                "symbol" : "2317",
+                "weight" : 5.5
+              }
+            ],
+            "date" : "2026-10-01",
+            "source" : "test",
+            "symbol" : "0050"
+          }
+        },
+        "dividends" : [
+          {
+            "amount" : 2390,
+            "date" : 815184000,
+            "deduction" : 10,
+            "exDate" : 814000000,
+            "holdingID" : "11111111-2222-4333-8444-555555555555",
+            "id" : "A1B2C3D4-0000-4000-8000-000000000002",
+            "note" : "季配",
+            "perShare" : 0.4,
+            "shares" : 6000,
+            "source" : "投信公告",
+            "status" : "已公告",
+            "symbol" : "00878"
+          }
+        ],
+        "favorites" : [
+          "0050",
+          "00919"
+        ],
+        "fees" : {
+          "0050" : {
+            "annualExpensePercent" : 0.22,
+            "custody" : "0.035%",
+            "effectiveDate" : "2026-01-01",
+            "expenseYear" : 2025,
+            "management" : "0.15%",
+            "note" : "",
+            "sourceURL" : "https://example.com/fee",
+            "symbol" : "0050"
+          }
+        },
+        "game" : {
+          "celebratedAchievements" : [
+            "dcaPunchCard"
+          ],
+          "celebratedCoins" : 800,
+          "celebratedLevel" : 5,
+          "coins" : 930,
+          "collected" : {
+            "0050" : 815000000
+          },
+          "counts" : {
+            "feeCompared" : 1,
+            "monthlyDCA" : 3
+          },
+          "dcaMonths" : [
+            {
+              "month" : 9,
+              "year" : 2026
+            },
+            {
+              "month" : 10,
+              "year" : 2026
+            },
+            {
+              "month" : 11,
+              "year" : 2026
+            }
+          ],
+          "habit" : "dividends",
+          "lastAward" : "reconciled",
+          "longestStreak" : 3,
+          "migratedAt" : 800000000,
+          "migration" : 2,
+          "questsDone" : {
+            "2026-11" : [
+              "dcaLogged",
+              "reconciled"
+            ]
+          },
+          "rewardKeys" : [
+            "dividend|00878|2026-11",
+            "reconciled|2026-11"
+          ],
+          "unlocked" : {
+            "dcaPunchCard" : 815000050
+          },
+          "xp" : 930,
+          "xpByMonth" : {
+            "2026-11" : 120
+          }
+        },
+        "histories" : {
+          "0050" : {
+            "adjusted" : true,
+            "fetchedDay" : "2026-10-30",
+            "points" : [
+              {
+                "close" : 100,
+                "date" : "2026-01-02"
+              },
+              {
+                "close" : 120.5,
+                "date" : "2026-06-01"
+              }
+            ],
+            "source" : "test",
+            "symbol" : "0050"
+          }
+        },
+        "holdings" : [
+          {
+            "broker" : "富邦證券",
+            "id" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+            "name" : "元大台灣50",
+            "purchaseDate" : 780000000.5,
+            "shares" : 2000,
+            "sourceAccount" : "主帳戶",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 50
+          },
+          {
+            "broker" : "國泰證券（融資）",
+            "id" : "11111111-2222-4333-8444-555555555555",
+            "name" : "國泰永續高股息",
+            "shares" : 6000,
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 20.35
+          }
+        ],
+        "legacyDividends" : {
+          "pwa-dividend-1" : {
+            "actualReceived" : 2385,
+            "code" : "0050",
+            "deductions" : 10,
+            "eligibleShares" : 2000,
+            "exDate" : "2026-10-01",
+            "id" : "pwa-dividend-1",
+            "name" : "元大台灣50",
+            "paymentDate" : "2026-10-10",
+            "perShare" : 1.2,
+            "sourceUrl" : "https://example.com/dividend",
+            "status" : "received"
+          }
+        },
+        "legacyPlan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0.04,
+          "frequency" : 4,
+          "monthly" : 5000,
+          "principal" : 100000,
+          "reinvest" : 1,
+          "totalReturn" : 0.06,
+          "years" : 10
+        },
+        "legacyPrices" : {
+          "pwa-001" : {
+            "date" : "2026-10-01",
+            "price" : 55,
+            "symbol" : "0050"
+          }
+        },
+        "quotes" : {
+          "0050" : {
+            "change" : 0.25,
+            "changePercent" : 0.42,
+            "currency" : "TWD",
+            "date" : "2026-10-30",
+            "fetchedAt" : 815100000,
+            "high" : 55.5,
+            "low" : 54.8,
+            "open" : 55,
+            "price" : 55.2,
+            "source" : "open-data",
+            "symbol" : "0050",
+            "volume" : 12345
+          }
+        },
+        "schema" : 1,
+        "trades" : [
+          {
+            "action" : "買進",
+            "amount" : 50071,
+            "broker" : "富邦證券",
+            "date" : 815000000,
+            "id" : "22222222-0000-4000-8000-000000000001",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "symbol" : "0050",
+            "unitCost" : 50
+          },
+          {
+            "action" : "賣出",
+            "amount" : 27400,
+            "broker" : "富邦證券",
+            "date" : 815000100,
+            "id" : "22222222-0000-4000-8000-000000000002",
+            "name" : "元大台灣50",
+            "realized" : 2400.5,
+            "shares" : 500,
+            "symbol" : "0050",
+            "unitCost" : 55
+          }
+        ]
+      },
+      "input" : {
+        "file" : "vectors/models/backups/full.json"
+      },
+      "name" : "full"
     },
     {
-      "name": "old-no-optionals",
-      "input": {
-        "file": "vectors/models/backups/old-no-optionals.json"
-      }
+      "expected" : {
+        "dividends" : [
+          {
+            "amount" : 2400,
+            "date" : 815184000,
+            "id" : "A1B2C3D4-0000-4000-8000-000000000001",
+            "status" : "已入帳",
+            "symbol" : "0050"
+          }
+        ],
+        "favorites" : [
+          "0050",
+          "00878"
+        ],
+        "holdings" : [
+          {
+            "broker" : "富邦證券",
+            "id" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "quotes" : {
+          "0050" : {
+            "changePercent" : 0.42,
+            "date" : "2026-10-30",
+            "fetchedAt" : 815100000,
+            "price" : 55.2,
+            "symbol" : "0050"
+          }
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/old-no-optionals.json"
+      },
+      "name" : "old-no-optionals"
     },
     {
-      "name": "unknown-key",
-      "input": {
-        "file": "vectors/models/backups/unknown-key.json"
-      }
+      "expected" : {
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/unknown-key.json"
+      },
+      "name" : "unknown-key"
     },
     {
-      "name": "game-defaults",
-      "input": {
-        "file": "vectors/models/backups/game-defaults.json"
-      }
+      "expected" : {
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "game" : {
+          "celebratedAchievements" : [
+            "a",
+            "b"
+          ],
+          "celebratedCoins" : 300,
+          "celebratedLevel" : 4,
+          "coins" : 300,
+          "collected" : {
+
+          },
+          "counts" : {
+
+          },
+          "dcaMonths" : [
+
+          ],
+          "longestStreak" : 0,
+          "migration" : 0,
+          "questsDone" : {
+
+          },
+          "rewardKeys" : [
+
+          ],
+          "unlocked" : {
+            "a" : 1,
+            "b" : 2
+          },
+          "xp" : 460,
+          "xpByMonth" : {
+
+          }
+        },
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/game-defaults.json"
+      },
+      "name" : "game-defaults"
     },
     {
-      "name": "combo-forced",
-      "input": {
-        "file": "vectors/models/backups/combo-forced.json"
-      }
+      "expected" : {
+        "combo" : {
+          "buyFee" : false,
+          "etfReturn" : 5,
+          "excluded" : [
+
+          ],
+          "includeETFs" : true,
+          "includeStocks" : false,
+          "monthly" : 10000,
+          "reinvest" : true,
+          "scenario" : "基準",
+          "simulated" : [
+
+          ],
+          "source" : 0,
+          "startOfMonth" : false,
+          "stockReturn" : 5,
+          "years" : 3
+        },
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/combo-forced.json"
+      },
+      "name" : "combo-forced"
     },
     {
-      "name": "lowercase-ids",
-      "input": {
-        "file": "vectors/models/backups/lowercase-ids.json"
-      }
+      "expected" : {
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+          {
+            "broker" : "富邦證券",
+            "id" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "file" : "vectors/models/backups/lowercase-ids.json"
+      },
+      "name" : "lowercase-ids"
     },
     {
-      "name": "over-size-limit",
-      "input": {
-        "file": "vectors/models/backups/empty.json",
-        "limit": 10
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "file" : "vectors/models/backups/empty.json",
+        "limit" : 10
+      },
+      "name" : "over-size-limit"
     },
     {
-      "name": "schema-2",
-      "input": {
-        "text": "{\"schema\": 2, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 2, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "schema-2"
     },
     {
-      "name": "missing-quotes-key",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": []}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": []}"
+      },
+      "name" : "missing-quotes-key"
     },
     {
-      "name": "missing-schema-key",
-      "input": {
-        "text": "{\"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "missing-schema-key"
     },
     {
-      "name": "null-holdings",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": null, \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": null, \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "null-holdings"
     },
     {
-      "name": "negative-shares",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": -1, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "請填寫代碼與名稱，股數須大於 0，成本不可為負數。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": -1, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "negative-shares"
     },
     {
-      "name": "zero-shares",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 0, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "請填寫代碼與名稱，股數須大於 0，成本不可為負數。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 0, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "zero-shares"
     },
     {
-      "name": "duplicate-holding-id",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}, {\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}, {\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "duplicate-holding-id"
     },
     {
-      "name": "holding-missing-id",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "holding-missing-id"
     },
     {
-      "name": "unknown-strategy",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"未知\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"未知\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "unknown-strategy"
     },
     {
-      "name": "bad-uuid",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"1-1-1-1-1\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"1-1-1-1-1\", \"symbol\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "bad-uuid"
     },
     {
-      "name": "long-symbol",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"000000000000000000000\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "請填寫代碼與名稱，股數須大於 0，成本不可為負數。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [{\"id\": \"5FEF0885-6A6B-555C-8BEC-451862548983\", \"symbol\": \"000000000000000000000\", \"name\": \"元大台灣50\", \"shares\": 2000, \"unitCost\": 50, \"broker\": \"富邦證券\", \"strategy\": \"存錢筒\"}], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "long-symbol"
     },
     {
-      "name": "negative-dividend",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [{\"id\": \"A1B2C3D4-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"date\": 1, \"amount\": -1, \"status\": \"已入帳\"}], \"favorites\": [], \"quotes\": {}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [{\"id\": \"A1B2C3D4-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"date\": 1, \"amount\": -1, \"status\": \"已入帳\"}], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "negative-dividend"
     },
     {
-      "name": "quote-key-mismatch",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {\"0056\": {\"symbol\": \"0050\", \"price\": 1, \"changePercent\": null, \"date\": \"2026-10-30\", \"fetchedAt\": 1}}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {\"0056\": {\"symbol\": \"0050\", \"price\": 1, \"changePercent\": null, \"date\": \"2026-10-30\", \"fetchedAt\": 1}}}"
+      },
+      "name" : "quote-key-mismatch"
     },
     {
-      "name": "quote-zero-price",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {\"0050\": {\"symbol\": \"0050\", \"price\": 0, \"date\": \"2026-10-30\", \"fetchedAt\": 1}}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {\"0050\": {\"symbol\": \"0050\", \"price\": 0, \"date\": \"2026-10-30\", \"fetchedAt\": 1}}}"
+      },
+      "name" : "quote-zero-price"
     },
     {
-      "name": "history-thirteen-days",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-13\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-12\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-11\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-10\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-09\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-08\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-07\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-06\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-05\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-04\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-03\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-02\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-13\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-12\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-11\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-10\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-09\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-08\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-07\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-06\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-05\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-04\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-03\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-02\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
+      },
+      "name" : "history-thirteen-days"
     },
     {
-      "name": "history-twelve-days",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-12\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-11\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-10\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-09\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-08\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-07\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-06\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-05\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-04\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-03\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-02\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
-      }
+      "expected" : {
+        "componentHistory" : {
+          "0050" : [
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-12",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-11",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-10",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-09",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-08",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-07",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-06",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-05",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-04",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-03",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-02",
+              "source" : "test",
+              "symbol" : "0050"
+            },
+            {
+              "components" : [
+                {
+                  "name" : "台積電",
+                  "symbol" : "2330",
+                  "weight" : 50
+                }
+              ],
+              "date" : "2026-09-01",
+              "source" : "test",
+              "symbol" : "0050"
+            }
+          ]
+        },
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-12\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-11\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-10\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-09\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-08\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-07\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-06\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-05\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-04\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-03\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-02\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
+      },
+      "name" : "history-twelve-days"
     },
     {
-      "name": "history-wrong-code",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0056\": [{\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0056\": [{\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
+      },
+      "name" : "history-wrong-code"
     },
     {
-      "name": "history-same-date-twice",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"componentHistory\": {\"0050\": [{\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}, {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"test\"}]}}"
+      },
+      "name" : "history-same-date-twice"
     },
     {
-      "name": "component-weight-over-100",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"components\": {\"0050\": {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 180}], \"source\": \"test\"}}}"
-      }
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"components\": {\"0050\": {\"symbol\": \"0050\", \"date\": \"2026-09-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 180}], \"source\": \"test\"}}}"
+      },
+      "name" : "component-weight-over-100"
     },
     {
-      "name": "comparison-four",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"comparison\": [\"0050\", \"0056\", \"00878\", \"00919\"]}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"comparison\": [\"0050\", \"0056\", \"00878\", \"00919\"]}"
+      },
+      "name" : "comparison-four"
     },
     {
-      "name": "legacy-price-bad-date",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"legacyPrices\": {\"x\": {\"symbol\": \"0050\", \"price\": 1, \"date\": \"2026-02-30\"}}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"legacyPrices\": {\"x\": {\"symbol\": \"0050\", \"price\": 1, \"date\": \"2026-02-30\"}}}"
+      },
+      "name" : "legacy-price-bad-date"
     },
     {
-      "name": "game-xp-text",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"game\": {\"xp\": \"10\"}}"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"game\": {\"xp\": \"10\"}}"
+      },
+      "name" : "game-xp-text"
     },
     {
-      "name": "trade-negative-amount",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"trades\": [{\"id\": \"22222222-0000-4000-8000-000000000001\", \"date\": 1, \"action\": \"買進\", \"symbol\": \"0050\", \"name\": \"x\", \"shares\": 1, \"unitCost\": 1, \"broker\": \"b\", \"amount\": -5}]}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"trades\": [{\"id\": \"22222222-0000-4000-8000-000000000001\", \"date\": 1, \"action\": \"買進\", \"symbol\": \"0050\", \"name\": \"x\", \"shares\": 1, \"unitCost\": 1, \"broker\": \"b\", \"amount\": -5}]}"
+      },
+      "name" : "trade-negative-amount"
     },
     {
-      "name": "alerts-twenty-one",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 1, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000002\", \"symbol\": \"0050\", \"above\": true, \"price\": 2, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000003\", \"symbol\": \"0050\", \"above\": true, \"price\": 3, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000004\", \"symbol\": \"0050\", \"above\": true, \"price\": 4, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000005\", \"symbol\": \"0050\", \"above\": true, \"price\": 5, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000006\", \"symbol\": \"0050\", \"above\": true, \"price\": 6, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000007\", \"symbol\": \"0050\", \"above\": true, \"price\": 7, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000008\", \"symbol\": \"0050\", \"above\": true, \"price\": 8, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000009\", \"symbol\": \"0050\", \"above\": true, \"price\": 9, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000010\", \"symbol\": \"0050\", \"above\": true, \"price\": 10, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000011\", \"symbol\": \"0050\", \"above\": true, \"price\": 11, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000012\", \"symbol\": \"0050\", \"above\": true, \"price\": 12, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000013\", \"symbol\": \"0050\", \"above\": true, \"price\": 13, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000014\", \"symbol\": \"0050\", \"above\": true, \"price\": 14, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000015\", \"symbol\": \"0050\", \"above\": true, \"price\": 15, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000016\", \"symbol\": \"0050\", \"above\": true, \"price\": 16, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000017\", \"symbol\": \"0050\", \"above\": true, \"price\": 17, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000018\", \"symbol\": \"0050\", \"above\": true, \"price\": 18, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000019\", \"symbol\": \"0050\", \"above\": true, \"price\": 19, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000020\", \"symbol\": \"0050\", \"above\": true, \"price\": 20, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000021\", \"symbol\": \"0050\", \"above\": true, \"price\": 21, \"enabled\": true}]}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 1, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000002\", \"symbol\": \"0050\", \"above\": true, \"price\": 2, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000003\", \"symbol\": \"0050\", \"above\": true, \"price\": 3, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000004\", \"symbol\": \"0050\", \"above\": true, \"price\": 4, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000005\", \"symbol\": \"0050\", \"above\": true, \"price\": 5, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000006\", \"symbol\": \"0050\", \"above\": true, \"price\": 6, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000007\", \"symbol\": \"0050\", \"above\": true, \"price\": 7, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000008\", \"symbol\": \"0050\", \"above\": true, \"price\": 8, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000009\", \"symbol\": \"0050\", \"above\": true, \"price\": 9, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000010\", \"symbol\": \"0050\", \"above\": true, \"price\": 10, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000011\", \"symbol\": \"0050\", \"above\": true, \"price\": 11, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000012\", \"symbol\": \"0050\", \"above\": true, \"price\": 12, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000013\", \"symbol\": \"0050\", \"above\": true, \"price\": 13, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000014\", \"symbol\": \"0050\", \"above\": true, \"price\": 14, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000015\", \"symbol\": \"0050\", \"above\": true, \"price\": 15, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000016\", \"symbol\": \"0050\", \"above\": true, \"price\": 16, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000017\", \"symbol\": \"0050\", \"above\": true, \"price\": 17, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000018\", \"symbol\": \"0050\", \"above\": true, \"price\": 18, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000019\", \"symbol\": \"0050\", \"above\": true, \"price\": 19, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000020\", \"symbol\": \"0050\", \"above\": true, \"price\": 20, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000021\", \"symbol\": \"0050\", \"above\": true, \"price\": 21, \"enabled\": true}]}"
+      },
+      "name" : "alerts-twenty-one"
     },
     {
-      "name": "alert-not-a-code",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"abc\", \"above\": true, \"price\": 200, \"enabled\": true}]}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"abc\", \"above\": true, \"price\": 200, \"enabled\": true}]}"
+      },
+      "name" : "alert-not-a-code"
     },
     {
-      "name": "alert-twin-id",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 200, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 300, \"enabled\": true}]}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"alerts\": [{\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 200, \"enabled\": true}, {\"id\": \"33333333-0000-4000-8000-000000000001\", \"symbol\": \"0050\", \"above\": true, \"price\": 300, \"enabled\": true}]}"
+      },
+      "name" : "alert-twin-id"
     },
     {
-      "name": "combo-years-four",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"combo\": {\"years\": 4}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"combo\": {\"years\": 4}}"
+      },
+      "name" : "combo-years-four"
     },
     {
-      "name": "not-json",
-      "input": {
-        "text": "{\"schema\":1,"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{\"schema\":1,"
+      },
+      "name" : "not-json"
     },
     {
-      "name": "top-level-array",
-      "input": {
-        "text": "[]"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "[]"
+      },
+      "name" : "top-level-array"
     },
     {
-      "name": "legacy-plan-frequency-3",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"legacyPlan\": {\"principal\": 1, \"monthly\": 1, \"years\": 1, \"totalReturn\": 0, \"distributionRate\": 0, \"frequency\": 3, \"reinvest\": 0, \"deductionRate\": 0}}"
-      }
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"legacyPlan\": {\"principal\": 1, \"monthly\": 1, \"years\": 1, \"totalReturn\": 0, \"distributionRate\": 0, \"frequency\": 3, \"reinvest\": 0, \"deductionRate\": 0}}"
+      },
+      "name" : "legacy-plan-frequency-3"
     },
     {
-      "name": "fee-javascript-url",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"fees\": {\"0050\": {\"symbol\": \"0050\", \"effectiveDate\": \"2026-01-01\", \"management\": \"a\", \"custody\": \"b\", \"sourceURL\": \"javascript:alert(1)\", \"note\": \"\"}}}"
-      }
+      "expected" : {
+        "error" : "參考網址須為 https 開頭。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"fees\": {\"0050\": {\"symbol\": \"0050\", \"effectiveDate\": \"2026-01-01\", \"management\": \"a\", \"custody\": \"b\", \"sourceURL\": \"javascript:alert(1)\", \"note\": \"\"}}}"
+      },
+      "name" : "fee-javascript-url"
     },
     {
-      "name": "price-history-unordered",
-      "input": {
-        "text": "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"histories\": {\"0050\": {\"symbol\": \"0050\", \"adjusted\": true, \"points\": [{\"date\": \"2025-01-02\", \"close\": 100}, {\"date\": \"2025-01-01\", \"close\": 101}], \"fetchedDay\": \"2025-01-03\", \"source\": \"t\"}}}"
-      }
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}, \"histories\": {\"0050\": {\"symbol\": \"0050\", \"adjusted\": true, \"points\": [{\"date\": \"2025-01-02\", \"close\": 100}, {\"date\": \"2025-01-01\", \"close\": 101}], \"fetchedDay\": \"2025-01-03\", \"source\": \"t\"}}}"
+      },
+      "name" : "price-history-unordered"
     }
-  ]
+  ],
+  "kind" : "Portfolio.decodeBackup"
 }

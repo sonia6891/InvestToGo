@@ -1,47 +1,83 @@
 {
-  "kind": "ComponentSnapshot.imported",
-  "cases": [
+  "cases" : [
     {
-      "name": "good",
-      "input": {
-        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
-        "symbol": "0050"
-      }
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 50
+          }
+        ],
+        "date" : "2026-10-01",
+        "source" : "使用者匯入；原來源：投信",
+        "symbol" : "0050"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}"
+      },
+      "name" : "good"
     },
     {
-      "name": "no-source",
-      "input": {
-        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"\\u53f0\\u7a4d\\u96fb\", \"weight\": 50}]}",
-        "symbol": "0050"
-      }
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 50
+          }
+        ],
+        "date" : "2026-10-01",
+        "source" : "使用者匯入；原來源：未提供",
+        "symbol" : "0050"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"\\u53f0\\u7a4d\\u96fb\", \"weight\": 50}]}"
+      },
+      "name" : "no-source"
     },
     {
-      "name": "other-code",
-      "input": {
-        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
-        "symbol": "0056"
-      }
+      "expected" : {
+        "error" : "成分檔與這檔 ETF 的代碼不同。"
+      },
+      "input" : {
+        "symbol" : "0056",
+        "text" : "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}"
+      },
+      "name" : "other-code"
     },
     {
-      "name": "future-date",
-      "input": {
-        "text": "{\"symbol\": \"0050\", \"date\": \"2099-01-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}",
-        "symbol": "0050"
-      }
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\": \"0050\", \"date\": \"2099-01-01\", \"components\": [{\"symbol\": \"2330\", \"name\": \"台積電\", \"weight\": 50}], \"source\": \"投信\"}"
+      },
+      "name" : "future-date"
     },
     {
-      "name": "no-components",
-      "input": {
-        "text": "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [], \"source\": \"投信\"}",
-        "symbol": "0050"
-      }
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\": \"0050\", \"date\": \"2026-10-01\", \"components\": [], \"source\": \"投信\"}"
+      },
+      "name" : "no-components"
     },
     {
-      "name": "not-json",
-      "input": {
-        "text": "nope",
-        "symbol": "0050"
-      }
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "nope"
+      },
+      "name" : "not-json"
     }
-  ]
+  ],
+  "kind" : "ComponentSnapshot.imported"
 }

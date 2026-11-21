@@ -1,68 +1,77 @@
 {
-  "kind": "AlertEngine.isCurrent",
-  "cases": [
+  "cases" : [
     {
-      "name": "today",
-      "input": {
-        "day": "2026-11-14",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-14",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "today"
     },
     {
-      "name": "yesterday",
-      "input": {
-        "day": "2026-11-13",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-13",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "yesterday"
     },
     {
-      "name": "seven-days",
-      "input": {
-        "day": "2026-11-07",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-07",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "seven-days"
     },
     {
-      "name": "eight-days",
-      "input": {
-        "day": "2026-11-06",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : false,
+      "input" : {
+        "day" : "2026-11-06",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "eight-days"
     },
     {
-      "name": "bundled",
-      "input": {
-        "day": "2026-08-01",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : false,
+      "input" : {
+        "day" : "2026-08-01",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "bundled"
     },
     {
-      "name": "empty",
-      "input": {
-        "day": "",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : false,
+      "input" : {
+        "day" : "",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "empty"
     },
     {
-      "name": "compact",
-      "input": {
-        "day": "20261114",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : false,
+      "input" : {
+        "day" : "20261114",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "compact"
     },
     {
-      "name": "taipei-just-after-midnight",
-      "input": {
-        "day": "2026-11-07",
-        "now": "2026-11-13T16:05:00Z"
-      }
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-07",
+        "now" : "2026-11-13T16:05:00Z"
+      },
+      "name" : "taipei-just-after-midnight"
     },
     {
-      "name": "future-day",
-      "input": {
-        "day": "2026-11-20",
-        "now": "2026-11-14T12:00:00+08:00"
-      }
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-20",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "future-day"
     }
-  ]
+  ],
+  "kind" : "AlertEngine.isCurrent"
 }

@@ -1,237 +1,255 @@
 {
-  "kind": "AlertEngine.due",
-  "cases": [
+  "cases" : [
     {
-      "name": "member-mixed",
-      "input": {
-        "alerts": [
+      "expected" : [
+        "33333333-0000-4000-8000-000000000001",
+        "33333333-0000-4000-8000-000000000003"
+      ],
+      "input" : {
+        "alerts" : [
           {
-            "id": "33333333-0000-4000-8000-000000000001",
-            "symbol": "0050",
-            "above": true,
-            "price": 100,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 100,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000002",
-            "symbol": "0050",
-            "above": false,
-            "price": 50,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 50,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000003",
-            "symbol": "00878",
-            "above": false,
-            "price": 20,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000003",
+            "price" : 20,
+            "symbol" : "00878"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000004",
-            "symbol": "0056",
-            "above": true,
-            "price": 40,
-            "enabled": false
+            "above" : true,
+            "enabled" : false,
+            "id" : "33333333-0000-4000-8000-000000000004",
+            "price" : 40,
+            "symbol" : "0056"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000005",
-            "symbol": "00919",
-            "above": true,
-            "price": 25,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000005",
+            "price" : 25,
+            "symbol" : "00919"
           }
         ],
-        "prices": {
-          "0050": 100,
-          "00878": 20,
-          "0056": 45,
-          "00919": 24.99
-        },
-        "isMember": true
-      }
+        "isMember" : true,
+        "prices" : {
+          "0050" : 100,
+          "0056" : 45,
+          "00878" : 20,
+          "00919" : 24.99
+        }
+      },
+      "name" : "member-mixed"
     },
     {
-      "name": "below-fires",
-      "input": {
-        "alerts": [
+      "expected" : [
+        "33333333-0000-4000-8000-000000000002"
+      ],
+      "input" : {
+        "alerts" : [
           {
-            "id": "33333333-0000-4000-8000-000000000001",
-            "symbol": "0050",
-            "above": true,
-            "price": 100,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 100,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000002",
-            "symbol": "0050",
-            "above": false,
-            "price": 50,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 50,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000003",
-            "symbol": "00878",
-            "above": false,
-            "price": 20,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000003",
+            "price" : 20,
+            "symbol" : "00878"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000004",
-            "symbol": "0056",
-            "above": true,
-            "price": 40,
-            "enabled": false
+            "above" : true,
+            "enabled" : false,
+            "id" : "33333333-0000-4000-8000-000000000004",
+            "price" : 40,
+            "symbol" : "0056"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000005",
-            "symbol": "00919",
-            "above": true,
-            "price": 25,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000005",
+            "price" : 25,
+            "symbol" : "00919"
           }
         ],
-        "prices": {
-          "0050": 49.5
-        },
-        "isMember": true
-      }
+        "isMember" : true,
+        "prices" : {
+          "0050" : 49.5
+        }
+      },
+      "name" : "below-fires"
     },
     {
-      "name": "not-member",
-      "input": {
-        "alerts": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "alerts" : [
           {
-            "id": "33333333-0000-4000-8000-000000000001",
-            "symbol": "0050",
-            "above": true,
-            "price": 100,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 100,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000002",
-            "symbol": "0050",
-            "above": false,
-            "price": 50,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 50,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000003",
-            "symbol": "00878",
-            "above": false,
-            "price": 20,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000003",
+            "price" : 20,
+            "symbol" : "00878"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000004",
-            "symbol": "0056",
-            "above": true,
-            "price": 40,
-            "enabled": false
+            "above" : true,
+            "enabled" : false,
+            "id" : "33333333-0000-4000-8000-000000000004",
+            "price" : 40,
+            "symbol" : "0056"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000005",
-            "symbol": "00919",
-            "above": true,
-            "price": 25,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000005",
+            "price" : 25,
+            "symbol" : "00919"
           }
         ],
-        "prices": {
-          "0050": 150,
-          "00878": 10
-        },
-        "isMember": false
-      }
+        "isMember" : false,
+        "prices" : {
+          "0050" : 150,
+          "00878" : 10
+        }
+      },
+      "name" : "not-member"
     },
     {
-      "name": "zero-price-skipped",
-      "input": {
-        "alerts": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "alerts" : [
           {
-            "id": "33333333-0000-4000-8000-000000000001",
-            "symbol": "0050",
-            "above": true,
-            "price": 100,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 100,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000002",
-            "symbol": "0050",
-            "above": false,
-            "price": 50,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 50,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000003",
-            "symbol": "00878",
-            "above": false,
-            "price": 20,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000003",
+            "price" : 20,
+            "symbol" : "00878"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000004",
-            "symbol": "0056",
-            "above": true,
-            "price": 40,
-            "enabled": false
+            "above" : true,
+            "enabled" : false,
+            "id" : "33333333-0000-4000-8000-000000000004",
+            "price" : 40,
+            "symbol" : "0056"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000005",
-            "symbol": "00919",
-            "above": true,
-            "price": 25,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000005",
+            "price" : 25,
+            "symbol" : "00919"
           }
         ],
-        "prices": {
-          "00878": 0
-        },
-        "isMember": true
-      }
+        "isMember" : true,
+        "prices" : {
+          "00878" : 0
+        }
+      },
+      "name" : "zero-price-skipped"
     },
     {
-      "name": "no-prices",
-      "input": {
-        "alerts": [
+      "expected" : [
+
+      ],
+      "input" : {
+        "alerts" : [
           {
-            "id": "33333333-0000-4000-8000-000000000001",
-            "symbol": "0050",
-            "above": true,
-            "price": 100,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000001",
+            "price" : 100,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000002",
-            "symbol": "0050",
-            "above": false,
-            "price": 50,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000002",
+            "price" : 50,
+            "symbol" : "0050"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000003",
-            "symbol": "00878",
-            "above": false,
-            "price": 20,
-            "enabled": true
+            "above" : false,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000003",
+            "price" : 20,
+            "symbol" : "00878"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000004",
-            "symbol": "0056",
-            "above": true,
-            "price": 40,
-            "enabled": false
+            "above" : true,
+            "enabled" : false,
+            "id" : "33333333-0000-4000-8000-000000000004",
+            "price" : 40,
+            "symbol" : "0056"
           },
           {
-            "id": "33333333-0000-4000-8000-000000000005",
-            "symbol": "00919",
-            "above": true,
-            "price": 25,
-            "enabled": true
+            "above" : true,
+            "enabled" : true,
+            "id" : "33333333-0000-4000-8000-000000000005",
+            "price" : 25,
+            "symbol" : "00919"
           }
         ],
-        "prices": {},
-        "isMember": true
-      }
+        "isMember" : true,
+        "prices" : {
+
+        }
+      },
+      "name" : "no-prices"
     }
-  ]
+  ],
+  "kind" : "AlertEngine.due"
 }

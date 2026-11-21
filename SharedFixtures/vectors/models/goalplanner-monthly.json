@@ -1,95 +1,105 @@
 {
-  "kind": "GoalPlanner.monthlyContribution",
-  "cases": [
+  "cases" : [
     {
-      "name": "three-million-ten-years-6pct",
-      "input": {
-        "target": 3000000,
-        "years": 10,
-        "current": 0,
-        "annualReturn": 6
-      }
+      "expected" : 18464.55614635255,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "three-million-ten-years-6pct"
     },
     {
-      "name": "with-existing-money",
-      "input": {
-        "target": 3000000,
-        "years": 10,
-        "current": 500000,
-        "annualReturn": 6
-      }
+      "expected" : 12953.354839288933,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 500000,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "with-existing-money"
     },
     {
-      "name": "zero-return",
-      "input": {
-        "target": 3000000,
-        "years": 10,
-        "current": 0,
-        "annualReturn": 0
-      }
+      "expected" : 25000,
+      "input" : {
+        "annualReturn" : 0,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "zero-return"
     },
     {
-      "name": "already-there",
-      "input": {
-        "target": 3000000,
-        "years": 10,
-        "current": 4000000,
-        "annualReturn": 6
-      }
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 4000000,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "already-there"
     },
     {
-      "name": "zero-years",
-      "input": {
-        "target": 3000000,
-        "years": 0,
-        "current": 0,
-        "annualReturn": 6
-      }
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 0
+      },
+      "name" : "zero-years"
     },
     {
-      "name": "negative-years",
-      "input": {
-        "target": 3000000,
-        "years": -1,
-        "current": 0,
-        "annualReturn": 6
-      }
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : -1
+      },
+      "name" : "negative-years"
     },
     {
-      "name": "negative-return",
-      "input": {
-        "target": 1000000,
-        "years": 5,
-        "current": 0,
-        "annualReturn": -1
-      }
+      "expected" : 17081.783544206482,
+      "input" : {
+        "annualReturn" : -1,
+        "current" : 0,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "negative-return"
     },
     {
-      "name": "minus-99",
-      "input": {
-        "target": 1000000,
-        "years": 5,
-        "current": 100,
-        "annualReturn": -99
-      }
+      "expected" : 318707.93097390624,
+      "input" : {
+        "annualReturn" : -99,
+        "current" : 100,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "minus-99"
     },
     {
-      "name": "minus-100",
-      "input": {
-        "target": 1000000,
-        "years": 5,
-        "current": 0,
-        "annualReturn": -100
-      }
+      "expected" : 1000000,
+      "input" : {
+        "annualReturn" : -100,
+        "current" : 0,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "minus-100"
     },
     {
-      "name": "one-year",
-      "input": {
-        "target": 120000,
-        "years": 1,
-        "current": 0,
-        "annualReturn": 12
-      }
+      "expected" : 9488.792934582967,
+      "input" : {
+        "annualReturn" : 12,
+        "current" : 0,
+        "target" : 120000,
+        "years" : 1
+      },
+      "name" : "one-year"
     }
-  ]
+  ],
+  "kind" : "GoalPlanner.monthlyContribution"
 }
