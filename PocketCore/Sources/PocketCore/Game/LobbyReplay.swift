@@ -9,11 +9,12 @@ struct LobbySnapshot: Codable, Equatable {
     var month: String
     var quests: Set<String>
 
-    /// The lobby's quests that are done this Taipei month, by the same list the quest card shows.
-    static func of(_ game: GameState, now: Date) -> LobbySnapshot {
+    /// The lobby's quests that are done this Taipei month, by the same list the quest card shows. A DCA whose buy was
+    /// deleted does not count (`records`).
+    static func of(_ game: GameState, records: Portfolio, now: Date) -> LobbySnapshot {
         let month = YearMonth(now)
         let done = Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
-            .filter { game.isDone($0, in: month) }
+            .filter { game.isDone($0, in: month, records: records) }
             .map(\.id)
         return LobbySnapshot(xp: game.xp, coins: game.coins, month: month.key, quests: Set(done))
     }

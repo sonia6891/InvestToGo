@@ -61,10 +61,27 @@ final class LobbyReplayTests: XCTestCase {
         let quests = Quests.forMonth(month, habit: .dca, isNewbie: false)
         game.questsDone[month.key] = Set(quests.prefix(2).map(\.id))
         game.xp = 340; game.coins = 330
-        let s = LobbySnapshot.of(game, now: now)
+        var records = Portfolio()
+        records.game = game
+        records.trades = [Trade(date: now, action: .buy, holding: Holding(symbol: "0050", name: "測試", shares: 100, unitCost: 10, broker: "", strategy: .saving))]
+        let s = LobbySnapshot.of(game, records: records, now: now)
         XCTAssertEqual(s.quests, Set(quests.prefix(2).map(\.id)))
         XCTAssertEqual(s.xp, 340); XCTAssertEqual(s.coins, 330)
         XCTAssertEqual(s.month, "2026-11")
+    }
+
+    func testSnapshotUnticksADeletedDCA() {
+        let now = GameRules.taipei.date(from: DateComponents(year: 2026, month: 11, day: 12, hour: 12))!
+        let month = YearMonth(now)
+        var game = GameState()
+        game.habit = .dca
+        game.dcaMonths = [month]
+        game.questsDone[month.key] = [Quests.dcaLogged.id]
+        var records = Portfolio()
+        records.game = game
+        XCTAssertFalse(LobbySnapshot.of(game, records: records, now: now).quests.contains(Quests.dcaLogged.id), "No buy this month: the tick is gone")
+        records.trades = [Trade(date: now, action: .buy, holding: Holding(symbol: "0050", name: "測試", shares: 100, unitCost: 10, broker: "", strategy: .saving))]
+        XCTAssertTrue(LobbySnapshot.of(game, records: records, now: now).quests.contains(Quests.dcaLogged.id))
     }
 
     // MARK: arrival (what the lobby plays on arriving)

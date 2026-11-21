@@ -55,6 +55,11 @@ struct LobbyView: View {
     @StateObject private var replayer = LobbyReplayPlayer()
     /// Where the replay's coins fly from and to, in the lobby's own coordinates.
     @State private var spots: [ReplaySpot: CGRect] = [:]
+    /// 記一筆 is up (`quickDCA`) or still closing (`sheetUp`): the replay waits until it is gone, never plays under it.
+    @State private var quickDCA = false
+    @State private var sheetUp = false
+    /// The quests that were ticked when 記一筆 opened: nothing new ticks until the replay, after the sheet has gone.
+    @State private var ticksAtOpen: Set<String> = []
     private let shownStore = LobbyShownStore()
     private static let space = "lobby-replay"
 
@@ -126,9 +131,13 @@ struct LobbyView: View {
             if phase == .background { opensAgain = true } else if phase == .active, onScreen { playOpening() }
         }
         // Earned while the lobby is in front (or the records were read late): replayed there and then.
-        .onChange(of: LobbySnapshot.of(game, now: now)) { _, _ in arrive(lead: 0.15) }
+        .onChange(of: LobbySnapshot.of(game, records: store.data, now: now)) { _, _ in arrive(lead: 0.15) }
         .onChange(of: covered) { _, isCovered in
             if isCovered { replayer.coverOpened() } else { replayer.coverClosed(); arrive(lead: 0.15) }
+        }
+        // 記一筆: what it earns is replayed once the sheet has gone (spec 3.2), never under it.
+        .sheet(isPresented: $quickDCA, onDismiss: { sheetUp = false; arrive(lead: 0.15) }) {
+            QuickDCASheet { quickDCA = false }
         }
     }
 
@@ -146,10 +155,10 @@ struct LobbyView: View {
     /// once. Nothing to replay: LEVEL×UP right away, if one is due. Reduce Motion and `--ui-testing` show the final
     /// numbers at once and go straight to LEVEL×UP.
     private func arrive(lead: Double) {
-        guard onScreen, !covered, !replayer.playing, !store.recordsLocked else { return }
+        guard onScreen, !covered, !quickDCA, !sheetUp, !replayer.playing, !store.recordsLocked else { return }
         let game = store.data.game ?? GameState(), date = Date()
         let order = Quests.forMonth(YearMonth(date), habit: game.habit ?? .dca, isNewbie: game.isNewbie).map(\.id)
-        let snapshot = LobbySnapshot.of(game, now: date)
+        let snapshot = LobbySnapshot.of(game, records: store.data, now: date)
         let shown = shownStore.load()
         let replay = LobbyReplay.arrival(shown: shown, now: snapshot, questOrder: order, levelUpDue: game.levelUpDue, celebratedLevel: game.celebratedLevel)
         shownStore.save(snapshot)
@@ -329,19 +338,37 @@ struct LobbyView: View {
         let quests = Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
         // A quest done elsewhere ticks when the replay reaches it.
         let unticked = replayer.display?.unticked ?? []
-        let shownDone = { (quest: Quest) in game.isDone(quest, in: month) && !unticked.contains(quest.id) }
+        let holdsTicks = quickDCA || sheetUp
+        let shownDone = { (quest: Quest) in
+            game.isDone(quest, in: month, records: store.data) && !unticked.contains(quest.id) && (!holdsTicks || ticksAtOpen.contains(quest.id))
+        }
         let done = quests.filter(shownDone).count
-        let finalDone = quests.filter { game.isDone($0, in: month) }.count
+        let finalDone = quests.filter { game.isDone($0, in: month, records: store.data) }.count
         let reward = quests.count * (GameRules.xp[.questDone] ?? 0)
         let confetti = skin.burst.map { Color(rgb: $0) }
-        let rows = ForEach(quests) { quest in
-            HStack(spacing: 7) {
-                SkinCheck(done: shownDone(quest), size: 18)
-                    // VoiceOver reads the real state, not the replay's in-between one (spec 6).
-                    .accessibilityLabel(game.isDone(quest, in: month) ? "已完成" : "未完成")
-                    .scaleEffect(replayer.popping == quest.id ? 1.4 : 1)
-                    .overlay { BurstView(trigger: replayer.confetti[quest.id] ?? 0, center: .center, colors: confetti).frame(width: 64, height: 64) }
-                Text(quest.title).skinFont(.body(12)).fixedSize(horizontal: false, vertical: true)
+        // 記一筆 sits at the end of the DCA row until this month's DCA is on record.
+        func rows(stretch: Bool) -> some View {
+            ForEach(quests) { quest in
+                HStack(spacing: 7) {
+                    SkinCheck(done: shownDone(quest), size: 18)
+                        // VoiceOver reads the real state, not the replay's in-between one (spec 6).
+                        .accessibilityLabel(game.isDone(quest, in: month, records: store.data) ? "已完成" : "未完成")
+                        .scaleEffect(replayer.popping == quest.id ? 1.4 : 1)
+                        .overlay { BurstView(trigger: replayer.confetti[quest.id] ?? 0, center: .center, colors: confetti).frame(width: 64, height: 64) }
+                    Text(quest.title).skinFont(.body(12)).fixedSize(horizontal: false, vertical: true)
+                    if quest.trigger == .dcaLogged, !game.isDone(quest, in: month, records: store.data), !store.recordsLocked {
+                        if stretch { Spacer(minLength: 8) }
+                        Button {
+                            ticksAtOpen = Set(quests.filter { game.isDone($0, in: month, records: store.data) }.map(\.id))
+                            quickDCA = true; sheetUp = true
+                        } label: {
+                            SkinTag("記一筆").padding(.vertical, 6).contentShape(Rectangle())
+                        }
+                        .buttonStyle(PressableStyle())
+                        .accessibilityLabel("記一筆本月定投")
+                        .accessibilityIdentifier("lobby-quick-dca")
+                    }
+                }
             }
         }
         return SkinCard {
@@ -358,8 +385,8 @@ struct LobbyView: View {
                 }
                 .skinFont(.mono(11)).skinForeground(\.sub)
                 ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 14) { rows }
-                    VStack(alignment: .leading, spacing: 8) { rows }
+                    HStack(spacing: 14) { rows(stretch: false) }
+                    VStack(alignment: .leading, spacing: 8) { rows(stretch: true) }
                 }
             }
         }

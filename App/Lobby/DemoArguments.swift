@@ -3,6 +3,7 @@ import Foundation
 /// Launch arguments that set up game progress for UI tests and screenshots; ignored without `--ui-testing`.
 ///
 /// - `--demo-streak <n>`: DCA recorded in each of the n months up to and including this one.
+/// - `--demo-unlogged`: with `--demo-streak n`, the n months end at last month, so this month is still to log.
 /// - `--demo-level <n>`: experience at the start of level n, `GameRules.xpToReach(level: n)`.
 /// - `--demo-xp <n>`: experience n (wins over `--demo-level`).
 /// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
@@ -39,7 +40,8 @@ enum DemoArguments {
             return n
         }
         if let streak = number("--demo-streak") {
-            var months = Set<YearMonth>(), month = YearMonth(now)
+            // `--demo-unlogged`: the run ends at last month, so this month's DCA is still to log.
+            var months = Set<YearMonth>(), month = args.contains("--demo-unlogged") ? YearMonth(now).previous() : YearMonth(now)
             for _ in 0..<streak { months.insert(month); month = month.previous() }
             game.dcaMonths = months
             game.longestStreak = max(game.longestStreak, streak)

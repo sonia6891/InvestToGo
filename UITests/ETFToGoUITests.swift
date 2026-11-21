@@ -390,6 +390,51 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter().wait(for: [after], timeout: 5), .completed, "XP went from \(before) to \(String(describing: xp.value))")
     }
 
+    /// 記一筆 on the lobby: the sheet comes prefilled, a double tap on 「記好了」 logs the month once, the streak grows and
+    /// the button goes; the entry is one buy more in the trade log.
+    func testQuickDCAFromLobby() {
+        let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000"])
+        XCTAssertTrue(app.descendants(matching: .any)["連續定投 3 個月"].waitForExistence(timeout: 10), "This month is still to log")
+        let open = app.buttons["lobby-quick-dca"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5), "The DCA quest offers 記一筆")
+        open.tap()
+        let symbol = app.textFields["quick-dca-symbol"], amount = app.textFields["quick-dca-amount"], shares = app.textFields["quick-dca-shares"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5), "The sheet opens")
+        let prefilled = NSPredicate(format: "value == %@", "0050")
+        XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: prefilled, object: symbol)], timeout: 5), .completed, "The held fund is prefilled: \(String(describing: symbol.value))")
+        XCTAssertEqual(amount.value as? String, "5000")
+        let whole = NSPredicate(format: "value MATCHES %@", "[1-9][0-9]*")
+        XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: whole, object: shares)], timeout: 5), .completed, "Shares are estimated: \(String(describing: shares.value))")
+        let note = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH '以 ' AND label ENDSWITH '收盤價估算，可改成實際成交股數'")).firstMatch
+        XCTAssertTrue(note.exists, "The estimate says which close it used")
+        capture(app, "quick-dca-sheet")
+        app.buttons["quick-dca-save"].doubleTap()
+        XCTAssertTrue(app.textFields["quick-dca-symbol"].waitForNonExistence(timeout: 5), "The sheet closes")
+        XCTAssertTrue(open.waitForNonExistence(timeout: 5), "Once logged, 記一筆 is gone")
+        XCTAssertTrue(app.descendants(matching: .any)["連續定投 4 個月"].waitForExistence(timeout: 5), "The streak grew")
+        quickPick(app, "pocket")
+        reveal(app, app.buttons["holdings-trades"])
+        XCTAssertTrue(app.staticTexts["買進"].firstMatch.waitForExistence(timeout: 5))
+        // --demo-held seeds one buy; the quick entry is the second, so the double tap logged once.
+        XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == '買進'")).count, 2)
+    }
+
+    func testQuickDCARefusesUnknownCode() {
+        let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000"])
+        let open = app.buttons["lobby-quick-dca"]
+        XCTAssertTrue(open.waitForExistence(timeout: 10))
+        open.tap()
+        let symbol = app.textFields["quick-dca-symbol"]
+        XCTAssertTrue(symbol.waitForExistence(timeout: 5))
+        symbol.tap()
+        symbol.press(forDuration: 1.0)
+        if app.menuItems["全選"].waitForExistence(timeout: 2) { app.menuItems["全選"].tap() }
+        symbol.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 12))
+        symbol.typeText("9999")
+        XCTAssertTrue(app.staticTexts["找不到這檔 ETF"].waitForExistence(timeout: 5), "An unknown code is refused")
+        XCTAssertFalse(app.buttons["quick-dca-save"].isEnabled, "Nothing can be saved for it")
+    }
+
     /// 口袋 and 配息 with sample holdings in each skin, to compare with the canvas. A loss is shown honestly: ▼ and
     /// its size, spoken as 下跌.
     func testPocketAndDividendsInEverySkin() {
