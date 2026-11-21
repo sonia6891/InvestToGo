@@ -71,8 +71,28 @@ struct LobbyNavigation {
 
 private struct LobbyNavigationKey: EnvironmentKey { static let defaultValue = LobbyNavigation() }
 private struct LobbyNamespaceKey: EnvironmentKey { static let defaultValue: Namespace.ID? = nil }
+private struct CelebrateIfDueKey: EnvironmentKey { static let defaultValue: () -> Void = {} }
+private struct ReturningFromKey: EnvironmentKey { static let defaultValue: Feature? = nil }
+private struct LobbyCoveredKey: EnvironmentKey { static let defaultValue = false }
 
 extension EnvironmentValues {
+    /// Shows LEVEL×UP when one is due and the lobby is the screen in front (spec 5.4). Set by the root view; the lobby
+    /// calls it once its experience bar has filled, or at once when there is nothing to replay.
+    var celebrateIfDue: () -> Void {
+        get { self[CelebrateIfDueKey.self] }
+        set { self[CelebrateIfDueKey.self] = newValue }
+    }
+    /// The feature the viewer last left to come back to the lobby (nil at launch, or after a page pushed from the
+    /// lobby itself): the lobby's replay flies its coins from that object.
+    var returningFrom: Feature? {
+        get { self[ReturningFromKey.self] }
+        set { self[ReturningFromKey.self] = newValue }
+    }
+    /// A full-screen cover (LEVEL×UP) is over the lobby, which gets no `onDisappear` for it: its ambient motion pauses.
+    var lobbyCovered: Bool {
+        get { self[LobbyCoveredKey.self] }
+        set { self[LobbyCoveredKey.self] = newValue }
+    }
     var lobbyNavigation: LobbyNavigation {
         get { self[LobbyNavigationKey.self] }
         set { self[LobbyNavigationKey.self] = newValue }

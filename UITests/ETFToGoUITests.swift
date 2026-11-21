@@ -682,17 +682,18 @@ final class ETFToGoUITests: XCTestCase {
         app.textFields["dividend-shares"].tap(); app.textFields["dividend-shares"].typeText("1000")
         app.textFields["dividend-per-share"].tap(); app.textFields["dividend-per-share"].typeText("1")
         app.buttons["save-dividend"].tap()
-        // The +20 toast comes first, then the celebration over it.
+        // The +20 toast comes on 配息; LEVEL×UP waits for the lobby, where the experience bar fills (spec 5.4).
         XCTAssertTrue(app.staticTexts["dividend-xp-toast"].waitForExistence(timeout: 5), "The +20 toast is not lost")
-        XCTAssertTrue(level.waitForExistence(timeout: 10), "Crossing 450 experience celebrates level 4")
+        XCTAssertFalse(level.waitForExistence(timeout: 4), "Not over the dividends screen")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(level.waitForExistence(timeout: 10), "Crossing 450 experience celebrates level 4 in the lobby")
         XCTAssertEqual(level.label, "LV.4")
         XCTAssertTrue(app.staticTexts["LEVEL×UP"].exists)
         XCTAssertTrue(app.buttons["levelup-share"].exists, "分享這一刻")
         sleep(1); capture(app, "level-up")
         app.buttons["levelup-accept"].tap()
         XCTAssertTrue(level.waitForNonExistence(timeout: 5), "收下 closes it")
-        app.buttons["bar-lobby"].tap()
-        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "Back on the lobby underneath")
         XCTAssertEqual(xp.value as? String, "460 經驗")
         app.buttons["lobby-dividends"].tap()
         XCTAssertTrue(log.waitForExistence(timeout: 5))
@@ -702,6 +703,24 @@ final class ETFToGoUITests: XCTestCase {
         app.terminate(); app.launchArguments = ["--ui-testing", "--skip-onboarding"]; app.launch()
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10))
         XCTAssertFalse(level.waitForExistence(timeout: 4), "Shown once: not again after a relaunch")
+    }
+
+    /// A level crossed on 配息 and never brought back to the lobby (the quick pick goes straight to 找 ETF): LEVEL×UP
+    /// waits on every feature screen and comes up the next time the lobby is seen (spec 5.4).
+    func testLevelUpWaitsForLobby() {
+        let app = launch(["--demo-xp", "440", "--demo-held"])
+        let level = app.staticTexts["levelup-level"]
+        logDividendFromLobby(app)
+        XCTAssertTrue(app.staticTexts["dividend-xp-toast"].waitForExistence(timeout: 5), "The +20 toast comes on 配息")
+        quickPick(app, "find")
+        XCTAssertTrue(app.textFields["fund-search"].waitForExistence(timeout: 5), "The quick pick opens 找 ETF")
+        XCTAssertFalse(level.waitForExistence(timeout: 4), "Not over 找 ETF: the lobby has not been seen")
+        app.buttons["bar-lobby"].tap()
+        XCTAssertTrue(level.waitForExistence(timeout: 10), "In the lobby, the level crossed on 配息 is celebrated")
+        XCTAssertEqual(level.label, "LV.4")
+        app.buttons["levelup-accept"].tap()
+        XCTAssertTrue(level.waitForNonExistence(timeout: 5), "收下 closes it")
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "Back on the lobby")
     }
 
     // MARK: Feel, states and accessibility (spec 3.5, 7.1, 9; Task 12)

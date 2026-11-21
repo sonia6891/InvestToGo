@@ -45,6 +45,16 @@ struct LobbyView: View {
     @State private var opensAgain = false
     /// Taps on each object, to play its ring.
     @State private var taps: [Feature: Int] = [:]
+    /// LEVEL×UP covers the lobby (a full-screen cover from the root view: no `onDisappear` here).
+    @Environment(\.lobbyCovered) private var covered
+    @Environment(\.celebrateIfDue) private var celebrateIfDue
+    @Environment(\.returningFrom) private var returningFrom
+    /// The replay of what was earned since the lobby was last seen (spec 5.3).
+    @StateObject private var replayer = LobbyReplayPlayer()
+    /// Where the replay's coins fly from and to, in the lobby's own coordinates.
+    @State private var spots: [ReplaySpot: CGRect] = [:]
+    private let shownStore = LobbyShownStore()
+    private static let space = "lobby-replay"
 
     /// UI tests and screenshots never see the notice: the lobby they check stays as it was.
     private static let testing = ProcessInfo.processInfo.arguments.contains("--ui-testing")
@@ -53,7 +63,7 @@ struct LobbyView: View {
     /// it (Reduce Motion, Low Power Mode, `--ui-testing`).
     private var ambient: Bool {
         AmbientMotion.allowed(reduceMotion: reduceMotion, lowPower: power.lowPower, uiTesting: AmbientMotion.uiTesting,
-                              onScreen: onScreen, active: scenePhase == .active)
+                              onScreen: onScreen && !covered, active: scenePhase == .active)
     }
 
     var body: some View {
@@ -67,6 +77,7 @@ struct LobbyView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack(alignment: .top) { entry(.find, ambient: ambient); Spacer(); entry(.dividends, ambient: ambient) }
                 HeroNumber(value: hero.value, caption: hero.caption, label: hero.label, action: { navigation.push(.dcaHistory) }, ambient: ambient)
+                    .marksSpot(in: Self.space) { spots[.numeral] = $0 }
                     // The opening: the numeral drops into place.
                     .offset(y: opened ? 0 : -36)
                     .opacity(opened ? 1 : 0)
@@ -90,18 +101,87 @@ struct LobbyView: View {
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 16)
+            .overlay { replayOverlay }
+            .coordinateSpace(.named(Self.space))
         }
         .scrollBounceBehavior(.basedOnSize)
+        // A tap anywhere during the replay jumps to the final numbers; the tap itself still does what it does.
+        .simultaneousGesture(TapGesture().onEnded { replayer.cancel() }, including: replayer.playing ? .all : .subviews)
         .modifier(FadeInWithReducedMotion())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
         // Decided each time the lobby comes up, and again once StoreKit has said whether this is a member.
         .task(id: membership.has(.report)) { announceReport(now: Date()) }
-        .onAppear { onScreen = true; playOpening() }
-        .onDisappear { onScreen = false }
+        .onAppear {
+            onScreen = true
+            let opening = (!opened || opensAgain) && !reduceMotion && !AmbientMotion.uiTesting
+            playOpening()
+            arrive(lead: opening ? 0.5 : 0.15)
+        }
+        .onDisappear { onScreen = false; replayer.cancel() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { opensAgain = true } else if phase == .active, onScreen { playOpening() }
         }
+        // Earned while the lobby is in front (or the records were read late): replayed there and then.
+        .onChange(of: LobbySnapshot.of(game, now: now)) { _, _ in arrive(lead: 0.15) }
+        .onChange(of: covered) { _, isCovered in
+            if isCovered { replayer.coverOpened() } else { replayer.coverClosed(); arrive(lead: 0.15) }
+        }
+    }
+
+    // MARK: Replay (spec 5.3, 5.4)
+
+    /// The lobby comes on screen: what grew since it was last seen is replayed, and what it shows now is remembered at
+    /// once. Nothing to replay: LEVEL×UP right away, if one is due. Reduce Motion and `--ui-testing` show the final
+    /// numbers at once and go straight to LEVEL×UP.
+    private func arrive(lead: Double) {
+        guard onScreen, !covered, !replayer.playing, !store.recordsLocked else { return }
+        let game = store.data.game ?? GameState(), date = Date()
+        let order = Quests.forMonth(YearMonth(date), habit: game.habit ?? .dca, isNewbie: game.isNewbie).map(\.id)
+        let snapshot = LobbySnapshot.of(game, now: date)
+        let shown = shownStore.load()
+        var replay = LobbyReplay.between(shown: shown, now: snapshot, questOrder: order)
+        shownStore.save(snapshot)
+        // A LEVEL×UP still due from an earlier visit (its replay was tapped away, or the app closed over it): the bar
+        // fills to full again first (spec 5.4). Not on a first launch or after a restore (nothing was shown before):
+        // a level reached by the new experience curve is celebrated without a fill.
+        if shown != nil, game.levelUpDue != nil {
+            if var grown = replay {
+                grown.levelFrom = min(grown.levelFrom, game.celebratedLevel)
+                replay = grown
+            } else {
+                replay = LobbyReplay(newQuests: [], coinsFrom: snapshot.coins, coinsTo: snapshot.coins, xpFrom: snapshot.xp, xpTo: snapshot.xp,
+                                     levelFrom: game.celebratedLevel, levelTo: GameRules.level(xp: snapshot.xp))
+            }
+        }
+        guard let replay, !reduceMotion, !AmbientMotion.uiTesting else {
+            // Once the zoom back to the lobby has settled: a cover asked for in the middle of it may not come up.
+            let celebrate = celebrateIfDue
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { celebrate() }
+            return
+        }
+        replayer.play(replay, lead: lead, skin: skin, celebrate: celebrateIfDue)
+    }
+
+    /// The coins flying and 「+N XP」 floating, drawn over the lobby in its own coordinates.
+    private var replayOverlay: some View {
+        ZStack {
+            if let start = replayer.flight, let to = spots[.coins], let from = flightOrigin {
+                ReplayCoinFlight(start: start, from: from, to: CGPoint(x: to.minX + 7, y: to.midY))
+            }
+            if let float = replayer.xpFloat, let bar = spots[.bar] {
+                ReplayXPFloat(float: float, at: CGPoint(x: bar.midX, y: bar.maxY + 12))
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    /// The object just left, or the numeral when none was (launch, or a page pushed from the lobby itself).
+    private var flightOrigin: CGPoint? {
+        if let feature = returningFrom, let rect = spots[.feature(feature)] { return CGPoint(x: rect.midX, y: rect.midY) }
+        guard let numeral = spots[.numeral] else { return nil }
+        return CGPoint(x: numeral.midX, y: numeral.minY + HeroNumber.numeralHeight / 2)
     }
 
     // MARK: Opening
@@ -156,10 +236,13 @@ struct LobbyView: View {
     // MARK: Top bar
 
     private func topBar(_ game: GameState, ambient: Bool) -> some View {
-        let level = GameRules.level(xp: game.xp), progress = GameRules.progress(xp: game.xp)
-        let fraction = CGFloat(progress.into) / CGFloat(max(progress.needed, 1))
+        // While a replay plays, the bar, the level and the coins show its numbers; VoiceOver always hears the saved ones.
+        let level = GameRules.level(xp: game.xp), display = replayer.display
+        let fraction = CGFloat(display?.fraction ?? LobbyReplayPlayer.fraction(xp: game.xp))
+        let coins = display?.coins ?? game.coins
         return HStack(spacing: 8) {
-            Text("LV.\(level)").skinFont(.big(13))
+            Text("LV.\(display?.level ?? level)").skinFont(.big(13))
+                .contentTransition(.numericText())
                 .foregroundStyle(skin.onFill(skin.colors.accent))
                 .padding(.horizontal, 9).padding(.vertical, 3)
                 .background(RoundedRectangle(cornerRadius: skin.style.button == .pixelBlock ? 0 : 6).fill(skin.color(\.accent)))
@@ -174,7 +257,15 @@ struct LobbyView: View {
                             .frame(width: geo.size.width * fraction)
                     }
                 }
+                // The full bar's flash before LEVEL×UP.
+                .overlay {
+                    Capsule().fill(Color.white).opacity(replayer.flashing ? 0.9 : 0)
+                        .shadow(color: skin.color(\.accent), radius: replayer.flashing ? 6 : 0)
+                        .allowsHitTesting(false)
+                }
                 .frame(width: 92, height: 6)
+                .scaleEffect(y: replayer.flashing ? 1.6 : 1)
+                .marksSpot(in: Self.space) { spots[.bar] = $0 }
                 .accessibilityElement()
                 .accessibilityLabel("經驗")
                 .accessibilityValue("\(game.xp) 經驗")
@@ -182,8 +273,10 @@ struct LobbyView: View {
             Spacer(minLength: 4)
             HStack(spacing: 5) {
                 Circle().fill(skin.color(\.accent)).overlay(Circle().strokeBorder(skin.color(\.line), lineWidth: 3)).frame(width: 14, height: 14)
-                Text(game.coins.formatted()).skinFont(.mono(12)).skinForeground(\.ink)
+                Text(coins.formatted()).skinFont(.mono(12)).skinForeground(\.ink)
+                    .contentTransition(.numericText(value: Double(coins)))
             }
+            .marksSpot(in: Self.space) { spots[.coins] = $0 }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("金幣 \(game.coins)")
             Button { navigation.open(.achievements) } label: {
@@ -191,6 +284,7 @@ struct LobbyView: View {
             }
             .buttonStyle(.plain)
             .modifier(ZoomSource(feature: .achievements, namespace: namespace))
+            .marksSpot(in: Self.space) { spots[.feature(.achievements)] = $0 }
             .accessibilityLabel("成就")
             .accessibilityIdentifier("lobby-achievements")
         }
@@ -222,6 +316,7 @@ struct LobbyView: View {
         }
         .buttonStyle(PressableStyle())
         .modifier(ZoomSource(feature: feature, namespace: namespace))
+        .marksSpot(in: Self.space) { spots[.feature(feature)] = $0 }
         .accessibilityLabel(feature.title)
         .accessibilityIdentifier("lobby-\(feature.rawValue)")
     }
@@ -230,11 +325,17 @@ struct LobbyView: View {
 
     private func questCard(_ game: GameState, month: YearMonth, ambient: Bool) -> some View {
         let quests = Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
-        let done = quests.filter { game.isDone($0, in: month) }.count
+        // A quest done elsewhere ticks when the replay reaches it.
+        let unticked = replayer.display?.unticked ?? []
+        let shownDone = { (quest: Quest) in game.isDone(quest, in: month) && !unticked.contains(quest.id) }
+        let done = quests.filter(shownDone).count
         let reward = quests.count * (GameRules.xp[.questDone] ?? 0)
+        let confetti = skin.burst.map { Color(rgb: $0) }
         let rows = ForEach(quests) { quest in
             HStack(spacing: 7) {
-                SkinCheck(done: game.isDone(quest, in: month), size: 18)
+                SkinCheck(done: shownDone(quest), size: 18)
+                    .scaleEffect(replayer.popping == quest.id ? 1.4 : 1)
+                    .overlay { BurstView(trigger: replayer.confetti[quest.id] ?? 0, center: .center, colors: confetti).frame(width: 64, height: 64) }
                 Text(quest.title).skinFont(.body(12)).fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -242,6 +343,8 @@ struct LobbyView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("本月任務 \(done)/\(quests.count)")
+                        .contentTransition(.numericText(value: Double(done)))
+                        .scaleEffect(replayer.popping != nil ? 1.12 : 1, anchor: .leading)
                     Spacer()
                     // The reward not yet earned breathes (spec 5.1).
                     Text("+\(reward) XP").foregroundStyle(skin.color(skin.lightText ? \.accent : \.ink))
@@ -254,6 +357,18 @@ struct LobbyView: View {
                 }
             }
         }
+    }
+}
+
+/// The places on the lobby the replay's coins and 「+N XP」 come from and go to.
+enum ReplaySpot: Hashable {
+    case feature(Feature), numeral, coins, bar
+}
+
+extension View {
+    /// Reports this view's frame in the named coordinate space whenever it changes (the lobby's replay spots).
+    func marksSpot(in space: String, _ report: @escaping (CGRect) -> Void) -> some View {
+        onGeometryChange(for: CGRect.self, of: { $0.frame(in: .named(space)) }, action: report)
     }
 }
 

@@ -463,6 +463,8 @@ import SwiftUI
         try commit(next)
         let merged = alertBook.alerts ?? []
         if merged != alerts { try saveAlerts(merged) }
+        // The lobby shows the restored numbers as they are, without replaying them (spec 5.3).
+        LobbyShownStore().reset()
         return ImportSummary(gameSkipped: game.skipped)
     }
     func saveRecovery() throws {
