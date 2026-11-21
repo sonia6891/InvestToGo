@@ -108,6 +108,17 @@ jobs:
             -destination 'generic/platform=iOS' -archivePath build/ETFToGo.xcarchive \
             "${SIGN[@]}" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$ETF_BUNDLE_ID" \
             CURRENT_PROJECT_VERSION="3.$GITHUB_RUN_NUMBER" 2>&1 | tee build/archive.log
+          if [[ "${SIGNING:-}" == "cloud" ]]; then
+            # An unsigned archive still carries each prebuilt framework's vendor signature (Sentry's), already broken
+            # by the copy step's strip; the export would keep it and App Store Connect rejects it (error 90035).
+            # Stripped of it, the frameworks are unsigned like the app, and the export signs them all.
+            shopt -s nullglob
+            for framework in build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Frameworks/*.framework; do
+              codesign --remove-signature "$framework/$(basename "$framework" .framework)"
+              rm -rf "$framework/_CodeSignature"
+              echo "Removed the vendor signature from $(basename "$framework")"
+            done
+          fi
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only archive', p['CFBundleShortVersionString'], p['CFBundleVersion'])"
       - name: Upload archive to App Store Connect
         run: |
