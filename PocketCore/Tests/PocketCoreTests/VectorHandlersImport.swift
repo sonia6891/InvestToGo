@@ -88,6 +88,14 @@ private func preview(_ input: Any) throws -> BrokerPreview {
     return try BrokerPreview.make(table: table, mapping: mapping(input, table), broker: string(input, "broker"), account: string(input, "account"), funds: funds(input))
 }
 
+/// JSON has no NaN or infinity: they are written as text.
+private func jsonNumber(_ value: Double?) -> Any {
+    guard let value else { return NSNull() }
+    if value.isNaN { return "nan" }
+    if value.isInfinite { return value > 0 ? "inf" : "-inf" }
+    return value
+}
+
 let importHandlers: [String: VectorHandler] = [
     "CSVTable.parse": { input in
         let table = try CSVTable.parse(inputBytes(input))
@@ -103,14 +111,8 @@ let importHandlers: [String: VectorHandler] = [
     "BrokerPreview.costWarning": { input in
         orNull(BrokerPreview.costWarning(average: try number(input, "average"), price: optionalNumber(try VectorIO.object(input), "price")))
     },
-    "BrokerPreview.shareCount": { input in orNull(BrokerPreview.shareCount(try string(input, "text"))) },
-    "BrokerPreview.number": { input in
-        guard let value = BrokerPreview.number(try string(input, "text")) else { return NSNull() }
-        // JSON has no NaN or infinity: they are written as text.
-        if value.isNaN { return "nan" }
-        if value.isInfinite { return value > 0 ? "inf" : "-inf" }
-        return value
-    },
+    "BrokerPreview.shareCount": { input in jsonNumber(BrokerPreview.shareCount(try string(input, "text"))) },
+    "BrokerPreview.number": { input in jsonNumber(BrokerPreview.number(try string(input, "text"))) },
     "ScreenshotImport.lines": { input in ScreenshotImport.lines(from: try boxes(input, "boxes")) },
     "ScreenshotImport.combine": { input in
         ScreenshotImport.combine(corrected: try boxes(input, "corrected"), raw: try boxes(input, "raw")).map {
