@@ -1,47 +1,54 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "id": "blackgold"
+      "expected" : "blackgold",
+      "input" : {
+        "id" : "blackgold"
       },
-      "name": "blackgold"
+      "name" : "blackgold"
     },
     {
-      "input": {
-        "id": "voxel"
+      "expected" : "voxel",
+      "input" : {
+        "id" : "voxel"
       },
-      "name": "voxel"
+      "name" : "voxel"
     },
     {
-      "input": {
-        "id": "stitch"
+      "expected" : "stitch",
+      "input" : {
+        "id" : "stitch"
       },
-      "name": "stitch"
+      "name" : "stitch"
     },
     {
-      "input": {
-        "id": "sketch"
+      "expected" : "sketch",
+      "input" : {
+        "id" : "sketch"
       },
-      "name": "sketch"
+      "name" : "sketch"
     },
     {
-      "input": {
-        "id": "ember"
+      "expected" : "blackgold",
+      "input" : {
+        "id" : "ember"
       },
-      "name": "ember"
+      "name" : "ember"
     },
     {
-      "input": {
-        "id": ""
+      "expected" : "blackgold",
+      "input" : {
+        "id" : ""
       },
-      "name": "empty"
+      "name" : "empty"
     },
     {
-      "input": {
-        "id": "BLACKGOLD"
+      "expected" : "blackgold",
+      "input" : {
+        "id" : "BLACKGOLD"
       },
-      "name": "BLACKGOLD"
+      "name" : "BLACKGOLD"
     }
   ],
-  "kind": "Skins.named"
+  "kind" : "Skins.named"
 }

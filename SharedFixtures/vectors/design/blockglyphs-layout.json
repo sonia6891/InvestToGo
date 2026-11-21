@@ -1,89 +1,1771 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "text": "1"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0,
+            "y" : -0.575
+          }
+        ],
+        "width" : 0.45999999999999996
       },
-      "name": "1"
+      "input" : {
+        "text" : "1"
+      },
+      "name" : "1"
     },
     {
-      "input": {
-        "text": "12"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.89,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.89,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.89,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.15000000000000002,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : -0.9199999999999999
+          }
+        ],
+        "width" : 2.24
       },
-      "name": "12"
+      "input" : {
+        "text" : "12"
+      },
+      "name" : "12"
     },
     {
-      "input": {
-        "text": "100"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.78,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.78,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.52,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.52,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.04,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.04,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 1.26,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.78,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.78,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 1.26,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.74,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.74,
+            "y" : 0.575
+          }
+        ],
+        "width" : 4.02
       },
-      "name": "100"
+      "input" : {
+        "text" : "100"
+      },
+      "name" : "100"
     },
     {
-      "input": {
-        "text": "$"
+      "expected" : {
+        "blocks" : [
+
+        ],
+        "width" : 0
       },
-      "name": "$"
+      "input" : {
+        "text" : "$"
+      },
+      "name" : "$"
     },
     {
-      "input": {
-        "text": "0123456789"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -8.010000000000002,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -7.490000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -7.490000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -8.010000000000002,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -8.530000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -8.530000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -5.71,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -5.71,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -4.45,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -3.93,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -4.45,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -4.97,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -4.45,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -2.67,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.15,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -2.67,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.15,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -2.67,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.41,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.8899999999999999,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.3699999999999999,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.3699999999999999,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.8900000000000001,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.3700000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.8900000000000001,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.4100000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.8900000000000001,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.67,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 2.15,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.67,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 2.15,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.67,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 3.19,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 4.45,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 4.97,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 4.97,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 6.23,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 6.750000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 6.750000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 6.23,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 5.71,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 5.71,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 6.23,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 8.010000000000002,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 8.530000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 8.530000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 8.010000000000002,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 7.490000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 8.010000000000002,
+            "y" : 0
+          }
+        ],
+        "width" : 17.520000000000003
       },
-      "name": "0123456789"
+      "input" : {
+        "text" : "0123456789"
+      },
+      "name" : "0123456789"
     },
     {
-      "input": {
-        "text": "88"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.89,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.37,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.37,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.89,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.4100000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.4100000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.89,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.4100000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.4100000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.37,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.37,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : 0
+          }
+        ],
+        "width" : 3.2800000000000002
       },
-      "name": "88"
+      "input" : {
+        "text" : "88"
+      },
+      "name" : "88"
     },
     {
-      "input": {
-        "text": "0.42%"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -3.0774999999999997,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.5575,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.5575,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -3.0774999999999997,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -3.5975,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -3.5975,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.8175000000000001,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.0775000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.5575000000000001,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.03750000000000009,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.03750000000000009,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 1.2225,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.7425,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 1.2225,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.7024999999999999,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 1.2225,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : 2.5924999999999994,
+            "y" : 0.6
+          },
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : 3.4875,
+            "y" : -0.6
+          },
+          {
+            "depth" : 0.7200000000000001,
+            "gold" : false,
+            "height" : 2.415,
+            "rotation" : -0.42,
+            "shape" : "slash",
+            "width" : 0.34500000000000003,
+            "x" : 3.04,
+            "y" : 0
+          }
+        ],
+        "width" : 7.654999999999999
       },
-      "name": "0.42%"
+      "input" : {
+        "text" : "0.42%"
+      },
+      "name" : "0.42%"
     },
     {
-      "input": {
-        "text": "−0.02%"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -3.9675000000000002,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -2.1875,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.6675,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.6675,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -2.1875,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.7075,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.7075,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.9275,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.3325,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.8525,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.8525,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.3325,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.1875,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.1875,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.1125,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 2.6325,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.1125,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.5924999999999998,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.1125,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : 3.4825,
+            "y" : 0.6
+          },
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : 4.3775,
+            "y" : -0.6
+          },
+          {
+            "depth" : 0.7200000000000001,
+            "gold" : false,
+            "height" : 2.415,
+            "rotation" : -0.42,
+            "shape" : "slash",
+            "width" : 0.34500000000000003,
+            "x" : 3.93,
+            "y" : 0
+          }
+        ],
+        "width" : 9.435
       },
-      "name": "−0.02%"
+      "input" : {
+        "text" : "−0.02%"
+      },
+      "name" : "−0.02%"
     },
     {
-      "input": {
-        "text": "-5"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -0.89,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.37,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.4100000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.89,
+            "y" : -0.9199999999999999
+          }
+        ],
+        "width" : 3.2800000000000002
       },
-      "name": "-5"
+      "input" : {
+        "text" : "-5"
+      },
+      "name" : "-5"
     },
     {
-      "input": {
-        "text": "1,240"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.67,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -2.67,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -1.41,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.8899999999999999,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -1.41,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -1.93,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : -1.41,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.1499999999999999,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.3700000000000001,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.8900000000000001,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.8900000000000001,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.15,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 2.67,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 2.67,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 2.15,
+            "y" : -0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.63,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 1.63,
+            "y" : 0.575
+          }
+        ],
+        "width" : 5.8
       },
-      "name": "1,240"
+      "input" : {
+        "text" : "1,240"
+      },
+      "name" : "1,240"
     },
     {
-      "input": {
-        "text": "A1 2"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.89,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.89,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : 0.9199999999999999
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0.89,
+            "y" : 0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : 0
+          },
+          {
+            "depth" : 0.8,
+            "gold" : false,
+            "height" : 1.15,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : -0.15000000000000002,
+            "y" : -0.575
+          },
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 1.5,
+            "x" : 0.37,
+            "y" : -0.9199999999999999
+          }
+        ],
+        "width" : 2.24
       },
-      "name": "A1 2"
+      "input" : {
+        "text" : "A1 2"
+      },
+      "name" : "A1 2"
     },
     {
-      "input": {
-        "text": ""
+      "expected" : {
+        "blocks" : [
+
+        ],
+        "width" : 0
       },
-      "name": "empty"
+      "input" : {
+        "text" : ""
+      },
+      "name" : "empty"
     },
     {
-      "input": {
-        "text": "."
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.8,
+            "gold" : true,
+            "height" : 0.46,
+            "rotation" : 0,
+            "shape" : "box",
+            "width" : 0.46,
+            "x" : 0,
+            "y" : -0.9199999999999999
+          }
+        ],
+        "width" : 0.46
       },
-      "name": "."
+      "input" : {
+        "text" : "."
+      },
+      "name" : "."
     },
     {
-      "input": {
-        "text": "%"
+      "expected" : {
+        "blocks" : [
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : -0.44750000000000006,
+            "y" : 0.6
+          },
+          {
+            "depth" : 0.4,
+            "gold" : true,
+            "height" : 0.68,
+            "rotation" : 0,
+            "shape" : "ring",
+            "width" : 0.68,
+            "x" : 0.44750000000000006,
+            "y" : -0.6
+          },
+          {
+            "depth" : 0.7200000000000001,
+            "gold" : false,
+            "height" : 2.415,
+            "rotation" : -0.42,
+            "shape" : "slash",
+            "width" : 0.34500000000000003,
+            "x" : 0,
+            "y" : 0
+          }
+        ],
+        "width" : 1.5750000000000002
       },
-      "name": "%"
+      "input" : {
+        "text" : "%"
+      },
+      "name" : "%"
     }
   ],
-  "kind": "BlockGlyphs.layout"
+  "kind" : "BlockGlyphs.layout"
 }

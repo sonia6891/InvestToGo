@@ -1,61 +1,94 @@
 {
-  "cases": [
+  "cases" : [
     {
-      "input": {
-        "level": 1,
-        "member": false
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 1,
+        "member" : false
       },
-      "name": "lv1-free"
+      "name" : "lv1-free"
     },
     {
-      "input": {
-        "level": 4,
-        "member": false
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 4,
+        "member" : false
       },
-      "name": "lv4-free"
+      "name" : "lv4-free"
     },
     {
-      "input": {
-        "level": 5,
-        "member": false
+      "expected" : [
+        "blackgold",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 5,
+        "member" : false
       },
-      "name": "lv5-free"
+      "name" : "lv5-free"
     },
     {
-      "input": {
-        "level": 9,
-        "member": false
+      "expected" : [
+        "blackgold",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 9,
+        "member" : false
       },
-      "name": "lv9-free"
+      "name" : "lv9-free"
     },
     {
-      "input": {
-        "level": 10,
-        "member": false
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 10,
+        "member" : false
       },
-      "name": "lv10-free"
+      "name" : "lv10-free"
     },
     {
-      "input": {
-        "level": 40,
-        "member": false
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 40,
+        "member" : false
       },
-      "name": "lv40-free"
+      "name" : "lv40-free"
     },
     {
-      "input": {
-        "level": 1,
-        "member": true
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "stitch",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 1,
+        "member" : true
       },
-      "name": "lv1-member"
+      "name" : "lv1-member"
     },
     {
-      "input": {
-        "level": 0,
-        "member": false
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 0,
+        "member" : false
       },
-      "name": "lv0-free"
+      "name" : "lv0-free"
     }
   ],
-  "kind": "Skins.isUnlocked"
+  "kind" : "Skins.isUnlocked"
 }
