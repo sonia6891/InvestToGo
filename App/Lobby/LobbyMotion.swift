@@ -41,9 +41,9 @@ enum LobbySignature: Equatable {
     /// How far through its move the object is at `time` (0..<1), or nil between moves. Deterministic: the same time
     /// always gives the same pose.
     static func progress(time: Double, phase: Double) -> Double? {
-        let interval = interval(phase: phase)
-        var local = (time + phase * interval).truncatingRemainder(dividingBy: interval)
-        if local < 0 { local += interval }
+        let period = interval(phase: phase)
+        var local = (time + phase * period).truncatingRemainder(dividingBy: period)
+        if local < 0 { local += period }
         return local < moveDuration ? local / moveDuration : nil
     }
 
