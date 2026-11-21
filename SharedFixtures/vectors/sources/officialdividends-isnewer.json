@@ -1,0 +1,51 @@
+{
+  "cases": [
+    {
+      "input": {
+        "a": {
+          "tpex": "2026-11-01",
+          "twse": "2026-11-11"
+        },
+        "b": {
+          "tpex": "2026-11-09",
+          "twse": "2026-11-10"
+        }
+      },
+      "name": "newer-twse"
+    },
+    {
+      "input": {
+        "a": {
+          "tpex": "2026-11-10",
+          "twse": "2026-11-10"
+        },
+        "b": {
+          "tpex": "2026-11-09",
+          "twse": "2026-11-10"
+        }
+      },
+      "name": "same-twse-newer-tpex"
+    },
+    {
+      "input": {
+        "a": {
+          "twse": "2026-11-10"
+        },
+        "b": {
+          "twse": "2026-11-10"
+        }
+      },
+      "name": "same"
+    },
+    {
+      "input": {
+        "a": {},
+        "b": {
+          "twse": "2026-11-10"
+        }
+      },
+      "name": "empty-vs-some"
+    }
+  ],
+  "kind": "OfficialDividends.isNewer"
+}

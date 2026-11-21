@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_capital_buyback_00919.json",
+        "symbol": "00919"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "{\"code\":500,\"data\":null,\"message\":\"系統忙碌\"}"
+      },
+      "name": "error-body"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "{\"code\":\"404\"}"
+      },
+      "name": "error-without-message"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "{\"code\":200,\"data\":{\"pcf\":{\"date2\":\"2026/11/13\"}}}"
+      },
+      "name": "no-stocks"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "{}"
+      },
+      "name": "empty-object"
+    }
+  ],
+  "kind": "IssuerHoldings.capital"
+}

@@ -1,0 +1,9 @@
+{
+  "cases": [
+    {
+      "input": {},
+      "name": "bundled"
+    }
+  ],
+  "kind": "CatalogSnapshot.bundled.summary"
+}

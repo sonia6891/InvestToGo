@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_capital_items_sample.json",
+        "symbol": "00919"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_capital_items_sample.json",
+        "symbol": "00982A"
+      },
+      "name": "fixture-active"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_capital_items_sample.json",
+        "symbol": "0050"
+      },
+      "name": "fixture-missing"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "{}"
+      },
+      "name": "empty-object"
+    },
+    {
+      "input": {
+        "symbol": "00919",
+        "text": "oops"
+      },
+      "name": "not-json"
+    }
+  ],
+  "kind": "IssuerHoldings.capitalFundNo"
+}

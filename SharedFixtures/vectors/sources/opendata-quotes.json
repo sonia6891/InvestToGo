@@ -1,0 +1,12 @@
+{
+  "cases": [
+    {
+      "input": {
+        "tpex": "official/tpex-daily-close.json",
+        "twse": "official/twse-stock-day-all.json"
+      },
+      "name": "both-fixtures"
+    }
+  ],
+  "kind": "OpenData.quotes"
+}

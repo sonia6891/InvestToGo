@@ -9,6 +9,7 @@ let vectorHandlers: [String: VectorHandler] = [
     ["Vector.echo": { input in try VectorIO.object(input)["value"] ?? NSNull() }],
     supportHandlers,
     modelHandlers,
+    sourceHandlers,
 ].reduce(into: [:]) { all, group in all.merge(group) { first, _ in first } }
 
 /// `nil` as JSON null.

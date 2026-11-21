@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_cathay_GetETFList_00878.json",
+        "symbol": "00878"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_cathay_GetETFList_00878.json",
+        "symbol": "0050"
+      },
+      "name": "fixture-other"
+    },
+    {
+      "input": {
+        "symbol": "00878",
+        "text": "{\"totalCount\":3,\"result\":[{\"fundCode\":\"EA\",\"stockCode\":\"00400A\"},{\"fundCode\":\"CN\",\"stockCode\":\"00878\"},{\"fundCode\":\" \",\"stockCode\":\"00881\"}],\"returnCode\":\"2000\",\"success\":true}"
+      },
+      "name": "many-exact"
+    },
+    {
+      "input": {
+        "symbol": "00400a",
+        "text": "{\"result\":[{\"fundCode\":\"EA\",\"stockCode\":\"00400A\"}]}"
+      },
+      "name": "case-insensitive"
+    },
+    {
+      "input": {
+        "symbol": "00881",
+        "text": "{\"result\":[{\"fundCode\":\" \",\"stockCode\":\"00881\"}]}"
+      },
+      "name": "blank-code"
+    },
+    {
+      "input": {
+        "symbol": "0087",
+        "text": "{\"result\":[{\"fundCode\":\"CN\",\"stockCode\":\"00878\"}]}"
+      },
+      "name": "prefix-is-not-a-match"
+    },
+    {
+      "input": {
+        "symbol": "00878",
+        "text": "{\"totalCount\":0,\"result\":[]}"
+      },
+      "name": "empty"
+    },
+    {
+      "input": {
+        "symbol": "00878",
+        "text": "oops"
+      },
+      "name": "not-json"
+    }
+  ],
+  "kind": "IssuerHoldings.cathayFundCode"
+}

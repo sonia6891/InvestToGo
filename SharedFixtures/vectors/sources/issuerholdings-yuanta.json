@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_yuanta_PCF_Daily_0050.json",
+        "symbol": "0050"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_yuanta_PCF_Daily_0050.json",
+        "symbol": "0056"
+      },
+      "name": "wrong-fund"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"PCF\":{\"markcd\":\"0050\",\"trandate\":\"20261111\"},\"FundWeights\":{\"StockWeights\":[]}}"
+      },
+      "name": "empty-weights"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"PCF\":{\"markcd\":\"0050\"},\"FundWeights\":{\"StockWeights\":[{\"code\":\"2330\",\"name\":\"台積電\",\"weights\":58.7}]}}"
+      },
+      "name": "no-date"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{}"
+      },
+      "name": "empty-object"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "[]"
+      },
+      "name": "array"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "<html>維護中</html>"
+      },
+      "name": "html"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"PCF\":{\"markcd\":\"0050\",\"trandate\":\"20261111\"}}"
+      },
+      "name": "no-weights-key"
+    }
+  ],
+  "kind": "IssuerHoldings.yuanta"
+}

@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_ctbc_ETFList_sample.json",
+        "symbol": "00934"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_ctbc_ETFList_sample.json",
+        "symbol": "00882"
+      },
+      "name": "fixture-other"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_ctbc_ETFList_sample.json",
+        "symbol": "0050"
+      },
+      "name": "fixture-missing"
+    },
+    {
+      "input": {
+        "symbol": "00934",
+        "text": "{}"
+      },
+      "name": "empty-object"
+    }
+  ],
+  "kind": "IssuerHoldings.ctbcFID"
+}

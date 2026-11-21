@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "official/twse-stock-day-all.json"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "text": "{}"
+      },
+      "name": "not-an-array"
+    },
+    {
+      "input": {
+        "text": "[]"
+      },
+      "name": "empty"
+    },
+    {
+      "input": {
+        "text": "[{\"Code\":\"0050\",\"Date\":\"bad\",\"ClosingPrice\":\"1\"},{\"Code\":\"00x\",\"Date\":\"1151110\",\"ClosingPrice\":\"1\"},{\"Code\":\"0056\",\"Date\":\"1151110\",\"ClosingPrice\":\"5d\"},{\"Code\":\"006208\",\"Date\":\"1151110\",\"ClosingPrice\":\" 1,234.5 \"}]"
+      },
+      "name": "bad-rows-skipped"
+    }
+  ],
+  "kind": "OpenData.decodeTWSE"
+}

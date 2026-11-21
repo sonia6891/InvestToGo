@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "input": {
+        "name": "元大台灣50"
+      },
+      "name": "tw50"
+    },
+    {
+      "input": {
+        "name": "富邦台50"
+      },
+      "name": "fubon50"
+    },
+    {
+      "input": {
+        "name": "元大富櫃50"
+      },
+      "name": "otc50"
+    },
+    {
+      "input": {
+        "name": "元大台灣50正2"
+      },
+      "name": "leveraged"
+    },
+    {
+      "input": {
+        "name": "元大台灣50反1"
+      },
+      "name": "inverse"
+    },
+    {
+      "input": {
+        "name": "某某槓桿"
+      },
+      "name": "leverage-word"
+    },
+    {
+      "input": {
+        "name": "某某反向"
+      },
+      "name": "inverse-word"
+    },
+    {
+      "input": {
+        "name": "國泰永續高股息"
+      },
+      "name": "high-dividend"
+    },
+    {
+      "input": {
+        "name": "復華台灣科技優息"
+      },
+      "name": "you-xi"
+    },
+    {
+      "input": {
+        "name": "群益台灣精選高息"
+      },
+      "name": "gao-xi"
+    },
+    {
+      "input": {
+        "name": "元大美債20年"
+      },
+      "name": "bond"
+    },
+    {
+      "input": {
+        "name": "高股息正2"
+      },
+      "name": "risk-beats-income"
+    },
+    {
+      "input": {
+        "name": ""
+      },
+      "name": "empty"
+    }
+  ],
+  "kind": "CatalogAPI.strategy"
+}

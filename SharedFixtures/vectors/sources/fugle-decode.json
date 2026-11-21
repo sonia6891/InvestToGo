@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      },
+      "name": "close-price"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1,\"isTrial\":true}"
+      },
+      "name": "trial-uses-last-price"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"lastPrice\":99.8}"
+      },
+      "name": "last-price-only"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0056",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":99.7,\"lastPrice\":99.8,\"changePercent\":1.2,\"change\":1.15,\"openPrice\":98.5,\"highPrice\":100.1,\"lowPrice\":98.2,\"total\":{\"tradeVolume\":12345},\"extra\":1}"
+      },
+      "name": "wrong-symbol"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\"}"
+      },
+      "name": "no-price"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":0}"
+      },
+      "name": "zero-price"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":1,\"total\":{\"tradeVolume\":-1}}"
+      },
+      "name": "negative-volume"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"date\":\"2026-11-11\",\"closePrice\":\"99.7\"}"
+      },
+      "name": "string-price"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"closePrice\":99.7}"
+      },
+      "name": "missing-date"
+    },
+    {
+      "input": {
+        "expectedSymbol": "0050",
+        "text": "oops"
+      },
+      "name": "not-json"
+    }
+  ],
+  "kind": "Fugle.decode"
+}

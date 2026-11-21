@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/official/A_twse_STOCK_DAY_0050_202506.json"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "text": "{\"stat\": \"很抱歉，沒有符合條件的資料!\"}"
+      },
+      "name": "no-match"
+    },
+    {
+      "input": {
+        "text": "{\"stat\": \"查詢日期錯誤\"}"
+      },
+      "name": "error-stat"
+    },
+    {
+      "input": {
+        "text": "{}"
+      },
+      "name": "missing-stat"
+    },
+    {
+      "input": {
+        "text": "[]"
+      },
+      "name": "not-object"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"OK\",\"fields\":[\"Date\",\"Close\"],\"data\":[[\"114/06/02\",\"1\"]]}"
+      },
+      "name": "renamed-fields"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"bad\",\"--\"]]}"
+      },
+      "name": "all-rows-bad"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\",175.9],[\"114/06/03\",null]]}"
+      },
+      "name": "number-cells"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"OK\",\"fields\":[\"日期\",\"收盤價\"],\"data\":[[\"114/06/02\"],[\"114/06/03\",\"1,180.5\"]]}"
+      },
+      "name": "short-row-skipped"
+    }
+  ],
+  "kind": "OfficialHistory.twseMonth"
+}

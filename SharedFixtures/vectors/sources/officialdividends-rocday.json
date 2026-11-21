@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "input": {
+        "text": "115年10月22日"
+      },
+      "name": "roc-words"
+    },
+    {
+      "input": {
+        "text": "1151016"
+      },
+      "name": "seven-digits"
+    },
+    {
+      "input": {
+        "text": " 1151016 "
+      },
+      "name": "padded"
+    },
+    {
+      "input": {
+        "text": "115年1月2日"
+      },
+      "name": "single-digit-parts"
+    },
+    {
+      "input": {
+        "text": "115年13月01日"
+      },
+      "name": "bad-month"
+    },
+    {
+      "input": {
+        "text": "abc"
+      },
+      "name": "letters"
+    },
+    {
+      "input": {
+        "text": "11510160"
+      },
+      "name": "eight-digits"
+    },
+    {
+      "input": {
+        "text": "115/10/22"
+      },
+      "name": "slashes"
+    },
+    {
+      "input": {
+        "text": "115年10月22日extra"
+      },
+      "name": "trailing-text"
+    },
+    {
+      "input": {
+        "text": "1151032"
+      },
+      "name": "bad-day"
+    },
+    {
+      "input": {
+        "text": "１１５１０１６"
+      },
+      "name": "fullwidth-digits"
+    }
+  ],
+  "kind": "OfficialDividends.rocDay"
+}

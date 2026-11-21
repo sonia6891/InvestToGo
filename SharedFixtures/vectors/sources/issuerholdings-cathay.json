@@ -1,0 +1,93 @@
+{
+  "cases": [
+    {
+      "input": {
+        "date": "2026-11-13",
+        "file": "member/issuers/E_cathay_GetETFDetailStockList_00878.json",
+        "symbol": "00878"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "date": "2026/11/13",
+        "file": "member/issuers/E_cathay_GetETFDetailStockList_00878.json",
+        "symbol": "00878"
+      },
+      "name": "slashed-date"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":null,\"returnCode\":\"9999\",\"success\":false,\"returnMessage\":\"查無資料\"}"
+      },
+      "name": "error-body"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"success\":false}"
+      },
+      "name": "error-without-message"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"code\":\"2891\",\"title\":\"中信金\",\"ratio\":\"11.26\"}],\"success\":true}"
+      },
+      "name": "renamed-rows"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"--\"}],\"success\":true}"
+      },
+      "name": "bad-weight"
+    },
+    {
+      "input": {
+        "date": "",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"}],\"success\":true}"
+      },
+      "name": "blank-date"
+    },
+    {
+      "input": {
+        "date": "2999-01-01",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"}],\"success\":true}"
+      },
+      "name": "future-date"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"80\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"80\"}],\"success\":true}"
+      },
+      "name": "too-much-weight"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\" 2891 \",\"stockName\":\" 中信金 \",\"weights\":\"1.5\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"8.01%\"},{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"2.25\"},{\"stockCode\":\"\",\"stockName\":\"現金\",\"weights\":\"3.34\"},{\"stockCode\":\"2882\",\"stockName\":\"\",\"weights\":7}],\"success\":true}"
+      },
+      "name": "rows-cleaned"
+    },
+    {
+      "input": {
+        "date": "2026-11-13",
+        "symbol": "00878",
+        "text": "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"1,1.5％\"}],\"success\":true}"
+      },
+      "name": "fullwidth-percent"
+    }
+  ],
+  "kind": "IssuerHoldings.cathay"
+}

@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "input": {
+        "name": "元大台灣50"
+      },
+      "name": "yuanta"
+    },
+    {
+      "input": {
+        "name": "國泰永續高股息"
+      },
+      "name": "cathay"
+    },
+    {
+      "input": {
+        "name": "富邦台50"
+      },
+      "name": "fubon"
+    },
+    {
+      "input": {
+        "name": "群益台灣精選高息"
+      },
+      "name": "capital"
+    },
+    {
+      "input": {
+        "name": "復華台灣科技優息"
+      },
+      "name": "fhtrust"
+    },
+    {
+      "input": {
+        "name": "中信關鍵半導體"
+      },
+      "name": "ctbc-short"
+    },
+    {
+      "input": {
+        "name": "中國信託臺灣ESG"
+      },
+      "name": "ctbc-long"
+    },
+    {
+      "input": {
+        "name": "主動群益台灣強棒"
+      },
+      "name": "active"
+    },
+    {
+      "input": {
+        "name": " 主動 元大AI新經濟 "
+      },
+      "name": "active-spaced"
+    },
+    {
+      "input": {
+        "name": "兆豐藍籌30"
+      },
+      "name": "unknown"
+    },
+    {
+      "input": {
+        "name": ""
+      },
+      "name": "empty"
+    }
+  ],
+  "kind": "IssuerDirectory.issuer"
+}

@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/official/C_tpex_exDailyQ_2025_sample.json"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"ok\"}"
+      },
+      "name": "no-tables"
+    },
+    {
+      "input": {
+        "text": "{\"tables\":[{\"fields\":[\"除權息日期\",\"代號\",\"現金股利\"],\"data\":[[\"bad\",\"1\",\"x\"]]}]}"
+      },
+      "name": "all-rows-bad"
+    },
+    {
+      "input": {
+        "text": "{\"tables\":[{\"fields\":[\"除權息日期\",\"代號\",\"現金股利\"],\"data\":[[\"114/01/22\",\"00937B\",\"0.082\",\"extra\"],[\"114/01/23\",\" 00679B \",\"0.5\"]]}]}"
+      },
+      "name": "wrong-cell-count"
+    }
+  ],
+  "kind": "OfficialHistory.tpexDividends"
+}

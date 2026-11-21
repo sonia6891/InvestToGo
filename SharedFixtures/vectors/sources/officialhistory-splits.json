@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/official/D_twse_TWTCAU_2015_2026.json"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "text": "{\"stat\": \"error\"}"
+      },
+      "name": "error-stat"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"OK\",\"fields\":[\"恢復買賣日期\",\"ETF代號\",\"停止買賣前收盤價格\",\"恢復買賣參考價\"],\"data\":[[\"bad\",\"0050\",\"x\",\"y\"]]}"
+      },
+      "name": "all-rows-bad"
+    }
+  ],
+  "kind": "OfficialHistory.splits"
+}

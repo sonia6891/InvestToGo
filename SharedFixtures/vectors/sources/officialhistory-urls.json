@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "input": {
+        "from": "2025-01-01T00:00:00+08:00",
+        "month": {
+          "month": 6,
+          "year": 2025
+        },
+        "symbol": "0050",
+        "to": "2025-12-31T23:59:00+08:00"
+      },
+      "name": "june"
+    },
+    {
+      "input": {
+        "from": "2025-12-31T16:30:00Z",
+        "month": {
+          "month": 11,
+          "year": 2026
+        },
+        "symbol": "00679B",
+        "to": "2026-11-21T20:00:00Z"
+      },
+      "name": "taipei-day-not-utc"
+    }
+  ],
+  "kind": "OfficialHistory.urls"
+}

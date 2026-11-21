@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {
+      "input": {
+        "text": "[{\"Date\":\"20261110\",\"Close\":\"300.12\",\"Change\":\"-1.5\",\"Open\":\"301\",\"High\":\"302\",\"Low\":\"299\"},{\"Date\":\"20261111\",\"Close\":\"302.00\",\"Change\":\"1.88\",\"Open\":\"300\",\"High\":\"303\",\"Low\":\"299.5\"},{\"Date\":\"2026111\",\"Close\":\"999\"}]"
+      },
+      "name": "latest-row"
+    },
+    {
+      "input": {
+        "text": "[{\"Date\":\"20261111\",\"Close\":\"--\"}]"
+      },
+      "name": "no-close"
+    },
+    {
+      "input": {
+        "text": "[]"
+      },
+      "name": "empty"
+    }
+  ],
+  "kind": "OpenData.decodeTPExIndex"
+}

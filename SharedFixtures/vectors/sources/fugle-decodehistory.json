@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"D\",\"data\":[{\"date\":\"2026-11-10\",\"close\":99.7},{\"date\":\"2026-11-11\",\"close\":100.2,\"volume\":5}]}"
+      },
+      "name": "adjusted-daily"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"adjusted\":false,\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name": "not-adjusted"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name": "adjusted-missing"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"W\",\"data\":[]}"
+      },
+      "name": "weekly"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0056\",\"adjusted\":true,\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name": "wrong-symbol"
+    },
+    {
+      "input": {
+        "symbol": "0050",
+        "text": "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"D\"}"
+      },
+      "name": "missing-data"
+    }
+  ],
+  "kind": "Fugle.decodeHistory"
+}

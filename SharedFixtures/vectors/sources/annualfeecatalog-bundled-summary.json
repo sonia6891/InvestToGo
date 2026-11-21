@@ -1,0 +1,9 @@
+{
+  "cases": [
+    {
+      "input": {},
+      "name": "bundled"
+    }
+  ],
+  "kind": "AnnualFeeCatalog.bundled.summary"
+}

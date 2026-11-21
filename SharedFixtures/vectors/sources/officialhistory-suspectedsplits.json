@@ -1,0 +1,101 @@
+{
+  "cases": [
+    {
+      "input": {
+        "bars": [
+          {
+            "close": 100,
+            "date": "2025-06-17"
+          },
+          {
+            "close": 25,
+            "date": "2025-06-18"
+          }
+        ],
+        "dividends": [],
+        "known": []
+      },
+      "name": "flagged"
+    },
+    {
+      "input": {
+        "bars": [
+          {
+            "close": 100,
+            "date": "2025-06-17"
+          },
+          {
+            "close": 25,
+            "date": "2025-06-18"
+          }
+        ],
+        "dividends": [],
+        "known": [
+          {
+            "ratio": 4,
+            "resumeDate": "2025-06-18",
+            "symbol": "0050"
+          }
+        ]
+      },
+      "name": "known-split"
+    },
+    {
+      "input": {
+        "bars": [
+          {
+            "close": 100,
+            "date": "2025-06-17"
+          },
+          {
+            "close": 30,
+            "date": "2025-06-18"
+          }
+        ],
+        "dividends": [
+          {
+            "cash": 70,
+            "exDate": "2025-06-18",
+            "symbol": "x"
+          }
+        ],
+        "known": []
+      },
+      "name": "dividend-day"
+    },
+    {
+      "input": {
+        "bars": [
+          {
+            "close": 10,
+            "date": "2025-01-01"
+          },
+          {
+            "close": 25,
+            "date": "2025-01-02"
+          },
+          {
+            "close": 63,
+            "date": "2025-01-03"
+          },
+          {
+            "close": 25.2,
+            "date": "2025-01-04"
+          },
+          {
+            "close": 0,
+            "date": "2025-01-05"
+          },
+          {
+            "close": 5,
+            "date": "2025-01-06"
+          }
+        ],
+        "dividends": [],
+        "known": []
+      },
+      "name": "jump-up-and-edges"
+    }
+  ],
+  "kind": "OfficialHistory.suspectedSplits"
+}

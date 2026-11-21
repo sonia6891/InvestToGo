@@ -1,0 +1,41 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/official/B_tpex_tradingStock_00679B_202506.json"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"ok\",\"tables\":[{\"data\":[],\"fields\":[]}]}"
+      },
+      "name": "empty-data"
+    },
+    {
+      "input": {
+        "text": "{\"stat\":\"ok\"}"
+      },
+      "name": "no-tables"
+    },
+    {
+      "input": {
+        "text": "{\"tables\":[{\"fields\":[]}]}"
+      },
+      "name": "no-data"
+    },
+    {
+      "input": {
+        "text": "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"114/06/02\",\"25.21\"]]}]}"
+      },
+      "name": "spaced-field-names"
+    },
+    {
+      "input": {
+        "text": "{\"tables\":[{\"fields\":[\"日 期\",\"收盤\"],\"data\":[[\"bad\",\"--\"]]}]}"
+      },
+      "name": "all-rows-bad"
+    }
+  ],
+  "kind": "OfficialHistory.tpexMonth"
+}

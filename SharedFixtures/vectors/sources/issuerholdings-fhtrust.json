@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_fhtrust_assets_00929.json",
+        "symbol": "00929"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_fhtrust_assets_00929.json",
+        "symbol": "00927"
+      },
+      "name": "wrong-fund"
+    },
+    {
+      "input": {
+        "symbol": "00929",
+        "text": "{\"result\":[],\"status\":0}"
+      },
+      "name": "empty-result"
+    },
+    {
+      "input": {
+        "symbol": "00929",
+        "text": "{\"result\":[{\"etf002\":\"00929\",\"dDate\":\"2026/11/11\"}]}"
+      },
+      "name": "no-detail"
+    }
+  ],
+  "kind": "IssuerHoldings.fhtrust"
+}

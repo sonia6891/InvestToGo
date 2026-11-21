@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "input": {
+        "file": "member/issuers/E_ctbc_ETFHoldingWeight_00934.json",
+        "symbol": "00934"
+      },
+      "name": "fixture"
+    },
+    {
+      "input": {
+        "file": "member/issuers/E_ctbc_ETFHoldingWeight_00934.json",
+        "symbol": "00882"
+      },
+      "name": "wrong-fund"
+    },
+    {
+      "input": {
+        "symbol": "00934",
+        "text": "{\"ResultCode\":1,\"ResultMsg\":\"查無資料\",\"Data\":null}"
+      },
+      "name": "error-body"
+    },
+    {
+      "input": {
+        "symbol": "00934",
+        "text": "{\"ResultCode\":2}"
+      },
+      "name": "error-without-message"
+    },
+    {
+      "input": {
+        "symbol": "00934",
+        "text": "{\"ResultCode\":0,\"Data\":{\"FundAssetsDetail\":[{\"Code\":\"CASH\",\"Data\":[]}]}}"
+      },
+      "name": "no-stock-group"
+    },
+    {
+      "input": {
+        "symbol": "00934",
+        "text": "{\"ResultCode\":0,\"Data\":{}}"
+      },
+      "name": "no-groups"
+    }
+  ],
+  "kind": "IssuerHoldings.ctbc"
+}

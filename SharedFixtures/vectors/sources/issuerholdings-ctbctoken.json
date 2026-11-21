@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "input": {
+        "text": "{\"ResultCode\":0,\"ResultMsg\":\"\",\"Data\":{\"token\":\" aB+/c9== \"}}"
+      },
+      "name": "trimmed"
+    },
+    {
+      "input": {
+        "text": "{\"ResultCode\":0,\"Data\":{\"token\":\"\"}}"
+      },
+      "name": "blank"
+    },
+    {
+      "input": {
+        "text": "{\"ResultCode\":1,\"Data\":null}"
+      },
+      "name": "null-data"
+    },
+    {
+      "input": {
+        "text": "<html>"
+      },
+      "name": "html"
+    }
+  ],
+  "kind": "IssuerHoldings.ctbcToken"
+}

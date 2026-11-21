@@ -1,0 +1,111 @@
+{
+  "cases": [
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "file": "official/tpex-daily-close.json"
+        },
+        "today": "2026-11-12",
+        "twse": {
+          "file": "official/twse-stock-day-all.json"
+        }
+      },
+      "name": "fixtures"
+    },
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "file": "official/tpex-daily-close.json"
+        },
+        "previous": {
+          "fetchedDay": "2026-11-01",
+          "funds": [
+            {
+              "fullName": "元大美國政府20年期(以上)債券證券投資信託基金",
+              "fundType": "債券",
+              "id": "00679B",
+              "listingDate": "2017-01-17",
+              "market": "TPEx",
+              "name": "元大美債20年",
+              "strategy": "待分類"
+            }
+          ],
+          "listedDate": "2026-11-01",
+          "sources": []
+        },
+        "today": "2026-11-12",
+        "twse": {
+          "file": "official/twse-stock-day-all.json"
+        }
+      },
+      "name": "otc-carries-previous-details"
+    },
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "file": "official/tpex-daily-close.json"
+        },
+        "today": "2026-11-11",
+        "twse": {
+          "file": "official/twse-stock-day-all.json"
+        }
+      },
+      "name": "listed-day-after-today"
+    },
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "text": "[]"
+        },
+        "today": "2026-11-12",
+        "twse": {
+          "file": "official/twse-stock-day-all.json"
+        }
+      },
+      "name": "otc-empty"
+    },
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "file": "official/tpex-daily-close.json"
+        },
+        "today": "2026-11-12",
+        "twse": {
+          "text": "[{\"code\":\"0050\",\"name\":\"元大台灣50\"}]"
+        }
+      },
+      "name": "twse-renamed"
+    },
+    {
+      "input": {
+        "listed": {
+          "file": "member/catalog/F_twse_openapi_t187ap47_L_sample.json"
+        },
+        "otc": {
+          "text": "[{\"SecuritiesCompanyCode\":\"6488\",\"CompanyName\":\"環球晶\"}]"
+        },
+        "today": "2026-11-12",
+        "twse": {
+          "file": "official/twse-stock-day-all.json"
+        }
+      },
+      "name": "otc-no-etfs"
+    }
+  ],
+  "kind": "CatalogAPI.decode"
+}

@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "input": {
+        "value": "20261111"
+      },
+      "name": "compact"
+    },
+    {
+      "input": {
+        "value": "2026/11/11"
+      },
+      "name": "slashes"
+    },
+    {
+      "input": {
+        "value": "2026-11-11"
+      },
+      "name": "dashes"
+    },
+    {
+      "input": {
+        "value": " 2026-11-11 "
+      },
+      "name": "padded"
+    },
+    {
+      "input": {
+        "value": "115/11/11"
+      },
+      "name": "roc"
+    },
+    {
+      "input": {
+        "value": "2026/13/01"
+      },
+      "name": "bad-month"
+    },
+    {
+      "input": {
+        "value": "abc"
+      },
+      "name": "letters"
+    },
+    {
+      "input": {
+        "value": null
+      },
+      "name": "null"
+    },
+    {
+      "input": {
+        "value": 20261111
+      },
+      "name": "number"
+    },
+    {
+      "input": {
+        "value": "2026/1/5"
+      },
+      "name": "short-parts"
+    },
+    {
+      "input": {
+        "value": "２０２６-11-11"
+      },
+      "name": "fullwidth"
+    },
+    {
+      "input": {
+        "value": "2026/11-11"
+      },
+      "name": "mixed-separators"
+    },
+    {
+      "input": {
+        "value": "2026//11"
+      },
+      "name": "empty-part"
+    }
+  ],
+  "kind": "IssuerHoldings.day"
+}
