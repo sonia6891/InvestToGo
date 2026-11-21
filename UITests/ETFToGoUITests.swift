@@ -412,7 +412,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.textFields["quick-dca-symbol"].waitForNonExistence(timeout: 5), "The sheet closes")
         XCTAssertTrue(open.waitForNonExistence(timeout: 5), "Once logged, 記一筆 is gone")
         XCTAssertTrue(app.descendants(matching: .any)["連續定投 4 個月"].waitForExistence(timeout: 5), "The streak grew")
-        quickPick(app, "pocket")
+        app.buttons["lobby-pocket"].tap()
         reveal(app, app.buttons["holdings-trades"])
         XCTAssertTrue(app.staticTexts["買進"].firstMatch.waitForExistence(timeout: 5))
         // --demo-held seeds one buy; the quick entry is the second, so the double tap logged once.
