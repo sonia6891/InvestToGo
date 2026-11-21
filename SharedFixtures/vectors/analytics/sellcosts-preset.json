@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "input": {
+        "broker": "國泰證券"
+      },
+      "name": "國泰證券"
+    },
+    {
+      "input": {
+        "broker": "國泰"
+      },
+      "name": "國泰"
+    },
+    {
+      "input": {
+        "broker": "國泰綜合證券"
+      },
+      "name": "國泰綜合證券"
+    },
+    {
+      "input": {
+        "broker": "永豐金證券"
+      },
+      "name": "永豐金證券"
+    },
+    {
+      "input": {
+        "broker": "元大證券（融資）"
+      },
+      "name": "元大證券（融資）"
+    },
+    {
+      "input": {
+        "broker": "富邦證券(融資)"
+      },
+      "name": "富邦證券(融資)"
+    },
+    {
+      "input": {
+        "broker": "  凱基證券  "
+      },
+      "name": "  凱基證券  "
+    },
+    {
+      "input": {
+        "broker": "群益金鼎證券"
+      },
+      "name": "群益金鼎證券"
+    },
+    {
+      "input": {
+        "broker": "元富證券"
+      },
+      "name": "元富證券"
+    },
+    {
+      "input": {
+        "broker": ""
+      },
+      "name": "empty"
+    },
+    {
+      "input": {
+        "broker": "（融資）"
+      },
+      "name": "（融資）"
+    },
+    {
+      "input": {
+        "broker": "Cathay"
+      },
+      "name": "Cathay"
+    }
+  ],
+  "kind": "SellCosts.preset"
+}

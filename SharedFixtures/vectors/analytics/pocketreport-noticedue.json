@@ -1,0 +1,284 @@
+{
+  "cases": [
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": "2026-09"
+      },
+      "name": "new-month"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": ""
+      },
+      "name": "never-announced"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": "2026-10"
+      },
+      "name": "already-announced"
+    },
+    {
+      "input": {
+        "isMember": false,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": "2026-09"
+      },
+      "name": "not-member"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-30T23:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": "2026-10"
+      },
+      "name": "before-taipei-midnight"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-12-01T00:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 811137600.0,
+              "id": "00000000-0000-4000-8000-000000000015",
+              "status": "已入帳",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": "2026-10"
+      },
+      "name": "at-taipei-midnight"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [],
+          "favorites": [],
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": ""
+      },
+      "name": "no-records"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 815371200.0,
+              "id": "00000000-0000-4000-8000-000000000016",
+              "status": "已入帳",
+              "symbol": "00878"
+            },
+            {
+              "amount": 100,
+              "date": 810100800.0,
+              "id": "00000000-0000-4000-8000-000000000017",
+              "status": "預估",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
+              {
+                "month": 11,
+                "year": 2026
+              }
+            ],
+            "xpByMonth": {
+              "2026-11": 100
+            }
+          },
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": ""
+      },
+      "name": "started-this-month"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-12-02T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 815371200.0,
+              "id": "00000000-0000-4000-8000-000000000016",
+              "status": "已入帳",
+              "symbol": "00878"
+            },
+            {
+              "amount": 100,
+              "date": 810100800.0,
+              "id": "00000000-0000-4000-8000-000000000017",
+              "status": "預估",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "game": {
+            "dcaMonths": [
+              {
+                "month": 11,
+                "year": 2026
+              }
+            ],
+            "xpByMonth": {
+              "2026-11": 100
+            }
+          },
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": ""
+      },
+      "name": "next-month-has-report"
+    },
+    {
+      "input": {
+        "isMember": true,
+        "now": "2026-11-14T12:00:00+08:00",
+        "portfolio": {
+          "dividends": [
+            {
+              "amount": 100,
+              "date": 815371200.0,
+              "id": "00000000-0000-4000-8000-000000000016",
+              "status": "已入帳",
+              "symbol": "00878"
+            },
+            {
+              "amount": 100,
+              "date": 810100800.0,
+              "id": "00000000-0000-4000-8000-000000000017",
+              "status": "預估",
+              "symbol": "00878"
+            }
+          ],
+          "favorites": [],
+          "game": {
+            "collected": {
+              "0050": 815151600.0
+            },
+            "dcaMonths": [
+              {
+                "month": 11,
+                "year": 2026
+              }
+            ],
+            "xpByMonth": {
+              "2026-11": 100
+            }
+          },
+          "holdings": [],
+          "quotes": {},
+          "schema": 1
+        },
+        "seen": ""
+      },
+      "name": "dex-card-last-month"
+    }
+  ],
+  "kind": "PocketReport.noticeDue"
+}

@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "input": {
+        "gross": 34700,
+        "rate": {
+          "discount": 2.8,
+          "minimum": 1
+        }
+      },
+      "name": "cathay"
+    },
+    {
+      "input": {
+        "gross": 100000,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
+        }
+      },
+      "name": "list-price"
+    },
+    {
+      "input": {
+        "gross": 1000,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
+        }
+      },
+      "name": "minimum"
+    },
+    {
+      "input": {
+        "gross": 0,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
+        }
+      },
+      "name": "zero"
+    },
+    {
+      "input": {
+        "gross": -5,
+        "rate": {
+          "discount": 10,
+          "minimum": 20
+        }
+      },
+      "name": "negative"
+    },
+    {
+      "input": {
+        "gross": 210526.3157894737,
+        "rate": {
+          "discount": 10,
+          "minimum": 0
+        }
+      },
+      "name": "exact-hundredth"
+    },
+    {
+      "input": {
+        "gross": 100000,
+        "rate": {
+          "discount": 30,
+          "minimum": -5
+        }
+      },
+      "name": "unclamped"
+    }
+  ],
+  "kind": "SellCosts.fee"
+}

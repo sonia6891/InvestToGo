@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "input": {
+        "history": []
+      },
+      "name": "empty"
+    },
+    {
+      "input": {
+        "history": [
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 10
+              }
+            ],
+            "date": "2026-11-13",
+            "source": "test",
+            "symbol": "00982A"
+          }
+        ]
+      },
+      "name": "one-day"
+    },
+    {
+      "input": {
+        "history": [
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 10
+              }
+            ],
+            "date": "2026-11-13",
+            "source": "test",
+            "symbol": "00982A"
+          },
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 11
+              }
+            ],
+            "date": "2026-11-13",
+            "source": "test",
+            "symbol": "00982A"
+          }
+        ]
+      },
+      "name": "same-day-twice"
+    },
+    {
+      "input": {
+        "history": [
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 1
+              }
+            ],
+            "date": "2026-11-10",
+            "source": "test",
+            "symbol": "00982A"
+          },
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 12
+              },
+              {
+                "name": "名稱D",
+                "symbol": "D",
+                "weight": 4
+              }
+            ],
+            "date": "2026-11-13",
+            "source": "test",
+            "symbol": "00982A"
+          },
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 10
+              },
+              {
+                "name": "名稱C",
+                "symbol": "C",
+                "weight": 3
+              }
+            ],
+            "date": "2026-11-11",
+            "source": "test",
+            "symbol": "00982A"
+          }
+        ]
+      },
+      "name": "two-newest-any-order"
+    },
+    {
+      "input": {
+        "history": [
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 12
+              }
+            ],
+            "date": "2026-11-13",
+            "source": "富果／投信揭露資料",
+            "symbol": "00982A"
+          },
+          {
+            "components": [
+              {
+                "name": "名稱A",
+                "symbol": "A",
+                "weight": 10
+              }
+            ],
+            "date": "2026-11-11",
+            "source": "群益投信",
+            "symbol": "00982A"
+          }
+        ]
+      },
+      "name": "mixed-sources"
+    }
+  ],
+  "kind": "SnapshotDiff.latest"
+}

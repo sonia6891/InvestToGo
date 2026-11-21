@@ -1,0 +1,1086 @@
+{
+  "cases": [
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "two-months"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-15"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
+              }
+            ],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "single-reinvest"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-15"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
+              }
+            ],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": false,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "single-cash"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 12,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 11,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 12,
+                "date": "2024-02-02"
+              },
+              {
+                "close": 13,
+                "date": "2024-03-02"
+              },
+              {
+                "close": 14,
+                "date": "2024-04-02"
+              },
+              {
+                "close": 15,
+                "date": "2024-05-02"
+              },
+              {
+                "close": 16,
+                "date": "2024-06-02"
+              },
+              {
+                "close": 17,
+                "date": "2024-07-02"
+              },
+              {
+                "close": 18,
+                "date": "2024-08-02"
+              },
+              {
+                "close": 19,
+                "date": "2024-09-02"
+              },
+              {
+                "close": 20,
+                "date": "2024-10-02"
+              },
+              {
+                "close": 21,
+                "date": "2024-11-02"
+              },
+              {
+                "close": 22,
+                "date": "2024-12-02"
+              },
+              {
+                "close": 25,
+                "date": "2024-12-31"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 0.5,
+                "exDate": "2024-06-15",
+                "symbol": "X"
+              }
+            ],
+            "splits": [],
+            "suspect": false
+          },
+          "Y": {
+            "bars": [
+              {
+                "close": 29,
+                "date": "2024-01-03"
+              },
+              {
+                "close": 28,
+                "date": "2024-02-03"
+              },
+              {
+                "close": 27,
+                "date": "2024-03-03"
+              },
+              {
+                "close": 26,
+                "date": "2024-04-03"
+              },
+              {
+                "close": 25,
+                "date": "2024-05-03"
+              },
+              {
+                "close": 24,
+                "date": "2024-06-03"
+              },
+              {
+                "close": 23,
+                "date": "2024-07-03"
+              },
+              {
+                "close": 22,
+                "date": "2024-08-03"
+              },
+              {
+                "close": 21,
+                "date": "2024-09-03"
+              },
+              {
+                "close": 20,
+                "date": "2024-10-03"
+              },
+              {
+                "close": 19,
+                "date": "2024-11-03"
+              },
+              {
+                "close": 18,
+                "date": "2024-12-03"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          },
+          "Z": {
+            "bars": [
+              {
+                "close": 55,
+                "date": "2024-01-05"
+              },
+              {
+                "close": 60,
+                "date": "2024-02-05"
+              },
+              {
+                "close": 50,
+                "date": "2024-03-05"
+              },
+              {
+                "close": 55,
+                "date": "2024-04-05"
+              },
+              {
+                "close": 60,
+                "date": "2024-05-05"
+              },
+              {
+                "close": 50,
+                "date": "2024-06-05"
+              },
+              {
+                "close": 55,
+                "date": "2024-07-05"
+              },
+              {
+                "close": 60,
+                "date": "2024-08-05"
+              },
+              {
+                "close": 50,
+                "date": "2024-09-05"
+              },
+              {
+                "close": 55,
+                "date": "2024-10-05"
+              },
+              {
+                "close": 60,
+                "date": "2024-11-05"
+              },
+              {
+                "close": 50,
+                "date": "2024-12-05"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2024-03-20",
+                "symbol": "X"
+              },
+              {
+                "cash": 1.2,
+                "exDate": "2024-09-20",
+                "symbol": "X"
+              }
+            ],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 0.5
+          },
+          {
+            "symbol": "Y",
+            "weight": 0.3
+          },
+          {
+            "symbol": "Z",
+            "weight": 0.2
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "three-legs-weighted"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-03-04"
+              },
+              {
+                "close": 10,
+                "date": "2024-03-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "late-listing"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 7,
+          "year": 2025
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 100,
+                "date": "2025-06-02"
+              },
+              {
+                "close": 25,
+                "date": "2025-06-18"
+              },
+              {
+                "close": 25,
+                "date": "2025-07-01"
+              }
+            ],
+            "dividends": [],
+            "splits": [
+              {
+                "ratio": 4,
+                "resumeDate": "2025-06-18",
+                "symbol": "X"
+              }
+            ],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 6,
+          "year": 2025
+        }
+      },
+      "name": "split"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2025
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2025-01-02"
+              },
+              {
+                "close": 70,
+                "date": "2025-02-10"
+              },
+              {
+                "close": 70,
+                "date": "2025-03-03"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2025-02-10",
+                "symbol": "X"
+              }
+            ],
+            "splits": [
+              {
+                "ratio": 0.14285714285714285,
+                "resumeDate": "2025-02-10",
+                "symbol": "X"
+              }
+            ],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2025
+        }
+      },
+      "name": "reverse-split-and-dividend-same-day"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": true
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "suspect"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 1,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "single-day"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 12,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 11,
+                "date": "2024-12-31"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "year-rising"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 6,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "end-beyond-data"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 0.5
+          },
+          {
+            "symbol": "Y",
+            "weight": 0.5
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "leg-without-history"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          },
+          "Y": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2023-05-02"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 0.5
+          },
+          {
+            "symbol": "Y",
+            "weight": 0.5
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "leg-with-no-bars-in-range"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-03-01"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2024-02-10",
+                "symbol": "X"
+              }
+            ],
+            "splits": [
+              {
+                "ratio": 2,
+                "resumeDate": "2024-02-20",
+                "symbol": "X"
+              }
+            ],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": false,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "dividend-before-split"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 4,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 12,
+                "date": "2024-03-04"
+              },
+              {
+                "close": 11,
+                "date": "2024-04-01"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "gap-month-carries-state"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 0,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 12,
+                "date": "2024-03-01"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 11,
+                "date": "2024-02-02"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "unsorted-bars-and-zero-close"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 3,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 12,
+                "date": "2024-02-30"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "lenient-day"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 30,
+                "date": "2024-03-01"
+              }
+            ],
+            "dividends": [
+              {
+                "cash": 1,
+                "exDate": "2024-01-15",
+                "symbol": "X"
+              }
+            ],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 2,
+          "year": 2024
+        }
+      },
+      "name": "bars-outside-range-ignored"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 2,
+          "year": 2024
+        },
+        "history": {},
+        "legs": [],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 1,
+          "year": 2024
+        }
+      },
+      "name": "no-legs"
+    },
+    {
+      "input": {
+        "end": {
+          "month": 1,
+          "year": 2024
+        },
+        "history": {
+          "X": {
+            "bars": [
+              {
+                "close": 10,
+                "date": "2024-01-02"
+              },
+              {
+                "close": 10,
+                "date": "2024-01-31"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-01"
+              },
+              {
+                "close": 20,
+                "date": "2024-02-29"
+              }
+            ],
+            "dividends": [],
+            "splits": [],
+            "suspect": false
+          }
+        },
+        "legs": [
+          {
+            "symbol": "X",
+            "weight": 1
+          }
+        ],
+        "monthly": 1000,
+        "reinvest": true,
+        "start": {
+          "month": 3,
+          "year": 2024
+        }
+      },
+      "name": "start-after-end"
+    }
+  ],
+  "kind": "Backtest.run"
+}

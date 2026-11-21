@@ -1,0 +1,118 @@
+{
+  "cases": [
+    {
+      "input": {
+        "broker": "國泰證券",
+        "stored": {
+          "": {
+            "discount": 5,
+            "minimum": 10
+          },
+          "國泰證券": {
+            "discount": 3.5,
+            "minimum": 5
+          }
+        }
+      },
+      "name": "own-rate"
+    },
+    {
+      "input": {
+        "broker": "國泰證券（融資）",
+        "stored": {
+          "": {
+            "discount": 5,
+            "minimum": 10
+          },
+          "國泰證券": {
+            "discount": 3.5,
+            "minimum": 5
+          }
+        }
+      },
+      "name": "own-rate-margin"
+    },
+    {
+      "input": {
+        "broker": "元大證券",
+        "stored": {
+          "": {
+            "discount": 5,
+            "minimum": 10
+          },
+          "國泰證券": {
+            "discount": 3.5,
+            "minimum": 5
+          }
+        }
+      },
+      "name": "preset-beats-default"
+    },
+    {
+      "input": {
+        "broker": "統一證券",
+        "stored": {
+          "": {
+            "discount": 5,
+            "minimum": 10
+          },
+          "國泰證券": {
+            "discount": 3.5,
+            "minimum": 5
+          }
+        }
+      },
+      "name": "default"
+    },
+    {
+      "input": {
+        "broker": "統一證券",
+        "stored": {}
+      },
+      "name": "list-price"
+    },
+    {
+      "input": {
+        "broker": "永豐金證券",
+        "stored": {}
+      },
+      "name": "preset-no-store"
+    },
+    {
+      "input": {
+        "broker": "統一證券",
+        "stored": {
+          "統一證券": {
+            "discount": 12,
+            "minimum": -1
+          }
+        }
+      },
+      "name": "own-rate-clamped"
+    },
+    {
+      "input": {
+        "broker": "",
+        "stored": {
+          "": {
+            "discount": 5,
+            "minimum": 10
+          },
+          "國泰證券": {
+            "discount": 3.5,
+            "minimum": 5
+          }
+        }
+      },
+      "name": "empty-broker-uses-default"
+    },
+    {
+      "input": {
+        "broker": "",
+        "stored": {}
+      },
+      "name": "empty-broker-list"
+    }
+  ],
+  "kind": "SellCosts.rate"
+}
