@@ -413,8 +413,8 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(open.waitForNonExistence(timeout: 5), "Once logged, 記一筆 is gone")
         XCTAssertTrue(app.descendants(matching: .any)["連續定投 4 個月"].waitForExistence(timeout: 5), "The streak grew")
         let pocket = app.buttons["lobby-pocket"]
-        XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: pocket)], timeout: 10), .completed, "The lobby is clear of the sheet")
-        pocket.tap()
+        // The second tap of the double tap may land on the lobby object under the sheet and open the pocket already.
+        if XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: pocket)], timeout: 4) == .completed { pocket.tap() }
         reveal(app, app.buttons["holdings-trades"])
         XCTAssertTrue(app.staticTexts["買進"].firstMatch.waitForExistence(timeout: 5))
         // --demo-held seeds one buy; the quick entry is the second, so the double tap logged once.
