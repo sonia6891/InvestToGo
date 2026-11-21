@@ -626,8 +626,11 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(skip.waitForExistence(timeout: 10), "The opening offers 略過")
         skip.tap()
         let find = app.buttons["lobby-find"]
-        let hittable = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: find)
-        XCTAssertEqual(XCTWaiter().wait(for: [hittable], timeout: 2), .completed, "略過 goes straight to the lobby")
+        // Checked as often as the simulator answers for 2 s, then once more: a predicate expectation polls about once a
+        // second, and on a slow CI simulator one query can take that long, so it could time out without a single answer.
+        let deadline = Date().addingTimeInterval(2)
+        while Date() < deadline, !(find.exists && find.isHittable) { usleep(100_000) }
+        XCTAssertTrue(find.exists && find.isHittable, "略過 goes straight to the lobby")
     }
 
     /// 工具 › 提醒 has the debit-day reminder chosen in onboarding: on or off, the day and the time (final review I5).
