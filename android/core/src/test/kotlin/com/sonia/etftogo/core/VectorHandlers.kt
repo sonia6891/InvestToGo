@@ -55,4 +55,5 @@ val vectorHandlers: Map<String, VectorHandler> = buildMap {
     put("Vector.echo") { input -> VectorIO.obj(input)["value"] ?: JsonNull }
     putAll(supportHandlers)
     putAll(formatHandlers)
+    putAll(modelHandlers)
 }

@@ -26,6 +26,17 @@ class CoreJsonTests {
         assertEquals(id, CoreJson.json.decodeFromString(Sample.serializer(), """{"at":0,"id":"5fef0885-6a6b-555c-8bec-451862548983"}""").id)
     }
 
+    @Serializable
+    data class Shape(val count: Int, val on: Boolean, val name: String, val list: List<Double> = emptyList())
+
+    @Test fun typesAreNotConvertedLikeSwift() {
+        CoreJson.decode(Shape.serializer(), """{"count":1,"on":true,"name":"a","list":[1,2.5]}""")
+        for (bad in listOf("""{"count":"1","on":true,"name":"a"}""", """{"count":1,"on":"true","name":"a"}""",
+                "{\"count\":1,\"on\":true,\"name\":5}", """{"count":1,"on":true,"name":"a","list":["1"]}""")) {
+            kotlin.test.assertFailsWith<kotlinx.serialization.SerializationException>(bad) { CoreJson.decode(Shape.serializer(), bad) }
+        }
+    }
+
     @Test fun fractionalSecondsSurvive() {
         val back = CoreJson.json.decodeFromString(Sample.serializer(), """{"at":1.5,"id":"00000000-0000-0000-0000-000000000000","extra":1}""")
         assertEquals(Instant.parse("2001-01-01T00:00:01.500Z"), back.at)
