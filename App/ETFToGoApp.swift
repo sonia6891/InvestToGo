@@ -55,22 +55,38 @@ import SwiftUI
         }
     }
 }
-/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby.
+/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby. Every cold
+/// launch first plays the opening (2026-11-21 design): on the first launch it is the splash itself, on later ones it
+/// stands in front of the lobby until it ends or is skipped. Coming back from the background never replays it.
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
     @Environment(\.motionReduced) private var reduceMotion
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
+    /// How the opening plays at this launch, decided once with `start`.
+    @State private var play: OpeningPlay
+    /// A later launch's opening is in front of the lobby. The lobby is built only once it has gone, so its entrance and
+    /// LEVEL×UP are never spent behind the opening.
+    @State private var opening: Bool
 
     init() {
-        _start = State(initialValue: Onboarding.start(ProcessInfo.processInfo.arguments,
-                                                      onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey)))
+        let arguments = ProcessInfo.processInfo.arguments
+        let start = Onboarding.start(arguments, onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey))
+        let play = Opening.play(firstLaunch: start == .splash, arguments: arguments, fromNotification: OpeningLaunch.shared.fromNotification)
+        _start = State(initialValue: start)
+        _play = State(initialValue: play)
+        _opening = State(initialValue: start == nil && play == .animated)
     }
 
     var body: some View {
         ZStack {
-            if let start {
-                FirstLaunchView(start: start) {
+            if opening {
+                SplashView(play: play, ending: .continues) {
+                    withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { opening = false }
+                }
+                .transition(.opacity)
+            } else if let start {
+                FirstLaunchView(start: start, play: play) {
                     onboarded = true
                     UserDefaults.standard.synchronize()
                     withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }

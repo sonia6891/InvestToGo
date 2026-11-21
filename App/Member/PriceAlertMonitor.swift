@@ -58,6 +58,16 @@ final class PriceAlertPresenter: NSObject, UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler(notification.request.identifier.hasPrefix(PriceAlertMonitor.notificationPrefix) ? [.banner, .list, .sound] : [])
     }
+
+    /// Any notification tapped (到價提醒, 配息提醒, 扣款日提醒). At a cold launch from the tap the opening steps aside
+    /// (`OpeningLaunch`); otherwise the app opens as before.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            Task { @MainActor in OpeningLaunch.shared.notificationOpened() }
+        }
+        completionHandler()
+    }
 }
 
 /// True for the first caller only, whichever thread it is on.
