@@ -1,59 +1,68 @@
 {
-  "kind": "DataChecks.code",
-  "cases": [
+  "cases" : [
     {
-      "name": "plain",
-      "input": {
-        "value": "0050"
-      }
+      "expected" : true,
+      "input" : {
+        "value" : "0050"
+      },
+      "name" : "plain"
     },
     {
-      "name": "bond-suffix",
-      "input": {
-        "value": "00679B"
-      }
+      "expected" : true,
+      "input" : {
+        "value" : "00679B"
+      },
+      "name" : "bond-suffix"
     },
     {
-      "name": "six-digits",
-      "input": {
-        "value": "006208"
-      }
+      "expected" : true,
+      "input" : {
+        "value" : "006208"
+      },
+      "name" : "six-digits"
     },
     {
-      "name": "letters",
-      "input": {
-        "value": "AAPL"
-      }
+      "expected" : false,
+      "input" : {
+        "value" : "AAPL"
+      },
+      "name" : "letters"
     },
     {
-      "name": "three-digits",
-      "input": {
-        "value": "005"
-      }
+      "expected" : false,
+      "input" : {
+        "value" : "005"
+      },
+      "name" : "three-digits"
     },
     {
-      "name": "lowercase-suffix",
-      "input": {
-        "value": "00679b"
-      }
+      "expected" : false,
+      "input" : {
+        "value" : "00679b"
+      },
+      "name" : "lowercase-suffix"
     },
     {
-      "name": "seven-digits",
-      "input": {
-        "value": "0050000"
-      }
+      "expected" : false,
+      "input" : {
+        "value" : "0050000"
+      },
+      "name" : "seven-digits"
     },
     {
-      "name": "empty",
-      "input": {
-        "value": ""
-      }
+      "expected" : false,
+      "input" : {
+        "value" : ""
+      },
+      "name" : "empty"
     },
     {
-      "name": "two-suffix-letters",
-      "input": {
-        "value": "00631LL"
-      }
+      "expected" : false,
+      "input" : {
+        "value" : "00631LL"
+      },
+      "name" : "two-suffix-letters"
     }
-  ]
+  ],
+  "kind" : "DataChecks.code"
 }

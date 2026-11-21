@@ -1,65 +1,75 @@
 {
-  "kind": "DataChecks.rocDay",
-  "cases": [
+  "cases" : [
     {
-      "name": "roc-seven",
-      "input": {
-        "text": "1151110"
-      }
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "1151110"
+      },
+      "name" : "roc-seven"
     },
     {
-      "name": "roc-slashes",
-      "input": {
-        "text": "115/11/10"
-      }
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "115/11/10"
+      },
+      "name" : "roc-slashes"
     },
     {
-      "name": "western-eight",
-      "input": {
-        "text": "20261110"
-      }
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "20261110"
+      },
+      "name" : "western-eight"
     },
     {
-      "name": "roc-feb-30",
-      "input": {
-        "text": "1150230"
-      }
+      "expected" : null,
+      "input" : {
+        "text" : "1150230"
+      },
+      "name" : "roc-feb-30"
     },
     {
-      "name": "too-short",
-      "input": {
-        "text": "11511"
-      }
+      "expected" : null,
+      "input" : {
+        "text" : "11511"
+      },
+      "name" : "too-short"
     },
     {
-      "name": "roc-leap-day",
-      "input": {
-        "text": "1170229"
-      }
+      "expected" : "2028-02-29",
+      "input" : {
+        "text" : "1170229"
+      },
+      "name" : "roc-leap-day"
     },
     {
-      "name": "roc-not-leap",
-      "input": {
-        "text": "1150229"
-      }
+      "expected" : null,
+      "input" : {
+        "text" : "1150229"
+      },
+      "name" : "roc-not-leap"
     },
     {
-      "name": "empty",
-      "input": {
-        "text": ""
-      }
+      "expected" : null,
+      "input" : {
+        "text" : ""
+      },
+      "name" : "empty"
     },
     {
-      "name": "fullwidth-digits",
-      "input": {
-        "text": "１１５１１１０"
-      }
+      "expected" : null,
+      "input" : {
+        "text" : "１１５１１１０"
+      },
+      "name" : "fullwidth-digits"
     },
     {
-      "name": "chinese-around",
-      "input": {
-        "text": "民國115年11月10日"
-      }
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "民國115年11月10日"
+      },
+      "name" : "chinese-around"
     }
-  ]
+  ],
+  "kind" : "DataChecks.rocDay"
 }

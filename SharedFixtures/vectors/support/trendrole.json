@@ -1,29 +1,45 @@
 {
-  "kind": "TrendRole.init",
-  "cases": [
+  "cases" : [
     {
-      "name": "up",
-      "input": {
-        "value": 0.01
-      }
+      "expected" : {
+        "colorName" : "red",
+        "role" : "up"
+      },
+      "input" : {
+        "value" : 0.01
+      },
+      "name" : "up"
     },
     {
-      "name": "down",
-      "input": {
-        "value": -0.01
-      }
+      "expected" : {
+        "colorName" : "green",
+        "role" : "down"
+      },
+      "input" : {
+        "value" : -0.01
+      },
+      "name" : "down"
     },
     {
-      "name": "flat",
-      "input": {
-        "value": 0
-      }
+      "expected" : {
+        "colorName" : "muted",
+        "role" : "flat"
+      },
+      "input" : {
+        "value" : 0
+      },
+      "name" : "flat"
     },
     {
-      "name": "tiny-negative",
-      "input": {
-        "value": -1e-12
-      }
+      "expected" : {
+        "colorName" : "green",
+        "role" : "down"
+      },
+      "input" : {
+        "value" : -1e-12
+      },
+      "name" : "tiny-negative"
     }
-  ]
+  ],
+  "kind" : "TrendRole.init"
 }
