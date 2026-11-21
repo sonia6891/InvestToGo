@@ -1,0 +1,36 @@
+{
+  "kind": "format.wanText",
+  "cases": [
+    {
+      "name": "big",
+      "input": {
+        "value": 12345678
+      },
+      "expected": "1,234.6萬"
+    },
+    {
+      "name": "million",
+      "input": {
+        "value": 1000000
+      },
+      "expected": "100萬"
+    },
+    {
+      "name": "below",
+      "input": {
+        "value": 999999
+      },
+      "expected": "999,999"
+    },
+    {
+      "name": "negative-big",
+      "input": {
+        "value": -2500000
+      },
+      "expected": "-250萬"
+    }
+  ],
+  "platforms": [
+    "kotlin"
+  ]
+}

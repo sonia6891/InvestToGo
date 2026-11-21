@@ -1,0 +1,50 @@
+{
+  "kind": "format.money",
+  "cases": [
+    {
+      "name": "thousands",
+      "input": {
+        "value": 1234567
+      },
+      "expected": "1,234,567"
+    },
+    {
+      "name": "zero",
+      "input": {
+        "value": 0
+      },
+      "expected": "0"
+    },
+    {
+      "name": "negative",
+      "input": {
+        "value": -5200
+      },
+      "expected": "-5,200"
+    },
+    {
+      "name": "half-even-down",
+      "input": {
+        "value": 2.5
+      },
+      "expected": "2"
+    },
+    {
+      "name": "half-even-up",
+      "input": {
+        "value": 3.5
+      },
+      "expected": "4"
+    },
+    {
+      "name": "small",
+      "input": {
+        "value": 999
+      },
+      "expected": "999"
+    }
+  ],
+  "platforms": [
+    "kotlin"
+  ]
+}

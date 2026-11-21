@@ -1,0 +1,29 @@
+{
+  "kind": "DataChecks.day",
+  "cases": [
+    {
+      "name": "taipei-evening",
+      "input": {
+        "at": "2026-11-22T23:30:00+08:00"
+      }
+    },
+    {
+      "name": "utc-late-is-next-day",
+      "input": {
+        "at": "2026-10-31T16:30:00Z"
+      }
+    },
+    {
+      "name": "utc-early",
+      "input": {
+        "at": "2026-10-31T15:59:59Z"
+      }
+    },
+    {
+      "name": "year-end",
+      "input": {
+        "at": "2026-12-31T16:00:00Z"
+      }
+    }
+  ]
+}

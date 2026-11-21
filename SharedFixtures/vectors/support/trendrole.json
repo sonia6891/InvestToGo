@@ -1,0 +1,29 @@
+{
+  "kind": "TrendRole.init",
+  "cases": [
+    {
+      "name": "up",
+      "input": {
+        "value": 0.01
+      }
+    },
+    {
+      "name": "down",
+      "input": {
+        "value": -0.01
+      }
+    },
+    {
+      "name": "flat",
+      "input": {
+        "value": 0
+      }
+    },
+    {
+      "name": "tiny-negative",
+      "input": {
+        "value": -1e-12
+      }
+    }
+  ]
+}

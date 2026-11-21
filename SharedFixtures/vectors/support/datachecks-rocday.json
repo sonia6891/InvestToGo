@@ -1,0 +1,53 @@
+{
+  "kind": "DataChecks.rocDay",
+  "cases": [
+    {
+      "name": "roc-seven",
+      "input": {
+        "text": "1151110"
+      }
+    },
+    {
+      "name": "roc-slashes",
+      "input": {
+        "text": "115/11/10"
+      }
+    },
+    {
+      "name": "western-eight",
+      "input": {
+        "text": "20261110"
+      }
+    },
+    {
+      "name": "roc-feb-30",
+      "input": {
+        "text": "1150230"
+      }
+    },
+    {
+      "name": "too-short",
+      "input": {
+        "text": "11511"
+      }
+    },
+    {
+      "name": "roc-leap-day",
+      "input": {
+        "text": "1170229"
+      }
+    },
+    {
+      "name": "roc-not-leap",
+      "input": {
+        "text": "1150229"
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "text": ""
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "kind": "StableID.make",
+  "cases": [
+    {
+      "name": "legacy-holding",
+      "input": {
+        "namespace": "legacy-holding",
+        "value": "pwa-001"
+      }
+    },
+    {
+      "name": "broker-account",
+      "input": {
+        "namespace": "broker-account",
+        "value": "富邦證券\u0000主帳戶"
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "namespace": "",
+        "value": ""
+      }
+    },
+    {
+      "name": "emoji",
+      "input": {
+        "namespace": "x",
+        "value": "💰0050"
+      }
+    }
+  ]
+}

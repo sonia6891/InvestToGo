@@ -1,0 +1,35 @@
+{
+  "kind": "DataChecks.date",
+  "cases": [
+    {
+      "name": "valid",
+      "input": {
+        "text": "2026-11-10"
+      }
+    },
+    {
+      "name": "feb-30",
+      "input": {
+        "text": "2026-02-30"
+      }
+    },
+    {
+      "name": "no-padding",
+      "input": {
+        "text": "2026-1-5"
+      }
+    },
+    {
+      "name": "leap",
+      "input": {
+        "text": "2028-02-29"
+      }
+    },
+    {
+      "name": "garbage",
+      "input": {
+        "text": "abc"
+      }
+    }
+  ]
+}

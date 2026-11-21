@@ -1,0 +1,29 @@
+{
+  "kind": "format.priceText",
+  "cases": [
+    {
+      "name": "two-places",
+      "input": {
+        "value": 99.7
+      },
+      "expected": "99.70"
+    },
+    {
+      "name": "integer",
+      "input": {
+        "value": 100
+      },
+      "expected": "100.00"
+    },
+    {
+      "name": "thousands",
+      "input": {
+        "value": 1234.5
+      },
+      "expected": "1,234.50"
+    }
+  ],
+  "platforms": [
+    "kotlin"
+  ]
+}
