@@ -71,6 +71,8 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        # App 上鎖 (2026-11-22 design): what iOS shows when it first asks to allow Face ID.
+        INFOPLIST_KEY_NSFaceIDUsageDescription: 用 Face ID 解鎖投資袋著走
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
   ETFToGoTests:
     type: bundle.unit-test

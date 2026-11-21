@@ -58,9 +58,15 @@ import SwiftUI
 /// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby. Every cold
 /// launch first plays the opening (2026-11-21 design): on the first launch it is the splash itself, on later ones it
 /// stands in front of the lobby until it ends or is skipped. Coming back from the background never replays it.
+///
+/// App 上鎖 (2026-11-22 design) comes after the opening: with the lock on, the opening goes on to the lock screen, and
+/// the lobby is built only once it is passed. Onboarding is never locked. The lock screen and the privacy cover are in
+/// `LockWindow`, above the app's window; the scene's phases reach `AppLock` from here.
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
     @Environment(\.motionReduced) private var reduceMotion
+    @Environment(\.scenePhase) private var phase
+    @ObservedObject private var lock = AppLock.shared
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
     /// How the opening plays at this launch, decided once with `start`.
@@ -97,10 +103,21 @@ struct LaunchGate: View {
                     withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
                 }
                 .transition(.opacity)
-            } else {
+            } else if lock.lobbyReleased {
                 RootView().transition(.opacity)
+            } else {
+                // Until the cold launch is decided and, with the lock on, passed: the cover, never the lobby.
+                LockCover()
+                    .task {
+                        try? await Task.sleep(for: .seconds(1))
+                        if !Task.isCancelled { lock.openingFallback() }
+                    }
             }
         }
+        .background(LockWindowAnchor().frame(width: 0, height: 0).accessibilityHidden(true))
+        .onChange(of: phase, initial: true) { _, value in lock.scene(value) }
+        .onAppear { if !opening { lock.openingEnded(onboarding: start != nil) } }
+        .onChange(of: opening) { _, value in if !value { lock.openingEnded(onboarding: start != nil) } }
     }
 }
 
