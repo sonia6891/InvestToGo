@@ -83,7 +83,7 @@ final class StoreDemoTests: XCTestCase {
         var game = GameState()
         DemoArguments.apply(to: &game, args: store + ["--demo-streak", "3", "--demo-level", "2"], now: noon(2026, 11, 14))
         XCTAssertEqual(game.streak(now: noon(2026, 11, 14)), 3)
-        XCTAssertEqual(game.xp, GameRules.xpPerLevel)
+        XCTAssertEqual(game.xp, GameRules.xpToReach(level: 2))
     }
 
     // MARK: Records
@@ -169,10 +169,10 @@ final class StoreDemoTests: XCTestCase {
     /// The detail line breaks only after a 「・」, into lines of about the same length.
     @MainActor func testPlanDetailBreaksAtTheDot() {
         let detail = MemberView.Plan.pocket.detail
-        XCTAssertEqual(detail, "成分重疊・回測・目標反推・到價提醒・月報年報・全部皮膚", "The line itself is unchanged")
-        XCTAssertEqual(MemberView.detailLines(detail, count: 2), ["成分重疊・回測・目標反推・", "到價提醒・月報年報・全部皮膚"])
+        XCTAssertEqual(detail, "成分重疊・回測・目標反推・到價提醒・月報年報・全部外觀主題", "The line itself is unchanged")
+        XCTAssertEqual(MemberView.detailLines(detail, count: 2), ["成分重疊・回測・目標反推・", "到價提醒・月報年報・全部外觀主題"])
         let three = MemberView.detailLines(detail, count: 3)
-        XCTAssertEqual(three, ["成分重疊・回測・", "目標反推・到價提醒・", "月報年報・全部皮膚"])
+        XCTAssertEqual(three, ["成分重疊・回測・", "目標反推・到價提醒・", "月報年報・全部外觀主題"])
         XCTAssertEqual(three.joined(), detail, "Nothing is lost or added")
         XCTAssertEqual(MemberView.detailLines(MemberView.Plan.free.detail, count: 2), [MemberView.Plan.free.detail], "Nothing to cut at")
         XCTAssertEqual(MemberView.detailLines("甲・乙", count: 3), ["甲・乙"], "Too few parts for three lines")

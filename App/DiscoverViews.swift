@@ -132,9 +132,10 @@ struct DiscoverView: View {
     var body: some View {
         let items = funds
         Page {
-            header
+            header.enterStagger(0)
             SkinSearchField(text: $query, prompt: "輸入代號或名稱", focus: $searchFocused, identifier: "fund-search")
                 .onSubmit { searchFocused = false }
+                .enterStagger(1)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     SkinChip("全部", selected: series == nil) { series = nil }
@@ -143,7 +144,8 @@ struct DiscoverView: View {
                     }
                 }
             }
-            countRow(items.count)
+            .enterStagger(2)
+            countRow(items.count).enterStagger(3)
             if store.catalogRefreshing { LoadingFloat(art: .find) }
             else if store.catalogFailed || connectivity.offline {
                 // The list below is still the last one that came through (spec 9 讀取失敗).

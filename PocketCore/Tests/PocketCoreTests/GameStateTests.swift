@@ -6,14 +6,24 @@ final class GameStateTests: XCTestCase {
         GameRules.taipei.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
     }
 
-    func testLevelEvery300XP() {
-        XCTAssertEqual(GameRules.level(xp: 0), 1)
-        XCTAssertEqual(GameRules.level(xp: 299), 1)
-        XCTAssertEqual(GameRules.level(xp: 300), 2)
-        XCTAssertEqual(GameRules.level(xp: 3000), 11)
-        let p = GameRules.progress(xp: 420)
-        XCTAssertEqual(p.into, 120)
-        XCTAssertEqual(p.needed, 300)
+    func testFrontLoadedLevelCurve() {
+        XCTAssertEqual(GameRules.level(xp: 0), 1); XCTAssertEqual(GameRules.level(xp: 99), 1)
+        XCTAssertEqual(GameRules.level(xp: 100), 2); XCTAssertEqual(GameRules.level(xp: 249), 2)
+        XCTAssertEqual(GameRules.level(xp: 250), 3); XCTAssertEqual(GameRules.level(xp: 700), 5)
+        XCTAssertEqual(GameRules.level(xp: 2200), 10); XCTAssertEqual(GameRules.level(xp: 2499), 10); XCTAssertEqual(GameRules.level(xp: 2500), 11)
+        XCTAssertEqual(GameRules.xpToReach(level: 7), 1300)
+        XCTAssertEqual(GameRules.xpToReach(level: 1), 0)
+        XCTAssertEqual(GameRules.xpToReach(level: 4), 450)
+        XCTAssertTrue(GameRules.progress(xp: 250) == (0, 200)); XCTAssertTrue(GameRules.progress(xp: 449) == (199, 200))
+        XCTAssertTrue(GameRules.progress(xp: 1000) == (0, 300))
+    }
+
+    func testOldSaveKeepsXPAndCelebratesOnce() throws {
+        var g = try JSONDecoder().decode(GameState.self, from: Data(#"{"xp":900,"coins":900,"celebratedLevel":4}"#.utf8))
+        XCTAssertEqual(GameRules.level(xp: g.xp), 5)
+        XCTAssertEqual(g.levelUpDue, 5)
+        g.celebrate(5)
+        XCTAssertNil(g.levelUpDue)
     }
 
     func testStreakAcrossYearBoundaryAndGaps() {

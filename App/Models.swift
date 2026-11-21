@@ -461,6 +461,9 @@ import SwiftUI
         next.game = game.game
         try saveRecovery()
         try commit(next)
+        // The lobby shows the restored numbers as they are, without replaying them (spec 5.3); reset with the records, so a
+        // failing alerts save below cannot leave a snapshot that would replay them.
+        LobbyShownStore().reset()
         let merged = alertBook.alerts ?? []
         if merged != alerts { try saveAlerts(merged) }
         return ImportSummary(gameSkipped: game.skipped)

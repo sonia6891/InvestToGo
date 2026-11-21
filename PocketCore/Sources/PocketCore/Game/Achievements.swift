@@ -74,7 +74,7 @@ enum Achievements {
         Achievement(id: "feeSaver", title: "省費達人", goal: feeSaverGoal) { g, _, _ in g.counter(.feeCompared) },
         Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal, comingSoon: true) { g, _, _ in g.counter(.checkup) },
         Achievement(id: "dexCollector", title: "ETF 圖鑑", goal: dexCollectorGoal) { g, _, _ in g.collected.count },
-        Achievement(id: "exDividendSkin", title: "除息季限定皮膚", goal: exDividendSkinGoal, comingSoon: true) { g, _, _ in g.counter(.exDividendSeason) },
+        Achievement(id: "exDividendSkin", title: "除息季限定外觀主題", goal: exDividendSkinGoal, comingSoon: true) { g, _, _ in g.counter(.exDividendSeason) },
         Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal, comingSoon: true) { g, _, _ in g.counter(.yearReport) },
         Achievement(id: "dividendMilestone", title: "累計領息里程碑", goal: dividendMilestoneGoal) { _, p, _ in p.dividends.filter { $0.status == .paid }.count }
     ]

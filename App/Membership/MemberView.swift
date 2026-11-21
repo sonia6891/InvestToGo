@@ -195,7 +195,7 @@ struct MemberView: View {
         var detail: String {
             switch self {
             case .free: return "記帳、配息、提醒、圖鑑"
-            case .pocket: return "成分重疊・回測・目標反推・到價提醒・月報年報・全部皮膚"
+            case .pocket: return "成分重疊・回測・目標反推・到價提醒・月報年報・全部外觀主題"
             case .ai: return "AI 問答與月報"
             }
         }
@@ -244,7 +244,7 @@ struct MemberView: View {
                 .accessibilityHidden(true)
                 VStack(spacing: 8) {
                     Text("口袋會員").skinFont(.title(30)).skinForeground(\.ink)
-                    SkinTag(membership.isMember ? "你是會員・全部皮膚已解鎖" : "看懂・規劃・回顧")
+                    SkinTag(membership.isMember ? "你是會員・全部外觀主題已解鎖" : "看懂・規劃・回顧")
                 }
                 .frame(maxWidth: .infinity)
                 // Only the stage gives way: the cards have a least height (44) they would otherwise be pressed down
@@ -310,7 +310,7 @@ struct MemberView: View {
                 HStack(spacing: 12) {
                     SkinImage(.badge).frame(width: 44, height: 44).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("換膚").skinFont(.title(16))
+                        Text("外觀主題").skinFont(.title(16))
                         Text("目前：\(skins.skin.name)・四套世界任你換").skinFont(.body(12)).skinForeground(\.sub)
                     }
                     Spacer(minLength: 0)

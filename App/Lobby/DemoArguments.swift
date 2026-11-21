@@ -3,7 +3,7 @@ import Foundation
 /// Launch arguments that set up game progress for UI tests and screenshots; ignored without `--ui-testing`.
 ///
 /// - `--demo-streak <n>`: DCA recorded in each of the n months up to and including this one.
-/// - `--demo-level <n>`: experience at the start of level n, `(n - 1) × GameRules.xpPerLevel`.
+/// - `--demo-level <n>`: experience at the start of level n, `GameRules.xpToReach(level: n)`.
 /// - `--demo-xp <n>`: experience n (wins over `--demo-level`).
 /// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
 /// - `--demo-pocket`: four sample holdings, one of them at a loss, and a year of received dividends (`seedPocket`).
@@ -44,7 +44,7 @@ enum DemoArguments {
             game.dcaMonths = months
             game.longestStreak = max(game.longestStreak, streak)
         }
-        if let level = number("--demo-level"), level >= 1 { game.xp = (level - 1) * GameRules.xpPerLevel }
+        if let level = number("--demo-level"), level >= 1 { game.xp = GameRules.xpToReach(level: level) }
         if let xp = number("--demo-xp") { game.xp = xp }
         // Demo progress is set-up, not an earned level: no LEVEL×UP for it (spec 5.12 celebrates crossing a level).
         if number("--demo-level") != nil || number("--demo-xp") != nil { game.celebrate(GameRules.level(xp: game.xp)); game.celebratedLevel = GameRules.level(xp: game.xp) }
@@ -159,7 +159,7 @@ enum DemoArguments {
         for (item, date) in zip(pocketSample, collected) { game.collected[item.symbol] = date }
 
         func pays(_ event: XPEvent) -> Int { GameRules.xp[event] ?? 0 }
-        let total = (storeLevel - 1) * GameRules.xpPerLevel + GameRules.xpPerLevel * 3 / 5
+        let total = GameRules.xpToReach(level: storeLevel) + GameRules.progress(xp: GameRules.xpToReach(level: storeLevel)).needed * 3 / 5
         var byMonth = [
             this.key: pays(.monthlyDCA) + (quests.count - 1) * pays(.questDone),
             last.key: pays(.monthlyDCA) + quests.count * pays(.questDone) + pays(.reconciled) + 2 * pays(.firstDexCard),

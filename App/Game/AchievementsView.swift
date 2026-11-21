@@ -26,9 +26,11 @@ struct AchievementsView: View {
                     Spacer()
                     SkinImage(.achievements).frame(width: 96, height: 96).accessibilityHidden(true)
                 }
+                .enterStagger(0)
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(wall) { item in badge(item, game: game, now: now) }
                 }
+                .enterStagger(1)
             }
             .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 24)
         }

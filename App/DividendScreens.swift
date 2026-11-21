@@ -111,7 +111,8 @@ struct DividendsView: View {
         let newbie = store.data.dividends.isEmpty && store.data.holdings.isEmpty
         Page {
             Text("DIV×\(String(Calendar.current.component(.year, from: now)))").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-            hero(year)
+                .enterStagger(0)
+            hero(year).enterStagger(1)
             if store.officialFailed || connectivity.offline {
                 // Newcomer or not, what is below is the last data that came through (spec 9 讀取失敗).
                 LoadFailed(message: connectivity.offline ? "目前沒有網路，先顯示上次的配息公告。" : "配息公告這次沒有更新成功，先顯示上次的公告。",
@@ -127,11 +128,12 @@ struct DividendsView: View {
                     logButton(primary: true)
                 }
                 .frame(maxWidth: .infinity)
+                .enterStagger(2)
             } else {
-                received(year)
-                months(year, now: now)
-                upcoming
-                logButton(primary: false).frame(maxWidth: .infinity)
+                received(year).enterStagger(2)
+                months(year, now: now).enterStagger(3)
+                upcoming.enterStagger(4)
+                logButton(primary: false).frame(maxWidth: .infinity).enterStagger(5)
                 more
             }
         }
@@ -242,7 +244,7 @@ struct DividendsView: View {
 
     private func logButton(primary: Bool) -> some View {
         NavigationLink(value: AppRoute.dividendForm(id: nil, symbol: nil, officialEx: nil)) { Text("記一筆配息") }
-            .buttonStyle(SkinButtonStyle(primary: primary, seed: SkinSeed.of("記一筆配息")))
+            .buttonStyle(PressableOver(base: SkinButtonStyle(primary: primary, seed: SkinSeed.of("記一筆配息"))))
             .accessibilityIdentifier("dividends-log")
     }
 
@@ -534,7 +536,7 @@ struct DividendFormView: View {
                 if let error { Text(error).font(.caption).foregroundStyle(Palette.red).padding(.top, 6) }
             }
             HStack(spacing: 12) {
-                Button { save() } label: { Text("儲存紀錄").font(.headline).frame(maxWidth: .infinity).padding(.vertical, 14).foregroundStyle(.white).background(Palette.hero, in: RoundedRectangle(cornerRadius: 14)) }.accessibilityIdentifier("save-dividend")
+                Button { save() } label: { Text("儲存紀錄").font(.headline).frame(maxWidth: .infinity).padding(.vertical, 14).foregroundStyle(.white).background(Palette.hero, in: RoundedRectangle(cornerRadius: 14)) }.buttonStyle(PressableStyle()).accessibilityIdentifier("save-dividend")
                 Button { dismiss() } label: { Text("取消").font(.headline).frame(maxWidth: .infinity).padding(.vertical, 14).foregroundStyle(Palette.ink).background(Palette.card, in: RoundedRectangle(cornerRadius: 14)) }
             }.buttonStyle(.plain)
             Text("紀錄類型決定狀態：證券帳務＝已入帳、投信公告＝已公告、自行預估＝預估。公告與預估不計入已入帳股息。").font(.caption).foregroundStyle(Palette.muted)

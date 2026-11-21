@@ -18,7 +18,7 @@ final class LobbyTests: XCTestCase {
     func testDemoLevelAndXP() {
         var game = GameState()
         DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7"], now: now)
-        XCTAssertEqual(game.xp, 6 * GameRules.xpPerLevel)
+        XCTAssertEqual(game.xp, GameRules.xpToReach(level: 7))
         XCTAssertEqual(GameRules.level(xp: game.xp), 7)
         DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7", "--demo-xp", "290"], now: now)
         XCTAssertEqual(game.xp, 290, "--demo-xp wins")
@@ -75,5 +75,38 @@ final class LobbyTests: XCTestCase {
                 XCTAssertLessThan(p.y + 50, size.height - GameBottomBar.height / 2, "\(size) disc \(i) clears the bar")
             }
         }
+    }
+
+    func testLobbySignatures() {
+        XCTAssertEqual(LobbySignature.of(.find), .swing)
+        XCTAssertEqual(LobbySignature.of(.dividends), .flip)
+        XCTAssertEqual(LobbySignature.of(.pocket), .hop)
+        XCTAssertEqual(LobbySignature.of(.tools), .blink)
+        XCTAssertEqual(LobbySignature.phase(.find), 0)
+        XCTAssertEqual(LobbySignature.phase(.dividends), 0.25)
+        XCTAssertEqual(LobbySignature.phase(.pocket), 0.5)
+        XCTAssertEqual(LobbySignature.phase(.tools), 0.75)
+    }
+
+    func testSignatureMovesEveryFourToSevenSecondsOutOfStep() {
+        let four: [Feature] = [.find, .dividends, .pocket, .tools]
+        for feature in four {
+            let phase = LobbySignature.phase(feature), interval = LobbySignature.interval(phase: phase)
+            XCTAssertTrue((4...7).contains(interval), "\(feature) moves every \(interval) s")
+            // Sampled every 0.05 s over one interval: exactly one move, lasting moveDuration.
+            let samples = stride(from: 1000.0, to: 1000 + interval, by: 0.05).map { LobbySignature.progress(time: $0, phase: phase) }
+            let moving = samples.filter { $0 != nil }.count
+            XCTAssertEqual(Double(moving) * 0.05, LobbySignature.moveDuration, accuracy: 0.11, "\(feature)")
+            XCTAssertTrue(samples.compactMap { $0 }.allSatisfy { (0..<1).contains($0) })
+        }
+        // Deterministic: the same moment gives the same pose.
+        XCTAssertEqual(LobbySignature.progress(time: 12_345.6, phase: 0.25), LobbySignature.progress(time: 12_345.6, phase: 0.25))
+        // Out of step: each keeps its own rhythm, so they drift apart rather than moving together.
+        XCTAssertEqual(Set(four.map { LobbySignature.interval(phase: LobbySignature.phase($0)) }).count, 4)
+        // At rest, and the swing stays within ±8°.
+        XCTAssertEqual(LobbySignature.swing.pose(nil), LobbySignature.Pose())
+        let swing = stride(from: 0.0, to: 1, by: 0.01).map { abs(LobbySignature.swing.pose($0).rotation) }
+        XCTAssertLessThanOrEqual(swing.max() ?? 0, 8)
+        XCTAssertGreaterThan(swing.max() ?? 0, 7)
     }
 }

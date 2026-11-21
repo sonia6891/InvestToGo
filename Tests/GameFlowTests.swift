@@ -9,10 +9,10 @@ final class GameFlowTests: XCTestCase {
 
     func testLevelUpIsDueOnceWhenExperienceCrossesAWholeLevel() {
         var game = GameState()
-        game.xp = 290
+        game.xp = 90
         XCTAssertNil(game.levelUpDue, "Level 1 is where everyone starts: nothing to celebrate")
         game.award(.dividendLogged)
-        XCTAssertEqual(game.xp, 310)
+        XCTAssertEqual(game.xp, 110)
         XCTAssertEqual(game.levelUpDue, 2)
         XCTAssertEqual(game.lastAward, .dividendLogged)
         game.celebrate(2)
@@ -24,16 +24,16 @@ final class GameFlowTests: XCTestCase {
     func testSeveralLevelsAtOnceCelebrateTheHighestOnce() {
         var game = GameState()
         game.xp = 650
-        XCTAssertEqual(game.levelUpDue, 3)
-        game.celebrate(3)
+        XCTAssertEqual(game.levelUpDue, 4)
+        game.celebrate(4)
         XCTAssertNil(game.levelUpDue)
         game.celebrate(2)
-        XCTAssertEqual(game.celebratedLevel, 3, "The celebrated level never goes back down")
+        XCTAssertEqual(game.celebratedLevel, 4, "The celebrated level never goes back down")
     }
 
     func testCelebratedLevelIsSaved() throws {
         var game = GameState()
-        game.xp = 310
+        game.xp = 110
         game.celebrate(2)
         let back = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(game))
         XCTAssertEqual(back.celebratedLevel, 2)
@@ -42,7 +42,7 @@ final class GameFlowTests: XCTestCase {
 
     func testOlderSaveCelebratesNothingAlreadyHeld() throws {
         let old = try JSONDecoder().decode(GameState.self, from: Data(#"{"xp":1800,"coins":1800}"#.utf8))
-        XCTAssertEqual(GameRules.level(xp: old.xp), 7)
+        XCTAssertEqual(GameRules.level(xp: old.xp), 8)
         XCTAssertNil(old.levelUpDue, "Levels reached before this build are not new")
         XCTAssertNil(old.lastAward)
     }
@@ -51,7 +51,7 @@ final class GameFlowTests: XCTestCase {
         var game = GameState()
         DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7"], now: now)
         XCTAssertNil(game.levelUpDue, "Screenshots at LV.7 open on the lobby, not on a celebration")
-        DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-xp", "290"], now: now)
+        DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-xp", "90"], now: now)
         XCTAssertNil(game.levelUpDue)
         game.award(.dividendLogged)
         XCTAssertEqual(game.levelUpDue, 2, "The test's +20 crosses into level 2")
@@ -76,7 +76,7 @@ final class GameFlowTests: XCTestCase {
 
     func testRewardsListCoinsEarnedSinceTheLastCelebration() {
         var game = GameState()
-        game.xp = 290; game.coins = 290
+        game.xp = 90; game.coins = 90
         game.celebrate(1)
         game.award(.dividendLogged)
         XCTAssertEqual(game.coinsSinceCelebration, 20)
@@ -88,14 +88,14 @@ final class GameFlowTests: XCTestCase {
     func testReplayedCelebrationStillListsItsAchievements() throws {
         var game = GameState()
         for i in 0..<12 { _ = game.recordDCA(on: GameRules.taipei.date(byAdding: .month, value: -i, to: now)!) }
-        XCTAssertEqual(game.levelUpDue, 5)
+        XCTAssertEqual(game.levelUpDue, 6)
         XCTAssertEqual(game.refreshAchievements(Portfolio(), now: now), ["dcaPunchCard"])
-        XCTAssertTrue(LevelUp.rewards(game, level: 5).contains("新成就「定期定額打卡」"))
+        XCTAssertTrue(LevelUp.rewards(game, level: 6).contains("新成就「定期定額打卡」"))
         // Closed before 收下: the saved game, read again, lists the same achievement although it is already stamped.
         var replay = try JSONDecoder().decode(GameState.self, from: JSONEncoder().encode(game))
         XCTAssertEqual(replay.refreshAchievements(Portfolio(), now: now), [], "Already unlocked")
-        XCTAssertEqual(replay.levelUpDue, 5)
-        XCTAssertTrue(LevelUp.rewards(replay, level: 5).contains("新成就「定期定額打卡」"), "\(LevelUp.rewards(replay, level: 5))")
+        XCTAssertEqual(replay.levelUpDue, 6)
+        XCTAssertTrue(LevelUp.rewards(replay, level: 6).contains("新成就「定期定額打卡」"), "\(LevelUp.rewards(replay, level: 6))")
         replay.celebrate(5)
         XCTAssertEqual(replay.achievementsSinceCelebration, [], "Once accepted, not listed again")
     }

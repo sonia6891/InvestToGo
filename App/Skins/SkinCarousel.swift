@@ -14,10 +14,10 @@ enum SkinStatus: Equatable {
     /// The tag under the name, e.g. 「LV.5 已解鎖 · 你是 LV.7」.
     func tag(_ skin: Skin, level: Int, member: Bool) -> String {
         switch self {
-        case .wearing: return skin.unlock == .free ? "預設皮膚 · 使用中" : "使用中"
+        case .wearing: return skin.unlock == .free ? "預設外觀主題 · 使用中" : "使用中"
         case .unlocked:
             switch skin.unlock {
-            case .free: return "預設皮膚 · 已解鎖"
+            case .free: return "預設外觀主題 · 已解鎖"
             case .level(let needed): return member && level < needed ? "會員 · 已解鎖" : "LV.\(needed) 已解鎖 · 你是 LV.\(level)"
             case .member: return "會員 · 已解鎖"
             }
@@ -68,7 +68,7 @@ struct SkinsView: View {
         let status = SkinStatus(focused, current: skins.skin.id, level: level, member: member)
         Page {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
-                Text("換膚").skinFont(.title(30)).skinForeground(\.ink)
+                Text("外觀主題").skinFont(.title(30)).skinForeground(\.ink)
                 Text("SKINS").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
             }
             SkinCarousel(focus: $focus, tryOn: $skins.tryOn)
@@ -236,7 +236,7 @@ struct SkinCarousel: View {
                 }
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(item.name)皮膚的口袋")
+        .accessibilityLabel("\(item.name)外觀主題的口袋")
         .accessibilityHint("長按可以全螢幕試穿")
         .accessibilityAddTraits(.isImage)
         // VoiceOver cannot hold a card: 「試穿」 opens the preview and the next action (or escape) closes it.

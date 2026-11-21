@@ -57,7 +57,7 @@ final class PocketReportTests: XCTestCase {
         p.game = game
         let card = PocketReport.make(.year(2026), portfolio: p, now: now)
         XCTAssertNil(card.xpEarned, "Experience earned before it was recorded by month is not guessed at")
-        XCTAssertEqual(card.level, 3, "The level held now is still shown")
+        XCTAssertEqual(card.level, 4, "The level held now is still shown")
     }
 
     func testXpIsTheSumOfTheMonthsRecordedInThePeriod() {

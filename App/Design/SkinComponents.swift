@@ -375,11 +375,13 @@ enum DecorPage { case lobby, splash, other }
 /// The flat background decoration of a skin (spec 3.3, 7.1). It never sits under text or controls: give it the
 /// frame of the screen's hero / stage zone, and it draws around that zone's centre (where the stage goes) and along
 /// its left and right edges. Shapes are laid out on a 390pt-wide design and scaled uniformly, so circles stay round.
-/// Behind content, never tappable, hidden from VoiceOver.
+/// Behind content, never tappable, hidden from VoiceOver. With `drifts` (the living lobby, spec 5.1) the whole drawing
+/// floats a few points to and fro; the shapes themselves never change.
 struct SkinDecor: View {
     @Environment(\.skin) private var skin
     let page: DecorPage
-    init(page: DecorPage) { self.page = page }
+    var drifts: Bool
+    init(page: DecorPage, drifts: Bool = false) { self.page = page; self.drifts = drifts }
 
     var body: some View {
         Canvas { context, size in
@@ -393,8 +395,24 @@ struct SkinDecor: View {
             case .doodles: doodles(&context, frame)
             }
         }
+        .modifier(DecorDrift(enabled: drifts))
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    /// A slow float: ±2pt across (so the edge shapes never leave a gap) every 11 s, ±4pt up and down every 7 s, in
+    /// the skin's steps. Only the drawing's position changes; the canvas is not redrawn.
+    private struct DecorDrift: ViewModifier {
+        var enabled: Bool
+        @Environment(\.skin) private var skin
+        func body(content: Content) -> some View {
+            let motion = SkinMotion.of(skin)
+            TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
+                let t = motion.clock(timeline.date.timeIntervalSinceReferenceDate)
+                content.offset(x: enabled ? 2 * CGFloat(sin(2 * .pi * t / 11)) : 0,
+                               y: enabled ? 4 * CGFloat(sin(2 * .pi * t / 7 + 1)) : 0)
+            }
+        }
     }
 
     /// Maps design points (x 0…390, y offset from the zone centre) to the canvas.
