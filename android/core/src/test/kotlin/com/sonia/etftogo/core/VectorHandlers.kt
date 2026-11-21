@@ -60,4 +60,5 @@ val vectorHandlers: Map<String, VectorHandler> = buildMap {
     putAll(gameHandlers)
     putAll(analyticsHandlers)
     putAll(importHandlers)
+    putAll(designHandlers)
 }
