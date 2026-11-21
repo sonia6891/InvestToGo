@@ -83,7 +83,7 @@ final class StoreDemoTests: XCTestCase {
         var game = GameState()
         DemoArguments.apply(to: &game, args: store + ["--demo-streak", "3", "--demo-level", "2"], now: noon(2026, 11, 14))
         XCTAssertEqual(game.streak(now: noon(2026, 11, 14)), 3)
-        XCTAssertEqual(game.xp, GameRules.xpPerLevel)
+        XCTAssertEqual(game.xp, GameRules.xpToReach(level: 2))
     }
 
     // MARK: Records

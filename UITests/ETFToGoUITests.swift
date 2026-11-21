@@ -667,10 +667,10 @@ final class ETFToGoUITests: XCTestCase {
     }
 
     func testLevelUpShowsOnce() {
-        let app = launch(["--demo-xp", "290", "--demo-held"])
+        let app = launch(["--demo-xp", "440", "--demo-held"])
         let xp = app.descendants(matching: .any)["lobby-xp"]
         XCTAssertTrue(xp.waitForExistence(timeout: 10))
-        XCTAssertEqual(xp.value as? String, "290 經驗")
+        XCTAssertEqual(xp.value as? String, "440 經驗")
         let level = app.staticTexts["levelup-level"]
         XCTAssertFalse(level.exists, "No celebration at launch")
         app.buttons["lobby-dividends"].tap()
@@ -684,8 +684,8 @@ final class ETFToGoUITests: XCTestCase {
         app.buttons["save-dividend"].tap()
         // The +20 toast comes first, then the celebration over it.
         XCTAssertTrue(app.staticTexts["dividend-xp-toast"].waitForExistence(timeout: 5), "The +20 toast is not lost")
-        XCTAssertTrue(level.waitForExistence(timeout: 10), "Crossing 300 experience celebrates level 2")
-        XCTAssertEqual(level.label, "LV.2")
+        XCTAssertTrue(level.waitForExistence(timeout: 10), "Crossing 450 experience celebrates level 4")
+        XCTAssertEqual(level.label, "LV.4")
         XCTAssertTrue(app.staticTexts["LEVEL×UP"].exists)
         XCTAssertTrue(app.buttons["levelup-share"].exists, "分享這一刻")
         sleep(1); capture(app, "level-up")
@@ -693,7 +693,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(level.waitForNonExistence(timeout: 5), "收下 closes it")
         app.buttons["bar-lobby"].tap()
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5))
-        XCTAssertEqual(xp.value as? String, "310 經驗")
+        XCTAssertEqual(xp.value as? String, "460 經驗")
         app.buttons["lobby-dividends"].tap()
         XCTAssertTrue(log.waitForExistence(timeout: 5))
         app.buttons["bar-lobby"].tap()

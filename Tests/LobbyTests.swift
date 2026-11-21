@@ -18,7 +18,7 @@ final class LobbyTests: XCTestCase {
     func testDemoLevelAndXP() {
         var game = GameState()
         DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7"], now: now)
-        XCTAssertEqual(game.xp, 6 * GameRules.xpPerLevel)
+        XCTAssertEqual(game.xp, GameRules.xpToReach(level: 7))
         XCTAssertEqual(GameRules.level(xp: game.xp), 7)
         DemoArguments.apply(to: &game, args: ["--ui-testing", "--demo-level", "7", "--demo-xp", "290"], now: now)
         XCTAssertEqual(game.xp, 290, "--demo-xp wins")

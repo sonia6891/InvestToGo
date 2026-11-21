@@ -28,16 +28,38 @@ enum GameRules {
         c.timeZone = TimeZone(identifier: "Asia/Taipei") ?? .current
         return c
     }()
-    static let xpPerLevel = 300
     static let xp: [XPEvent: Int] = [.monthlyDCA: 100, .questDone: 40, .firstDexCard: 30, .dividendLogged: 20, .reconciled: 20]
     /// New dex cards that earn experience in one Taipei calendar month; later ones are collected for nothing (R34).
     static let dexXPPerMonth = 3
     /// 記一筆配息 experience paid at most this many times in one Taipei month (re-review N1), like the dex cards.
     static let dividendXPPerMonth = 3
 
+    /// Experience at which `level` starts: front-loaded 100, 250, 450, 700, then 300 per level.
+    static func xpToReach(level: Int) -> Int {
+        switch level {
+        case ...1: return 0
+        case 2: return 100
+        case 3: return 250
+        case 4: return 450
+        default: return 700 + (level - 5) * 300
+        }
+    }
+
     /// Starts at 1, no cap.
-    static func level(xp: Int) -> Int { max(0, xp) / xpPerLevel + 1 }
-    static func progress(xp: Int) -> (into: Int, needed: Int) { (max(0, xp) % xpPerLevel, xpPerLevel) }
+    static func level(xp: Int) -> Int {
+        let x = max(0, xp)
+        if x >= 700 { return 5 + (x - 700) / 300 }
+        if x >= 450 { return 4 }
+        if x >= 250 { return 3 }
+        if x >= 100 { return 2 }
+        return 1
+    }
+
+    static func progress(xp: Int) -> (into: Int, needed: Int) {
+        let x = max(0, xp), level = level(xp: x)
+        let start = xpToReach(level: level)
+        return (x - start, xpToReach(level: level + 1) - start)
+    }
 }
 
 extension GameState {
