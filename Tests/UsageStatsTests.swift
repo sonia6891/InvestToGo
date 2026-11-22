@@ -222,12 +222,13 @@ final class UsageStatsTests: XCTestCase {
         XCTAssertEqual(transport.events.map(\.kind), ["first_open", "daily_open"])
     }
 
-    func testNeverUnderUITestsTheTestHostOrPreviews() async {
-        XCTAssertTrue(UsageGate.allowed(arguments: ["ETFToGo"], environment: [:]))
-        XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo", "--ui-testing"], environment: [:]))
-        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCTestConfigurationFilePath": "/x.xctestconfiguration"]))
-        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCODE_RUNNING_FOR_PREVIEWS": "1"]))
-        // This process is the unit-test host: the shared reporter is off.
+    func testNeverUnderUITestsTheTestHostPreviewsOrDebugBuilds() async {
+        XCTAssertTrue(UsageGate.allowed(arguments: ["ETFToGo"], environment: [:], debug: false), "A Release build reports")
+        XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo"], environment: [:], debug: true), "A Debug build never reports")
+        XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo", "--ui-testing"], environment: [:], debug: false))
+        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCTestConfigurationFilePath": "/x.xctestconfiguration"], debug: false))
+        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCODE_RUNNING_FOR_PREVIEWS": "1"], debug: false))
+        // This process is the unit-test host (and a Debug build): the shared reporter is off.
         XCTAssertFalse(UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment))
         let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         let usage = reporter(transport, clock: clock, allowed: false)
@@ -255,10 +256,21 @@ final class UsageStatsTests: XCTestCase {
         XCTAssertTrue(UsageInstall.isValid(UsageInstall.id(defaults: defaults)), "A damaged id is made again")
     }
 
-    func testTheInstallIDStaysOutOfTheAppBackup() throws {
+    /// Through the app's own export (資料備份與還原), with records, the install id, queued events and the rating state
+    /// all on the phone: none of the phone-only state is in the file.
+    @MainActor func testTheInstallIDStaysOutOfTheAppBackup() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("usage-backup-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("records.json"))
+        try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
         let iid = UsageInstall.id(defaults: .standard)
-        let backup = String(decoding: try JSONEncoder().encode(Portfolio()), as: UTF8.self)
-        XCTAssertFalse(backup.contains(iid))
+        let waiting = [UsageEvent.firstOpen(iid: iid, at: noon, region: "TW", version: "1.0(7)")]
+        UserDefaults.standard.set(try JSONEncoder().encode(waiting), forKey: UsageReporter.queueKey)
+        defer { UserDefaults.standard.removeObject(forKey: UsageReporter.queueKey) }
+        let backup = String(decoding: try Data(contentsOf: store.export()), as: UTF8.self)
+        XCTAssertTrue(backup.contains("0050"), "The export has the records")
+        XCTAssertFalse(backup.contains(iid), "but not the install id")
+        XCTAssertFalse(backup.contains("first_open"), "nor the waiting events")
         XCTAssertFalse(backup.contains("usageStats"))
     }
 
@@ -274,44 +286,37 @@ final class UsageStatsTests: XCTestCase {
 
     // MARK: Region
 
-    func testTheRegionIsTwoLettersFromTheStorefrontElseThePhone() {
-        XCTAssertEqual(UsageRegion.resolve(storefront: "TWN", phone: "JP"), "TW")
-        XCTAssertEqual(UsageRegion.resolve(storefront: "usa", phone: nil), "US")
-        XCTAssertEqual(UsageRegion.resolve(storefront: nil, phone: "jp"), "JP")
-        XCTAssertEqual(UsageRegion.resolve(storefront: "???", phone: "HK"), "HK")
-        XCTAssertEqual(UsageRegion.resolve(storefront: nil, phone: "419"), "", "A numeric region is not a country")
-        XCTAssertEqual(UsageRegion.resolve(storefront: nil, phone: nil), "")
-        for (three, two) in [("JPN", "JP"), ("HKG", "HK"), ("GBR", "GB"), ("KOR", "KR"), ("CHN", "CN"), ("SGP", "SG"), ("MYS", "MY"), ("MAC", "MO"), ("XKS", "XK")] {
-            XCTAssertEqual(UsageRegion.alpha2(three), two, three)
-        }
-    }
-
-    func testTheCountryTableIsWellFormed() {
-        let table = UsageRegion.table
-        XCTAssertGreaterThanOrEqual(table.count, 250)
-        XCTAssertEqual(Set(table.values).count, table.count, "Every alpha-2 appears once")
-        let iso = Set(Locale.Region.isoRegions.map(\.identifier))
-        for (three, two) in table {
-            XCTAssertTrue(three.count == 3 && three == three.uppercased(), three)
-            if two != "XK" { XCTAssertTrue(iso.contains(two), "\(three) → \(two) is an ISO region") }
-        }
+    /// The phone's region setting, as the contract and 額度雷達 do; '' when unknown or not a country.
+    func testTheRegionIsThePhonesTwoLetterRegion() {
+        XCTAssertEqual(UsageRegion.resolve(phone: "TW"), "TW")
+        XCTAssertEqual(UsageRegion.resolve(phone: "jp"), "JP")
+        XCTAssertEqual(UsageRegion.resolve(phone: "419"), "", "A numeric region is not a country")
+        XCTAssertEqual(UsageRegion.resolve(phone: "TWN"), "")
+        XCTAssertEqual(UsageRegion.resolve(phone: ""), "")
+        XCTAssertEqual(UsageRegion.resolve(phone: nil), "")
+        let here = UsageRegion.current()
+        XCTAssertTrue(here.isEmpty || here.range(of: "^[A-Z]{2}$", options: .regularExpression) != nil, here)
     }
 
     // MARK: Privacy manifest
 
-    func testThePrivacyManifestDeclaresProductInteractionForAnalytics() throws {
+    func testThePrivacyManifestDeclaresAnalyticsDataNotLinked() throws {
         let url = try XCTUnwrap(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"), "The manifest ships in the app")
         let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
         XCTAssertEqual(plist["NSPrivacyTracking"] as? Bool, false)
         let types = try XCTUnwrap(plist["NSPrivacyCollectedDataTypes"] as? [[String: Any]])
         let byType = Dictionary(uniqueKeysWithValues: types.compactMap { entry in (entry["NSPrivacyCollectedDataType"] as? String).map { ($0, entry) } })
-        let interaction = try XCTUnwrap(byType["NSPrivacyCollectedDataTypeProductInteraction"])
-        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypeLinked"] as? Bool, false)
-        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypeTracking"] as? Bool, false)
-        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypePurposes"] as? [String], ["NSPrivacyCollectedDataTypePurposeAnalytics"])
+        // The daily open, Apple's subscription notifications keyed to the install id, and the install id itself.
+        for type in ["NSPrivacyCollectedDataTypeProductInteraction", "NSPrivacyCollectedDataTypePurchaseHistory", "NSPrivacyCollectedDataTypeDeviceID"] {
+            let entry = try XCTUnwrap(byType[type], type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypeLinked"] as? Bool, false, type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypeTracking"] as? Bool, false, type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypePurposes"] as? [String], ["NSPrivacyCollectedDataTypePurposeAnalytics"], type)
+        }
         XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeCrashData"], "The crash entries stay")
         XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeOtherDiagnosticData"])
     }
+
 
     private func event(_ id: String) -> UsageEvent {
         UsageEvent(id: id, kind: "daily_open", at: "2026-11-22T03:04:05.125Z", iid: "x", pf: "ios", m: "TW", v: "1.0(7)")

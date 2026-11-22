@@ -7,7 +7,7 @@ import StoreKit
 //   first_open  the app was opened for the first time on this phone (downloads), once per install
 //   daily_open  the app was opened on this local calendar day (version use, retention), once a day
 // Each event carries only a random install id (made here, never tied to the Apple ID or anything personal), the
-// platform, the region (the App Store storefront's country, else the phone's region) and the app version. Never
+// platform, the phone's region setting and the app version. Never
 // holdings, amounts, trades, ETF lists or any record. 設定 › 隱私與安全 › 「傳送匿名使用統計」 turns it off: then nothing
 // is queued or sent and the waiting events are cleared. Events wait in UserDefaults until the workstation answers, at
 // most `UsageQueue.limit` of them; the workstation ignores an id it already has.
@@ -115,75 +115,32 @@ enum UsageInstall {
     }
 }
 
-/// Whether this process may report at all: never in UI tests, in the unit-test host or in Xcode previews.
+/// Whether this process may report at all: never in UI tests, in the unit-test host, in Xcode previews or in a Debug
+/// build (a developer's run on a device never reaches the production numbers).
 enum UsageGate {
-    static func allowed(arguments: [String], environment: [String: String]) -> Bool {
-        !arguments.contains("--ui-testing")
+    #if DEBUG
+    static let debugBuild = true
+    #else
+    static let debugBuild = false
+    #endif
+
+    static func allowed(arguments: [String], environment: [String: String], debug: Bool = debugBuild) -> Bool {
+        !debug
+            && !arguments.contains("--ui-testing")
             && environment["XCTestConfigurationFilePath"] == nil
             && environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1"
     }
 }
 
-/// The two-letter region: the App Store storefront's country (StoreKit gives ISO 3166-1 alpha-3), else the phone's
-/// region, else ''.
+/// The two-letter region: the phone's region setting (as the contract and 額度雷達 do), '' when it is unknown or not a
+/// country (a numeric region such as 419).
 enum UsageRegion {
-    static func resolve(storefront: String?, phone: String?) -> String {
-        if let storefront, let code = alpha2(storefront) { return code }
-        if let phone, isAlpha2(phone.uppercased()) { return phone.uppercased() }
-        return ""
+    static func resolve(phone: String?) -> String {
+        guard let code = phone?.uppercased(), code.utf8.count == 2, code.utf8.allSatisfy({ (0x41...0x5A).contains($0) }) else { return "" }
+        return code
     }
 
-    /// An alpha-3 (TWN) or alpha-2 (TW) code as alpha-2; nil for anything else.
-    static func alpha2(_ code: String) -> String? {
-        let upper = code.uppercased()
-        if isAlpha2(upper) { return upper }
-        return table[upper]
-    }
-
-    private static func isAlpha2(_ text: String) -> Bool {
-        text.utf8.count == 2 && text.utf8.allSatisfy { (0x41...0x5A).contains($0) }
-    }
-
-    /// ISO 3166-1 alpha-3 → alpha-2, with Kosovo (XKS, the App Store's code) as XK.
-    static let table: [String: String] = {
-        let pairs = """
-        AFG AF ALA AX ALB AL DZA DZ ASM AS AND AD AGO AO AIA AI ATA AQ ATG AG ARG AR ARM AM ABW AW AUS AU AUT AT AZE AZ \
-        BHS BS BHR BH BGD BD BRB BB BLR BY BEL BE BLZ BZ BEN BJ BMU BM BTN BT BOL BO BES BQ BIH BA BWA BW BVT BV BRA BR \
-        IOT IO BRN BN BGR BG BFA BF BDI BI CPV CV KHM KH CMR CM CAN CA CYM KY CAF CF TCD TD CHL CL CHN CN CXR CX CCK CC \
-        COL CO COM KM COG CG COD CD COK CK CRI CR CIV CI HRV HR CUB CU CUW CW CYP CY CZE CZ DNK DK DJI DJ DMA DM DOM DO \
-        ECU EC EGY EG SLV SV GNQ GQ ERI ER EST EE SWZ SZ ETH ET FLK FK FRO FO FJI FJ FIN FI FRA FR GUF GF PYF PF ATF TF \
-        GAB GA GMB GM GEO GE DEU DE GHA GH GIB GI GRC GR GRL GL GRD GD GLP GP GUM GU GTM GT GGY GG GIN GN GNB GW GUY GY \
-        HTI HT HMD HM VAT VA HND HN HKG HK HUN HU ISL IS IND IN IDN ID IRN IR IRQ IQ IRL IE IMN IM ISR IL ITA IT JAM JM \
-        JPN JP JEY JE JOR JO KAZ KZ KEN KE KIR KI PRK KP KOR KR KWT KW KGZ KG LAO LA LVA LV LBN LB LSO LS LBR LR LBY LY \
-        LIE LI LTU LT LUX LU MAC MO MDG MG MWI MW MYS MY MDV MV MLI ML MLT MT MHL MH MTQ MQ MRT MR MUS MU MYT YT MEX MX \
-        FSM FM MDA MD MCO MC MNG MN MNE ME MSR MS MAR MA MOZ MZ MMR MM NAM NA NRU NR NPL NP NLD NL NCL NC NZL NZ NIC NI \
-        NER NE NGA NG NIU NU NFK NF MKD MK MNP MP NOR NO OMN OM PAK PK PLW PW PSE PS PAN PA PNG PG PRY PY PER PE PHL PH \
-        PCN PN POL PL PRT PT PRI PR QAT QA REU RE ROU RO RUS RU RWA RW BLM BL SHN SH KNA KN LCA LC MAF MF SPM PM VCT VC \
-        WSM WS SMR SM STP ST SAU SA SEN SN SRB RS SYC SC SLE SL SGP SG SXM SX SVK SK SVN SI SLB SB SOM SO ZAF ZA SGS GS \
-        SSD SS ESP ES LKA LK SDN SD SUR SR SJM SJ SWE SE CHE CH SYR SY TWN TW TJK TJ TZA TZ THA TH TLS TL TGO TG TKL TK \
-        TON TO TTO TT TUN TN TUR TR TKM TM TCA TC TUV TV UGA UG UKR UA ARE AE GBR GB USA US UMI UM URY UY UZB UZ VUT VU \
-        VEN VE VNM VN VGB VG VIR VI WLF WF ESH EH YEM YE ZMB ZM ZWE ZW XKS XK
-        """
-        let words = pairs.split(separator: " ").map(String.init)
-        var table: [String: String] = [:]
-        for index in stride(from: 0, to: words.count - 1, by: 2) { table[words[index]] = words[index + 1] }
-        return table
-    }()
-
-    /// The storefront's country, waiting at most two seconds for StoreKit.
-    static func storefront() async -> String? {
-        await withTaskGroup(of: String?.self) { group in
-            group.addTask { await Storefront.current?.countryCode }
-            group.addTask { try? await Task.sleep(for: .seconds(2)); return nil }
-            let first = await group.next() ?? nil
-            group.cancelAll()
-            return first
-        }
-    }
-
-    static func current() async -> String {
-        resolve(storefront: await storefront(), phone: Locale.current.region?.identifier)
-    }
+    static func current() -> String { resolve(phone: Locale.current.region?.identifier) }
 }
 
 /// Sends a batch; returns the HTTP status, or nil when there was no answer.
@@ -232,7 +189,7 @@ actor UsageReporter {
         defaults: .standard, transport: WorkstationTransport(),
         allowed: UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment),
         version: UsageVersion.string(info: Bundle.main.infoDictionary),
-        now: { Date() }, timeZone: { TimeZone.current }, region: { await UsageRegion.current() })
+        now: { Date() }, timeZone: { TimeZone.current }, region: { UsageRegion.current() })
 
     private let defaults: UserDefaults
     private let transport: UsageTransport

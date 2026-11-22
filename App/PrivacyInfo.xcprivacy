@@ -25,6 +25,22 @@
 <key>NSPrivacyCollectedDataTypeTracking</key><false/>
 <key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAnalytics</string></array>
 </dict>
+<!-- Apple's subscription notifications (new, renewed, cancelled, refunded) reach the workstation keyed to the same random
+     install number, passed as the purchase's appAccountToken: which version a cancellation came from. Not linked. -->
+<dict>
+<key>NSPrivacyCollectedDataType</key><string>NSPrivacyCollectedDataTypePurchaseHistory</string>
+<key>NSPrivacyCollectedDataTypeLinked</key><false/>
+<key>NSPrivacyCollectedDataTypeTracking</key><false/>
+<key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAnalytics</string></array>
+</dict>
+<!-- The random install number itself (a UUID made on this phone, not the advertising identifier or anything about the
+     device or the person). Not linked. -->
+<dict>
+<key>NSPrivacyCollectedDataType</key><string>NSPrivacyCollectedDataTypeDeviceID</string>
+<key>NSPrivacyCollectedDataTypeLinked</key><false/>
+<key>NSPrivacyCollectedDataTypeTracking</key><false/>
+<key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAnalytics</string></array>
+</dict>
 </array>
 <!-- The app's own @AppStorage/UserDefaults, and Sentry's required-reason APIs: it is linked statically, so its own
      privacy manifest is not shipped and its reasons are declared here. -->
