@@ -1174,4 +1174,56 @@ final class ETFToGoUITests: XCTestCase {
         let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
         XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(value), got \(element.exists ? String(describing: element.value) : "nothing")", file: file, line: line)
     }
+
+    // MARK: App 上鎖 (docs/superpowers/specs/2026-11-22-app-lock-design.md)
+
+    /// Types a passcode on the lock's number pad (the lock screen's, or the settings sheet's).
+    private func typePasscode(_ app: XCUIApplication, _ code: String, file: StaticString = #filePath, line: UInt = #line) {
+        for digit in code {
+            let key = app.buttons["lock-key-\(digit)"]
+            XCTAssertTrue(key.waitForExistence(timeout: 5), "lock-key-\(digit) is on the pad", file: file, line: line)
+            key.tap()
+        }
+    }
+
+    /// `--lock`: the lock is on with 123456 and no Face ID. A wrong code keeps it locked; 123456 opens the lobby.
+    func testAppLockWithPasscode() {
+        let app = launch(["--lock"])
+        let screen = app.descendants(matching: .any)["lock-screen"]
+        XCTAssertTrue(screen.waitForExistence(timeout: 10), "With the lock on, the app opens on the lock screen")
+        XCTAssertFalse(app.buttons["lobby-find"].exists, "The lobby is not built behind it")
+        XCTAssertTrue(app.buttons["lock-forgot"].exists, "忘記密碼 is offered")
+        XCTAssertFalse(app.buttons["lock-faceid"].exists, "No Face ID in UI tests")
+        sleep(1); capture(app, "lock-screen")
+        typePasscode(app, "000000")
+        XCTAssertTrue(app.staticTexts["密碼錯誤"].waitForExistence(timeout: 5), "A wrong code says so")
+        XCTAssertTrue(screen.exists, "and stays locked")
+        XCTAssertFalse(app.buttons["lobby-find"].exists)
+        typePasscode(app, "123456")
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "123456 opens the lobby")
+        let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: screen)
+        XCTAssertEqual(XCTWaiter().wait(for: [gone], timeout: 5), .completed, "The lock screen has gone")
+    }
+
+    /// 設定 › 隱私與安全: 「App 上鎖」 is off; turning it on asks for a new code twice, and then it reads on.
+    func testTurnOnLock() {
+        let app = launch(["--open", "privacy"])
+        let toggle = app.switches["lock-toggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "隱私與安全 has 「App 上鎖」")
+        // The card is where 「目前未提供 App 內上鎖」 was, below the crash-report card: scrolled into view.
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
+        XCTAssertEqual(toggle.value as? String, "0", "Off by default")
+        XCTAssertFalse(app.buttons["lock-change"].exists, "No 變更密碼 before a passcode is set")
+        sleep(1); capture(app, "lock-settings-off")
+        let knob = toggle.switches.firstMatch
+        if knob.exists { knob.tap() } else { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
+        XCTAssertTrue(app.staticTexts["設定 6 位數的 App 密碼"].waitForExistence(timeout: 5), "Turning it on asks for a new code")
+        typePasscode(app, "246810")
+        XCTAssertTrue(app.staticTexts["再輸入一次"].waitForExistence(timeout: 5), "then for the same code again")
+        typePasscode(app, "246810")
+        waitForValue(toggle, "1")
+        XCTAssertTrue(app.buttons["lock-change"].waitForExistence(timeout: 5), "變更密碼 shows once a passcode is set")
+        XCTAssertFalse(app.switches["lock-faceid-toggle"].exists, "No Face ID toggle without Face ID")
+        sleep(1); capture(app, "lock-settings-on")
+    }
 }
