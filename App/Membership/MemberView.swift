@@ -132,10 +132,13 @@ enum PlanPrice {
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.
+    /// The anonymous install id goes with it as the `appAccountToken` (2026-11-22 產品工作站 design): Apple echoes it back
+    /// in its subscription notifications, so 退訂紀錄 can show which version a cancellation came from. It is only a random
+    /// number kept on this phone, so it goes also with 「傳送匿名使用統計」 off.
     func purchase(_ id: String) async {
         guard let product = products[id] else { return }
         do {
-            switch try await product.purchase() {
+            switch try await product.purchase(options: UsageInstall.purchaseOptions()) {
             case .success(.verified(let transaction)):
                 await transaction.finish()
                 await refreshMembership()
