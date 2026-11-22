@@ -55,13 +55,13 @@ final class GameTriggerStoreTests: XCTestCase {
         let s = store()
         let first = s.collectDexCard("0050")
         XCTAssertEqual(first, FundVisit(new: true, cardXP: 30))
-        XCTAssertEqual(FundDetail.toastText(first), "收進圖鑑 +30 經驗")
+        XCTAssertEqual(DexReveal.rewardText(first), "+30 經驗")
         XCTAssertTrue(game(s).isDone(Quests.firstDexCard, in: YearMonth(Date())), "收集第 1 張圖鑑卡 is ticked")
         XCTAssertEqual(s.collectDexCard("0050"), FundVisit(), "A second visit collects nothing")
         _ = s.collectDexCard("0056"); _ = s.collectDexCard("00878")
         let fourth = s.collectDexCard("006208")
         XCTAssertEqual(fourth, FundVisit(new: true, cardXP: 0))
-        XCTAssertEqual(FundDetail.toastText(fourth), "收進圖鑑", "Past this month's three, no experience is promised")
+        XCTAssertEqual(DexReveal.rewardText(fourth), "收進圖鑑", "Past this month's three, no experience is promised")
     }
 
     @MainActor func testBrokerImportReconcilesOncePerMonth() throws {

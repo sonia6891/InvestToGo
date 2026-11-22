@@ -96,7 +96,7 @@ struct DexCardView: View {
 
 /// The card itself. Its paper is the skin's light colour (ink on dark skins, card on light ones) and the 特技 box the
 /// dark one, so the card reads as a printed card on every skin.
-private struct DexCard: View {
+struct DexCard: View {
     let fund: Fund
     let facts: DexFacts
     let among: [Fund]
