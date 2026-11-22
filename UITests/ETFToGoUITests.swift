@@ -7,6 +7,7 @@ final class ETFToGoUITests: XCTestCase {
         let search = app.textFields["fund-search"]
         XCTAssertTrue(search.waitForExistence(timeout: 10)); search.tap(); search.typeText("00679B\n")
         let fund = app.staticTexts["元大美債20年"]; XCTAssertTrue(fund.waitForExistence(timeout: 5)); fund.tap()
+        acceptDexReveal(app)
         XCTAssertTrue(app.buttons["持股"].waitForExistence(timeout: 5))
         app.buttons["持股"].tap()
         XCTAssertTrue(app.buttons["更新成分股"].waitForExistence(timeout: 5))
@@ -17,6 +18,12 @@ final class ETFToGoUITests: XCTestCase {
         app.buttons["tool-broker"].tap()
         XCTAssertTrue(app.textFields["broker-import-name"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["選擇庫存 CSV"].exists)
+    }
+    /// A fund's first 詳情 plays the card reveal over the page; 「收下」 returns to the 詳情.
+    private func acceptDexReveal(_ app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+        let accept = app.buttons["dex-reveal-accept"]
+        XCTAssertTrue(accept.waitForExistence(timeout: 5), "The first visit plays the card reveal", file: file, line: line)
+        accept.tap()
     }
     private func capture(_ app: XCUIApplication, _ name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot()); attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
@@ -47,6 +54,7 @@ final class ETFToGoUITests: XCTestCase {
         let app=XCUIApplication(); app.launchArguments=["--ui-testing","--reset","--skip-onboarding","--open","find"]; app.launch()
         let search=app.textFields["fund-search"]; XCTAssertTrue(search.waitForExistence(timeout:10))
         search.tap(); search.typeText("0050\n"); app.staticTexts["元大台灣50"].tap()
+        acceptDexReveal(app)
         XCTAssertTrue(app.buttons["資訊"].waitForExistence(timeout:5))
         app.buttons["資訊"].tap()
         XCTAssertTrue(app.staticTexts["annual-fee-heading"].waitForExistence(timeout:5))
@@ -270,14 +278,14 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(shown.contains { move.evaluate(with: $0.1) }, "At least one row moved")
         capture(app, "find-high-dividend")
 
-        // Search 0050 and open it: the code, the four tabs and, the first time, the dex toast.
+        // Search 0050 and open it: the card reveal the first time, then the code and the four tabs.
         app.buttons["全部"].tap()
         search.tap(); search.typeText("0050\n")
         let row = app.staticTexts["元大台灣50"]
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
-        let toast = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '收進圖鑑'")).firstMatch
-        XCTAssertTrue(toast.waitForExistence(timeout: 5), "The first visit collects the card")
-        XCTAssertEqual(toast.label, "收進圖鑑 +30 經驗")
+        XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The first visit plays the reveal")
+        XCTAssertTrue(app.staticTexts["+30 經驗"].exists, "The reveal names the experience")
+        acceptDexReveal(app)
         XCTAssertTrue(app.staticTexts["detail-code"].exists)
         XCTAssertEqual(app.staticTexts["detail-code"].label, "0050")
         for tab in ["走勢", "持股", "配息", "資訊"] { XCTAssertTrue(app.buttons[tab].exists, "The detail has the \(tab) tab") }
@@ -294,13 +302,80 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["加入口袋"].exists)
         capture(app, "dex-0050")
 
-        // Back to the list and in again: already collected, so no toast.
+        // Back to the list and in again: already collected, so no reveal.
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(app.buttons["圖鑑卡"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.element(boundBy: 0).tap()
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
         XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
-        XCTAssertFalse(toast.waitForExistence(timeout: 3), "A collected card does not toast again")
+        XCTAssertFalse(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 3), "A collected card does not play the reveal again")
+    }
+
+    /// Searches a code in 找 ETF (replacing any earlier query) and opens its row.
+    private func openFund(_ app: XCUIApplication, code: String, file: StaticString = #filePath, line: UInt = #line) {
+        let search = app.textFields["fund-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10), file: file, line: line)
+        search.tap()
+        if let current = search.value as? String, !current.isEmpty, current != search.placeholderValue {
+            search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count))
+        }
+        search.typeText("\(code)\n")
+        let row = app.staticTexts[code]
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "\(code) is listed", file: file, line: line); row.tap()
+    }
+
+    /// The reveal plays once per fund: the first 詳情 shows the card and the experience, 「收下」 returns to it.
+    func testDexRevealOnFirstVisit() {
+        let app = launch(["--open", "find"])
+        let search = app.textFields["fund-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10)); search.tap(); search.typeText("0050\n")
+        let row = app.staticTexts["元大台灣50"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The reveal plays")
+        XCTAssertTrue(app.staticTexts["+30 經驗"].waitForExistence(timeout: 5), "It shows the experience")
+        let accept = app.buttons["dex-reveal-accept"]
+        XCTAssertTrue(accept.isHittable, "收下 can be tapped")
+        accept.tap()
+        XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["detail-code"].label, "0050")
+        XCTAssertFalse(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 2), "The reveal is gone")
+    }
+
+    func testDexRevealOnlyOnFirstVisit() {
+        let app = launch(["--open", "find"])
+        let search = app.textFields["fund-search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10)); search.tap(); search.typeText("0050\n")
+        let row = app.staticTexts["元大台灣50"]
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        acceptDexReveal(app)
+        XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+        XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 3), "A collected card does not play the reveal again")
+    }
+
+    func testDexRevealOpensTheCard() {
+        let app = launch(["--open", "detail", "--symbol", "0050"])
+        let open = app.buttons["dex-reveal-open"]
+        XCTAssertTrue(open.waitForExistence(timeout: 5), "The reveal offers 看圖鑑")
+        open.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["dex-bar-fee"].waitForExistence(timeout: 5), "The card opens after the cover has gone")
+    }
+
+    /// Past this month's three cards no experience is promised, and the reveal says so.
+    func testFourthCardThisMonthSaysCollected() {
+        let app = launch(["--open", "find"])
+        for code in ["0050", "006208", "0056"] {
+            openFund(app, code: code)
+            acceptDexReveal(app)
+            XCTAssertTrue(app.staticTexts["detail-code"].waitForExistence(timeout: 5))
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
+        openFund(app, code: "00878")
+        XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The fourth card still plays the reveal")
+        XCTAssertTrue(app.staticTexts["收進圖鑑"].waitForExistence(timeout: 5), "It says the card is collected")
+        XCTAssertFalse(app.staticTexts["+30 經驗"].exists, "No experience is promised")
     }
 
     /// 找 ETF, the detail and the dex card in each skin, to compare with the canvas.
@@ -313,6 +388,7 @@ final class ETFToGoUITests: XCTestCase {
             search.tap(); search.typeText("0050\n")
             let row = app.staticTexts["元大台灣50"]
             XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
+            acceptDexReveal(app)
             XCTAssertTrue(app.buttons["圖鑑卡"].waitForExistence(timeout: 5), "\(id): the detail opens")
             sleep(3); capture(app, "detail-\(id)")
             app.buttons["圖鑑卡"].tap()
@@ -887,6 +963,7 @@ final class ETFToGoUITests: XCTestCase {
         let row = app.staticTexts["元大台灣50"]
         XCTAssertTrue(row.waitForExistence(timeout: 5), "0050 is listed")
         XCTAssertTrue(row.isHittable, "The row can be tapped"); row.tap()
+        acceptDexReveal(app)
         assertReachable(app, app.buttons["圖鑑卡"], "圖鑑卡")
         sleep(1); capture(app, "largest-text-detail")
         assertReachable(app, app.buttons["走勢"], "走勢")

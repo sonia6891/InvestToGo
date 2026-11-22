@@ -383,8 +383,14 @@ struct WatchlistView: View {
 struct FundDetail: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
+    @Environment(\.motionReduced) private var reduceMotion
+    @Environment(\.lobbyNavigation) private var navigation
     @ObservedObject private var connectivity = Connectivity.shared
     let fund: Fund
+    /// The card reveal for this fund's first visit; presentation only (the card and its experience are already saved).
+    @State private var reveal: DexRevealItem?
+    /// 「看圖鑑」 was tapped: the card screen opens once the cover has gone.
+    @State private var openCardAfterReveal = false
     @State private var section = 0
     @State private var range = ChartRange.year
     private static let tabs = ["走勢", "持股", "配息", "資訊"]
@@ -413,9 +419,19 @@ struct FundDetail: View {
         .onAppear {
             store.quoteFailure = nil
             store.liveFocus = fund.id; store.live.syncSoon()
-            // The notice shows in the root's toast region, above the navigation bar's row, never over the code.
+            // A later appear (after the cover or the card screen) finds the card already collected: no second reveal.
             let visit = store.collectDexCard(fund.id)
-            if visit.new, !DemoArguments.quietToasts { store.pendingNotice = Self.toastText(visit) }
+            if visit.new, !DemoArguments.quietToasts { setReveal(DexRevealItem(symbol: fund.id, visit: visit)) }
+        }
+        .fullScreenCover(item: $reveal, onDismiss: {
+            if openCardAfterReveal { openCardAfterReveal = false; navigation.push(.dexCard(fund.id)) }
+        }) { item in
+            DexRevealView(item: item,
+                          onAccept: { setReveal(nil) },
+                          onOpen: { openCardAfterReveal = true; setReveal(nil) })
+                .environmentObject(store)
+                .environment(\.skin, skin)
+                .preferredColorScheme(SkinStore.shared.colorScheme)
         }
         .onDisappear { if store.liveFocus == fund.id { store.liveFocus = nil; store.live.syncSoon() } }
         .navigationBarTitleDisplayMode(.inline)
@@ -536,7 +552,12 @@ struct FundDetail: View {
         .background(skin.color(\.page).ignoresSafeArea(edges: .bottom))
     }
     /// 「收進圖鑑 +30 經驗」, or just 「收進圖鑑」 once this month's experience-earning cards are used up (ruling R34).
-    static func toastText(_ visit: FundVisit) -> String { visit.cardXP > 0 ? "收進圖鑑 +\(visit.cardXP) 經驗" : "收進圖鑑" }
+    /// Presents or dismisses the reveal; with Reduce Motion the cover appears and goes without animation.
+    private func setReveal(_ item: DexRevealItem?) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = reduceMotion
+        withTransaction(transaction) { reveal = item }
+    }
 }
 /// 持股 tab: component weights from the existing research view, plus fund facts.
 struct FundHoldingsContent: View {

@@ -243,8 +243,13 @@ jobs:
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN-locked.png" || true
             settle "build/screens/screen-$SCREEN-locked.png"
           done
+          # 圖鑑卡翻面: a fund's first 詳情 plays the reveal (no --quiet-toasts); it opens in its final state under --ui-testing.
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --open detail --symbol 0050
+          sleep 5
+          xcrun simctl io "$DEVICE" screenshot "build/screens/screen-dex-reveal.png"
       - name: Capture the skin kit sheet in every skin
-        timeout-minutes: 2
+        timeout-minutes: 3
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -255,6 +260,13 @@ jobs:
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open skinKit
             sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
+          done
+          # The card reveal in every 外觀主題, to check the face, the reward and both buttons read in each.
+          for SKIN in blackgold voxel stitch sketch; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open detail --symbol 0050
+            sleep 6
+            xcrun simctl io "$DEVICE" screenshot "build/screens/dex-reveal-$SKIN.png"
           done
       # App 上鎖 (2026-11-22 design): 設定 › 隱私與安全 with its 「App 上鎖」 card, and the lock screen (`--lock`) in every
       # 外觀主題. Their own step, so the screens above are untouched.
