@@ -24,7 +24,7 @@ final class UsageStatsTests: XCTestCase {
     /// 2026-11-22 11:04:05.125 in Taipei.
     private let noon = Date(timeIntervalSince1970: 1_795_316_645.125)
 
-    private func reporter(_ transport: FakeTransport, clock: TestClock, allowed: Bool = true, region: String = "TW") -> UsageReporter {
+    private func reporter(_ transport: UsageFakeTransport, clock: UsageTestClock, allowed: Bool = true, region: String = "TW") -> UsageReporter {
         let zone = taipei
         return UsageReporter(defaults: defaults, transport: transport, allowed: allowed, version: "1.0(7)",
                       now: { clock.date }, timeZone: { zone }, region: { region })
@@ -64,7 +64,7 @@ final class UsageStatsTests: XCTestCase {
     // MARK: Once per install, once a day
 
     func testFirstOpenAndDailyOpenGoOutOnTheFirstLaunch() async throws {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         await reporter(transport, clock: clock).appOpened()
         let events = transport.events
         // The workstation groups retention by an install's first daily_open day: the first launch sends both, together.
@@ -80,7 +80,7 @@ final class UsageStatsTests: XCTestCase {
     }
 
     func testDailyOpenAtMostOncePerLocalDay() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         let usage = reporter(transport, clock: clock)
         await usage.appOpened()
         clock.date = noon.addingTimeInterval(3600)
@@ -97,7 +97,7 @@ final class UsageStatsTests: XCTestCase {
     }
 
     func testFirstOpenOnlyOncePerInstall() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         await reporter(transport, clock: clock).appOpened()
         for day in 1...3 {
             clock.date = noon.addingTimeInterval(Double(day) * 86_400)
@@ -129,7 +129,7 @@ final class UsageStatsTests: XCTestCase {
     }
 
     func testFailedSendsWaitAndGoOutNextTime() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         transport.answers = [503, nil]
         let usage = reporter(transport, clock: clock)
         await usage.appOpened()
@@ -146,7 +146,7 @@ final class UsageStatsTests: XCTestCase {
 
     func testRefusedEventsAreDropped() async {
         for status in [400, 413, 422] {
-            let transport = FakeTransport(), clock = TestClock(noon)
+            let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
             transport.answers = [status]
             defaults.removePersistentDomain(forName: suite)
             let usage = reporter(transport, clock: clock)
@@ -157,7 +157,7 @@ final class UsageStatsTests: XCTestCase {
     }
 
     func testTheQueueNeverPassesFiftyWhileOffline() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         transport.answers = Array(repeating: nil, count: 80)
         let usage = reporter(transport, clock: clock)
         for day in 0..<70 {
@@ -193,7 +193,7 @@ final class UsageStatsTests: XCTestCase {
     // MARK: The switch and the gate
 
     func testNothingIsQueuedOrSentWithTheSwitchOff() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         transport.answers = [nil]
         let usage = reporter(transport, clock: clock)
         XCTAssertTrue(UsageReporter.isEnabled(defaults), "On by default")
@@ -213,7 +213,7 @@ final class UsageStatsTests: XCTestCase {
     }
 
     func testTurningItBackOnReportsToday() async {
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         defaults.set(false, forKey: UsageReporter.enabledKey)
         let usage = reporter(transport, clock: clock)
         await usage.appOpened()
@@ -229,7 +229,7 @@ final class UsageStatsTests: XCTestCase {
         XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCODE_RUNNING_FOR_PREVIEWS": "1"]))
         // This process is the unit-test host: the shared reporter is off.
         XCTAssertFalse(UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment))
-        let transport = FakeTransport(), clock = TestClock(noon)
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         let usage = reporter(transport, clock: clock, allowed: false)
         await usage.appOpened()
         await usage.flush()
@@ -318,7 +318,7 @@ final class UsageStatsTests: XCTestCase {
     }
 }
 
-final class TestClock: @unchecked Sendable {
+final class UsageTestClock: @unchecked Sendable {
     private let lock = NSLock()
     private var value: Date
     init(_ date: Date) { value = date }
@@ -329,7 +329,7 @@ final class TestClock: @unchecked Sendable {
 }
 
 /// Records each body; answers 200 unless told otherwise (`answers`, in order; nil is no answer).
-final class FakeTransport: UsageTransport, @unchecked Sendable {
+final class UsageFakeTransport: UsageTransport, @unchecked Sendable {
     private let lock = NSLock()
     private var sent: [Data] = []
     private var queued: [Int?] = []
