@@ -1,0 +1,96 @@
+{
+  "cases" : [
+    {
+      "expected" : "存錢筒",
+      "input" : {
+        "name" : "元大台灣50"
+      },
+      "name" : "tw50"
+    },
+    {
+      "expected" : "存錢筒",
+      "input" : {
+        "name" : "富邦台50"
+      },
+      "name" : "fubon50"
+    },
+    {
+      "expected" : "存錢筒",
+      "input" : {
+        "name" : "元大富櫃50"
+      },
+      "name" : "otc50"
+    },
+    {
+      "expected" : "老虎機",
+      "input" : {
+        "name" : "元大台灣50正2"
+      },
+      "name" : "leveraged"
+    },
+    {
+      "expected" : "老虎機",
+      "input" : {
+        "name" : "元大台灣50反1"
+      },
+      "name" : "inverse"
+    },
+    {
+      "expected" : "老虎機",
+      "input" : {
+        "name" : "某某槓桿"
+      },
+      "name" : "leverage-word"
+    },
+    {
+      "expected" : "老虎機",
+      "input" : {
+        "name" : "某某反向"
+      },
+      "name" : "inverse-word"
+    },
+    {
+      "expected" : "印鈔機",
+      "input" : {
+        "name" : "國泰永續高股息"
+      },
+      "name" : "high-dividend"
+    },
+    {
+      "expected" : "印鈔機",
+      "input" : {
+        "name" : "復華台灣科技優息"
+      },
+      "name" : "you-xi"
+    },
+    {
+      "expected" : "印鈔機",
+      "input" : {
+        "name" : "群益台灣精選高息"
+      },
+      "name" : "gao-xi"
+    },
+    {
+      "expected" : "待分類",
+      "input" : {
+        "name" : "元大美債20年"
+      },
+      "name" : "bond"
+    },
+    {
+      "expected" : "老虎機",
+      "input" : {
+        "name" : "高股息正2"
+      },
+      "name" : "risk-beats-income"
+    },
+    {
+      "expected" : "待分類",
+      "input" : {
+        "name" : ""
+      },
+      "name" : "empty"
+    }
+  ],
+  "kind" : "CatalogAPI.strategy"
+}

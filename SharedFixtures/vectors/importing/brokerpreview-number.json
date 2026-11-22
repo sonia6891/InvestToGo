@@ -1,0 +1,117 @@
+{
+  "cases" : [
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1000"
+      },
+      "name" : "1000"
+    },
+    {
+      "expected" : 1000.5,
+      "input" : {
+        "text" : "1,000.5"
+      },
+      "name" : "1,000.5"
+    },
+    {
+      "expected" : 12,
+      "input" : {
+        "text" : " 12 "
+      },
+      "name" : " 12 "
+    },
+    {
+      "expected" : 5,
+      "input" : {
+        "text" : "+5"
+      },
+      "name" : "+5"
+    },
+    {
+      "expected" : -5,
+      "input" : {
+        "text" : "-5"
+      },
+      "name" : "-5"
+    },
+    {
+      "expected" : 0.5,
+      "input" : {
+        "text" : ".5"
+      },
+      "name" : ".5"
+    },
+    {
+      "expected" : 5,
+      "input" : {
+        "text" : "5."
+      },
+      "name" : "5."
+    },
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1e3"
+      },
+      "name" : "1e3"
+    },
+    {
+      "expected" : "inf",
+      "input" : {
+        "text" : "inf"
+      },
+      "name" : "inf"
+    },
+    {
+      "expected" : "-inf",
+      "input" : {
+        "text" : "-infinity"
+      },
+      "name" : "-infinity"
+    },
+    {
+      "expected" : "nan",
+      "input" : {
+        "text" : "NaN"
+      },
+      "name" : "NaN"
+    },
+    {
+      "expected" : 16,
+      "input" : {
+        "text" : "0x10"
+      },
+      "name" : "0x10"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "1_000"
+      },
+      "name" : "1_000"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "１２"
+      },
+      "name" : "１２"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "5d"
+      },
+      "name" : "5d"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : ""
+      },
+      "name" : "empty"
+    }
+  ],
+  "kind" : "BrokerPreview.number"
+}

@@ -1,0 +1,179 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "cash" : 0,
+          "contributed" : 100000,
+          "dividends" : 0,
+          "invested" : 100000,
+          "total" : 100000,
+          "year" : 0
+        },
+        {
+          "cash" : 0,
+          "contributed" : 100000,
+          "dividends" : 4148.907523655886,
+          "invested" : 106000.00000000003,
+          "total" : 106000.00000000003,
+          "year" : 1
+        }
+      ],
+      "input" : {
+        "plan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0.04,
+          "frequency" : 4,
+          "monthly" : 0,
+          "principal" : 100000,
+          "reinvest" : 1,
+          "totalReturn" : 0.06,
+          "years" : 1
+        }
+      },
+      "name" : "reinvest-one-year"
+    },
+    {
+      "expected" : [
+        {
+          "cash" : 0,
+          "contributed" : 100000,
+          "dividends" : 0,
+          "invested" : 100000,
+          "total" : 100000,
+          "year" : 0
+        },
+        {
+          "cash" : 3940.399,
+          "contributed" : 100000,
+          "dividends" : 3940.399,
+          "invested" : 96059.601,
+          "total" : 100000,
+          "year" : 1
+        }
+      ],
+      "input" : {
+        "plan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0.04,
+          "frequency" : 4,
+          "monthly" : 0,
+          "principal" : 100000,
+          "reinvest" : 0,
+          "totalReturn" : 0,
+          "years" : 1
+        }
+      },
+      "name" : "cash-zero-return"
+    },
+    {
+      "expected" : [
+        {
+          "cash" : 0,
+          "contributed" : 100000,
+          "dividends" : 0,
+          "invested" : 100000,
+          "total" : 100000,
+          "year" : 0
+        },
+        {
+          "cash" : 3479.45976641342,
+          "contributed" : 160000,
+          "dividends" : 6958.91953282684,
+          "invested" : 162022.0960056979,
+          "total" : 165501.55577211134,
+          "year" : 1
+        },
+        {
+          "cash" : 8652.533560425987,
+          "contributed" : 220000,
+          "dividends" : 17305.067120851974,
+          "invested" : 225028.43967922614,
+          "total" : 233680.9732396521,
+          "year" : 2
+        },
+        {
+          "cash" : 15546.097862586124,
+          "contributed" : 280000,
+          "dividends" : 31092.19572517225,
+          "invested" : 289034.65034876,
+          "total" : 304580.74821134616,
+          "year" : 3
+        }
+      ],
+      "input" : {
+        "plan" : {
+          "deductionRate" : 0.1,
+          "distributionRate" : 0.06,
+          "frequency" : 12,
+          "monthly" : 5000,
+          "principal" : 100000,
+          "reinvest" : 0.5,
+          "totalReturn" : 0.05,
+          "years" : 3
+        }
+      },
+      "name" : "deduction-monthly-pay"
+    },
+    {
+      "expected" : [
+        {
+          "cash" : 0,
+          "contributed" : 50000,
+          "dividends" : 0,
+          "invested" : 50000,
+          "total" : 50000,
+          "year" : 0
+        },
+        {
+          "cash" : 0,
+          "contributed" : 62000,
+          "dividends" : 977.1720767660968,
+          "invested" : 50835.77591507093,
+          "total" : 50835.77591507093,
+          "year" : 1
+        },
+        {
+          "cash" : 0,
+          "contributed" : 74000,
+          "dividends" : 1967.4491198805058,
+          "invested" : 51504.12919883486,
+          "total" : 51504.12919883486,
+          "year" : 2
+        }
+      ],
+      "input" : {
+        "plan" : {
+          "deductionRate" : 0.02,
+          "distributionRate" : 0.02,
+          "frequency" : 1,
+          "monthly" : 1000,
+          "principal" : 50000,
+          "reinvest" : 1,
+          "totalReturn" : -0.2,
+          "years" : 2
+        }
+      },
+      "name" : "yearly-pay-negative-return"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "plan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0,
+          "frequency" : 4,
+          "monthly" : 1,
+          "principal" : 1,
+          "reinvest" : 0,
+          "totalReturn" : 0,
+          "years" : 0
+        }
+      },
+      "name" : "invalid-years"
+    }
+  ],
+  "kind" : "PlanMath.project"
+}

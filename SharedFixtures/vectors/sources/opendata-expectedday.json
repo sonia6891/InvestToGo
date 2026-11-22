@@ -1,0 +1,40 @@
+{
+  "cases" : [
+    {
+      "expected" : "2026-11-10",
+      "input" : {
+        "at" : "2026-11-11T14:00:00+08:00"
+      },
+      "name" : "weekday-before-close"
+    },
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "at" : "2026-11-11T14:30:00+08:00"
+      },
+      "name" : "weekday-after-close"
+    },
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "at" : "2026-11-14T20:00:00+08:00"
+      },
+      "name" : "saturday"
+    },
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "at" : "2026-11-16T09:00:00+08:00"
+      },
+      "name" : "monday-morning"
+    },
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "at" : "2026-11-15T23:30:00Z"
+      },
+      "name" : "utc-evening-is-taipei-morning"
+    }
+  ],
+  "kind" : "OpenData.expectedDay"
+}

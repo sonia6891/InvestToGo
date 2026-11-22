@@ -1,0 +1,77 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-14",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "today"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-13",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "yesterday"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-07",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "seven-days"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "day" : "2026-11-06",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "eight-days"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "day" : "2026-08-01",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "bundled"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "day" : "",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "day" : "20261114",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "compact"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-07",
+        "now" : "2026-11-13T16:05:00Z"
+      },
+      "name" : "taipei-just-after-midnight"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "day" : "2026-11-20",
+        "now" : "2026-11-14T12:00:00+08:00"
+      },
+      "name" : "future-day"
+    }
+  ],
+  "kind" : "AlertEngine.isCurrent"
+}

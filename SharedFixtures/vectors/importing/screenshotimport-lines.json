@@ -1,0 +1,253 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        "0050 元大台灣50",
+        "股數 1,000"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.8,
+              0.2,
+              0.03
+            ],
+            "text" : "股數"
+          },
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "0050"
+          },
+          {
+            "box" : [
+              0.4,
+              0.901,
+              0.2,
+              0.03
+            ],
+            "text" : "元大台灣50"
+          },
+          {
+            "box" : [
+              0.5,
+              0.802,
+              0.2,
+              0.03
+            ],
+            "text" : "1,000"
+          }
+        ]
+      },
+      "name" : "rows-top-to-bottom-left-to-right"
+    },
+    {
+      "expected" : [
+        "x"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "  "
+          },
+          {
+            "box" : [
+              0.3,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "\t"
+          },
+          {
+            "box" : [
+              0.5,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "x"
+          }
+        ]
+      },
+      "name" : "blank-boxes-dropped"
+    },
+    {
+      "expected" : [
+        "\n x"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "\n"
+          },
+          {
+            "box" : [
+              0.5,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "x"
+          }
+        ]
+      },
+      "name" : "newline-box-kept"
+    },
+    {
+      "expected" : [
+        "a",
+        "c",
+        "b"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.03
+            ],
+            "text" : "a"
+          },
+          {
+            "box" : [
+              0.1,
+              0.86,
+              0.2,
+              0.03
+            ],
+            "text" : "b"
+          },
+          {
+            "box" : [
+              0.5,
+              0.885,
+              0.2,
+              0.03
+            ],
+            "text" : "c"
+          }
+        ]
+      },
+      "name" : "tilted-row-joins-nearest"
+    },
+    {
+      "expected" : [
+        "b",
+        "a"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.04
+            ],
+            "text" : "a"
+          },
+          {
+            "box" : [
+              0.5,
+              0.92,
+              0.2,
+              0.04
+            ],
+            "text" : "b"
+          }
+        ]
+      },
+      "name" : "half-height-apart-is-new-line"
+    },
+    {
+      "expected" : [
+        "a b"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.04
+            ],
+            "text" : "a"
+          },
+          {
+            "box" : [
+              0.5,
+              0.919,
+              0.2,
+              0.04
+            ],
+            "text" : "b"
+          }
+        ]
+      },
+      "name" : "just-inside-half-height"
+    },
+    {
+      "expected" : [
+        "big",
+        "tiny"
+      ],
+      "input" : {
+        "boxes" : [
+          {
+            "box" : [
+              0.1,
+              0.9,
+              0.2,
+              0.08
+            ],
+            "text" : "big"
+          },
+          {
+            "box" : [
+              0.5,
+              0.912,
+              0.2,
+              0.02
+            ],
+            "text" : "tiny"
+          }
+        ]
+      },
+      "name" : "small-text-uses-smaller-height"
+    },
+    {
+      "expected" : [
+
+      ],
+      "input" : {
+        "boxes" : [
+
+        ]
+      },
+      "name" : "empty"
+    }
+  ],
+  "kind" : "ScreenshotImport.lines"
+}

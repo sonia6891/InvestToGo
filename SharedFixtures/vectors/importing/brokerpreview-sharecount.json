@@ -1,0 +1,110 @@
+{
+  "cases" : [
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1000"
+      },
+      "name" : "1000"
+    },
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1,000"
+      },
+      "name" : "1,000"
+    },
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1,000股"
+      },
+      "name" : "1,000股"
+    },
+    {
+      "expected" : 2000,
+      "input" : {
+        "text" : "2張"
+      },
+      "name" : "2張"
+    },
+    {
+      "expected" : 3000,
+      "input" : {
+        "text" : " 3張 "
+      },
+      "name" : " 3張 "
+    },
+    {
+      "expected" : 1500,
+      "input" : {
+        "text" : "1.5張"
+      },
+      "name" : "1.5張"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "張"
+      },
+      "name" : "張"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
+      },
+      "name" : "abc"
+    },
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1 000"
+      },
+      "name" : "1 000"
+    },
+    {
+      "expected" : -2,
+      "input" : {
+        "text" : "-2"
+      },
+      "name" : "-2"
+    },
+    {
+      "expected" : 1000,
+      "input" : {
+        "text" : "1e3"
+      },
+      "name" : "1e3"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "２張"
+      },
+      "name" : "２張"
+    },
+    {
+      "expected" : "nan",
+      "input" : {
+        "text" : "nan"
+      },
+      "name" : "nan"
+    },
+    {
+      "expected" : 2000,
+      "input" : {
+        "text" : "2 張"
+      },
+      "name" : "2 張"
+    }
+  ],
+  "kind" : "BrokerPreview.shareCount"
+}

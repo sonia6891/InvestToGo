@@ -1,0 +1,61 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "at" : "2026-11-23T09:00:00+08:00"
+      },
+      "name" : "monday-open"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "at" : "2026-11-23T08:54:00+08:00"
+      },
+      "name" : "before-open"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "at" : "2026-11-23T08:55:00+08:00"
+      },
+      "name" : "at-open"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "at" : "2026-11-23T13:40:00+08:00"
+      },
+      "name" : "at-close"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "at" : "2026-11-23T13:41:00+08:00"
+      },
+      "name" : "after-close"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "at" : "2026-11-21T10:00:00+08:00"
+      },
+      "name" : "saturday"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "at" : "2026-11-22T10:00:00+08:00"
+      },
+      "name" : "sunday"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "at" : "2026-11-27T01:00:00Z"
+      },
+      "name" : "friday-utc"
+    }
+  ],
+  "kind" : "TaiwanMarket.isOpen"
+}

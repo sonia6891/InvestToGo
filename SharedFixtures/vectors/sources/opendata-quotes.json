@@ -1,0 +1,134 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "0050" : {
+          "change" : 2.25,
+          "changePercent" : 2.31,
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "fetchedAt" : 1794288600,
+          "high" : 100.5,
+          "low" : 97.8,
+          "open" : 99.55,
+          "price" : 99.7,
+          "source" : "收盤",
+          "symbol" : "0050",
+          "trial" : null,
+          "volume" : 192801
+        },
+        "00411A" : {
+          "change" : 0.16,
+          "changePercent" : 1.75,
+          "currency" : "TWD",
+          "date" : "2026-11-11",
+          "fetchedAt" : 1794375000,
+          "high" : 9.28,
+          "low" : 9.12,
+          "open" : 9.13,
+          "price" : 9.28,
+          "source" : "收盤",
+          "symbol" : "00411A",
+          "trial" : null,
+          "volume" : 6863
+        },
+        "00635U" : {
+          "change" : -0.02,
+          "changePercent" : -0.05,
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "fetchedAt" : 1794288600,
+          "high" : 42.49,
+          "low" : 42.17,
+          "open" : 42.45,
+          "price" : 42.31,
+          "source" : "收盤",
+          "symbol" : "00635U",
+          "trial" : null,
+          "volume" : 2052
+        },
+        "00636K" : {
+          "change" : 0.01,
+          "changePercent" : 0.13,
+          "currency" : "UNKNOWN",
+          "date" : "2026-11-10",
+          "fetchedAt" : 1794288600,
+          "high" : 7.71,
+          "low" : 7.71,
+          "open" : 7.71,
+          "price" : 7.71,
+          "source" : "收盤",
+          "symbol" : "00636K",
+          "trial" : null,
+          "volume" : 0
+        },
+        "00679B" : {
+          "change" : -0.37,
+          "changePercent" : -1.38,
+          "currency" : "TWD",
+          "date" : "2026-11-11",
+          "fetchedAt" : 1794375000,
+          "high" : 26.51,
+          "low" : 26.38,
+          "open" : 26.48,
+          "price" : 26.39,
+          "source" : "收盤",
+          "symbol" : "00679B",
+          "trial" : null,
+          "volume" : 20036
+        },
+        "00687C" : {
+          "change" : -0.12,
+          "changePercent" : -1.31,
+          "currency" : "UNKNOWN",
+          "date" : "2026-11-11",
+          "fetchedAt" : 1794375000,
+          "high" : 9.01,
+          "low" : 9,
+          "open" : 9,
+          "price" : 9.01,
+          "source" : "收盤",
+          "symbol" : "00687C",
+          "trial" : null,
+          "volume" : 38
+        },
+        "00878" : {
+          "change" : 0.18,
+          "changePercent" : 0.55,
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "fetchedAt" : 1794288600,
+          "high" : 33.57,
+          "low" : 32.77,
+          "open" : 33.3,
+          "price" : 32.95,
+          "source" : "收盤",
+          "symbol" : "00878",
+          "trial" : null,
+          "volume" : 77407
+        },
+        "2330" : {
+          "change" : 50,
+          "changePercent" : 2.24,
+          "currency" : "TWD",
+          "date" : "2026-11-10",
+          "fetchedAt" : 1794288600,
+          "high" : 2285,
+          "low" : 2230,
+          "open" : 2265,
+          "price" : 2285,
+          "source" : "收盤",
+          "symbol" : "2330",
+          "trial" : null,
+          "volume" : 36576
+        }
+      },
+      "input" : {
+        "tpex" : "official/tpex-daily-close.json",
+        "twse" : "official/twse-stock-day-all.json"
+      },
+      "name" : "both-fixtures"
+    }
+  ],
+  "kind" : "OpenData.quotes"
+}

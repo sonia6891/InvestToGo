@@ -1,0 +1,47 @@
+{
+  "cases" : [
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026/11/13\",\"fundPerNav\":\"33.51\"},\"returnCode\":\"2000\",\"success\":true}"
+      },
+      "name" : "real"
+    },
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026-11-13T00:00:00\"}}"
+      },
+      "name" : "with-time"
+    },
+    {
+      "expected" : "2026-11-13",
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"2026/11/13 08:00\"}}"
+      },
+      "name" : "with-space-time"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "{\"result\":{\"preDate\":\"\"}}"
+      },
+      "name" : "blank"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "{\"result\":null,\"returnCode\":\"9999\",\"success\":false}"
+      },
+      "name" : "null-result"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "oops"
+      },
+      "name" : "not-json"
+    }
+  ],
+  "kind" : "IssuerHoldings.cathayAssetsDate"
+}

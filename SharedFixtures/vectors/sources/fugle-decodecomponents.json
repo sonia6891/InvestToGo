@@ -1,0 +1,79 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 56.5
+          },
+          {
+            "name" : null,
+            "symbol" : "2317",
+            "weight" : 4.2
+          }
+        ],
+        "date" : "2026-11-11",
+        "source" : "富果／投信揭露資料",
+        "symbol" : "0050"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"data\":[{\"date\":\"2026-11-10\",\"components\":[{\"symbol\":\"2330\",\"name\":\"台積電\",\"weight\":55}]},{\"date\":\"2026-11-11\",\"components\":[{\"symbol\":\"2330\",\"name\":\"台積電\",\"weight\":56.5},{\"symbol\":\"2317\",\"weight\":4.2}]}]}"
+      },
+      "name" : "latest-day"
+    },
+    {
+      "expected" : {
+        "error" : "此區間沒有股票成分資料；債券、期貨或部分外幣級別可能沒有此資料，不能視為零重疊。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0056\",\"data\":[{\"date\":\"2026-11-11\",\"components\":[{\"symbol\":\"2330\",\"weight\":5}]}]}"
+      },
+      "name" : "wrong-symbol"
+    },
+    {
+      "expected" : {
+        "error" : "此區間沒有股票成分資料；債券、期貨或部分外幣級別可能沒有此資料，不能視為零重疊。"
+      },
+      "input" : {
+        "symbol" : "00679B",
+        "text" : "{\"symbol\":\"00679B\",\"data\":[{\"date\":\"2026-11-11\",\"components\":[]}]}"
+      },
+      "name" : "no-components"
+    },
+    {
+      "expected" : {
+        "error" : "此區間沒有股票成分資料；債券、期貨或部分外幣級別可能沒有此資料，不能視為零重疊。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"data\":[]}"
+      },
+      "name" : "no-days"
+    },
+    {
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"data\":[{\"date\":\"2026-11-11\",\"components\":[{\"symbol\":\"2330\",\"weight\":150}]}]}"
+      },
+      "name" : "bad-weight"
+    },
+    {
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "oops"
+      },
+      "name" : "not-json"
+    }
+  ],
+  "kind" : "Fugle.decodeComponents"
+}

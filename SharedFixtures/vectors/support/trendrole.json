@@ -1,0 +1,45 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "colorName" : "red",
+        "role" : "up"
+      },
+      "input" : {
+        "value" : 0.01
+      },
+      "name" : "up"
+    },
+    {
+      "expected" : {
+        "colorName" : "green",
+        "role" : "down"
+      },
+      "input" : {
+        "value" : -0.01
+      },
+      "name" : "down"
+    },
+    {
+      "expected" : {
+        "colorName" : "muted",
+        "role" : "flat"
+      },
+      "input" : {
+        "value" : 0
+      },
+      "name" : "flat"
+    },
+    {
+      "expected" : {
+        "colorName" : "green",
+        "role" : "down"
+      },
+      "input" : {
+        "value" : -1e-12
+      },
+      "name" : "tiny-negative"
+    }
+  ],
+  "kind" : "TrendRole.init"
+}

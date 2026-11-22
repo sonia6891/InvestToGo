@@ -29,17 +29,19 @@ struct OfficialDividends: Codable {
     /// The day the record starts; nil for a record kept from before, which held data read from the TWSE website.
     var since: String? { sources["since"] }
     /// Whether the record covers the past year, so counts and sums over it are whole.
-    var coversYear: Bool { (since ?? "9999") <= DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()) }
+    var coversYear: Bool { coversYear(at: Date()) }
+    /// `coversYear` as of `now`.
+    func coversYear(at now: Date) -> Bool { (since ?? "9999") <= DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: now) ?? now) }
     /// Sum of announced amounts per unit with an ex-dividend date in the past year; nil until the record covers it.
-    func trailingAmount(_ symbol: String) -> Double? {
-        guard coversYear else { return nil }
-        let from = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()), today = DataChecks.day()
+    func trailingAmount(_ symbol: String, now: Date = Date()) -> Double? {
+        guard coversYear(at: now) else { return nil }
+        let from = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: now) ?? now), today = DataChecks.day(now)
         let items = list(symbol).filter { $0.ex > from && $0.ex <= today && ($0.amount ?? 0) > 0 }
         return items.isEmpty ? nil : items.reduce(0) { $0 + ($1.amount ?? 0) }
     }
     /// Distribution frequency from the number of ex-dividend dates in the past year.
-    static func frequency(of list: [OfficialDistribution]) -> String? {
-        let from = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: Date()) ?? Date()), today = DataChecks.day()
+    static func frequency(of list: [OfficialDistribution], now: Date = Date()) -> String? {
+        let from = DataChecks.day(Calendar.current.date(byAdding: .year, value: -1, to: now) ?? now), today = DataChecks.day(now)
         let n = list.filter { $0.ex > from && $0.ex <= today }.count
         switch n {
         case 9...: return "月配"
@@ -83,15 +85,15 @@ struct OfficialDividends: Codable {
     /// Adds announcements to the known ones: a known ex-dividend day keeps its payment day, and its amount until the
     /// notice sets one. With `frequency`, once the record covers the past year, every ETF's label is worked out again
     /// from the whole record (an ETF with no new announcement still gets one, and a changed rhythm is relabelled).
-    func merging(_ fresh: [String: [OfficialDistribution]], frequency: Bool) -> OfficialDividends {
+    func merging(_ fresh: [String: [OfficialDistribution]], frequency: Bool, now: Date = Date()) -> OfficialDividends {
         var next = self
         for (symbol, items) in fresh {
             var byDay = Dictionary(list(symbol).map { ($0.ex, $0) }, uniquingKeysWith: { first, _ in first })
             for item in items { byDay[item.ex] = OfficialDistribution(ex: item.ex, pay: byDay[item.ex]?.pay ?? "", amount: item.amount ?? byDay[item.ex]?.amount) }
             next.events[symbol] = byDay.values.sorted { $0.ex > $1.ex }
         }
-        if frequency, coversYear {
-            for (symbol, items) in next.events { next.freq[symbol] = Self.frequency(of: items) }
+        if frequency, coversYear(at: now) {
+            for (symbol, items) in next.events { next.freq[symbol] = Self.frequency(of: items, now: now) }
         }
         return next
     }

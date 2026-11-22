@@ -1,0 +1,197 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "good"
+    },
+    {
+      "expected" : {
+        "error" : "總費用率須附統計年度，且數值應為 0～100%。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "rate-without-year"
+    },
+    {
+      "expected" : {
+        "error" : "費用年度與總費用率須一起填寫。"
+      },
+      "input" : {
+        "fee" : {
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "year-without-rate"
+    },
+    {
+      "expected" : {
+        "error" : "參考網址須為 https 開頭。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "javascript:alert(1)",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "javascript-url"
+    },
+    {
+      "expected" : {
+        "error" : "參考網址須為 https 開頭。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "http://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "http-url"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "no-url"
+    },
+    {
+      "expected" : {
+        "error" : "參考網址須為 https 開頭。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://a:b@example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "user-in-url"
+    },
+    {
+      "expected" : {
+        "error" : "總費用率須附統計年度，且數值應為 0～100%。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 1989,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "year-1989"
+    },
+    {
+      "expected" : {
+        "error" : "請填寫費率級距及有效日期。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2099-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "future-date"
+    },
+    {
+      "expected" : {
+        "error" : "請填寫費率級距及有效日期。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 0.2,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "empty-management"
+    },
+    {
+      "expected" : {
+        "error" : "總費用率須附統計年度，且數值應為 0～100%。"
+      },
+      "input" : {
+        "fee" : {
+          "annualExpensePercent" : 101,
+          "custody" : "級距費率",
+          "effectiveDate" : "2026-01-01",
+          "expenseYear" : 2025,
+          "management" : "級距費率",
+          "note" : "",
+          "sourceURL" : "https://example.com",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "rate-over-100"
+    }
+  ],
+  "kind" : "FeeRecord.validate"
+}

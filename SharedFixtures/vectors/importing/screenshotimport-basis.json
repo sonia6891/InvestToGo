@@ -1,0 +1,67 @@
+{
+  "cases" : [
+    {
+      "expected" : "total",
+      "input" : {
+        "cost" : 17350,
+        "price" : 17.5,
+        "shares" : 1000
+      },
+      "name" : "total"
+    },
+    {
+      "expected" : "perShare",
+      "input" : {
+        "cost" : 17.35,
+        "price" : 17.5,
+        "shares" : 1000
+      },
+      "name" : "per-share"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "cost" : 3,
+        "price" : 17.5,
+        "shares" : 1000
+      },
+      "name" : "neither"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "shares" : 1000
+      },
+      "name" : "no-price"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "price" : 0,
+        "shares" : 1000
+      },
+      "name" : "zero-price"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "cost" : 17.35,
+        "price" : 17.5,
+        "shares" : 0
+      },
+      "name" : "zero-shares"
+    },
+    {
+      "expected" : "total",
+      "input" : {
+        "cost" : 17,
+        "price" : 17.5,
+        "shares" : 1
+      },
+      "name" : "one-share-total-first"
+    }
+  ],
+  "kind" : "ScreenshotImport.basis"
+}

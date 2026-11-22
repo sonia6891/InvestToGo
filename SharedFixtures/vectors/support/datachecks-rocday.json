@@ -1,0 +1,89 @@
+{
+  "cases" : [
+    {
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "1151110"
+      },
+      "name" : "roc-seven"
+    },
+    {
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "115/11/10"
+      },
+      "name" : "roc-slashes"
+    },
+    {
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "20261110"
+      },
+      "name" : "western-eight"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "1150230"
+      },
+      "name" : "roc-feb-30"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "11511"
+      },
+      "name" : "too-short"
+    },
+    {
+      "expected" : "2028-02-29",
+      "input" : {
+        "text" : "1170229"
+      },
+      "name" : "roc-leap-day"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "1150229"
+      },
+      "name" : "roc-not-leap"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "１１５１１１０"
+      },
+      "name" : "fullwidth-digits"
+    },
+    {
+      "expected" : "2026-11-10",
+      "input" : {
+        "text" : "民國115年11月10日"
+      },
+      "name" : "chinese-around"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "115/11/10（一）"
+      },
+      "name" : "weekday-numeral-suffix"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "一一五1110"
+      },
+      "name" : "chinese-numeral-year"
+    }
+  ],
+  "kind" : "DataChecks.rocDay"
+}

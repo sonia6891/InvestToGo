@@ -1,0 +1,94 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 1,
+        "member" : false
+      },
+      "name" : "lv1-free"
+    },
+    {
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 4,
+        "member" : false
+      },
+      "name" : "lv4-free"
+    },
+    {
+      "expected" : [
+        "blackgold",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 5,
+        "member" : false
+      },
+      "name" : "lv5-free"
+    },
+    {
+      "expected" : [
+        "blackgold",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 9,
+        "member" : false
+      },
+      "name" : "lv9-free"
+    },
+    {
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 10,
+        "member" : false
+      },
+      "name" : "lv10-free"
+    },
+    {
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 40,
+        "member" : false
+      },
+      "name" : "lv40-free"
+    },
+    {
+      "expected" : [
+        "blackgold",
+        "voxel",
+        "stitch",
+        "sketch"
+      ],
+      "input" : {
+        "level" : 1,
+        "member" : true
+      },
+      "name" : "lv1-member"
+    },
+    {
+      "expected" : [
+        "blackgold"
+      ],
+      "input" : {
+        "level" : 0,
+        "member" : false
+      },
+      "name" : "lv0-free"
+    }
+  ],
+  "kind" : "Skins.isUnlocked"
+}

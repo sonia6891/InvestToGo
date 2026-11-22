@@ -1,0 +1,100 @@
+{
+  "cases" : [
+    {
+      "expected" : "平均成本 0.02 元，只有現價 17.50 元的 0.1%，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 0.017,
+        "price" : 17.5
+      },
+      "name" : "ported-far-under"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "average" : 17.35,
+        "price" : 17.5
+      },
+      "name" : "close"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "average" : 0.017
+      },
+      "name" : "no-price"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "average" : 0.017,
+        "price" : 0
+      },
+      "name" : "zero-price"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "average" : 0.3,
+        "price" : 1
+      },
+      "name" : "edge-low"
+    },
+    {
+      "expected" : "平均成本 0.30 元，只有現價 1.00 元的 30.0%，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 0.2999,
+        "price" : 1
+      },
+      "name" : "just-under"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "average" : 3,
+        "price" : 1
+      },
+      "name" : "edge-high"
+    },
+    {
+      "expected" : "平均成本 3.00 元，是現價 1.00 元的 3.0 倍，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 3.0001,
+        "price" : 1
+      },
+      "name" : "just-over"
+    },
+    {
+      "expected" : "平均成本 1,234.50 元，是現價 123.45 元的 10.0 倍，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 1234.5,
+        "price" : 123.45
+      },
+      "name" : "ten-times"
+    },
+    {
+      "expected" : "平均成本 0.25 元，只有現價 1.00 元的 25.0%，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 0.25,
+        "price" : 1
+      },
+      "name" : "rounds-half"
+    },
+    {
+      "expected" : "平均成本 0.01 元，只有現價 1.00 元的 1.2%，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 0.0125,
+        "price" : 1
+      },
+      "name" : "rounds-up"
+    },
+    {
+      "expected" : "平均成本 12.00 元，只有現價 1,234.57 元的 1.0%，請確認成本是每股價格還是總金額。",
+      "input" : {
+        "average" : 12,
+        "price" : 1234.567
+      },
+      "name" : "big-price"
+    }
+  ],
+  "kind" : "BrokerPreview.costWarning"
+}

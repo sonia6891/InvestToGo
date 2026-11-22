@@ -1,0 +1,105 @@
+{
+  "cases" : [
+    {
+      "expected" : 18464.55614635255,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "three-million-ten-years-6pct"
+    },
+    {
+      "expected" : 12953.354839288933,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 500000,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "with-existing-money"
+    },
+    {
+      "expected" : 25000,
+      "input" : {
+        "annualReturn" : 0,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "zero-return"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 4000000,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "already-there"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 0
+      },
+      "name" : "zero-years"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : -1
+      },
+      "name" : "negative-years"
+    },
+    {
+      "expected" : 17081.783544206482,
+      "input" : {
+        "annualReturn" : -1,
+        "current" : 0,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "negative-return"
+    },
+    {
+      "expected" : 318707.93097390624,
+      "input" : {
+        "annualReturn" : -99,
+        "current" : 100,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "minus-99"
+    },
+    {
+      "expected" : 1000000,
+      "input" : {
+        "annualReturn" : -100,
+        "current" : 0,
+        "target" : 1000000,
+        "years" : 5
+      },
+      "name" : "minus-100"
+    },
+    {
+      "expected" : 9488.792934582967,
+      "input" : {
+        "annualReturn" : 12,
+        "current" : 0,
+        "target" : 120000,
+        "years" : 1
+      },
+      "name" : "one-year"
+    }
+  ],
+  "kind" : "GoalPlanner.monthlyContribution"
+}

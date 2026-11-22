@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "holdings": [],
+  "dividends": [],
+  "favorites": [],
+  "quotes": {},
+  "game": {
+    "xp": 460,
+    "coins": 300,
+    "unlocked": {
+      "a": 1,
+      "b": 2
+    },
+    "lastAward": "futureEvent",
+    "habit": null
+  }
+}

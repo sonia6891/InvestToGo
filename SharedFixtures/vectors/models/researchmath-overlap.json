@@ -1,0 +1,107 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "left" : 50,
+          "name" : "台積電",
+          "right" : 48,
+          "symbol" : "2330"
+        },
+        {
+          "left" : 5,
+          "name" : "鴻海",
+          "right" : 6,
+          "symbol" : "2317"
+        },
+        {
+          "left" : 3,
+          "name" : "聯發科",
+          "right" : 4,
+          "symbol" : "2454"
+        }
+      ],
+      "input" : {
+        "left" : {
+          "components" : [
+            {
+              "name" : "台積電",
+              "symbol" : "2330",
+              "weight" : 50
+            },
+            {
+              "symbol" : "2317",
+              "weight" : 5
+            },
+            {
+              "name" : "聯發科",
+              "symbol" : "2454",
+              "weight" : 3
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "0050"
+        },
+        "right" : {
+          "components" : [
+            {
+              "symbol" : "2454",
+              "weight" : 4
+            },
+            {
+              "name" : "鴻海",
+              "symbol" : "2317",
+              "weight" : 6
+            },
+            {
+              "symbol" : "2330",
+              "weight" : 48
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "006208"
+        }
+      },
+      "name" : "three-shared"
+    },
+    {
+      "expected" : [
+
+      ],
+      "input" : {
+        "left" : {
+          "components" : [
+            {
+              "name" : "台積電",
+              "symbol" : "2330",
+              "weight" : 50
+            },
+            {
+              "symbol" : "2317",
+              "weight" : 5
+            },
+            {
+              "name" : "聯發科",
+              "symbol" : "2454",
+              "weight" : 3
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "0050"
+        },
+        "right" : {
+          "components" : [
+            {
+              "symbol" : "T1",
+              "weight" : 100
+            }
+          ],
+          "date" : "2026-10-01",
+          "symbol" : "00679B"
+        }
+      },
+      "name" : "none-shared"
+    }
+  ],
+  "kind" : "ResearchMath.overlap"
+}

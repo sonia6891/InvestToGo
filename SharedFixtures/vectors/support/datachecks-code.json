@@ -1,0 +1,68 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "value" : "0050"
+      },
+      "name" : "plain"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "value" : "00679B"
+      },
+      "name" : "bond-suffix"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "value" : "006208"
+      },
+      "name" : "six-digits"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : "AAPL"
+      },
+      "name" : "letters"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : "005"
+      },
+      "name" : "three-digits"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : "00679b"
+      },
+      "name" : "lowercase-suffix"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : "0050000"
+      },
+      "name" : "seven-digits"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "value" : "00631LL"
+      },
+      "name" : "two-suffix-letters"
+    }
+  ],
+  "kind" : "DataChecks.code"
+}

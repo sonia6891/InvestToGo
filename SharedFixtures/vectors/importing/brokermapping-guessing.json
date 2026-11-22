@@ -1,0 +1,89 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "cost" : 3,
+        "lots" : false,
+        "name" : 1,
+        "shares" : 2,
+        "symbol" : 0,
+        "totalCost" : true
+      },
+      "input" : {
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "plain"
+    },
+    {
+      "expected" : {
+        "cost" : 3,
+        "lots" : false,
+        "name" : 1,
+        "shares" : 2,
+        "symbol" : 0,
+        "totalCost" : true
+      },
+      "input" : {
+        "file" : "vectors/importing/csv/cathay.csv"
+      },
+      "name" : "cathay"
+    },
+    {
+      "expected" : {
+        "cost" : 3,
+        "lots" : false,
+        "name" : 1,
+        "shares" : 2,
+        "symbol" : 0,
+        "totalCost" : true
+      },
+      "input" : {
+        "text" : "Symbol,Name,Quantity,Cost\n0050,x,1,1\n"
+      },
+      "name" : "english"
+    },
+    {
+      "expected" : {
+        "cost" : 3,
+        "lots" : false,
+        "name" : -1,
+        "shares" : 2,
+        "symbol" : 1,
+        "totalCost" : true
+      },
+      "input" : {
+        "text" : "成本,代號,數量,總成本\n1,0050,1,1\n"
+      },
+      "name" : "total-beats-plain-cost"
+    },
+    {
+      "expected" : {
+        "cost" : -1,
+        "lots" : false,
+        "name" : -1,
+        "shares" : -1,
+        "symbol" : -1,
+        "totalCost" : true
+      },
+      "input" : {
+        "text" : "日期,金額\n1,2\n"
+      },
+      "name" : "missing-columns"
+    },
+    {
+      "expected" : {
+        "cost" : 5,
+        "lots" : false,
+        "name" : -1,
+        "shares" : 2,
+        "symbol" : 0,
+        "totalCost" : true
+      },
+      "input" : {
+        "text" : "代碼,代號,股數,庫存股數,成本,總成本\n0050,0050,1,1,1,1\n"
+      },
+      "name" : "first-match-wins"
+    }
+  ],
+  "kind" : "BrokerMapping.guessing"
+}

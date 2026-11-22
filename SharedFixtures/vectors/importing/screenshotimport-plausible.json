@@ -1,0 +1,53 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "average" : 0.3,
+        "price" : 1
+      },
+      "name" : "low-edge"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "average" : 0.29,
+        "price" : 1
+      },
+      "name" : "under"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "average" : 3,
+        "price" : 1
+      },
+      "name" : "high-edge"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "average" : 3.01,
+        "price" : 1
+      },
+      "name" : "over"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "average" : 17.35,
+        "price" : 17.5
+      },
+      "name" : "middle"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "average" : 0.6,
+        "price" : 2
+      },
+      "name" : "float-edge"
+    }
+  ],
+  "kind" : "ScreenshotImport.plausible"
+}

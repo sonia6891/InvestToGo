@@ -1,0 +1,43 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "splits" : "https://www.twse.com.tw/rwd/zh/split/TWTCAU?startDate=20250101&endDate=20251231&response=json",
+        "tpexDividends" : "https://www.tpex.org.tw/www/zh-tw/bulletin/exDailyQ?startDate=2025/01/01&endDate=2025/12/31&response=json",
+        "tpexMonth" : "https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?code=0050&date=2025/06/01&response=json",
+        "twseDividends" : "https://www.twse.com.tw/rwd/zh/exRight/TWT49U?startDate=20250101&endDate=20251231&response=json",
+        "twseMonth" : "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=20250601&stockNo=0050&response=json"
+      },
+      "input" : {
+        "from" : "2025-01-01T00:00:00+08:00",
+        "month" : {
+          "month" : 6,
+          "year" : 2025
+        },
+        "symbol" : "0050",
+        "to" : "2025-12-31T23:59:00+08:00"
+      },
+      "name" : "june"
+    },
+    {
+      "expected" : {
+        "splits" : "https://www.twse.com.tw/rwd/zh/split/TWTCAU?startDate=20260101&endDate=20261122&response=json",
+        "tpexDividends" : "https://www.tpex.org.tw/www/zh-tw/bulletin/exDailyQ?startDate=2026/01/01&endDate=2026/11/22&response=json",
+        "tpexMonth" : "https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock?code=00679B&date=2026/11/01&response=json",
+        "twseDividends" : "https://www.twse.com.tw/rwd/zh/exRight/TWT49U?startDate=20260101&endDate=20261122&response=json",
+        "twseMonth" : "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY?date=20261101&stockNo=00679B&response=json"
+      },
+      "input" : {
+        "from" : "2025-12-31T16:30:00Z",
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        },
+        "symbol" : "00679B",
+        "to" : "2026-11-21T20:00:00Z"
+      },
+      "name" : "taipei-day-not-utc"
+    }
+  ],
+  "kind" : "OfficialHistory.urls"
+}

@@ -1,0 +1,135 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "comingSoon" : false,
+          "goal" : 6,
+          "id" : "dividendStreak",
+          "title" : "連續領息"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 1,
+          "id" : "holdingAnniversary",
+          "title" : "持有週年紀念"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 12,
+          "id" : "dcaPunchCard",
+          "title" : "定期定額打卡"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 1,
+          "id" : "steadyYear",
+          "title" : "一年不亂動"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 5,
+          "id" : "reconcileMaster",
+          "title" : "對帳達人"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 3,
+          "id" : "feeSaver",
+          "title" : "省費達人"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 10,
+          "id" : "dexCollector",
+          "title" : "ETF 圖鑑"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 12,
+          "id" : "dividendMilestone",
+          "title" : "累計領息里程碑"
+        }
+      ],
+      "input" : {
+        "upcoming" : false
+      },
+      "name" : "hidden"
+    },
+    {
+      "expected" : [
+        {
+          "comingSoon" : false,
+          "goal" : 6,
+          "id" : "dividendStreak",
+          "title" : "連續領息"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 1,
+          "id" : "holdingAnniversary",
+          "title" : "持有週年紀念"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 12,
+          "id" : "dcaPunchCard",
+          "title" : "定期定額打卡"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 1,
+          "id" : "steadyYear",
+          "title" : "一年不亂動"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 5,
+          "id" : "reconcileMaster",
+          "title" : "對帳達人"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 3,
+          "id" : "feeSaver",
+          "title" : "省費達人"
+        },
+        {
+          "comingSoon" : true,
+          "goal" : 1,
+          "id" : "checkupDone",
+          "title" : "體檢完成"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 10,
+          "id" : "dexCollector",
+          "title" : "ETF 圖鑑"
+        },
+        {
+          "comingSoon" : true,
+          "goal" : 1,
+          "id" : "exDividendSkin",
+          "title" : "除息季限定外觀主題"
+        },
+        {
+          "comingSoon" : true,
+          "goal" : 1,
+          "id" : "yearReport",
+          "title" : "口袋年報"
+        },
+        {
+          "comingSoon" : false,
+          "goal" : 12,
+          "id" : "dividendMilestone",
+          "title" : "累計領息里程碑"
+        }
+      ],
+      "input" : {
+        "upcoming" : true
+      },
+      "name" : "visible"
+    }
+  ],
+  "kind" : "Achievements.shown"
+}

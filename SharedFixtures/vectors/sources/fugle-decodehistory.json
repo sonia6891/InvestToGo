@@ -1,0 +1,72 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "close" : 99.7,
+          "date" : "2026-11-10"
+        },
+        {
+          "close" : 100.2,
+          "date" : "2026-11-11"
+        }
+      ],
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"D\",\"data\":[{\"date\":\"2026-11-10\",\"close\":99.7},{\"date\":\"2026-11-11\",\"close\":100.2,\"volume\":5}]}"
+      },
+      "name" : "adjusted-daily"
+    },
+    {
+      "expected" : {
+        "error" : "行情服務未確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"adjusted\":false,\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name" : "not-adjusted"
+    },
+    {
+      "expected" : {
+        "error" : "行情服務未確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name" : "adjusted-missing"
+    },
+    {
+      "expected" : {
+        "error" : "行情服務未確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"W\",\"data\":[]}"
+      },
+      "name" : "weekly"
+    },
+    {
+      "expected" : {
+        "error" : "行情服務未確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0056\",\"adjusted\":true,\"timeframe\":\"D\",\"data\":[]}"
+      },
+      "name" : "wrong-symbol"
+    },
+    {
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"symbol\":\"0050\",\"adjusted\":true,\"timeframe\":\"D\"}"
+      },
+      "name" : "missing-data"
+    }
+  ],
+  "kind" : "Fugle.decodeHistory"
+}

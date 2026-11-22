@@ -1,0 +1,68 @@
+{
+  "cases" : [
+    {
+      "expected" : 0.003,
+      "input" : {
+        "bond" : false,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "stock" : true
+      },
+      "name" : "stock"
+    },
+    {
+      "expected" : 0.003,
+      "input" : {
+        "bond" : true,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "stock" : true
+      },
+      "name" : "stock-and-bond"
+    },
+    {
+      "expected" : 0.001,
+      "input" : {
+        "bond" : false,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "stock" : false
+      },
+      "name" : "etf"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "bond" : true,
+        "on" : "2026-10-17T12:00:00+08:00",
+        "stock" : false
+      },
+      "name" : "bond-2026"
+    },
+    {
+      "expected" : 0.001,
+      "input" : {
+        "bond" : true,
+        "on" : "2027-01-02T12:00:00+08:00",
+        "stock" : false
+      },
+      "name" : "bond-2027"
+    },
+    {
+      "expected" : 0.001,
+      "input" : {
+        "bond" : true,
+        "on" : "2027-01-01T00:00:00+08:00",
+        "stock" : false
+      },
+      "name" : "bond-boundary"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "bond" : true,
+        "on" : "2026-12-31T15:59:59+00:00",
+        "stock" : false
+      },
+      "name" : "bond-boundary-minus"
+    }
+  ],
+  "kind" : "SellCosts.taxRate"
+}

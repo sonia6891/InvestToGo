@@ -1,0 +1,33 @@
+{
+  "cases" : [
+    {
+      "expected" : "aB+/c9==",
+      "input" : {
+        "text" : "{\"ResultCode\":0,\"ResultMsg\":\"\",\"Data\":{\"token\":\" aB+/c9== \"}}"
+      },
+      "name" : "trimmed"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "{\"ResultCode\":0,\"Data\":{\"token\":\"\"}}"
+      },
+      "name" : "blank"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "{\"ResultCode\":1,\"Data\":null}"
+      },
+      "name" : "null-data"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "<html>"
+      },
+      "name" : "html"
+    }
+  ],
+  "kind" : "IssuerHoldings.ctbcToken"
+}

@@ -1,0 +1,26 @@
+name: Record shared vectors
+# Swift is the reference for SharedFixtures/vectors. This fills every case's `expected` from PocketCore on Linux and
+# hands the folder back as the `vectors` artifact; it never pushes. (workflow_dispatch only works for workflows on the
+# default branch, so it also runs on pushes to feature branches that touch the vectors or PocketCore's tests.)
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths:
+      - SharedFixtures/vectors/**
+      - PocketCore/**
+      - .github/workflows/record-vectors.yml
+permissions:
+  contents: read
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record vectors from Swift
+        run: RECORD_VECTORS=1 swift test --package-path PocketCore --filter VectorTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vectors
+          path: SharedFixtures/vectors

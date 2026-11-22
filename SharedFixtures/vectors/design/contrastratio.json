@@ -1,0 +1,45 @@
+{
+  "cases" : [
+    {
+      "expected" : 21,
+      "input" : {
+        "a" : 16777215,
+        "b" : 0
+      },
+      "name" : "white-black"
+    },
+    {
+      "expected" : 1,
+      "input" : {
+        "a" : 8421504,
+        "b" : 8421504
+      },
+      "name" : "same"
+    },
+    {
+      "expected" : 9.519164923565752,
+      "input" : {
+        "a" : 15906354,
+        "b" : 1710621
+      },
+      "name" : "gold-page"
+    },
+    {
+      "expected" : 19.79814571052481,
+      "input" : {
+        "a" : 657930,
+        "b" : 16777215
+      },
+      "name" : "dark-channel"
+    },
+    {
+      "expected" : 15.374268784354154,
+      "input" : {
+        "a" : 1710621,
+        "b" : 16052712
+      },
+      "name" : "order"
+    }
+  ],
+  "kind" : "contrastRatio"
+}

@@ -1,0 +1,245 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        "dcaLogged",
+        "reconciled",
+        "dividendsViewed"
+      ],
+      "input" : {
+        "habit" : "dca",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "dca-2026-11"
+    },
+    {
+      "expected" : [
+        "firstPlanSet",
+        "firstDexCard",
+        "dcaLogged"
+      ],
+      "input" : {
+        "habit" : "dca",
+        "isNewbie" : true,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "dca-2026-11-newbie"
+    },
+    {
+      "expected" : [
+        "dcaLogged",
+        "dividendsViewed",
+        "newETFResearched"
+      ],
+      "input" : {
+        "habit" : "dca",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 12,
+          "year" : 2026
+        }
+      },
+      "name" : "dca-2026-12"
+    },
+    {
+      "expected" : [
+        "dcaLogged",
+        "newETFResearched",
+        "reminderSet"
+      ],
+      "input" : {
+        "habit" : "dca",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 1,
+          "year" : 2027
+        }
+      },
+      "name" : "dca-2027-01"
+    },
+    {
+      "expected" : [
+        "dcaLogged",
+        "reminderSet",
+        "reconciled"
+      ],
+      "input" : {
+        "habit" : "dca",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 2,
+          "year" : 2027
+        }
+      },
+      "name" : "dca-2027-02"
+    },
+    {
+      "expected" : [
+        "dividendsViewed",
+        "reconciled",
+        "dcaLogged"
+      ],
+      "input" : {
+        "habit" : "dividends",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "dividends-2026-11"
+    },
+    {
+      "expected" : [
+        "firstPlanSet",
+        "firstDexCard",
+        "dividendsViewed"
+      ],
+      "input" : {
+        "habit" : "dividends",
+        "isNewbie" : true,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "dividends-2026-11-newbie"
+    },
+    {
+      "expected" : [
+        "dividendsViewed",
+        "dcaLogged",
+        "newETFResearched"
+      ],
+      "input" : {
+        "habit" : "dividends",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 12,
+          "year" : 2026
+        }
+      },
+      "name" : "dividends-2026-12"
+    },
+    {
+      "expected" : [
+        "dividendsViewed",
+        "newETFResearched",
+        "reminderSet"
+      ],
+      "input" : {
+        "habit" : "dividends",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 1,
+          "year" : 2027
+        }
+      },
+      "name" : "dividends-2027-01"
+    },
+    {
+      "expected" : [
+        "dividendsViewed",
+        "reminderSet",
+        "reconciled"
+      ],
+      "input" : {
+        "habit" : "dividends",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 2,
+          "year" : 2027
+        }
+      },
+      "name" : "dividends-2027-02"
+    },
+    {
+      "expected" : [
+        "newETFResearched",
+        "reconciled",
+        "dcaLogged"
+      ],
+      "input" : {
+        "habit" : "savingGoal",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "savingGoal-2026-11"
+    },
+    {
+      "expected" : [
+        "firstPlanSet",
+        "firstDexCard",
+        "newETFResearched"
+      ],
+      "input" : {
+        "habit" : "savingGoal",
+        "isNewbie" : true,
+        "month" : {
+          "month" : 11,
+          "year" : 2026
+        }
+      },
+      "name" : "savingGoal-2026-11-newbie"
+    },
+    {
+      "expected" : [
+        "newETFResearched",
+        "dcaLogged",
+        "dividendsViewed"
+      ],
+      "input" : {
+        "habit" : "savingGoal",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 12,
+          "year" : 2026
+        }
+      },
+      "name" : "savingGoal-2026-12"
+    },
+    {
+      "expected" : [
+        "newETFResearched",
+        "dividendsViewed",
+        "reminderSet"
+      ],
+      "input" : {
+        "habit" : "savingGoal",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 1,
+          "year" : 2027
+        }
+      },
+      "name" : "savingGoal-2027-01"
+    },
+    {
+      "expected" : [
+        "newETFResearched",
+        "reminderSet",
+        "reconciled"
+      ],
+      "input" : {
+        "habit" : "savingGoal",
+        "isNewbie" : false,
+        "month" : {
+          "month" : 2,
+          "year" : 2027
+        }
+      },
+      "name" : "savingGoal-2027-02"
+    }
+  ],
+  "kind" : "Quests.forMonth"
+}

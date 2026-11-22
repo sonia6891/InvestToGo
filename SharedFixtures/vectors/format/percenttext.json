@@ -1,0 +1,29 @@
+{
+  "kind": "format.percentText",
+  "cases": [
+    {
+      "name": "negative",
+      "input": {
+        "value": -1.5
+      },
+      "expected": "-1.5%"
+    },
+    {
+      "name": "positive",
+      "input": {
+        "value": 2.25
+      },
+      "expected": "+2.25%"
+    },
+    {
+      "name": "zero",
+      "input": {
+        "value": 0
+      },
+      "expected": "0%"
+    }
+  ],
+  "platforms": [
+    "kotlin"
+  ]
+}

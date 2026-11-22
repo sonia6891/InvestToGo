@@ -1,0 +1,40 @@
+{
+  "cases" : [
+    {
+      "expected" : 1794240000,
+      "input" : {
+        "text" : "2026-11-10"
+      },
+      "name" : "valid"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "2026-02-30"
+      },
+      "name" : "feb-30"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "2026-1-5"
+      },
+      "name" : "no-padding"
+    },
+    {
+      "expected" : 1835366400,
+      "input" : {
+        "text" : "2028-02-29"
+      },
+      "name" : "leap"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
+      },
+      "name" : "garbage"
+    }
+  ],
+  "kind" : "DataChecks.date"
+}

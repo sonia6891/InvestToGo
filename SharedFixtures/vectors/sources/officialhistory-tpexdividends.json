@@ -1,0 +1,59 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "cash" : 0.082,
+          "exDate" : "2025-01-22",
+          "symbol" : "00937B"
+        },
+        {
+          "cash" : 0.082,
+          "exDate" : "2025-02-18",
+          "symbol" : "00937B"
+        },
+        {
+          "cash" : 0.3,
+          "exDate" : "2025-02-21",
+          "symbol" : "00679B"
+        }
+      ],
+      "input" : {
+        "file" : "member/official/C_tpex_exDailyQ_2025_sample.json"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : {
+        "error" : "櫃買除權息資料格式不符（缺少 tables）"
+      },
+      "input" : {
+        "text" : "{\"stat\":\"ok\"}"
+      },
+      "name" : "no-tables"
+    },
+    {
+      "expected" : {
+        "error" : "櫃買除權息資料無法解析（1 列皆無效）"
+      },
+      "input" : {
+        "text" : "{\"tables\":[{\"fields\":[\"除權息日期\",\"代號\",\"現金股利\"],\"data\":[[\"bad\",\"1\",\"x\"]]}]}"
+      },
+      "name" : "all-rows-bad"
+    },
+    {
+      "expected" : [
+        {
+          "cash" : 0.5,
+          "exDate" : "2025-01-23",
+          "symbol" : "00679B"
+        }
+      ],
+      "input" : {
+        "text" : "{\"tables\":[{\"fields\":[\"除權息日期\",\"代號\",\"現金股利\"],\"data\":[[\"114/01/22\",\"00937B\",\"0.082\",\"extra\"],[\"114/01/23\",\" 00679B \",\"0.5\"]]}]}"
+      },
+      "name" : "wrong-cell-count"
+    }
+  ],
+  "kind" : "OfficialHistory.tpexDividends"
+}

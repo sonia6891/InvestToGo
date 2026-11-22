@@ -1,0 +1,96 @@
+{
+  "cases" : [
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "20261111"
+      },
+      "name" : "compact"
+    },
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026/11/11"
+      },
+      "name" : "slashes"
+    },
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026-11-11"
+      },
+      "name" : "dashes"
+    },
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : " 2026-11-11 "
+      },
+      "name" : "padded"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : "115/11/11"
+      },
+      "name" : "roc"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : "2026/13/01"
+      },
+      "name" : "bad-month"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : "abc"
+      },
+      "name" : "letters"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : null
+      },
+      "name" : "null"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : 20261111
+      },
+      "name" : "number"
+    },
+    {
+      "expected" : "2026-01-05",
+      "input" : {
+        "value" : "2026/1/5"
+      },
+      "name" : "short-parts"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : "２０２６-11-11"
+      },
+      "name" : "fullwidth"
+    },
+    {
+      "expected" : "2026-11-11",
+      "input" : {
+        "value" : "2026/11-11"
+      },
+      "name" : "mixed-separators"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "value" : "2026//11"
+      },
+      "name" : "empty-part"
+    }
+  ],
+  "kind" : "IssuerHoldings.day"
+}

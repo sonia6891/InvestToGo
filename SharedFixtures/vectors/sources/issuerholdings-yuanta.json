@@ -1,0 +1,104 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 58.7
+          },
+          {
+            "name" : "聯發科",
+            "symbol" : "2454",
+            "weight" : 5.88
+          },
+          {
+            "name" : "鴻海",
+            "symbol" : "2317",
+            "weight" : 2.96
+          }
+        ],
+        "date" : "2026-11-11",
+        "source" : "元大投信",
+        "symbol" : "0050"
+      },
+      "input" : {
+        "file" : "member/issuers/E_yuanta_PCF_Daily_0050.json",
+        "symbol" : "0050"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料與查詢的 ETF 不符（回應為 0050）"
+      },
+      "input" : {
+        "file" : "member/issuers/E_yuanta_PCF_Daily_0050.json",
+        "symbol" : "0056"
+      },
+      "name" : "wrong-fund"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料沒有股票成分"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"PCF\":{\"markcd\":\"0050\",\"trandate\":\"20261111\"},\"FundWeights\":{\"StockWeights\":[]}}"
+      },
+      "name" : "empty-weights"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料格式不符（缺少資料日期）"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"PCF\":{\"markcd\":\"0050\"},\"FundWeights\":{\"StockWeights\":[{\"code\":\"2330\",\"name\":\"台積電\",\"weights\":58.7}]}}"
+      },
+      "name" : "no-date"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料格式不符（缺少 PCF）"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{}"
+      },
+      "name" : "empty-object"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料格式不符（不是 JSON 物件）"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "[]"
+      },
+      "name" : "array"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料格式不符（不是 JSON 物件）"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "<html>維護中</html>"
+      },
+      "name" : "html"
+    },
+    {
+      "expected" : {
+        "error" : "元大投信持股資料格式不符（缺少 StockWeights）"
+      },
+      "input" : {
+        "symbol" : "0050",
+        "text" : "{\"PCF\":{\"markcd\":\"0050\",\"trandate\":\"20261111\"}}"
+      },
+      "name" : "no-weights-key"
+    }
+  ],
+  "kind" : "IssuerHoldings.yuanta"
+}

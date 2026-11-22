@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "holdings": [
+    {
+      "id": "5FEF0885-6A6B-555C-8BEC-451862548983",
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "shares": 2000,
+      "unitCost": 50,
+      "broker": "富邦證券",
+      "strategy": "存錢筒"
+    }
+  ],
+  "dividends": [
+    {
+      "id": "A1B2C3D4-0000-4000-8000-000000000001",
+      "symbol": "0050",
+      "date": 815184000,
+      "amount": 2400,
+      "status": "已入帳"
+    }
+  ],
+  "favorites": [
+    "0050",
+    "00878"
+  ],
+  "quotes": {
+    "0050": {
+      "symbol": "0050",
+      "price": 55.2,
+      "changePercent": 0.42,
+      "date": "2026-10-30",
+      "fetchedAt": 815100000
+    }
+  }
+}

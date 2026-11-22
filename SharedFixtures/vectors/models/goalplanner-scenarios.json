@@ -1,0 +1,57 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "annualReturn" : 9,
+          "monthly" : 15812.888955719727,
+          "scenario" : "樂觀"
+        },
+        {
+          "annualReturn" : 6,
+          "monthly" : 18464.55614635255,
+          "scenario" : "基準"
+        },
+        {
+          "annualReturn" : -1,
+          "monthly" : 26266.331104685076,
+          "scenario" : "保守"
+        }
+      ],
+      "input" : {
+        "annualReturn" : 6,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "six-percent"
+    },
+    {
+      "expected" : [
+        {
+          "annualReturn" : -92,
+          "monthly" : 569407.8722501559,
+          "scenario" : "樂觀"
+        },
+        {
+          "annualReturn" : -95,
+          "monthly" : 662766.5758367323,
+          "scenario" : "基準"
+        },
+        {
+          "annualReturn" : -99,
+          "monthly" : 956123.792826116,
+          "scenario" : "保守"
+        }
+      ],
+      "input" : {
+        "annualReturn" : -95,
+        "current" : 0,
+        "target" : 3000000,
+        "years" : 10
+      },
+      "name" : "clamped-at-minus-99"
+    }
+  ],
+  "kind" : "GoalPlanner.scenarios"
+}

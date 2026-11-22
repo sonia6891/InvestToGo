@@ -1,0 +1,84 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "鈊象電子",
+            "symbol" : "3293",
+            "weight" : 8.1
+          },
+          {
+            "name" : "長榮海運",
+            "symbol" : "2603",
+            "weight" : 7.79
+          },
+          {
+            "name" : "廣達電腦",
+            "symbol" : "2382",
+            "weight" : 6.4
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "中國信託投信",
+        "symbol" : "00934"
+      },
+      "input" : {
+        "file" : "member/issuers/E_ctbc_ETFHoldingWeight_00934.json",
+        "symbol" : "00934"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : {
+        "error" : "中國信託投信持股資料與查詢的 ETF 不符（回應為 00934）"
+      },
+      "input" : {
+        "file" : "member/issuers/E_ctbc_ETFHoldingWeight_00934.json",
+        "symbol" : "00882"
+      },
+      "name" : "wrong-fund"
+    },
+    {
+      "expected" : {
+        "error" : "中國信託投信持股資料回應異常：查無資料"
+      },
+      "input" : {
+        "symbol" : "00934",
+        "text" : "{\"ResultCode\":1,\"ResultMsg\":\"查無資料\",\"Data\":null}"
+      },
+      "name" : "error-body"
+    },
+    {
+      "expected" : {
+        "error" : "中國信託投信持股資料回應異常：ResultCode 2"
+      },
+      "input" : {
+        "symbol" : "00934",
+        "text" : "{\"ResultCode\":2}"
+      },
+      "name" : "error-without-message"
+    },
+    {
+      "expected" : {
+        "error" : "中國信託投信持股資料沒有股票成分"
+      },
+      "input" : {
+        "symbol" : "00934",
+        "text" : "{\"ResultCode\":0,\"Data\":{\"FundAssetsDetail\":[{\"Code\":\"CASH\",\"Data\":[]}]}}"
+      },
+      "name" : "no-stock-group"
+    },
+    {
+      "expected" : {
+        "error" : "中國信託投信持股資料格式不符（缺少 FundAssetsDetail）"
+      },
+      "input" : {
+        "symbol" : "00934",
+        "text" : "{\"ResultCode\":0,\"Data\":{}}"
+      },
+      "name" : "no-groups"
+    }
+  ],
+  "kind" : "IssuerHoldings.ctbc"
+}

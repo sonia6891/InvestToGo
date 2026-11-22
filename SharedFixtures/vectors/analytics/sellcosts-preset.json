@@ -1,0 +1,113 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "discount" : 2.8,
+        "minimum" : 1
+      },
+      "input" : {
+        "broker" : "國泰證券"
+      },
+      "name" : "國泰證券"
+    },
+    {
+      "expected" : {
+        "discount" : 2.8,
+        "minimum" : 1
+      },
+      "input" : {
+        "broker" : "國泰"
+      },
+      "name" : "國泰"
+    },
+    {
+      "expected" : {
+        "discount" : 2.8,
+        "minimum" : 1
+      },
+      "input" : {
+        "broker" : "國泰綜合證券"
+      },
+      "name" : "國泰綜合證券"
+    },
+    {
+      "expected" : {
+        "discount" : 2,
+        "minimum" : 1
+      },
+      "input" : {
+        "broker" : "永豐金證券"
+      },
+      "name" : "永豐金證券"
+    },
+    {
+      "expected" : {
+        "discount" : 6,
+        "minimum" : 20
+      },
+      "input" : {
+        "broker" : "元大證券（融資）"
+      },
+      "name" : "元大證券（融資）"
+    },
+    {
+      "expected" : {
+        "discount" : 6,
+        "minimum" : 20
+      },
+      "input" : {
+        "broker" : "富邦證券(融資)"
+      },
+      "name" : "富邦證券(融資)"
+    },
+    {
+      "expected" : {
+        "discount" : 6,
+        "minimum" : 20
+      },
+      "input" : {
+        "broker" : "  凱基證券  "
+      },
+      "name" : "  凱基證券  "
+    },
+    {
+      "expected" : {
+        "discount" : 6,
+        "minimum" : 20
+      },
+      "input" : {
+        "broker" : "群益金鼎證券"
+      },
+      "name" : "群益金鼎證券"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "broker" : "元富證券"
+      },
+      "name" : "元富證券"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "broker" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "broker" : "（融資）"
+      },
+      "name" : "（融資）"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "broker" : "Cathay"
+      },
+      "name" : "Cathay"
+    }
+  ],
+  "kind" : "SellCosts.preset"
+}

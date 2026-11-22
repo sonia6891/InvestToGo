@@ -1,0 +1,45 @@
+{
+  "cases" : [
+    {
+      "expected" : "195",
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "00919"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : "399",
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "00982A"
+      },
+      "name" : "fixture-active"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "file" : "member/issuers/E_capital_items_sample.json",
+        "symbol" : "0050"
+      },
+      "name" : "fixture-missing"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "symbol" : "00919",
+        "text" : "{}"
+      },
+      "name" : "empty-object"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "symbol" : "00919",
+        "text" : "oops"
+      },
+      "name" : "not-json"
+    }
+  ],
+  "kind" : "IssuerHoldings.capitalFundNo"
+}

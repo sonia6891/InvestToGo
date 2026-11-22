@@ -1,0 +1,380 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "comparison" : [
+          "0050",
+          "00878"
+        ],
+        "dividends" : [
+          {
+            "amount" : 2385,
+            "date" : 813254400,
+            "id" : "6B156992-E96C-5723-B0A5-EA4F8A8C1246",
+            "status" : "已入帳",
+            "symbol" : "0050"
+          }
+        ],
+        "favorites" : [
+          "0050"
+        ],
+        "holdings" : [
+          {
+            "broker" : "舊版匯入（券商未記錄）",
+            "id" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "待分類",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "legacyDividends" : {
+          "pwa-dividend-1" : {
+            "actualReceived" : 2385,
+            "code" : "0050",
+            "deductions" : 10,
+            "eligibleShares" : 2000,
+            "exDate" : "2026-10-01",
+            "id" : "pwa-dividend-1",
+            "name" : "元大台灣50",
+            "paymentDate" : "2026-10-10",
+            "perShare" : 1.2,
+            "sourceUrl" : "https://example.com/dividend",
+            "status" : "received"
+          }
+        },
+        "legacyPlan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0.04,
+          "frequency" : 4,
+          "monthly" : 5000,
+          "principal" : 100000,
+          "reinvest" : 1,
+          "totalReturn" : 0.06,
+          "years" : 10
+        },
+        "legacyPrices" : {
+          "pwa-001" : {
+            "date" : "2026-10-01",
+            "price" : 55,
+            "symbol" : "0050"
+          }
+        },
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"app\": \"ETF_CLASSIFIER\", \"version\": 3, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "pwa-v3"
+    },
+    {
+      "expected" : {
+        "comparison" : [
+          "0050",
+          "00878"
+        ],
+        "dividends" : [
+          {
+            "amount" : 2390,
+            "date" : 813254400,
+            "id" : "6B156992-E96C-5723-B0A5-EA4F8A8C1246",
+            "status" : "預估",
+            "symbol" : "0050"
+          }
+        ],
+        "favorites" : [
+          "0050"
+        ],
+        "holdings" : [
+          {
+            "broker" : "舊版匯入（券商未記錄）",
+            "id" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "待分類",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "legacyDividends" : {
+          "pwa-dividend-1" : {
+            "actualReceived" : 2385,
+            "code" : "0050",
+            "deductions" : 10,
+            "eligibleShares" : 2000,
+            "exDate" : "2026-10-01",
+            "id" : "pwa-dividend-1",
+            "name" : "元大台灣50",
+            "paymentDate" : "2026-10-10",
+            "perShare" : 1.2,
+            "sourceUrl" : "https://example.com/dividend",
+            "status" : "planned"
+          }
+        },
+        "legacyPlan" : {
+          "deductionRate" : 0,
+          "distributionRate" : 0.04,
+          "frequency" : 4,
+          "monthly" : 5000,
+          "principal" : 100000,
+          "reinvest" : 1,
+          "totalReturn" : 0.06,
+          "years" : 10
+        },
+        "legacyPrices" : {
+          "pwa-001" : {
+            "date" : "2026-10-01",
+            "price" : 55,
+            "symbol" : "0050"
+          }
+        },
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"app\": \"ETF_TOGO_NATIVE\", \"version\": 1, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"planned\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "native-v1-planned"
+    },
+    {
+      "expected" : {
+        "dividends" : [
+          {
+            "amount" : 2385,
+            "date" : 813254400,
+            "id" : "6B156992-E96C-5723-B0A5-EA4F8A8C1246",
+            "status" : "已入帳",
+            "symbol" : "0050"
+          }
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+          {
+            "broker" : "舊版匯入（券商未記錄）",
+            "id" : "11111111-2222-4333-8444-555555555555",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "待分類",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "legacyDividends" : {
+          "pwa-dividend-1" : {
+            "actualReceived" : 2385,
+            "code" : "0050",
+            "deductions" : 10,
+            "eligibleShares" : 2000,
+            "exDate" : "2026-10-01",
+            "id" : "pwa-dividend-1",
+            "name" : "元大台灣50",
+            "paymentDate" : "2026-10-10",
+            "perShare" : 1.2,
+            "sourceUrl" : "https://example.com/dividend",
+            "status" : "received"
+          }
+        },
+        "legacyPrices" : {
+          "11111111-2222-4333-8444-555555555555" : {
+            "date" : "2026-10-01",
+            "price" : 55,
+            "symbol" : "0050"
+          }
+        },
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "bare-planning-v2"
+    },
+    {
+      "expected" : {
+        "dividends" : [
+          {
+            "amount" : 2390,
+            "date" : 813254400,
+            "id" : "6B156992-E96C-5723-B0A5-EA4F8A8C1246",
+            "status" : "已公告",
+            "symbol" : "0050"
+          }
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+          {
+            "broker" : "舊版匯入（券商未記錄）",
+            "id" : "11111111-2222-4333-8444-555555555555",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "strategy" : "待分類",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "legacyDividends" : {
+          "pwa-dividend-1" : {
+            "code" : "0050",
+            "deductions" : 10,
+            "eligibleShares" : 2000,
+            "exDate" : "2026-10-01",
+            "id" : "pwa-dividend-1",
+            "name" : "元大台灣50",
+            "paymentDate" : "2026-10-10",
+            "perShare" : 1.2,
+            "sourceUrl" : "https://example.com/dividend",
+            "status" : "announced"
+          }
+        },
+        "legacyPrices" : {
+          "11111111-2222-4333-8444-555555555555" : {
+            "date" : "2026-10-01",
+            "price" : 55,
+            "symbol" : "0050"
+          }
+        },
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"announced\", \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "announced-without-actual"
+    },
+    {
+      "expected" : {
+        "dividends" : [
+
+        ],
+        "favorites" : [
+
+        ],
+        "holdings" : [
+
+        ],
+        "quotes" : {
+
+        },
+        "schema" : 1
+      },
+      "input" : {
+        "text" : "{\"schema\": 1, \"holdings\": [], \"dividends\": [], \"favorites\": [], \"quotes\": {}}"
+      },
+      "name" : "schema-1-passthrough"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"app\": \"ETF_CLASSIFIER\", \"version\": 3, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": -1, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "negative-cost"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"app\": \"ETF_CLASSIFIER\", \"version\": 3, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": null, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "missing-actual-payment"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"app\": \"OTHER\", \"version\": 3, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "unknown-app"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"app\": \"ETF_CLASSIFIER\", \"version\": 4, \"planning\": {\"version\": 2, \"holdings\": [{\"id\": \"pwa-001\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}], \"plan\": {\"principal\": 100000, \"monthly\": 5000, \"years\": 10, \"totalReturn\": 0.06, \"distributionRate\": 0.04, \"frequency\": 4, \"reinvest\": 1, \"deductionRate\": 0}}, \"favorites\": [\"0050\"], \"comparison\": [\"0050\", \"00878\"]}"
+      },
+      "name" : "envelope-version-4"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"version\": 3, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "planning-version-3"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"maybe\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "unknown-status"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"ftp://example.com/x\"}]}"
+      },
+      "name" : "ftp-source"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55, \"priceDate\": \"2026-10-01\"}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-11\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "ex-date-after-payment"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "{\"version\": 2, \"holdings\": [{\"id\": \"11111111-2222-4333-8444-555555555555\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"shares\": 2000, \"cost\": 100000, \"price\": 55}], \"dividends\": [{\"id\": \"pwa-dividend-1\", \"code\": \"0050\", \"name\": \"元大台灣50\", \"paymentDate\": \"2026-10-10\", \"exDate\": \"2026-10-01\", \"eligibleShares\": 2000, \"perShare\": 1.2, \"deductions\": 10, \"status\": \"received\", \"actualReceived\": 2385, \"sourceUrl\": \"https://example.com/dividend\"}]}"
+      },
+      "name" : "price-without-date"
+    },
+    {
+      "expected" : {
+        "error" : "備份格式不支援或資料不完整；現有資料未變更。"
+      },
+      "input" : {
+        "text" : "[1]"
+      },
+      "name" : "not-an-object"
+    },
+    {
+      "expected" : {
+        "error" : "*"
+      },
+      "input" : {
+        "text" : "{}"
+      },
+      "name" : "empty-object"
+    }
+  ],
+  "kind" : "BackupImport.decode"
+}

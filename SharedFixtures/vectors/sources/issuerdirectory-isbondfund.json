@@ -1,0 +1,66 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "symbol" : "00679B"
+      },
+      "name" : "b-suffix"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "symbol" : "00679b"
+      },
+      "name" : "b-lowercase"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "fundType" : "國內債券型",
+        "symbol" : "00720"
+      },
+      "name" : "bond-type"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "fundType" : "平衡型債券",
+        "symbol" : "00720"
+      },
+      "name" : "balanced"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "fundType" : "多重資產債券",
+        "symbol" : "00720"
+      },
+      "name" : "multi-asset"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "fundType" : "國內成分證券ETF",
+        "symbol" : "0050"
+      },
+      "name" : "stock"
+    },
+    {
+      "expected" : false,
+      "input" : {
+        "symbol" : "0050"
+      },
+      "name" : "no-type"
+    },
+    {
+      "expected" : true,
+      "input" : {
+        "fundType" : "平衡型",
+        "symbol" : "00999B"
+      },
+      "name" : "balanced-b"
+    }
+  ],
+  "kind" : "IssuerDirectory.isBondFund"
+}

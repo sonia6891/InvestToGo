@@ -1,0 +1,244 @@
+{
+  "cases" : [
+    {
+      "expected" : [
+        {
+          "art" : {
+            "folder" : "Skins/blackgold",
+            "kind" : "render3D"
+          },
+          "burst" : [
+            16777215,
+            15906354,
+            16740241,
+            4029439
+          ],
+          "code" : "SKN 001",
+          "colors" : {
+            "accent" : 15906354,
+            "card" : 2302760,
+            "dim" : 7236195,
+            "down" : 3912307,
+            "extra" : [
+              15890298,
+              4029426,
+              0
+            ],
+            "ink" : 16052712,
+            "line" : 2894898,
+            "page" : 1710621,
+            "sub" : 11117463,
+            "up" : 15883348
+          },
+          "feedback" : {
+            "haptic" : "heavy",
+            "sound" : "thud"
+          },
+          "fonts" : {
+            "big" : "Anton-Regular",
+            "bigBold" : false,
+            "bigOverhang" : 0,
+            "body" : "NotoSansTC-Medium",
+            "mono" : "JetBrainsMono-Regular",
+            "title" : "NotoSansTC-Bold"
+          },
+          "id" : "blackgold",
+          "metal" : {
+            "color" : 16040526,
+            "metalness" : 0.2,
+            "roughness" : 0.62
+          },
+          "name" : "黑金",
+          "style" : {
+            "button" : "hex",
+            "chart" : "smooth",
+            "check" : "disc",
+            "decor" : "rays",
+            "quick" : "goldHex",
+            "stage" : "discRing",
+            "tag" : "hexOutline"
+          },
+          "unlock" : {
+            "kind" : "free"
+          }
+        },
+        {
+          "art" : {
+            "folder" : "Skins/voxel",
+            "kind" : "voxel3D"
+          },
+          "burst" : [
+            16765503,
+            16727435,
+            4055295,
+            16777215
+          ],
+          "code" : "SKN 002",
+          "colors" : {
+            "accent" : 16727435,
+            "card" : 2501478,
+            "dim" : 5923504,
+            "down" : 3922335,
+            "extra" : [
+              16765503,
+              4055295,
+              921648
+            ],
+            "ink" : 16777215,
+            "line" : 3028088,
+            "page" : 1777483,
+            "sub" : 10134504,
+            "up" : 16735340
+          },
+          "feedback" : {
+            "haptic" : "triple",
+            "sound" : "chip"
+          },
+          "fonts" : {
+            "big" : "PressStart2P-Regular",
+            "bigBold" : false,
+            "bigOverhang" : 0,
+            "body" : "DotGothic16-Regular",
+            "mono" : "PressStart2P-Regular",
+            "title" : "DotGothic16-Regular"
+          },
+          "id" : "voxel",
+          "metal" : {
+            "color" : 16765503,
+            "metalness" : 0.1,
+            "roughness" : 0.7
+          },
+          "name" : "像素",
+          "style" : {
+            "button" : "pixelBlock",
+            "chart" : "stepped",
+            "check" : "square",
+            "decor" : "pixelStars",
+            "quick" : "pinkBlock",
+            "stage" : "pixelFrame",
+            "tag" : "pixelBlock"
+          },
+          "unlock" : {
+            "kind" : "level",
+            "level" : 10
+          }
+        },
+        {
+          "art" : {
+            "folder" : "Skins/stitch",
+            "kind" : "vector"
+          },
+          "burst" : [
+            13195071,
+            3099245,
+            14919723,
+            16249057
+          ],
+          "code" : "SKN 003",
+          "colors" : {
+            "accent" : 13195071,
+            "card" : 16249057,
+            "dim" : 11046506,
+            "down" : 3046735,
+            "extra" : [
+              3099245,
+              14919723,
+              16249057
+            ],
+            "ink" : 3877402,
+            "line" : 13811352,
+            "page" : 15326403,
+            "sub" : 8018486,
+            "up" : 11740702
+          },
+          "feedback" : {
+            "haptic" : "tap",
+            "sound" : "snip"
+          },
+          "fonts" : {
+            "big" : "BreeSerif-Regular",
+            "bigBold" : false,
+            "bigOverhang" : 0,
+            "body" : "NotoSerifTC-Medium",
+            "mono" : "BreeSerif-Regular",
+            "title" : "NotoSerifTC-Bold"
+          },
+          "id" : "stitch",
+          "metal" : null,
+          "name" : "縫線",
+          "style" : {
+            "button" : "paperStitch",
+            "chart" : "plain",
+            "check" : "stitchDisc",
+            "decor" : "seams",
+            "quick" : "stitchDisc",
+            "stage" : "paperDisc",
+            "tag" : "paperStrip"
+          },
+          "unlock" : {
+            "kind" : "member"
+          }
+        },
+        {
+          "art" : {
+            "folder" : "Skins/sketch",
+            "kind" : "vector"
+          },
+          "burst" : [
+            2039583,
+            15913323,
+            16777215
+          ],
+          "code" : "SKN 004",
+          "colors" : {
+            "accent" : 15913323,
+            "card" : 16777215,
+            "dim" : 11051930,
+            "down" : 1802053,
+            "extra" : [
+
+            ],
+            "ink" : 2039583,
+            "line" : 14538957,
+            "page" : 16447731,
+            "sub" : 7038816,
+            "up" : 13840175
+          },
+          "feedback" : {
+            "haptic" : "faint",
+            "sound" : "scribble"
+          },
+          "fonts" : {
+            "big" : "Caveat-Regular",
+            "bigBold" : true,
+            "bigOverhang" : 0.12,
+            "body" : "LXGWWenKaiTC-Medium",
+            "mono" : "LXGWWenKaiTC-Medium",
+            "title" : "LXGWWenKaiTC-Medium"
+          },
+          "id" : "sketch",
+          "metal" : null,
+          "name" : "手繪",
+          "style" : {
+            "button" : "sketchBox",
+            "chart" : "pencil",
+            "check" : "sketchCircle",
+            "decor" : "doodles",
+            "quick" : "sketchDot",
+            "stage" : "none",
+            "tag" : "highlighter"
+          },
+          "unlock" : {
+            "kind" : "level",
+            "level" : 5
+          }
+        }
+      ],
+      "input" : {
+
+      },
+      "name" : "bundled"
+    }
+  ],
+  "kind" : "Skins.all.summary"
+}

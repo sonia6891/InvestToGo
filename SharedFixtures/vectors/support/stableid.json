@@ -1,0 +1,37 @@
+{
+  "cases" : [
+    {
+      "expected" : "5FEF0885-6A6B-555C-8BEC-451862548983",
+      "input" : {
+        "namespace" : "legacy-holding",
+        "value" : "pwa-001"
+      },
+      "name" : "legacy-holding"
+    },
+    {
+      "expected" : "BC7184A2-8615-5B96-BBEF-6ACB785C7D4E",
+      "input" : {
+        "namespace" : "broker-account",
+        "value" : "富邦證券\u0000主帳戶"
+      },
+      "name" : "broker-account"
+    },
+    {
+      "expected" : "6E340B9C-FFB3-5A98-9CA5-44E6BB780A2C",
+      "input" : {
+        "namespace" : "",
+        "value" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : "35C56EBB-8117-5AD3-BE8F-281CC79246B4",
+      "input" : {
+        "namespace" : "x",
+        "value" : "💰0050"
+      },
+      "name" : "emoji"
+    }
+  ],
+  "kind" : "StableID.make"
+}

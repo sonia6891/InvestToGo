@@ -1,0 +1,1159 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          },
+          {
+            "broker" : "測試券商",
+            "id" : "43AABE0C-E87C-5669-AA91-BE26A3EE25E2",
+            "name" : "國泰永續高股息",
+            "shares" : 2000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 21
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 192000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "plain-guessed"
+    },
+    {
+      "expected" : {
+        "broker" : "國泰證券",
+        "holdings" : [
+          {
+            "broker" : "國泰證券",
+            "id" : "738288BC-856A-5C23-A087-4D660247A369",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150.5
+          },
+          {
+            "broker" : "國泰證券",
+            "id" : "A44CFBC5-484D-5486-B48D-19263592A5DD",
+            "name" : "群益台灣精選高息",
+            "shares" : 3000,
+            "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+            "strategy" : "印鈔機",
+            "symbol" : "00919",
+            "unitCost" : 22.1
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+        "totalCost" : 216800
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "國泰證券",
+        "file" : "vectors/importing/csv/cathay.csv"
+      },
+      "name" : "cathay-guessed"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          },
+          {
+            "broker" : "測試券商",
+            "id" : "43AABE0C-E87C-5669-AA91-BE26A3EE25E2",
+            "name" : "國泰永續高股息",
+            "shares" : 2000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 21
+          }
+        ],
+        "skipped" : [
+          "第 4 列 合計：不是股票或 ETF 代號",
+          "第 5 列 備註：不是股票或 ETF 代號"
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 192000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/trailing-empty.csv"
+      },
+      "name" : "trailing-total-and-note"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "43AABE0C-E87C-5669-AA91-BE26A3EE25E2",
+            "name" : "國泰永續高股息",
+            "shares" : 2000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 21
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：欄位比標題列多，可能有未加引號的逗號"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 42000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/thousands-unquoted.csv"
+      },
+      "name" : "unquoted-thousands-skipped"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "skipped" : [
+          "第 3 列 00878：數量或成本不是有效數字",
+          "第 4 列 00919：欄位比標題列多，可能有未加引號的逗號",
+          "第 5 列 合計：不是股票或 ETF 代號",
+          "第 6 列 備註：不是股票或 ETF 代號"
+        ],
+        "skippedCodes" : [
+          "00878",
+          "00919"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 50000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "text" : "代碼,名稱,股數,總成本,\n0050,元大台灣50,1000,50000,\n00878,國泰永續高股息,abc,20000\n00919,群益台灣精選高息,1,000,22000\n合計,,,72000\n備註\n"
+      },
+      "name" : "ported-bad-rows"
+    },
+    {
+      "expected" : {
+        "error" : "沒有可匯入的列。例如第 2 列 合計：不是股票或 ETF 代號。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n合計,1,1"
+      },
+      "name" : "only-total-row"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "台灣,50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 50
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 50000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 3,
+          "lots" : false,
+          "name" : 1,
+          "shares" : 2,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,名稱,股數,總成本\r\n0050,\"台灣,50\",1000,\"50,000\"\r\n"
+      },
+      "name" : "quoted-thousands"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150.5
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150500
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : false
+        },
+        "text" : "代碼,股數,成本價\n0050,1000,150.5\n"
+      },
+      "name" : "unit-cost-column"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 300000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : true,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,張數,總成本\n0050,2,300000\n"
+      },
+      "name" : "lots-column"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 2000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 300000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : true,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : false
+        },
+        "text" : "代碼,張數,均價\n0050,2,150\n"
+      },
+      "name" : "lots-and-unit-cost"
+    },
+    {
+      "expected" : {
+        "error" : "00757C 為外幣級別，交易單位可能不是 1,000 股；請將數量改為實際股數再匯入。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "funds" : [
+          {
+            "id" : "0050",
+            "name" : "元大台灣50",
+            "strategy" : "存錢筒"
+          },
+          {
+            "id" : "00878",
+            "name" : "國泰永續高股息",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00919",
+            "name" : "群益台灣精選高息",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00991A",
+            "name" : "主動測試",
+            "strategy" : "待分類"
+          },
+          {
+            "id" : "00953B",
+            "name" : "群益優選非投等債",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00757C",
+            "name" : "外幣測試",
+            "strategy" : "待分類"
+          }
+        ],
+        "mapping" : {
+          "cost" : 2,
+          "lots" : true,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,張數,總成本\n00757C,2,300000\n"
+      },
+      "name" : "lots-foreign-currency"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "88D8148F-4640-53D6-87FE-D4005F1AE88D",
+            "name" : "元大高股息",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "0056",
+            "unitCost" : 30
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：數量或成本不是有效數字"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 30000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,NaN,1\n0056,1000,30000\n"
+      },
+      "name" : "nan-shares"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "88D8148F-4640-53D6-87FE-D4005F1AE88D",
+            "name" : "元大高股息",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "0056",
+            "unitCost" : 30
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：數量或成本不是有效數字"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 30000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,1000,inf\n0056,1000,30000\n"
+      },
+      "name" : "inf-cost"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "88D8148F-4640-53D6-87FE-D4005F1AE88D",
+            "name" : "元大高股息",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "0056",
+            "unitCost" : 30
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：數量或成本不是有效數字"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 30000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,-5,1\n0056,1000,30000\n"
+      },
+      "name" : "negative-shares"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "88D8148F-4640-53D6-87FE-D4005F1AE88D",
+            "name" : "元大高股息",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "0056",
+            "unitCost" : 30
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：數量或成本不是有效數字"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 30000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,0,1\n0056,1000,30000\n"
+      },
+      "name" : "zero-shares"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "88D8148F-4640-53D6-87FE-D4005F1AE88D",
+            "name" : "元大高股息",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "印鈔機",
+            "symbol" : "0056",
+            "unitCost" : 30
+          }
+        ],
+        "skipped" : [
+          "第 2 列 0050：數量或成本不是有效數字"
+        ],
+        "skippedCodes" : [
+          "0050"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 30000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,10,-1\n0056,1000,30000\n"
+      },
+      "name" : "negative-cost"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 10,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 0
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 0
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,10,0\n"
+      },
+      "name" : "zero-cost-is-fine"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,1e3,15e4\n"
+      },
+      "name" : "exponent-number"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,\"1 000\",150000\n"
+      },
+      "name" : "spaces-in-number"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+          "第 2 列 2330：不在目前股票或 ETF 名單"
+        ],
+        "skippedCodes" : [
+          "2330"
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n2330,1000,500000\n0050,1000,150000\n"
+      },
+      "name" : "unlisted-code"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+          "第 2 列 ABCD：不是股票或 ETF 代號"
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\nABCD,1000,500000\n0050,1000,150000\n"
+      },
+      "name" : "not-a-code"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "D17E4951-7086-5FE3-B415-D1FF949A4015",
+            "name" : "主動測試",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "待分類",
+            "symbol" : "00991A",
+            "unitCost" : 17.35
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 17350
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "funds" : [
+          {
+            "id" : "0050",
+            "name" : "元大台灣50",
+            "strategy" : "存錢筒"
+          },
+          {
+            "id" : "00878",
+            "name" : "國泰永續高股息",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00919",
+            "name" : "群益台灣精選高息",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00991A",
+            "name" : "主動測試",
+            "strategy" : "待分類"
+          },
+          {
+            "id" : "00953B",
+            "name" : "群益優選非投等債",
+            "strategy" : "印鈔機"
+          },
+          {
+            "id" : "00757C",
+            "name" : "外幣測試",
+            "strategy" : "待分類"
+          }
+        ],
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n00991a,1000,17350\n"
+      },
+      "name" : "lowercase-code-upcased"
+    },
+    {
+      "expected" : {
+        "error" : "0050 有多列，請先將同帳戶同一檔合併為一筆庫存。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,1000,150000\n0050,500,80000\n"
+      },
+      "name" : "duplicate-code"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "我的0050",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 3,
+          "lots" : false,
+          "name" : 1,
+          "shares" : 2,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,名稱,股數,總成本\n0050,我的0050,1000,150000\n"
+      },
+      "name" : "name-from-csv"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "1B180FC7-9F44-5207-8960-841067C48E48",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "DE524496-0FB6-5B88-B009-5866D609A021",
+        "totalCost" : 150000
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 3,
+          "lots" : false,
+          "name" : 1,
+          "shares" : 2,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,名稱,股數,總成本\n0050,,1000,150000\n"
+      },
+      "name" : "empty-name-uses-list"
+    },
+    {
+      "expected" : {
+        "error" : "請指定不同的代號、數量與成本欄。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/utf8.csv",
+        "mapping" : {
+          "cost" : 3,
+          "lots" : false,
+          "name" : 1,
+          "shares" : 0,
+          "symbol" : 0,
+          "totalCost" : true
+        }
+      },
+      "name" : "same-column-twice"
+    },
+    {
+      "expected" : {
+        "error" : "請指定不同的代號、數量與成本欄。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/utf8.csv",
+        "mapping" : {
+          "cost" : 9,
+          "lots" : false,
+          "name" : 1,
+          "shares" : 2,
+          "symbol" : 0,
+          "totalCost" : true
+        }
+      },
+      "name" : "column-out-of-range"
+    },
+    {
+      "expected" : {
+        "error" : "請填券商名稱與帳戶暱稱（各 80 字以內）。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "  ",
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "no-broker-name"
+    },
+    {
+      "expected" : {
+        "error" : "請填券商名稱與帳戶暱稱（各 80 字以內）。"
+      },
+      "input" : {
+        "account" : "帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "long-account"
+    },
+    {
+      "expected" : {
+        "broker" : "測試券商",
+        "holdings" : [
+          {
+            "broker" : "測試券商",
+            "id" : "98891599-7142-5644-A326-3429ABCD05E3",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "E69CF14F-78EF-5F5C-A77E-512E5757FDFC",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          },
+          {
+            "broker" : "測試券商",
+            "id" : "1AC5CF92-D1C5-5130-902C-747E66FF8ED1",
+            "name" : "國泰永續高股息",
+            "shares" : 2000,
+            "sourceAccount" : "E69CF14F-78EF-5F5C-A77E-512E5757FDFC",
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 21
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "E69CF14F-78EF-5F5C-A77E-512E5757FDFC",
+        "totalCost" : 192000
+      },
+      "input" : {
+        "account" : "帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳帳",
+        "broker" : "測試券商",
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "eighty-chars-ok"
+    },
+    {
+      "expected" : {
+        "broker" : "國泰證券",
+        "holdings" : [
+          {
+            "broker" : "國泰證券",
+            "id" : "738288BC-856A-5C23-A087-4D660247A369",
+            "name" : "元大台灣50",
+            "shares" : 1000,
+            "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+            "strategy" : "存錢筒",
+            "symbol" : "0050",
+            "unitCost" : 150
+          },
+          {
+            "broker" : "國泰證券",
+            "id" : "F39679E3-F9E2-563D-930E-A4E49E5606CF",
+            "name" : "國泰永續高股息",
+            "shares" : 2000,
+            "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+            "strategy" : "印鈔機",
+            "symbol" : "00878",
+            "unitCost" : 21
+          }
+        ],
+        "skipped" : [
+
+        ],
+        "skippedCodes" : [
+
+        ],
+        "sourceAccount" : "7888433C-F9B0-5924-BCE5-F1C042EF8760",
+        "totalCost" : 192000
+      },
+      "input" : {
+        "account" : " 主要 ",
+        "broker" : " 國泰證券 \n",
+        "file" : "vectors/importing/csv/utf8.csv"
+      },
+      "name" : "broker-trimmed"
+    },
+    {
+      "expected" : {
+        "error" : "沒有可匯入的列。例如第 2 列 2330：不在目前股票或 ETF 名單。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n2330,1,1\n"
+      },
+      "name" : "all-skipped-says-example"
+    },
+    {
+      "expected" : {
+        "error" : "請填寫代碼與名稱，股數須大於 0，成本不可為負數。"
+      },
+      "input" : {
+        "account" : "主要",
+        "broker" : "測試券商",
+        "mapping" : {
+          "cost" : 2,
+          "lots" : false,
+          "name" : -1,
+          "shares" : 1,
+          "symbol" : 0,
+          "totalCost" : true
+        },
+        "text" : "代碼,股數,總成本\n0050,20000000000,1\n"
+      },
+      "name" : "too-many-shares"
+    }
+  ],
+  "kind" : "BrokerPreview.makeTable"
+}

@@ -1,0 +1,154 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "統一證券" : {
+          "discount" : 3,
+          "minimum" : 1
+        }
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "rate" : {
+          "discount" : 3,
+          "minimum" : 1
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "new-broker"
+    },
+    {
+      "expected" : {
+
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "rate" : {
+          "discount" : 10,
+          "minimum" : 20
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "same-as-list-not-stored"
+    },
+    {
+      "expected" : {
+
+      },
+      "input" : {
+        "broker" : "國泰證券",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "same-as-preset-not-stored"
+    },
+    {
+      "expected" : {
+        "" : {
+          "discount" : 5,
+          "minimum" : 10
+        }
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "rate" : {
+          "discount" : 5,
+          "minimum" : 10
+        },
+        "stored" : {
+          "" : {
+            "discount" : 5,
+            "minimum" : 10
+          }
+        }
+      },
+      "name" : "same-as-default-not-stored"
+    },
+    {
+      "expected" : {
+        "國泰證券" : {
+          "discount" : 2,
+          "minimum" : 1
+        }
+      },
+      "input" : {
+        "broker" : "國泰證券（融資）",
+        "rate" : {
+          "discount" : 2,
+          "minimum" : 1
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "differs-from-preset"
+    },
+    {
+      "expected" : {
+        "國泰證券" : {
+          "discount" : 2.8,
+          "minimum" : 1
+        }
+      },
+      "input" : {
+        "broker" : "國泰證券",
+        "rate" : {
+          "discount" : 2.8,
+          "minimum" : 1
+        },
+        "stored" : {
+          "國泰證券" : {
+            "discount" : 2,
+            "minimum" : 1
+          }
+        }
+      },
+      "name" : "own-rate-updated-even-if-preset"
+    },
+    {
+      "expected" : {
+        "統一證券" : {
+          "discount" : 10,
+          "minimum" : 1000
+        }
+      },
+      "input" : {
+        "broker" : "統一證券",
+        "rate" : {
+          "discount" : 20,
+          "minimum" : 2000
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "clamped-when-stored"
+    },
+    {
+      "expected" : {
+
+      },
+      "input" : {
+        "broker" : "（融資）",
+        "rate" : {
+          "discount" : 3,
+          "minimum" : 1
+        },
+        "stored" : {
+
+        }
+      },
+      "name" : "empty-broker-ignored"
+    }
+  ],
+  "kind" : "SellCosts.remember"
+}

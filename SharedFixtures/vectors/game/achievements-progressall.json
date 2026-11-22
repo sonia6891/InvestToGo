@@ -1,0 +1,242 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "checkupDone" : 0,
+        "dcaPunchCard" : 0,
+        "dexCollector" : 0,
+        "dividendMilestone" : 0,
+        "dividendStreak" : 0,
+        "exDividendSkin" : 0,
+        "feeSaver" : 0,
+        "holdingAnniversary" : 0,
+        "reconcileMaster" : 0,
+        "steadyYear" : 0,
+        "yearReport" : 0
+      },
+      "input" : {
+        "now" : "2026-11-15T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
+
+          ],
+          "quotes" : {
+
+          },
+          "schema" : 1
+        },
+        "state" : {
+
+        }
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : {
+        "checkupDone" : 3,
+        "dcaPunchCard" : 12,
+        "dexCollector" : 10,
+        "dividendMilestone" : 12,
+        "dividendStreak" : 12,
+        "exDividendSkin" : 0,
+        "feeSaver" : 2,
+        "holdingAnniversary" : 1,
+        "reconcileMaster" : 5,
+        "steadyYear" : 1,
+        "yearReport" : 1
+      },
+      "input" : {
+        "now" : "2026-12-20T12:00:00+08:00",
+        "portfolio" : {
+          "dividends" : [
+            {
+              "amount" : 100,
+              "date" : 790142400,
+              "id" : "00000000-0000-4000-8000-000000000022",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 792820800,
+              "id" : "00000000-0000-4000-8000-000000000023",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 795240000,
+              "id" : "00000000-0000-4000-8000-000000000024",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 797918400,
+              "id" : "00000000-0000-4000-8000-000000000025",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 800510400,
+              "id" : "00000000-0000-4000-8000-000000000026",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 803188800,
+              "id" : "00000000-0000-4000-8000-000000000027",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 805780800,
+              "id" : "00000000-0000-4000-8000-000000000028",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 808459200,
+              "id" : "00000000-0000-4000-8000-000000000029",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 811137600,
+              "id" : "00000000-0000-4000-8000-000000000030",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 813729600,
+              "id" : "00000000-0000-4000-8000-000000000031",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 816408000,
+              "id" : "00000000-0000-4000-8000-000000000032",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            },
+            {
+              "amount" : 100,
+              "date" : 819000000,
+              "id" : "00000000-0000-4000-8000-000000000033",
+              "status" : "已入帳",
+              "symbol" : "0056"
+            }
+          ],
+          "favorites" : [
+
+          ],
+          "holdings" : [
+            {
+              "broker" : "測試券商",
+              "id" : "00000000-0000-4000-8000-000000000017",
+              "name" : "0050 基金",
+              "purchaseDate" : 725774400,
+              "shares" : 1000,
+              "strategy" : "存錢筒",
+              "symbol" : "0050",
+              "unitCost" : 50
+            }
+          ],
+          "quotes" : {
+
+          },
+          "schema" : 1,
+          "trades" : [
+
+          ]
+        },
+        "state" : {
+          "collected" : {
+            "0050" : 788932800,
+            "0056" : 789019200,
+            "00631L" : 789278400,
+            "00679B" : 789192000,
+            "00713" : 789624000,
+            "00757" : 789710400,
+            "00878" : 789105600,
+            "00919" : 789537600,
+            "00929" : 789364800,
+            "006208" : 789451200
+          },
+          "counts" : {
+            "checkup" : 3,
+            "feeCompared" : 2,
+            "reconciled" : 5,
+            "yearReport" : 1
+          },
+          "dcaMonths" : [
+            {
+              "month" : 1,
+              "year" : 2026
+            },
+            {
+              "month" : 2,
+              "year" : 2026
+            },
+            {
+              "month" : 3,
+              "year" : 2026
+            },
+            {
+              "month" : 4,
+              "year" : 2026
+            },
+            {
+              "month" : 5,
+              "year" : 2026
+            },
+            {
+              "month" : 6,
+              "year" : 2026
+            },
+            {
+              "month" : 7,
+              "year" : 2026
+            },
+            {
+              "month" : 8,
+              "year" : 2026
+            },
+            {
+              "month" : 9,
+              "year" : 2026
+            },
+            {
+              "month" : 10,
+              "year" : 2026
+            },
+            {
+              "month" : 11,
+              "year" : 2026
+            },
+            {
+              "month" : 12,
+              "year" : 2026
+            }
+          ],
+          "xp" : 900
+        }
+      },
+      "name" : "rich"
+    }
+  ],
+  "kind" : "Achievements.progressAll"
+}

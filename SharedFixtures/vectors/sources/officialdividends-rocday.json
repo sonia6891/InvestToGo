@@ -1,0 +1,82 @@
+{
+  "cases" : [
+    {
+      "expected" : "2026-10-22",
+      "input" : {
+        "text" : "115年10月22日"
+      },
+      "name" : "roc-words"
+    },
+    {
+      "expected" : "2026-10-16",
+      "input" : {
+        "text" : "1151016"
+      },
+      "name" : "seven-digits"
+    },
+    {
+      "expected" : "2026-10-16",
+      "input" : {
+        "text" : " 1151016 "
+      },
+      "name" : "padded"
+    },
+    {
+      "expected" : "2026-01-02",
+      "input" : {
+        "text" : "115年1月2日"
+      },
+      "name" : "single-digit-parts"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "115年13月01日"
+      },
+      "name" : "bad-month"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
+      },
+      "name" : "letters"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "11510160"
+      },
+      "name" : "eight-digits"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "115/10/22"
+      },
+      "name" : "slashes"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "115年10月22日extra"
+      },
+      "name" : "trailing-text"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "1151032"
+      },
+      "name" : "bad-day"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "１１５１０１６"
+      },
+      "name" : "fullwidth-digits"
+    }
+  ],
+  "kind" : "OfficialDividends.rocDay"
+}

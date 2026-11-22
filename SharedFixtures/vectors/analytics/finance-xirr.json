@@ -1,0 +1,158 @@
+{
+  "cases" : [
+    {
+      "expected" : 0.10000000003838061,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1000,
+            "date" : "2023-01-01T00:00:00Z"
+          },
+          {
+            "amount" : 1100,
+            "date" : "2024-01-01T00:00:00Z"
+          }
+        ]
+      },
+      "name" : "ten-percent"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1000,
+            "date" : "2023-01-01T00:00:00Z"
+          },
+          {
+            "amount" : -5,
+            "date" : "2024-01-01T00:00:00Z"
+          }
+        ]
+      },
+      "name" : "no-sign-change"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1000,
+            "date" : "2023-01-01T00:00:00Z"
+          },
+          {
+            "amount" : 1100,
+            "date" : "2023-01-01T12:00:00Z"
+          }
+        ]
+      },
+      "name" : "same-day"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "flows" : [
+
+        ]
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : -0.427577673459855,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1000,
+            "date" : "2024-01-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-02-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-03-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-04-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-05-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-06-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-07-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-08-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-09-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-10-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-11-02T00:00:00Z"
+          },
+          {
+            "amount" : -1000,
+            "date" : "2024-12-02T00:00:00Z"
+          },
+          {
+            "amount" : 9000,
+            "date" : "2024-12-31T00:00:00Z"
+          }
+        ]
+      },
+      "name" : "monthly-loss"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1,
+            "date" : "2024-01-01T00:00:00Z"
+          },
+          {
+            "amount" : 1000,
+            "date" : "2024-01-03T00:00:00Z"
+          }
+        ]
+      },
+      "name" : "outside-bracket"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "flows" : [
+          {
+            "amount" : -1000,
+            "date" : "2024-01-01T00:00:00Z"
+          },
+          {
+            "amount" : 0,
+            "date" : "2025-01-01T00:00:00Z"
+          },
+          {
+            "amount" : 1,
+            "date" : "2025-01-02T00:00:00Z"
+          }
+        ]
+      },
+      "name" : "total-loss"
+    }
+  ],
+  "kind" : "Finance.xirr"
+}

@@ -1,0 +1,75 @@
+{
+  "cases" : [
+    {
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "114/06/18"
+      },
+      "name" : "slashes"
+    },
+    {
+      "expected" : "2025-01-17",
+      "input" : {
+        "text" : "114年01月17日"
+      },
+      "name" : "words"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "abc"
+      },
+      "name" : "letters"
+    },
+    {
+      "expected" : "2025-06-01",
+      "input" : {
+        "text" : " 114/6/1 "
+      },
+      "name" : "padded-short"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "114/13/01"
+      },
+      "name" : "bad-month"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "0/01/01"
+      },
+      "name" : "year-zero"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "114/06"
+      },
+      "name" : "two-parts"
+    },
+    {
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "114//06/18"
+      },
+      "name" : "double-slash"
+    },
+    {
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "\t114/06/18\t"
+      },
+      "name" : "tab-padded"
+    },
+    {
+      "expected" : "2025-06-18",
+      "input" : {
+        "text" : "+114/06/18"
+      },
+      "name" : "signed"
+    }
+  ],
+  "kind" : "OfficialHistory.rocDate"
+}

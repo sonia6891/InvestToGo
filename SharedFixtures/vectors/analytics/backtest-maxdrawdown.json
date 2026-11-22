@@ -1,0 +1,62 @@
+{
+  "cases" : [
+    {
+      "expected" : 0.25,
+      "input" : {
+        "values" : [
+          100,
+          120,
+          90,
+          130
+        ]
+      },
+      "name" : "peak-trough"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "values" : [
+
+        ]
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : 0,
+      "input" : {
+        "values" : [
+          1,
+          2,
+          3
+        ]
+      },
+      "name" : "rising"
+    },
+    {
+      "expected" : 0.5,
+      "input" : {
+        "values" : [
+          0,
+          0,
+          50,
+          25
+        ]
+      },
+      "name" : "zeros-then-value"
+    },
+    {
+      "expected" : 0.8,
+      "input" : {
+        "values" : [
+          100,
+          50,
+          200,
+          40,
+          300
+        ]
+      },
+      "name" : "two-falls"
+    }
+  ],
+  "kind" : "Backtest.maxDrawdown"
+}

@@ -1,0 +1,192 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "中信金",
+            "symbol" : "2891",
+            "weight" : 11.26
+          },
+          {
+            "name" : "廣達",
+            "symbol" : "2382",
+            "weight" : 8.01
+          },
+          {
+            "name" : "國泰金",
+            "symbol" : "2882",
+            "weight" : 6.86
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "國泰投信",
+        "symbol" : "00878"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "file" : "member/issuers/E_cathay_GetETFDetailStockList_00878.json",
+        "symbol" : "00878"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "中信金",
+            "symbol" : "2891",
+            "weight" : 11.26
+          },
+          {
+            "name" : "廣達",
+            "symbol" : "2382",
+            "weight" : 8.01
+          },
+          {
+            "name" : "國泰金",
+            "symbol" : "2882",
+            "weight" : 6.86
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "國泰投信",
+        "symbol" : "00878"
+      },
+      "input" : {
+        "date" : "2026/11/13",
+        "file" : "member/issuers/E_cathay_GetETFDetailStockList_00878.json",
+        "symbol" : "00878"
+      },
+      "name" : "slashed-date"
+    },
+    {
+      "expected" : {
+        "error" : "國泰投信持股資料回應異常：查無資料"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":null,\"returnCode\":\"9999\",\"success\":false,\"returnMessage\":\"查無資料\"}"
+      },
+      "name" : "error-body"
+    },
+    {
+      "expected" : {
+        "error" : "國泰投信持股資料回應異常：success 為 false"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"success\":false}"
+      },
+      "name" : "error-without-message"
+    },
+    {
+      "expected" : {
+        "error" : "國泰投信持股資料無法解析（1 列皆無效）"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"code\":\"2891\",\"title\":\"中信金\",\"ratio\":\"11.26\"}],\"success\":true}"
+      },
+      "name" : "renamed-rows"
+    },
+    {
+      "expected" : {
+        "error" : "國泰投信持股資料無法解析（2382 的權重無效）"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"--\"}],\"success\":true}"
+      },
+      "name" : "bad-weight"
+    },
+    {
+      "expected" : {
+        "error" : "國泰投信持股資料格式不符（缺少資料日期）"
+      },
+      "input" : {
+        "date" : "",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"}],\"success\":true}"
+      },
+      "name" : "blank-date"
+    },
+    {
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "date" : "2999-01-01",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"11.26\"}],\"success\":true}"
+      },
+      "name" : "future-date"
+    },
+    {
+      "expected" : {
+        "error" : "成分資料日期、代碼或權重不正確。"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"80\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"80\"}],\"success\":true}"
+      },
+      "name" : "too-much-weight"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "中信金",
+            "symbol" : "2891",
+            "weight" : 3.75
+          },
+          {
+            "name" : "廣達",
+            "symbol" : "2382",
+            "weight" : 8.01
+          },
+          {
+            "name" : null,
+            "symbol" : "2882",
+            "weight" : 7
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "國泰投信",
+        "symbol" : "00878"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\" 2891 \",\"stockName\":\" 中信金 \",\"weights\":\"1.5\"},{\"stockCode\":\"2382\",\"stockName\":\"廣達\",\"weights\":\"8.01%\"},{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"2.25\"},{\"stockCode\":\"\",\"stockName\":\"現金\",\"weights\":\"3.34\"},{\"stockCode\":\"2882\",\"stockName\":\"\",\"weights\":7}],\"success\":true}"
+      },
+      "name" : "rows-cleaned"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "中信金",
+            "symbol" : "2891",
+            "weight" : 11.5
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "國泰投信",
+        "symbol" : "00878"
+      },
+      "input" : {
+        "date" : "2026-11-13",
+        "symbol" : "00878",
+        "text" : "{\"result\":[{\"stockCode\":\"2891\",\"stockName\":\"中信金\",\"weights\":\"1,1.5％\"}],\"success\":true}"
+      },
+      "name" : "fullwidth-percent"
+    }
+  ],
+  "kind" : "IssuerHoldings.cathay"
+}

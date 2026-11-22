@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "holdings": [
+    {
+      "id": "5fef0885-6a6b-555c-8bec-451862548983",
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "shares": 2000,
+      "unitCost": 50,
+      "broker": "富邦證券",
+      "strategy": "存錢筒"
+    }
+  ],
+  "dividends": [],
+  "favorites": [],
+  "quotes": {}
+}

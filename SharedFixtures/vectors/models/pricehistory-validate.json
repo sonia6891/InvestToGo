@@ -1,0 +1,223 @@
+{
+  "cases" : [
+    {
+      "expected" : true,
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2024-01-01"
+            },
+            {
+              "close" : 120,
+              "date" : "2024-06-01"
+            },
+            {
+              "close" : 90,
+              "date" : "2024-08-01"
+            },
+            {
+              "close" : 110,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "good"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2025-01-02"
+            },
+            {
+              "close" : 101,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "unordered"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2025-01-01"
+            },
+            {
+              "close" : 101,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "duplicate-date"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : false,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2024-01-01"
+            },
+            {
+              "close" : 120,
+              "date" : "2024-06-01"
+            },
+            {
+              "close" : 90,
+              "date" : "2024-08-01"
+            },
+            {
+              "close" : 110,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "not-adjusted"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "one-point"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2025-01-01"
+            },
+            {
+              "close" : 0,
+              "date" : "2025-01-02"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "zero-close"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-13-01",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2024-01-01"
+            },
+            {
+              "close" : 120,
+              "date" : "2024-06-01"
+            },
+            {
+              "close" : 90,
+              "date" : "2024-08-01"
+            },
+            {
+              "close" : 110,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "0050"
+        }
+      },
+      "name" : "bad-fetched-day"
+    },
+    {
+      "expected" : {
+        "error" : "歷史資料缺失、日期重複或沒有確認還原價格，未計算績效。"
+      },
+      "input" : {
+        "history" : {
+          "adjusted" : true,
+          "fetchedDay" : "2025-01-02",
+          "points" : [
+            {
+              "close" : 100,
+              "date" : "2024-01-01"
+            },
+            {
+              "close" : 120,
+              "date" : "2024-06-01"
+            },
+            {
+              "close" : 90,
+              "date" : "2024-08-01"
+            },
+            {
+              "close" : 110,
+              "date" : "2025-01-01"
+            }
+          ],
+          "source" : "t",
+          "symbol" : "AAPL"
+        }
+      },
+      "name" : "bad-code"
+    }
+  ],
+  "kind" : "PriceHistory.validate"
+}

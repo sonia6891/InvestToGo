@@ -1,0 +1,81 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "month" : 11,
+        "year" : 2026
+      },
+      "input" : {
+        "key" : "2026-11"
+      },
+      "name" : "good"
+    },
+    {
+      "expected" : {
+        "month" : 12,
+        "year" : 2026
+      },
+      "input" : {
+        "key" : "2026-12"
+      },
+      "name" : "december"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "2026-13"
+      },
+      "name" : "month-13"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "2026-00"
+      },
+      "name" : "month-0"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "2026-1"
+      },
+      "name" : "one-digit-month"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "2026/11"
+      },
+      "name" : "slash"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "2026-11-01"
+      },
+      "name" : "extra-part"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "+026-11"
+      },
+      "name" : "plus-sign"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "key" : "２０２６-11"
+      },
+      "name" : "fullwidth"
+    }
+  ],
+  "kind" : "YearMonth.fromKey"
+}

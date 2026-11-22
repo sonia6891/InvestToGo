@@ -1,0 +1,84 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "change" : -120.25,
+        "changePercent" : -0.44,
+        "currency" : "TWD",
+        "date" : "2026-11-10",
+        "fetchedAt" : 1794288600,
+        "high" : null,
+        "low" : null,
+        "open" : null,
+        "price" : 27000.5,
+        "source" : "收盤",
+        "symbol" : "IX0001",
+        "trial" : null,
+        "volume" : null
+      },
+      "input" : {
+        "text" : "[{\"日期\":\"1151110\",\"指數\":\"寶島股價指數\",\"收盤指數\":\"1\"},{\"日期\":\"1151110\",\"指數\":\"發行量加權股價指數\",\"收盤指數\":\"27,000.50\",\"漲跌\":\"-\",\"漲跌點數\":\"120.25\"}]"
+      },
+      "name" : "down"
+    },
+    {
+      "expected" : {
+        "change" : 120.25,
+        "changePercent" : 0.45,
+        "currency" : "TWD",
+        "date" : "2026-11-10",
+        "fetchedAt" : 1794288600,
+        "high" : null,
+        "low" : null,
+        "open" : null,
+        "price" : 27000.5,
+        "source" : "收盤",
+        "symbol" : "IX0001",
+        "trial" : null,
+        "volume" : null
+      },
+      "input" : {
+        "text" : "[{\"日期\":\"1151110\",\"指數\":\"發行量加權股價指數\",\"收盤指數\":\"27000.5\",\"漲跌\":\"+\",\"漲跌點數\":\"120.25\"}]"
+      },
+      "name" : "up"
+    },
+    {
+      "expected" : {
+        "change" : null,
+        "changePercent" : null,
+        "currency" : "TWD",
+        "date" : "2026-11-10",
+        "fetchedAt" : 1794288600,
+        "high" : null,
+        "low" : null,
+        "open" : null,
+        "price" : 27000.5,
+        "source" : "收盤",
+        "symbol" : "IX0001",
+        "trial" : null,
+        "volume" : null
+      },
+      "input" : {
+        "text" : "[{\"日期\":\"1151110\",\"指數\":\"發行量加權股價指數\",\"收盤指數\":\"27000.5\"}]"
+      },
+      "name" : "no-change"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "text" : "[{\"日期\":\"1151110\",\"指數\":\"其他\",\"收盤指數\":\"1\"}]"
+      },
+      "name" : "missing-row"
+    },
+    {
+      "expected" : {
+        "error" : "行情沒有有效成交價，請稍後再試。"
+      },
+      "input" : {
+        "text" : "{}"
+      },
+      "name" : "not-array"
+    }
+  ],
+  "kind" : "OpenData.decodeTAIEX"
+}

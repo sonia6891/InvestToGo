@@ -1,0 +1,161 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 58.4473
+          },
+          {
+            "name" : "聯發科",
+            "symbol" : "2454",
+            "weight" : 6.1603
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "富邦投信",
+        "symbol" : "006208"
+      },
+      "input" : {
+        "file" : "member/issuers/E_fubon_Assets_006208_excerpt.html",
+        "symbol" : "006208"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 58.4473
+          },
+          {
+            "name" : "元大美債20年",
+            "symbol" : "00679B",
+            "weight" : 1.5
+          },
+          {
+            "name" : "Apple",
+            "symbol" : "AAPL US",
+            "weight" : 3.25
+          },
+          {
+            "name" : "Berkshire",
+            "symbol" : "BRK.B",
+            "weight" : 1.25
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "富邦投信",
+        "symbol" : "006208"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "資料日期：2026/11/13<table><tr><td>股票代碼</td><td>股票名稱</td><td>股數</td><td>金額</td><td>權重(%)</td></tr><tr><td>2330</td><td>台積電</td><td>1</td><td>2</td><td>58.4473</td></tr><tr><td>00679B</td><td>元大美債20年</td><td>1</td><td>2</td><td>1.5</td></tr><tr><td>AAPL US</td><td>Apple</td><td>1</td><td>2</td><td>3.25</td></tr><tr><td>BRK.B</td><td>Berkshire</td><td>1</td><td>2</td><td>1.25</td></tr><tr><td>合計</td><td></td><td>4</td><td>8</td><td>64.4473</td></tr><tr><td>－</td><td>現金</td><td></td><td>9</td><td>0.5</td></tr></table>"
+      },
+      "name" : "skips-rows-without-a-code"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料沒有股票成分"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "資料日期：2026/11/13<table><tr><td>股票代碼</td><td>股票名稱</td><td>股數</td><td>金額</td><td>權重(%)</td></tr><tr><td>合計</td><td></td><td>4</td><td>8</td><td>64.4473</td></tr><tr><td>－</td><td>現金</td><td></td><td>9</td><td>0.5</td></tr></table>"
+      },
+      "name" : "only-footer"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料格式不符（缺少股票表頭）"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "<p>資料日期：2026/11/13</p><table><tr><td>項目</td><td>金額</td></tr></table>"
+      },
+      "name" : "date-but-no-stock-table"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料格式不符（缺少資料日期）"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "<table><tr><td>股票代碼</td><td>股票名稱</td><td>股數</td><td>金額</td><td>權重(%)</td></tr><tr><td>2330</td><td>台積電</td><td>1</td><td>2</td><td>58.4473</td></tr></table>"
+      },
+      "name" : "table-but-no-date"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台積電",
+            "symbol" : "2330",
+            "weight" : 58.4473
+          }
+        ],
+        "date" : "2026-11-13",
+        "source" : "富邦投信",
+        "symbol" : "006208"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "資料日期：2026/11/13<table><tr><td>股票代碼</td><td>股票名稱</td><td>股數</td><td>金額</td><td>權重(%)</td></tr><tr><td>2330</td><td>台積電</td><td>1</td><td>2</td><td>58.4473</td></tr></table>"
+      },
+      "name" : "date-and-table"
+    },
+    {
+      "expected" : {
+        "components" : [
+          {
+            "name" : "台&積 電",
+            "symbol" : "2330",
+            "weight" : 12.5
+          }
+        ],
+        "date" : "2026-01-05",
+        "source" : "富邦投信",
+        "symbol" : "006208"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "資料日期 : 2026/1/5\n<TABLE>\n<TR class=\"h\"><TH>股票代碼</TH><TH>股票名稱</TH><TH>權重 (%)</TH></TR>\n<tr><td> 2330 </td><td><b>台&amp;積&nbsp;電</b></td><td>\n12.5\n</td></tr>\n</TABLE>"
+      },
+      "name" : "th-head-newlines-entities"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料欄位不符（缺少「股票代碼」或「權重」）"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "資料日期：2026/11/13<table><tr><td>股票代碼</td><td>股票名稱</td></tr><tr><td>2330</td><td>台積電</td></tr></table>"
+      },
+      "name" : "no-weight-column"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料格式不符（缺少股票表頭）"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : ""
+      },
+      "name" : "empty"
+    },
+    {
+      "expected" : {
+        "error" : "富邦投信持股資料格式不符（缺少股票表頭）"
+      },
+      "input" : {
+        "symbol" : "006208",
+        "text" : "<html>維護中</html>"
+      },
+      "name" : "maintenance"
+    }
+  ],
+  "kind" : "IssuerHoldings.fubon"
+}

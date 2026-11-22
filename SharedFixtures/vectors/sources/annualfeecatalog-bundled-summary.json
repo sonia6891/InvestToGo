@@ -1,0 +1,30 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "count" : 292,
+        "fetchedDay" : "2026-10-15",
+        "first" : {
+          "commission" : 0.01,
+          "custody" : 0.03,
+          "fundID" : "98764389",
+          "fundName" : "元大台灣卓越50基金",
+          "guarantee" : 0,
+          "management" : 0.11,
+          "other" : 0.05,
+          "subscriptionOffset" : 0,
+          "symbol" : "0050",
+          "tax" : 0.02,
+          "total" : 0.22,
+          "year" : 2025
+        },
+        "sourceURL" : "https://www.sitca.org.tw/ROC/Industry/IN2211.aspx?pid=IN2222_01"
+      },
+      "input" : {
+
+      },
+      "name" : "bundled"
+    }
+  ],
+  "kind" : "AnnualFeeCatalog.bundled.summary"
+}

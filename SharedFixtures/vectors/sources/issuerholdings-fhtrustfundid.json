@@ -1,0 +1,85 @@
+{
+  "cases" : [
+    {
+      "expected" : "ETF21",
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "00929"
+      },
+      "name" : "fixture"
+    },
+    {
+      "expected" : "ETF23",
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "00991A"
+      },
+      "name" : "fixture-before"
+    },
+    {
+      "expected" : "ETF08",
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "00731"
+      },
+      "name" : "fixture-after"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "0092"
+      },
+      "name" : "fixture-prefix"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "0050"
+      },
+      "name" : "fixture-missing"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "file" : "member/issuers/E_fhtrust_etf_list_excerpt.html",
+        "symbol" : "2026"
+      },
+      "name" : "fixture-year-is-not-a-code"
+    },
+    {
+      "expected" : "ETF21",
+      "input" : {
+        "symbol" : "00929",
+        "text" : "<tr><td>00929</td><td><a href=\"/ETF/etf_detail/ETF21\">復華台灣科技優息</a></td></tr>"
+      },
+      "name" : "one-row"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "symbol" : "00929",
+        "text" : "<table><tr><td>00929</td><td>復華台灣科技優息</td></tr><tr><td>00731</td><td><a href=\"/ETF/etf_detail/ETF08\">復華富時高息低波</a></td></tr></table>"
+      },
+      "name" : "bare-row"
+    },
+    {
+      "expected" : "ETF08",
+      "input" : {
+        "symbol" : "00731",
+        "text" : "<table><tr><td>00929</td><td>復華台灣科技優息</td></tr><tr><td>00731</td><td><a href=\"/ETF/etf_detail/ETF08\">復華富時高息低波</a></td></tr></table>"
+      },
+      "name" : "bare-row-next"
+    },
+    {
+      "expected" : null,
+      "input" : {
+        "symbol" : "00929",
+        "text" : ""
+      },
+      "name" : "empty"
+    }
+  ],
+  "kind" : "IssuerHoldings.fhtrustFundID"
+}

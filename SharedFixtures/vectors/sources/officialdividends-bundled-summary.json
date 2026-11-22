@@ -1,0 +1,28 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "eventCount" : 99,
+        "firstSymbols" : [
+          "00401A",
+          "00406A",
+          "00408A",
+          "0056",
+          "00694B"
+        ],
+        "freqCount" : 0,
+        "sources" : {
+          "since" : "2026-10-18",
+          "tpex" : "2026-10-18",
+          "twse" : "2026-10-18"
+        },
+        "symbolCount" : 99
+      },
+      "input" : {
+
+      },
+      "name" : "bundled"
+    }
+  ],
+  "kind" : "OfficialDividends.bundled.summary"
+}

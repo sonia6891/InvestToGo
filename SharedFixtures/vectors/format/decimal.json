@@ -1,0 +1,50 @@
+{
+  "kind": "format.decimal",
+  "cases": [
+    {
+      "name": "integer",
+      "input": {
+        "value": 12
+      },
+      "expected": "12"
+    },
+    {
+      "name": "one-place",
+      "input": {
+        "value": 1.5
+      },
+      "expected": "1.5"
+    },
+    {
+      "name": "two-places",
+      "input": {
+        "value": 99.75
+      },
+      "expected": "99.75"
+    },
+    {
+      "name": "rounds-to-two",
+      "input": {
+        "value": 1.2345
+      },
+      "expected": "1.23"
+    },
+    {
+      "name": "thousands",
+      "input": {
+        "value": 12345.6
+      },
+      "expected": "12,345.6"
+    },
+    {
+      "name": "negative",
+      "input": {
+        "value": -0.5
+      },
+      "expected": "-0.5"
+    }
+  ],
+  "platforms": [
+    "kotlin"
+  ]
+}

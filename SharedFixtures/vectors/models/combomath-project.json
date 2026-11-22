@@ -1,0 +1,374 @@
+{
+  "cases" : [
+    {
+      "expected" : {
+        "end" : 734180.5066205552,
+        "etf" : {
+          "cash" : 0,
+          "end" : 595265.506620555,
+          "invested" : 360000,
+          "start" : 180000,
+          "value" : 595265.506620555
+        },
+        "invested" : 360000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 138915.00000000023,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 138915.00000000023
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 3
+      },
+      "name" : "base-3y"
+    },
+    {
+      "expected" : {
+        "end" : 1061021.8479059073,
+        "etf" : {
+          "cash" : 0,
+          "end" : 907868.0604059068,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 907868.0604059068
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 153153.78750000044,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 153153.78750000044
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "base-5y"
+    },
+    {
+      "expected" : {
+        "end" : 2032300.0010479,
+        "etf" : {
+          "cash" : 0,
+          "end" : 1836832.645834606,
+          "invested" : 1200000,
+          "start" : 180000,
+          "value" : 1836832.645834606
+        },
+        "invested" : 1200000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 195467.35521329407,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 195467.35521329407
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 10
+      },
+      "name" : "base-10y"
+    },
+    {
+      "expected" : {
+        "end" : 842347.8263916506,
+        "etf" : {
+          "cash" : 0,
+          "end" : 733877.3307756508,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 733877.3307756508
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 108470.49561599977,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 108470.49561599977
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "保守",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "conservative"
+    },
+    {
+      "expected" : {
+        "end" : 1170244.9266712165,
+        "etf" : {
+          "cash" : 0,
+          "end" : 993925.5574552168,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 993925.5574552168
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 176319.36921599976,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 176319.36921599976
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "樂觀",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "optimistic"
+    },
+    {
+      "expected" : {
+        "end" : 908735.8010758912,
+        "etf" : {
+          "cash" : 0,
+          "end" : 806633.2760758909,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 806633.2760758909
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 102102.52500000036,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 102102.52500000036
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "壓力測試",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "stress"
+    },
+    {
+      "expected" : {
+        "end" : 1500000,
+        "etf" : {
+          "cash" : 0,
+          "end" : 1380000,
+          "invested" : 1200000,
+          "start" : 180000,
+          "value" : 1380000
+        },
+        "invested" : 1200000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 120000,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 120000
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 0,
+          "monthly" : 10000,
+          "stockReturn" : 0
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 10
+      },
+      "name" : "flat-10y"
+    },
+    {
+      "expected" : {
+        "end" : 1049649.1334053096,
+        "etf" : {
+          "cash" : 96652.09622561716,
+          "end" : 898131.7811916771,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 801479.6849660599
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 12893.304952314174,
+          "end" : 151517.35221363258,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 138624.0472613184
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 5,
+          "etfYield" : 4,
+          "monthly" : 10000,
+          "reinvest" : false,
+          "stockReturn" : 5,
+          "stockYield" : 2
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "cash-yield"
+    },
+    {
+      "expected" : {
+        "end" : 1062814.3807533449,
+        "etf" : {
+          "cash" : 0,
+          "end" : 909660.5932533443,
+          "invested" : 600000,
+          "start" : 180000,
+          "value" : 909660.5932533443
+        },
+        "invested" : 600000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 153153.78750000044,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 153153.78750000044
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "基準",
+        "settings" : {
+          "buyFee" : true,
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "startOfMonth" : true,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 5
+      },
+      "name" : "start-of-month-with-fee"
+    },
+    {
+      "expected" : {
+        "end" : 593770.0729878875,
+        "etf" : {
+          "cash" : 0,
+          "end" : 501160.0729878873,
+          "invested" : 360000,
+          "start" : 180000,
+          "value" : 501160.0729878873
+        },
+        "invested" : 360000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 92610.00000000022,
+          "invested" : 0,
+          "start" : 120000,
+          "value" : 92610.00000000022
+        }
+      },
+      "input" : {
+        "etfStart" : 180000,
+        "scenario" : "壓力測試",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "startOfMonth" : true,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 120000,
+        "years" : 3
+      },
+      "name" : "stress-start-of-month"
+    },
+    {
+      "expected" : {
+        "end" : 122725.77529597285,
+        "etf" : {
+          "cash" : 0,
+          "end" : 122725.77529597285,
+          "invested" : 120000,
+          "start" : 0,
+          "value" : 122725.77529597285
+        },
+        "invested" : 120000,
+        "stock" : {
+          "cash" : 0,
+          "end" : 0,
+          "invested" : 0,
+          "start" : 0,
+          "value" : 0
+        }
+      },
+      "input" : {
+        "etfStart" : 0,
+        "scenario" : "基準",
+        "settings" : {
+          "etfReturn" : 5,
+          "monthly" : 10000,
+          "stockReturn" : 5
+        },
+        "stockShare" : 0.4,
+        "stockStart" : 0,
+        "years" : 1
+      },
+      "name" : "one-year-zero-start"
+    }
+  ],
+  "kind" : "ComboMath.project"
+}
