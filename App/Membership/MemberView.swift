@@ -36,6 +36,8 @@ enum PlanPrice {
     @Published private(set) var loading = false
     /// The App Store did not answer, or answered without the plans.
     @Published private(set) var failed = false
+    /// A purchase is in progress (the App Store's sheet, or its answer): the rating sheet waits (`ReviewPrompt`).
+    @Published private(set) var purchasing = false
     /// The paid plans this Apple ID holds, current and not refunded (StoreKit's own record of its purchases).
     @Published private(set) var owned: Set<String> = []
     var isMember: Bool { !owned.isEmpty }
@@ -137,6 +139,8 @@ enum PlanPrice {
     /// number kept on this phone, so it goes also with 「傳送匿名使用統計」 off.
     func purchase(_ id: String) async {
         guard let product = products[id] else { return }
+        purchasing = true
+        defer { purchasing = false }
         do {
             switch try await product.purchase(options: UsageInstall.purchaseOptions()) {
             case .success(.verified(let transaction)):

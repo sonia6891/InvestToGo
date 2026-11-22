@@ -84,6 +84,13 @@ struct LaunchGate: View {
         return start == nil ? lock.lobbyReleased : pastSplash
     }
 
+    /// App Store 評分視窗: the app is in front past the opening, onboarding and the lock (and its cover). Each time this
+    /// turns true the day of use is counted and, on an eligible day, the rating sheet waits for a free moment
+    /// (`ReviewPrompt`); turning false cancels the wait.
+    private var reviewReady: Bool {
+        phase == .active && !opening && start == nil && lock.lobbyReleased && !lock.locked && !lock.covered
+    }
+
     init() {
         let arguments = ProcessInfo.processInfo.arguments
         let start = Onboarding.start(arguments, onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey))
@@ -133,6 +140,10 @@ struct LaunchGate: View {
             guard usageReady else { return }
             try? await Task.sleep(for: .seconds(1))
             if !Task.isCancelled { UsageStats.appOpened() }
+        }
+        .task(id: reviewReady) {
+            guard reviewReady else { return }
+            await ReviewPrompt.shared.opened()
         }
     }
 }
