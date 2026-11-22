@@ -65,12 +65,18 @@ enum Onboarding {
 /// The first launch: the splash, then the four onboarding pages, then the lobby. Full screen, no bottom bar.
 struct FirstLaunchView: View {
     let onFinish: () -> Void
+    /// The splash (the first launch's opening) has gone: the onboarding pages are showing.
+    let onPastSplash: () -> Void
+    /// How the splash's opening plays (`Opening.play`).
+    let play: OpeningPlay
     /// 0 is the splash; 1–4 the onboarding pages.
     @State private var page: Int
     @Environment(\.motionReduced) private var reduceMotion
 
-    init(start: OnboardingStart, onFinish: @escaping () -> Void) {
+    init(start: OnboardingStart, play: OpeningPlay = .still, onPastSplash: @escaping () -> Void = {}, onFinish: @escaping () -> Void) {
         self.onFinish = onFinish
+        self.onPastSplash = onPastSplash
+        self.play = play
         switch start {
         case .splash: _page = State(initialValue: 0)
         case .page(let n): _page = State(initialValue: n)
@@ -80,11 +86,12 @@ struct FirstLaunchView: View {
     var body: some View {
         ZStack {
             if page == 0 {
-                SplashView { withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { page = 1 } }
+                SplashView(play: play) { withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { page = 1 } }
                     .transition(.opacity)
             } else {
                 OnboardingFlow(page: $page, onFinish: onFinish)
                     .transition(.opacity)
+                    .onAppear(perform: onPastSplash)
             }
         }
     }

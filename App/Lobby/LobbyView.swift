@@ -84,6 +84,8 @@ struct LobbyView: View {
         ScrollView {
             VStack(spacing: 10) {
                 topBar(game, ambient: ambient)
+                // 口袋會員前 7 天全開: on every day of the 7, at the top, so everyone knows (nothing outside them).
+                MemberOpenBanner()
                 Text("\(skin.code) · \(skin.name)").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 HStack(alignment: .top) { entry(.find, ambient: ambient); Spacer(); entry(.dividends, ambient: ambient) }
@@ -121,6 +123,8 @@ struct LobbyView: View {
         .modifier(FadeInWithReducedMotion())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
+        // 口袋會員前 7 天全開's notes, each once, only while the lobby is in front with nothing over it or about to be.
+        .modifier(MemberOpenNotes(ready: onScreen && !covered && !replayer.playing && game.levelUpDue == nil && !store.recordsLocked))
         // Decided each time the lobby comes up, and again once StoreKit has said whether this is a member.
         .task(id: membership.has(.report)) { announceReport(now: Date()) }
         .onAppear {
@@ -138,7 +142,9 @@ struct LobbyView: View {
         .onChange(of: store.recordsLocked) { _, _ in presentQuickDCA() }
         .onChange(of: replayer.playing) { _, playing in if !playing { presentQuickDCA() } }
         .onChange(of: modalPending) { _, pending in if !pending { presentQuickDCAAfterCover() } }
-        .onDisappear { onScreen = false; replayer.cancel() }
+        .onDisappear { onScreen = false; replayer.cancel(); ReviewPrompt.shared.release("replay") }
+        // App Store 評分視窗: never over the lobby's replay (coins flying, the bar filling).
+        .onChange(of: replayer.playing, initial: true) { _, playing in ReviewPrompt.shared.hold("replay", while: playing) }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { opensAgain = true } else if phase == .active, onScreen { playOpening() }
         }

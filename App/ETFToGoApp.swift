@@ -9,6 +9,8 @@ import UserNotifications
     init() {
         // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
         CrashReporting.start()
+        // App Store 評分視窗: made at launch, so it follows the keyboard from the start (it never asks over one).
+        _ = ReviewPrompt.shared
         let args = ProcessInfo.processInfo.arguments
         let testing = args.contains("--ui-testing")
         let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
@@ -62,30 +64,95 @@ import UserNotifications
         }
     }
 }
-/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby.
+/// The first launch goes splash → onboarding → lobby (spec 5.1, 5.2); every later launch opens on the lobby. Every cold
+/// launch first plays the opening (2026-11-21 design): on the first launch it is the splash itself, on later ones it
+/// stands in front of the lobby until it ends or is skipped. Coming back from the background never replays it.
+///
+/// App 上鎖 (2026-11-22 design) comes after the opening: with the lock on, the opening goes on to the lock screen, and
+/// the lobby is built only once it is passed. Onboarding is never locked. The lock screen and the privacy cover are in
+/// `LockWindow`, above the app's window; the scene's phases reach `AppLock` from here.
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
     @Environment(\.motionReduced) private var reduceMotion
+    @Environment(\.scenePhase) private var phase
+    @ObservedObject private var lock = AppLock.shared
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
+    /// How the opening plays at this launch, decided once with `start`.
+    @State private var play: OpeningPlay
+    /// A later launch's opening is in front of the lobby. The lobby is built only once it has gone, so its entrance and
+    /// LEVEL×UP are never spent behind the opening.
+    @State private var opening: Bool
+    /// The first launch's splash has gone (the onboarding pages are showing).
+    @State private var pastSplash = false
+
+    /// 產品工作站 (2026-11-22 design): the app is in front, past the opening (the splash on the first launch) and the
+    /// lock screen. Each time this turns true the day's anonymous open is reported (`UsageStats`), at most once a day.
+    private var usageReady: Bool {
+        guard phase == .active, !opening, !lock.locked else { return false }
+        return start == nil ? lock.lobbyReleased : pastSplash
+    }
+
+    /// App Store 評分視窗: the app is in front past the opening, onboarding and the lock (and its cover). Each time this
+    /// turns true the day of use is counted and, on an eligible day, the rating sheet waits for a free moment
+    /// (`ReviewPrompt`); turning false cancels the wait.
+    private var reviewReady: Bool {
+        phase == .active && !opening && start == nil && lock.lobbyReleased && !lock.locked && !lock.covered
+    }
 
     init() {
-        _start = State(initialValue: Onboarding.start(ProcessInfo.processInfo.arguments,
-                                                      onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey)))
+        let arguments = ProcessInfo.processInfo.arguments
+        let start = Onboarding.start(arguments, onboarded: UserDefaults.standard.bool(forKey: Onboarding.doneKey))
+        let launch = OpeningLaunch.shared
+        // `didReceive` usually arrives after this init, so `fromNotification` is mostly still false here: the real
+        // handling is in SplashView (its onChange, and the check in `begin()`). `played`: a scene iOS builds again while
+        // the process lives does not replay the opening.
+        let play = Opening.play(firstLaunch: start == .splash, arguments: arguments, fromNotification: launch.fromNotification,
+                                alreadyPlayed: launch.played)
+        _start = State(initialValue: start)
+        _play = State(initialValue: play)
+        _opening = State(initialValue: start == nil && play == .animated)
     }
 
     var body: some View {
         ZStack {
-            if let start {
-                FirstLaunchView(start: start) {
+            if opening {
+                SplashView(play: play, ending: .continues) {
+                    withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { opening = false }
+                }
+                .transition(.opacity)
+            } else if let start {
+                FirstLaunchView(start: start, play: play, onPastSplash: { pastSplash = true }) {
                     onboarded = true
                     UserDefaults.standard.synchronize()
                     withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
                 }
                 .transition(.opacity)
-            } else {
+            } else if lock.lobbyReleased {
                 RootView().transition(.opacity)
+            } else {
+                // Until the cold launch is decided and, with the lock on, passed: the cover, never the lobby.
+                LockCover()
+                    .task {
+                        try? await Task.sleep(for: .seconds(1))
+                        if !Task.isCancelled { lock.openingFallback() }
+                    }
             }
+        }
+        .background(LockWindowAnchor().frame(width: 0, height: 0).accessibilityHidden(true))
+        .onChange(of: phase, initial: true) { _, value in lock.scene(value) }
+        .onAppear { if !opening { lock.openingEnded(onboarding: start != nil) } }
+        .onChange(of: opening) { _, value in if !value { lock.openingEnded(onboarding: start != nil) } }
+        // A moment after, so a lock that comes up as the app returns cancels it; the work itself runs in the
+        // background and never holds up the screen. Nothing is sent under --ui-testing (`UsageGate`).
+        .task(id: usageReady) {
+            guard usageReady else { return }
+            try? await Task.sleep(for: .seconds(1))
+            if !Task.isCancelled { UsageStats.appOpened() }
+        }
+        .task(id: reviewReady) {
+            guard reviewReady else { return }
+            await ReviewPrompt.shared.opened()
         }
     }
 }
@@ -119,6 +186,11 @@ struct RootView: View {
     @AppStorage(Onboarding.monthlyKey) private var monthly = 0
     @AppStorage(Onboarding.symbolKey) private var onboardingSymbol = ""
     private var reminderInputs: DCAReminderInputs? { DCAReminders.inputs(store.data) }
+
+    /// LEVEL×UP is due, being prepared or on screen: the rating sheet waits (`ReviewPrompt` hold "levelUp").
+    private var levelUpComing: Bool {
+        celebration != nil || levelUp != nil || store.data.game?.levelUpDue != nil
+    }
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
@@ -180,6 +252,9 @@ struct RootView: View {
                 .preferredColorScheme(skins.colorScheme)
         }
         .modifier(SkinKitLaunch())
+        // App Store 評分視窗: never over LEVEL×UP, nor while it is on its way (waiting for a reward toast to finish).
+        .onChange(of: levelUpComing, initial: true) { _, coming in ReviewPrompt.shared.hold("levelUp", while: coming) }
+        .onDisappear { ReviewPrompt.shared.release("levelUp") }
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
@@ -188,6 +263,9 @@ struct RootView: View {
             // The records could not be opened at a launch in the background (locked phone): read them now.
             store.reloadIfLocked()
             if !store.recordsLocked { await DCAReminders.sync(reminderInputs) }
+            // 口袋會員前 7 天全開: judged again on every return, wherever the app is (not only over the lobby), so the
+            // tools close at the end on any screen.
+            MembershipStore.shared.refreshOpen()
             guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
             store.live.start()
             await store.followMarket()

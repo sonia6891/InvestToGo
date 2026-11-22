@@ -1,0 +1,365 @@
+import XCTest
+import StoreKit
+@testable import ETFToGo
+
+/// 產品工作站 (docs/superpowers/specs/2026-11-22-workstation-metrics-design.md): the anonymous events, the once-a-day
+/// rule, the queue and the server's answers, the switch and the UI-test gate, the install id and the purchase token.
+/// The clock, the defaults and the transport are injected: nothing here touches the network.
+final class UsageStatsTests: XCTestCase {
+    private var suite = ""
+    private var defaults: UserDefaults!
+    private let taipei = TimeZone(identifier: "Asia/Taipei")!
+
+    override func setUp() {
+        super.setUp()
+        suite = "ETFToGo.tests.usage.\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suite)
+    }
+
+    override func tearDown() {
+        defaults.removePersistentDomain(forName: suite)
+        super.tearDown()
+    }
+
+    /// 2026-11-22 11:04:05.125 in Taipei.
+    private let noon = Date(timeIntervalSince1970: 1_795_316_645.125)
+
+    private func reporter(_ transport: UsageFakeTransport, clock: UsageTestClock, allowed: Bool = true, region: String = "TW") -> UsageReporter {
+        let zone = taipei
+        return UsageReporter(defaults: defaults, transport: transport, allowed: allowed, version: "1.0(7)",
+                      now: { clock.date }, timeZone: { zone }, region: { region })
+    }
+
+    // MARK: Events
+
+    func testEventsCarryTheContractFields() {
+        let iid = "0f8e2c1a-3b4d-4e5f-8a9b-0c1d2e3f4a5b"
+        let first = UsageEvent.firstOpen(iid: iid, at: noon, region: "TW", version: "1.0(7)")
+        XCTAssertEqual(first, UsageEvent(id: "\(iid):first_open", kind: "first_open", at: "2026-11-22T03:04:05.125Z",
+                                         iid: iid, pf: "ios", m: "TW", v: "1.0(7)"))
+        let daily = UsageEvent.dailyOpen(iid: iid, day: "2026-11-22", at: noon, region: "", version: "1.0(7)")
+        XCTAssertEqual(daily.id, "\(iid):daily_open:2026-11-22")
+        XCTAssertEqual(daily.kind, "daily_open")
+        XCTAssertEqual(daily.m, "", "An unknown region is sent empty")
+    }
+
+    func testVersionIsShortVersionWithTheBuildInBrackets() {
+        XCTAssertEqual(UsageVersion.string(info: ["CFBundleShortVersionString": "1.2", "CFBundleVersion": "34"]), "1.2(34)")
+        XCTAssertEqual(UsageVersion.string(info: nil), "()")
+        let app = UsageVersion.string(info: Bundle.main.infoDictionary)
+        XCTAssertTrue(app.range(of: #"^[0-9.]+\([0-9]+\)$"#, options: .regularExpression) != nil, app)
+    }
+
+    func testTheDayIsGregorianWithPlainDigitsInLocalTime() {
+        XCTAssertEqual(UsageClock.day(noon, timeZone: taipei), "2026-11-22")
+        // 23:59:59 and 00:00:00 in Taipei.
+        XCTAssertEqual(UsageClock.day(Date(timeIntervalSince1970: 1_795_363_199), timeZone: taipei), "2026-11-22")
+        XCTAssertEqual(UsageClock.day(Date(timeIntervalSince1970: 1_795_363_200), timeZone: taipei), "2026-11-23")
+        XCTAssertEqual(UsageClock.day(Date(timeIntervalSince1970: 1_795_363_200), timeZone: TimeZone(identifier: "UTC")!), "2026-11-22")
+        for text in [UsageClock.day(noon, timeZone: taipei), UsageClock.iso(noon)] {
+            XCTAssertTrue(text.unicodeScalars.allSatisfy(\.isASCII), "No Arabic, Persian or other digits: \(text)")
+        }
+    }
+
+    // MARK: Once per install, once a day
+
+    func testFirstOpenAndDailyOpenGoOutOnTheFirstLaunch() async throws {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        await reporter(transport, clock: clock).appOpened()
+        let events = transport.events
+        // The workstation groups retention by an install's first daily_open day: the first launch sends both, together.
+        XCTAssertEqual(transport.bodyEvents.count, 1, "One request")
+        XCTAssertEqual(transport.bodyEvents.first?.map(\.kind), ["first_open", "daily_open"], "first_open and that day's daily_open in the same batch")
+        XCTAssertEqual(events.map(\.kind), ["first_open", "daily_open"])
+        XCTAssertEqual(Set(events.map(\.at)).count, 1, "Both carry the launch time")
+        let iid = UsageInstall.id(defaults: defaults)
+        XCTAssertEqual(events.map(\.id), ["\(iid):first_open", "\(iid):daily_open:2026-11-22"])
+        XCTAssertTrue(events.allSatisfy { $0.iid == iid && $0.pf == "ios" && $0.m == "TW" && $0.v == "1.0(7)" })
+        let queue = await reporter(transport, clock: clock).queue
+        XCTAssertTrue(queue.isEmpty, "Accepted events leave the queue")
+    }
+
+    func testDailyOpenAtMostOncePerLocalDay() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        let usage = reporter(transport, clock: clock)
+        await usage.appOpened()
+        clock.date = noon.addingTimeInterval(3600)
+        await usage.appOpened()
+        // 23:59:59 the same day, after a relaunch.
+        clock.date = Date(timeIntervalSince1970: 1_795_363_199)
+        await reporter(transport, clock: clock).appOpened()
+        XCTAssertEqual(transport.events.filter { $0.kind == "daily_open" }.count, 1, "One daily_open a local day")
+        XCTAssertEqual(transport.bodies.count, 1, "Nothing new to send, nothing sent")
+        // Midnight in Taipei: a new day.
+        clock.date = Date(timeIntervalSince1970: 1_795_363_200)
+        await usage.appOpened()
+        XCTAssertEqual(transport.events.filter { $0.kind == "daily_open" }.map { String($0.id.suffix(10)) }, ["2026-11-22", "2026-11-23"])
+    }
+
+    func testFirstOpenOnlyOncePerInstall() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        await reporter(transport, clock: clock).appOpened()
+        for day in 1...3 {
+            clock.date = noon.addingTimeInterval(Double(day) * 86_400)
+            await reporter(transport, clock: clock).appOpened()
+        }
+        XCTAssertEqual(transport.events.filter { $0.kind == "first_open" }.count, 1)
+        XCTAssertEqual(transport.events.filter { $0.kind == "daily_open" }.count, 4)
+    }
+
+    // MARK: Queue and answers
+
+    func testTheQueueKeepsTheNewestFiftyAndOneOfEachID() {
+        var queue: [UsageEvent] = []
+        for n in 0..<60 { queue = UsageQueue.enqueue(queue, event("e\(n)")) }
+        XCTAssertEqual(queue.count, 50)
+        XCTAssertEqual(queue.first?.id, "e10")
+        XCTAssertEqual(queue.last?.id, "e59")
+        queue = UsageQueue.enqueue(queue, event("e30"))
+        XCTAssertEqual(queue.count, 50)
+        XCTAssertEqual(queue.filter { $0.id == "e30" }.count, 1, "A waiting id is not queued twice")
+        XCTAssertEqual(queue.last?.id, "e30")
+    }
+
+    func testRefusedAnswersDropAndOthersKeep() {
+        for status in [200, 201, 204, 400, 413, 422] { XCTAssertTrue(UsageQueue.leavesQueue(status: status), "\(status)") }
+        for status in [nil, 401, 403, 404, 408, 429, 500, 502, 503] as [Int?] {
+            XCTAssertFalse(UsageQueue.leavesQueue(status: status), "\(String(describing: status))")
+        }
+    }
+
+    func testFailedSendsWaitAndGoOutNextTime() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        transport.answers = [503, nil]
+        let usage = reporter(transport, clock: clock)
+        await usage.appOpened()
+        var queue = await usage.queue
+        XCTAssertEqual(queue.count, 2, "A 503 keeps the events")
+        await usage.flush()
+        queue = await usage.queue
+        XCTAssertEqual(queue.count, 2, "No answer (offline) keeps them")
+        await usage.flush()
+        queue = await usage.queue
+        XCTAssertTrue(queue.isEmpty, "Accepted on the third try")
+        XCTAssertEqual(transport.bodies.count, 3)
+    }
+
+    func testRefusedEventsAreDropped() async {
+        for status in [400, 413, 422] {
+            let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+            transport.answers = [status]
+            defaults.removePersistentDomain(forName: suite)
+            let usage = reporter(transport, clock: clock)
+            await usage.appOpened()
+            let queue = await usage.queue
+            XCTAssertTrue(queue.isEmpty, "\(status) drops the batch")
+        }
+    }
+
+    func testTheQueueNeverPassesFiftyWhileOffline() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        transport.answers = Array(repeating: nil, count: 80)
+        let usage = reporter(transport, clock: clock)
+        for day in 0..<70 {
+            clock.date = noon.addingTimeInterval(Double(day) * 86_400)
+            await usage.appOpened()
+        }
+        let queue = await usage.queue
+        XCTAssertEqual(queue.count, 50)
+        XCTAssertEqual(queue.last?.id.hasSuffix(UsageClock.day(clock.date, timeZone: taipei)), true, "The newest are kept")
+        XCTAssertLessThanOrEqual(transport.bodyEvents.map(\.count).max() ?? 0, 50)
+    }
+
+    func testThePayloadIsTheWorkstationContract() throws {
+        let body = try UsageReporter.payload([event("a"), event("b")])
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        XCTAssertEqual(Set(json.keys), ["p_product", "p_events"])
+        XCTAssertEqual(json["p_product"] as? String, "94265929d4b69a431c5a")
+        let events = try XCTUnwrap(json["p_events"] as? [[String: Any]])
+        XCTAssertEqual(events.count, 2)
+        XCTAssertEqual(Set(events[0].keys), ["id", "kind", "at", "iid", "pf", "m", "v"], "Nothing else ever leaves the phone")
+    }
+
+    func testTheRequestCarriesTheAnonKey() {
+        let request = WorkstationTransport.request(Data("{}".utf8))
+        XCTAssertEqual(request.url?.absoluteString, "https://bpovoxjdqdwhhlfwgpep.supabase.co/rest/v1/rpc/ingest_app_events")
+        XCTAssertEqual(request.httpMethod, "POST")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "apikey"), WorkstationTransport.anonKey)
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer \(WorkstationTransport.anonKey)")
+        XCTAssertEqual(request.timeoutInterval, 10)
+    }
+
+    // MARK: The switch and the gate
+
+    func testNothingIsQueuedOrSentWithTheSwitchOff() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        transport.answers = [nil]
+        let usage = reporter(transport, clock: clock)
+        XCTAssertTrue(UsageReporter.isEnabled(defaults), "On by default")
+        await usage.appOpened()
+        var queue = await usage.queue
+        XCTAssertEqual(queue.count, 2, "Waiting after an offline try")
+        await usage.switched(on: false)
+        XCTAssertFalse(UsageReporter.isEnabled(defaults))
+        queue = await usage.queue
+        XCTAssertTrue(queue.isEmpty, "Turning it off clears the queue")
+        clock.date = noon.addingTimeInterval(86_400)
+        await usage.appOpened()
+        await usage.flush()
+        queue = await usage.queue
+        XCTAssertTrue(queue.isEmpty)
+        XCTAssertEqual(transport.bodies.count, 1, "Nothing sent after it was turned off")
+    }
+
+    func testTurningItBackOnReportsToday() async {
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        defaults.set(false, forKey: UsageReporter.enabledKey)
+        let usage = reporter(transport, clock: clock)
+        await usage.appOpened()
+        XCTAssertTrue(transport.bodies.isEmpty)
+        await usage.switched(on: true)
+        XCTAssertEqual(transport.events.map(\.kind), ["first_open", "daily_open"])
+    }
+
+    func testNeverUnderUITestsTheTestHostPreviewsOrDebugBuilds() async {
+        XCTAssertTrue(UsageGate.allowed(arguments: ["ETFToGo"], environment: [:], debug: false), "A Release build reports")
+        XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo"], environment: [:], debug: true), "A Debug build never reports")
+        XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo", "--ui-testing"], environment: [:], debug: false))
+        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCTestConfigurationFilePath": "/x.xctestconfiguration"], debug: false))
+        XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCODE_RUNNING_FOR_PREVIEWS": "1"], debug: false))
+        let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
+        let usage = reporter(transport, clock: clock, allowed: false)
+        await usage.appOpened()
+        await usage.flush()
+        let queue = await usage.queue
+        XCTAssertTrue(queue.isEmpty)
+        XCTAssertTrue(transport.bodies.isEmpty)
+        XCTAssertNil(defaults.string(forKey: UsageInstall.key), "Not even an install id is made")
+    }
+
+    // MARK: Install id and purchase token
+
+    func testTheInstallIDIsAStableLowercaseUUIDv4() {
+        let iid = UsageInstall.id(defaults: defaults)
+        XCTAssertTrue(UsageInstall.isValid(iid), iid)
+        XCTAssertEqual(iid, iid.lowercased())
+        XCTAssertEqual(UsageInstall.id(defaults: defaults), iid, "Made once, then kept")
+        let other = UserDefaults(suiteName: suite + ".other")!
+        defer { other.removePersistentDomain(forName: suite + ".other") }
+        XCTAssertNotEqual(UsageInstall.id(defaults: other), iid, "Random per install")
+        XCTAssertFalse(UsageInstall.isValid("0F8E2C1A-3B4D-4E5F-8A9B-0C1D2E3F4A5B"), "Uppercase is not the form sent")
+        XCTAssertFalse(UsageInstall.isValid("0f8e2c1a-3b4d-1e5f-8a9b-0c1d2e3f4a5b"), "Version 1 is not v4")
+        defaults.set("not-a-uuid", forKey: UsageInstall.key)
+        XCTAssertTrue(UsageInstall.isValid(UsageInstall.id(defaults: defaults)), "A damaged id is made again")
+    }
+
+    /// Through the app's own export (資料備份與還原), with records, the install id, queued events and the rating state
+    /// all on the phone: none of the phone-only state is in the file.
+    @MainActor func testTheInstallIDStaysOutOfTheAppBackup() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("usage-backup-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("records.json"))
+        try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
+        let iid = UsageInstall.id(defaults: .standard)
+        let waiting = [UsageEvent.firstOpen(iid: iid, at: noon, region: "TW", version: "1.0(7)")]
+        UserDefaults.standard.set(try JSONEncoder().encode(waiting), forKey: UsageReporter.queueKey)
+        defer { UserDefaults.standard.removeObject(forKey: UsageReporter.queueKey) }
+        let backup = String(decoding: try Data(contentsOf: store.export()), as: UTF8.self)
+        XCTAssertTrue(backup.contains("0050"), "The export has the records")
+        XCTAssertFalse(backup.contains(iid), "but not the install id")
+        XCTAssertFalse(backup.contains("first_open"), "nor the waiting events")
+        XCTAssertFalse(backup.contains("usageStats"))
+    }
+
+    func testTheAppAccountTokenIsTheInstallID() throws {
+        let iid = UsageInstall.id(defaults: defaults)
+        let token = try XCTUnwrap(UUID(uuidString: iid))
+        XCTAssertEqual(UsageInstall.purchaseOptions(defaults: defaults), [Product.PurchaseOption.appAccountToken(token)])
+        XCTAssertEqual(token.uuidString.lowercased(), iid)
+        // Also with the switch off: it is only a random number Apple echoes back.
+        defaults.set(false, forKey: UsageReporter.enabledKey)
+        XCTAssertEqual(UsageInstall.purchaseOptions(defaults: defaults), [Product.PurchaseOption.appAccountToken(token)])
+    }
+
+    // MARK: Region
+
+    /// The phone's region setting, as the contract and 額度雷達 do; '' when unknown or not a country.
+    func testTheRegionIsThePhonesTwoLetterRegion() {
+        XCTAssertEqual(UsageRegion.resolve(phone: "TW"), "TW")
+        XCTAssertEqual(UsageRegion.resolve(phone: "jp"), "JP")
+        XCTAssertEqual(UsageRegion.resolve(phone: "419"), "", "A numeric region is not a country")
+        XCTAssertEqual(UsageRegion.resolve(phone: "TWN"), "")
+        XCTAssertEqual(UsageRegion.resolve(phone: ""), "")
+        XCTAssertEqual(UsageRegion.resolve(phone: nil), "")
+        let here = UsageRegion.current()
+        XCTAssertTrue(here.isEmpty || here.range(of: "^[A-Z]{2}$", options: .regularExpression) != nil, here)
+    }
+
+    // MARK: Privacy manifest
+
+    func testThePrivacyManifestDeclaresAnalyticsDataNotLinked() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"), "The manifest ships in the app")
+        let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
+        XCTAssertEqual(plist["NSPrivacyTracking"] as? Bool, false)
+        let types = try XCTUnwrap(plist["NSPrivacyCollectedDataTypes"] as? [[String: Any]])
+        let byType = Dictionary(uniqueKeysWithValues: types.compactMap { entry in (entry["NSPrivacyCollectedDataType"] as? String).map { ($0, entry) } })
+        // The daily open, Apple's subscription notifications keyed to the install id, and the install id itself.
+        for type in ["NSPrivacyCollectedDataTypeProductInteraction", "NSPrivacyCollectedDataTypePurchaseHistory", "NSPrivacyCollectedDataTypeDeviceID"] {
+            let entry = try XCTUnwrap(byType[type], type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypeLinked"] as? Bool, false, type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypeTracking"] as? Bool, false, type)
+            XCTAssertEqual(entry["NSPrivacyCollectedDataTypePurposes"] as? [String], ["NSPrivacyCollectedDataTypePurposeAnalytics"], type)
+        }
+        XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeCrashData"], "The crash entries stay")
+        XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeOtherDiagnosticData"])
+    }
+
+
+    private func event(_ id: String) -> UsageEvent {
+        UsageEvent(id: id, kind: "daily_open", at: "2026-11-22T03:04:05.125Z", iid: "x", pf: "ios", m: "TW", v: "1.0(7)")
+    }
+}
+
+final class UsageTestClock: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Date
+    init(_ date: Date) { value = date }
+    var date: Date {
+        get { lock.withLock { value } }
+        set { lock.withLock { value = newValue } }
+    }
+}
+
+/// Records each body; answers 200 unless told otherwise (`answers`, in order; nil is no answer).
+final class UsageFakeTransport: UsageTransport, @unchecked Sendable {
+    private let lock = NSLock()
+    private var sent: [Data] = []
+    private var queued: [Int?] = []
+
+    var answers: [Int?] {
+        get { lock.withLock { queued } }
+        set { lock.withLock { queued = newValue } }
+    }
+    var bodies: [Data] { lock.withLock { sent } }
+
+    func send(_ body: Data) async -> Int? {
+        lock.withLock {
+            sent.append(body)
+            return queued.isEmpty ? 200 : queued.removeFirst()
+        }
+    }
+
+    /// The events of each body, in order.
+    var bodyEvents: [[UsageEvent]] {
+        struct Body: Decodable { let p_events: [UsageEvent] }
+        return bodies.compactMap { try? JSONDecoder().decode(Body.self, from: $0).p_events }
+    }
+
+    /// Every event that was sent, once per id (a retry sends the same event again).
+    var events: [UsageEvent] {
+        var seen = Set<String>(), out: [UsageEvent] = []
+        for event in bodyEvents.joined() where seen.insert(event.id).inserted { out.append(event) }
+        return out
+    }
+}

@@ -54,6 +54,8 @@ extension AppRoute {
         case "exposure" where testing: return [.feature(.tools), .exposure]
         case "backup" where testing: return [.feature(.tools), .backup]
         case "sources" where testing: return [.feature(.tools), .sources]
+        // 設定 › 隱私與安全, as 口袋's 設定 opens it (App 上鎖).
+        case "privacy" where testing: return [.feature(.pocket), .settings, .privacy]
         default: return nil
         }
     }

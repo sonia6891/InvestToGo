@@ -70,8 +70,13 @@ final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
         completionHandler(Self.presentation(for: notification.request.identifier))
     }
 
+    /// Any notification tapped (到價提醒, 配息提醒, 扣款日提醒). At a cold launch from the tap the opening steps aside
+    /// (`OpeningLaunch`); otherwise the app opens as before. A reminder that asks for 記一筆 also asks the lobby for it.
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            Task { @MainActor in OpeningLaunch.shared.notificationOpened() }
+        }
         if Self.wantsQuickDCA(response.notification.request.content.userInfo) {
             Task { @MainActor in AppRouter.shared.quickDCARequested = true }
         }

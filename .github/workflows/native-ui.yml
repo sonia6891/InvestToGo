@@ -156,6 +156,8 @@ jobs:
           # Sentry (Task 14): the Debug app CI runs carries an empty SentryDSN, so it sends nothing; the Release
           # setting resolves to the whole DSN (`//` and `@` intact).
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p.get('SentryDSN', None) == '', repr(p.get('SentryDSN', None)); print('Verified empty SentryDSN in Debug')"
+          # App 上鎖: Face ID asks with this line (2026-11-22 design).
+          python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist').read_bytes()); assert p.get('NSFaceIDUsageDescription') == '用 Face ID 解鎖投資袋著走', repr(p.get('NSFaceIDUsageDescription')); print('Verified NSFaceIDUsageDescription')"
           # -target, not -scheme (the two are exclusive): one target, so the first SENTRY_DSN line is the app's.
           xcodebuild -showBuildSettings -project ETFToGo.xcodeproj -target ETFToGo -configuration Release -sdk iphonesimulator > build/release-settings.txt
           RELEASE_DSN=$(sed -n 's/^ *SENTRY_DSN = //p' build/release-settings.txt | head -n 1)
@@ -254,6 +256,89 @@ jobs:
             sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
           done
+      # App 上鎖 (2026-11-22 design): 設定 › 隱私與安全 with its 「App 上鎖」 card, and the lock screen (`--lock`) in every
+      # 外觀主題. Their own step, so the screens above are untouched.
+      - name: Capture the app lock in every skin
+        timeout-minutes: 3
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -uo pipefail
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --open privacy || echo "::warning::launch failed for privacy"
+          sleep 5
+          xcrun simctl io "$DEVICE" screenshot "build/screens/screen-privacy.png" || true
+          for SKIN in blackgold voxel stitch sketch; do
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --lock --skin "$SKIN" || echo "::warning::launch failed for lock-$SKIN"
+            sleep 5
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-lock-$SKIN.png" || true
+          done
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+      # 口袋會員前 7 天全開 (2026-11-22 design): the lobby's line on day 2 (`--member-open 2`) and the summary after day 7
+      # (`--member-open 8`) in every 外觀主題, and day 1's and day 5's notes. Their own step, so the screens above are
+      # untouched.
+      - name: Capture 口袋會員全開 in every skin
+        timeout-minutes: 4
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -uo pipefail
+          shot() {
+            local name="$1"; shift
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --quiet-toasts --skip-onboarding --demo-streak 12 --demo-level 7 "$@" || echo "::warning::launch failed for $name"
+            # The notes wait for the lobby to settle (about a second and a half) before they come up.
+            sleep 7
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-member-open-$name.png" || true
+          }
+          for SKIN in blackgold voxel stitch sketch; do
+            shot "banner-$SKIN" --member-open 2 --skin "$SKIN"
+            shot "summary-$SKIN" --member-open 8 --skin "$SKIN"
+          done
+          shot day1 --member-open 1
+          shot day5 --member-open 5
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+      # 開場動畫 as video, for watching the motion itself: a later launch in each skin (--opening plays it under
+      # --ui-testing, then holds on 略過) and the first launch (ends on 輕點開始). Its own folder and artifact: the
+      # screenshots above are untouched.
+      - name: Record the opening in every skin
+        timeout-minutes: 4
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -uo pipefail
+          mkdir -p build/opening
+          record() {
+            local name="$1"; shift
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            sleep 1
+            xcrun simctl io "$DEVICE" recordVideo --codec h264 --force "build/opening/opening-$name.mp4" &
+            local recorder=$!
+            sleep 1
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview "$@" || echo "::warning::launch failed for $name"
+            # A cold launch takes one to two seconds before the first frame: 7 s reaches the 3 s opening's end.
+            sleep 7
+            kill -INT "$recorder" || true
+            wait "$recorder" || true
+          }
+          for SKIN in blackgold voxel stitch sketch; do
+            record "$SKIN" --ui-testing --reset --skip-onboarding --opening --skin "$SKIN"
+          done
+          record first-launch --ui-testing --reset --opening
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+          ls -l build/opening
+      - name: Publish the opening videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETFToGo-opening-video
+          path: build/opening/*.mp4
+          if-no-files-found: warn
+          retention-days: 14
       - name: Publish screenshots immediately for inspection
         if: always()
         uses: actions/upload-artifact@v4

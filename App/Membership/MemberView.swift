@@ -36,14 +36,17 @@ enum PlanPrice {
     @Published private(set) var loading = false
     /// The App Store did not answer, or answered without the plans.
     @Published private(set) var failed = false
+    /// A purchase is in progress (the App Store's sheet, or its answer): the rating sheet waits (`ReviewPrompt`).
+    @Published private(set) var purchasing = false
     /// The paid plans this Apple ID holds, current and not refunded (StoreKit's own record of its purchases).
     @Published private(set) var owned: Set<String> = []
     var isMember: Bool { !owned.isEmpty }
     /// `--ui-testing --demo-member` (or `--demo-store`, which implies it): every member feature open without a purchase
     /// (UI tests, screenshots).
     var demoMember = MembershipStore.demoMember(from: ProcessInfo.processInfo.arguments)
-    /// Whether this person may use a member feature. Reads `owned`, so views observing the store redraw on a change.
-    func has(_ feature: MemberFeature) -> Bool { isMember || demoMember }
+    /// Whether this person may use a member feature. Reads `owned` and `open`, so views observing the store redraw on
+    /// a change. The one gate: 口袋會員前 7 天全開 opens every member feature through it, exactly as a membership does.
+    func has(_ feature: MemberFeature) -> Bool { isMember || demoMember || openNow }
     nonisolated static func demoMember(from args: [String]) -> Bool { DemoArguments.has("--demo-member", in: args) }
     @Published var message: String?
     private var updates: Task<Void, Never>?
@@ -60,6 +63,74 @@ enum PlanPrice {
     var checksWornSkin = !ProcessInfo.processInfo.arguments.contains("--ui-testing")
         && ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil
     static let lapseNotice = "會員已到期，已換回黑金"
+
+    // MARK: 口袋會員前 7 天全開 (docs/superpowers/specs/2026-11-22-member-open-7-days-design.md)
+
+    /// The 7 days on this phone (`MemberOpenDays.forLaunch`); tests set their own.
+    var memberOpen: MemberOpenDays { didSet { refreshOpen() } }
+    /// Where the 7 days stand, refreshed at launch, on each return to the lobby, when a day turns and when they end.
+    @Published private(set) var open: MemberOpenInfo = .off
+    /// The 7 days are running right now (checked against the clock too, so a gate read between two refreshes is never
+    /// open past their end).
+    var openNow: Bool { open.active && (open.end.map { memberOpen.date < $0 } ?? false) }
+    /// 全部外觀主題 are a member's, and so the 7 days'.
+    var wearsMemberSkins: Bool { isMember || openNow }
+    private var openTurn: Task<Void, Never>?
+
+    init(memberOpen: MemberOpenDays = .forLaunch()) {
+        self.memberOpen = memberOpen
+        open = memberOpen.info()
+        scheduleOpenTurn()
+    }
+
+    /// Reads the 7 days again: the lobby's 「還剩 N 天」 follows the day, and every member screen locks again at their
+    /// end; a 外觀主題 worn during them then goes back to 黑金, with a notice of its own.
+    func refreshOpen() {
+        let was = open.active
+        open = memberOpen.info()
+        if isMember { memberOpen.quietForMember() }
+        scheduleOpenTurn()
+        if was && !open.active && answered { checkWornSkin() }
+    }
+
+    /// A member tool opened during the 7 days by someone who is not a member: counted for the summary after day 7.
+    func noteUse(_ feature: MemberFeature) {
+        guard openNow, !isMember, !demoMember else { return }
+        memberOpen.noteUse(feature)
+    }
+
+    /// Wakes at the next moment the 7 days change: the next day's start, or their end.
+    private func scheduleOpenTurn() {
+        openTurn?.cancel()
+        guard open.active, let start = open.start else { openTurn = nil; return }
+        let next = start.addingTimeInterval(Double(open.day) * MemberOpenInfo.dayLength)
+        let wait = max(1, next.timeIntervalSince(memberOpen.date))
+        openTurn = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(wait))
+            guard !Task.isCancelled else { return }
+            self?.refreshOpen()
+        }
+    }
+
+    /// The worn 外觀主題 went back to 黑金 at the end of the 7 days, at this launch: the summary says so too, since its
+    /// sheet covers the notice.
+    @Published private(set) var skinBackAtEnd = false
+
+    /// UI tests and screenshots: the summary and 「再考慮」 come up without the App Store's price (the CI simulator has
+    /// no products), showing 「口袋會員 —」 and 「看看口袋會員」. A real launch never shows them without a price.
+    var sellsWithoutPriceForUITests = ProcessInfo.processInfo.arguments.contains("--ui-testing")
+    /// Unit tests only: stands in for whether the App Store's product has loaded (a `Product` cannot be made in a test).
+    var planPriceLoadedForTests: Bool?
+    /// The App Store has given 口袋會員's monthly price.
+    var planPriceLoaded: Bool { planPriceLoadedForTests ?? (products[MembershipProducts.pocketMonthly] != nil) }
+
+    /// A 口袋會員全開 note would really come up on this launch once the lobby is free: day 1's or day 5's is due, or
+    /// the summary or 「再考慮」 is due and the price has loaded (or the UI-testing bypass applies). A due note that
+    /// cannot show (offline at day 8) does not count, so it never holds back another prompt (`LaunchPrompt`).
+    var memberOpenNoteWaiting: Bool {
+        guard let due = memberOpen.due(member: isMember || demoMember) else { return false }
+        return due.canShow(priced: planPriceLoaded || sellsWithoutPriceForUITests)
+    }
 
     /// Reads the prices and the membership, and follows purchases made elsewhere (renewals, Ask to Buy, refunds).
     func start() async {
@@ -111,11 +182,13 @@ enum PlanPrice {
     func apply(_ held: Set<String>) {
         owned = held
         answered = true
+        if isMember { memberOpen.quietForMember() }
         checkWornSkin()
     }
 
-    /// StoreKit has answered at least once since launch.
-    private var answered = false
+    /// StoreKit has answered at least once since launch. Until then a member looks like anyone else, so nothing about
+    /// the 7 days is said yet.
+    @Published private(set) var answered = false
     /// The records cannot be read yet (a launch in the background on a locked phone); set at launch. `level` then
     /// reads 1 whatever the player has reached, so the worn skin is not judged until `recordsRead`.
     var recordsLocked: () -> Bool = { false }
@@ -128,14 +201,25 @@ enum PlanPrice {
 
     private func checkWornSkin() {
         guard checksWornSkin, !recordsLocked() else { return }
-        if (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: isMember) { onLapse(Self.lapseNotice) }
+        let wardrobe = skins ?? SkinStore.shared, worn = wardrobe.skin
+        guard wardrobe.takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
+        // The 7 days' own notice only for the take-off their end caused: a skin a membership would keep on, taken off
+        // after the end, the first time, for someone never a member (`takeSkinBackAtEnd`). Any other: the lapse's.
+        let atEnd = !isMember && Skins.isUnlocked(worn, level: level(), member: true) && memberOpen.takeSkinBackAtEnd()
+        if atEnd { skinBackAtEnd = true }
+        onLapse(atEnd ? MemberOpenCopy.skinNotice : Self.lapseNotice)
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.
+    /// The anonymous install id goes with it as the `appAccountToken` (2026-11-22 產品工作站 design): Apple echoes it back
+    /// in its subscription notifications, so 退訂紀錄 can show which version a cancellation came from. It is only a random
+    /// number kept on this phone, so it goes also with 「傳送匿名使用統計」 off.
     func purchase(_ id: String) async {
         guard let product = products[id] else { return }
+        purchasing = true
+        defer { purchasing = false }
         do {
-            switch try await product.purchase() {
+            switch try await product.purchase(options: UsageInstall.purchaseOptions()) {
             case .success(.verified(let transaction)):
                 await transaction.finish()
                 await refreshMembership()
@@ -176,9 +260,9 @@ struct MemberView: View {
     /// The crown's stage gives way, down to the smaller size, so that the three plans fit above the buy button.
     static let stageSizes: ClosedRange<CGFloat> = 110...180
     /// Apple's standard licence agreement, the terms auto-renewing plans are sold under until the app has its own.
-    private static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
+    static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
     /// The privacy policy, linked beside 條款 (guideline 3.1.2 asks for both on a subscription screen).
-    static let privacy = URL(string: "https://sonia6891.github.io/etftogo/privacy")!
+    static let privacy = URL(string: "https://investtogo.pocketjoystudio.com/privacy/")!
 
     enum Plan: String, CaseIterable, Identifiable {
         case free, pocket, ai
@@ -244,7 +328,7 @@ struct MemberView: View {
                 .accessibilityHidden(true)
                 VStack(spacing: 8) {
                     Text("口袋會員").skinFont(.title(30)).skinForeground(\.ink)
-                    SkinTag(membership.isMember ? "你是會員・全部外觀主題已解鎖" : "看懂・規劃・回顧")
+                    SkinTag(Self.tag(member: membership.isMember, open: membership.openNow ? membership.open : nil))
                 }
                 .frame(maxWidth: .infinity)
                 // Only the stage gives way: the cards have a least height (44) they would otherwise be pressed down
@@ -290,6 +374,13 @@ struct MemberView: View {
             .background(skin.color(\.page))
             .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { footer = $0 }
         }
+    }
+
+    /// The line under 口袋會員: a member's, the 7 days' while they run (口袋會員前 7 天全開), else the plan's own.
+    static func tag(member: Bool, open: MemberOpenInfo?) -> String {
+        if member { return "你是會員・全部外觀主題已解鎖" }
+        if let end = open?.end { return "全開中・\(MemberOpenCopy.endText(end)) 結束" }
+        return "看懂・規劃・回顧"
     }
 
     /// The selected plan is already this Apple ID's.

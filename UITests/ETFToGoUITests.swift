@@ -654,7 +654,8 @@ final class ETFToGoUITests: XCTestCase {
         let splash = app.buttons["splash"]
         XCTAssertTrue(splash.waitForExistence(timeout: 10), "A first launch opens on the splash", file: file, line: line)
         if capturing {
-            XCTAssertTrue(app.staticTexts["SKN×001"].exists, "The splash shows the worn skin's code", file: file, line: line)
+            // The opening design (2026-11-21) took the code line off: the tag already names the 外觀主題.
+            XCTAssertFalse(app.staticTexts["SKN×001"].exists, "The splash no longer shows the skin's code", file: file, line: line)
             XCTAssertTrue(app.staticTexts["存 ETF，也存下好習慣。"].exists, file: file, line: line)
             XCTAssertFalse(app.buttons["lobby-find"].exists, "Not the lobby yet", file: file, line: line)
             sleep(1); capture(app, "splash")
@@ -699,6 +700,20 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "The next launch goes straight to the lobby")
         XCTAssertFalse(app.buttons["splash"].exists, "No splash once onboarded")
         XCTAssertFalse(app.buttons["habit-dca"].exists, "No onboarding once onboarded")
+    }
+
+    /// 開場動畫: a later launch forced to play it (`--opening`) offers 略過, which goes straight to the lobby.
+    func testOpeningSkips() {
+        let app = launch(["--opening"])
+        let skip = app.buttons["opening-skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 10), "The opening offers 略過")
+        skip.tap()
+        let find = app.buttons["lobby-find"]
+        // Checked as often as the simulator answers for 2 s, then once more: a predicate expectation polls about once a
+        // second, and on a slow CI simulator one query can take that long, so it could time out without a single answer.
+        let deadline = Date().addingTimeInterval(2)
+        while Date() < deadline, !(find.exists && find.isHittable) { usleep(100_000) }
+        XCTAssertTrue(find.exists && find.isHittable, "略過 goes straight to the lobby")
     }
 
     /// 工具 › 提醒 has the debit-day reminder chosen in onboarding: on or off, the day and the time (final review I5).
@@ -1125,6 +1140,52 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(shown(app).exists, "A non-member does not see \(route) itself", file: file, line: line)
         app.terminate()
     }
+    // MARK: 口袋會員前 7 天全開 (docs/superpowers/specs/2026-11-22-member-open-7-days-design.md)
+
+    /// Day 2 of the 7 (`--member-open 2`): the lobby's line says when they end and how many days are left, opens 會員,
+    /// and a member tool opens without its lock card. Day 2 has no note over the lobby.
+    func testMemberOpenBanner() {
+        let app = launch(["--member-open", "2"])
+        let banner = app.buttons["member-open-banner"]
+        XCTAssertTrue(banner.waitForExistence(timeout: 10), "The lobby has the 7 days' line")
+        XCTAssertTrue(banner.label.hasPrefix("口袋會員全開中・"), banner.label)
+        XCTAssertTrue(banner.label.contains(" 結束・"), "The end is said with its time: \(banner.label)")
+        XCTAssertTrue(banner.label.hasSuffix("還剩 6 天"), banner.label)
+        capture(app, "member-open-banner")
+        XCTAssertFalse(app.descendants(matching: .any)["member-open-note"].firstMatch.exists, "No note on day 2")
+        banner.tap()
+        XCTAssertTrue(app.buttons["member-buy"].waitForExistence(timeout: 5), "The line opens 會員")
+        app.terminate()
+
+        let tool = launch(["--member-open", "2", "--open", "backtest"])
+        XCTAssertTrue(tool.buttons["backtest-run"].waitForExistence(timeout: 10), "回測 opens during the 7 days")
+        XCTAssertFalse(tool.descendants(matching: .any)["member-lock-backtest"].exists, "with no lock card")
+    }
+
+    /// Day 8 (`--member-open 8`): the summary sheet comes up over the lobby with its main button (「看看口袋會員」 here: the
+    /// simulator has no App Store price; a real launch shows it only with the price and 「訂閱口袋會員」), the line is gone, and
+    /// the member tool is locked again.
+    func testMemberOpenEnds() {
+        let app = launch(["--member-open", "8"])
+        let summary = app.descendants(matching: .any)["member-open-summary"].firstMatch
+        XCTAssertTrue(summary.waitForExistence(timeout: 10), "The summary sheet comes up after day 7")
+        XCTAssertTrue(app.staticTexts["7 天的口袋會員全開結束了"].exists)
+        XCTAssertTrue(app.buttons["member-open-subscribe"].exists, "with its main button")
+        XCTAssertEqual(app.buttons["member-open-subscribe"].label, "看看口袋會員", "no App Store price here: not 訂閱口袋會員")
+        XCTAssertTrue(app.buttons["先用免費版"].exists, "and a way to close it")
+        capture(app, "member-open-summary")
+        app.buttons["先用免費版"].tap()
+        XCTAssertTrue(summary.waitForNonExistence(timeout: 5), "The sheet closes")
+        XCTAssertFalse(app.buttons["member-open-banner"].exists, "No line after the 7 days")
+        app.terminate()
+
+        let tool = launch(["--member-open", "8", "--open", "backtest"])
+        // The summary waits for the lobby; should it come up over this screen anyway, it is closed first.
+        let late = tool.buttons["先用免費版"]
+        if late.waitForExistence(timeout: 3) { late.tap() }
+        XCTAssertTrue(tool.descendants(matching: .any)["member-lock-backtest"].waitForExistence(timeout: 10), "回測 is locked again")
+        XCTAssertFalse(tool.buttons["backtest-run"].exists, "and its form is not shown")
+    }
     /// 組合試算's 基準 is free; 保守, 樂觀 and 壓力測試 are the member's (`MemberFeature.scenarios`). A non-member who
     /// picks one of them sees the lock instead of its figures and can go back to 基準; a member sees every scenario.
     func testScenarioLockInCombo() {
@@ -1247,5 +1308,69 @@ final class ETFToGoUITests: XCTestCase {
     private func waitForValue(_ element: XCUIElement, _ value: String, file: StaticString = #filePath, line: UInt = #line) {
         let found = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: element)
         XCTAssertEqual(XCTWaiter().wait(for: [found], timeout: 5), .completed, "Expected \(value), got \(element.exists ? String(describing: element.value) : "nothing")", file: file, line: line)
+    }
+
+    // MARK: App 上鎖 (docs/superpowers/specs/2026-11-22-app-lock-design.md)
+
+    /// Types a passcode on the lock's number pad (the lock screen's, or the settings sheet's).
+    private func typePasscode(_ app: XCUIApplication, _ code: String, file: StaticString = #filePath, line: UInt = #line) {
+        for digit in code {
+            let key = app.buttons["lock-key-\(digit)"]
+            XCTAssertTrue(key.waitForExistence(timeout: 5), "lock-key-\(digit) is on the pad", file: file, line: line)
+            key.tap()
+        }
+    }
+
+    /// `--lock`: the lock is on with 123456 and no Face ID. A wrong code keeps it locked; 123456 opens the lobby.
+    func testAppLockWithPasscode() {
+        let app = launch(["--lock"])
+        let screen = app.descendants(matching: .any)["lock-screen"]
+        XCTAssertTrue(screen.waitForExistence(timeout: 10), "With the lock on, the app opens on the lock screen")
+        XCTAssertFalse(app.buttons["lobby-find"].exists, "The lobby is not built behind it")
+        XCTAssertTrue(app.buttons["lock-forgot"].exists, "忘記密碼 is offered")
+        XCTAssertFalse(app.buttons["lock-faceid"].exists, "No Face ID in UI tests")
+        sleep(1); capture(app, "lock-screen")
+        typePasscode(app, "000000")
+        XCTAssertTrue(app.staticTexts["密碼錯誤"].waitForExistence(timeout: 5), "A wrong code says so")
+        XCTAssertTrue(screen.exists, "and stays locked")
+        XCTAssertFalse(app.buttons["lobby-find"].exists)
+        typePasscode(app, "123456")
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "123456 opens the lobby")
+        let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: screen)
+        XCTAssertEqual(XCTWaiter().wait(for: [gone], timeout: 5), .completed, "The lock screen has gone")
+    }
+
+    /// 設定 › 隱私與安全: 「App 上鎖」 is off; turning it on asks for a new code twice, and then it reads on.
+    func testTurnOnLock() {
+        let app = launch(["--open", "privacy"])
+        let toggle = app.switches["lock-toggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "隱私與安全 has 「App 上鎖」")
+        // The card is where 「目前未提供 App 內上鎖」 was, below the crash-report card: scrolled into view.
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
+        XCTAssertEqual(toggle.value as? String, "0", "Off by default")
+        XCTAssertFalse(app.buttons["lock-change"].exists, "No 變更密碼 before a passcode is set")
+        sleep(1); capture(app, "lock-settings-off")
+        let knob = toggle.switches.firstMatch
+        if knob.exists { knob.tap() } else { toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
+        XCTAssertTrue(app.staticTexts["設定 6 位數的 App 密碼"].waitForExistence(timeout: 5), "Turning it on asks for a new code")
+        typePasscode(app, "246810")
+        XCTAssertTrue(app.staticTexts["再輸入一次"].waitForExistence(timeout: 5), "then for the same code again")
+        typePasscode(app, "246810")
+        waitForValue(toggle, "1")
+        XCTAssertTrue(app.buttons["lock-change"].waitForExistence(timeout: 5), "變更密碼 shows once a passcode is set")
+        XCTAssertFalse(app.switches["lock-faceid-toggle"].exists, "No Face ID toggle without Face ID")
+        sleep(1); capture(app, "lock-settings-on")
+    }
+
+    /// 設定 › 隱私與安全: 「傳送匿名使用統計」 is on by default and says in one line what it sends. (Nothing is sent under
+    /// --ui-testing; the events themselves are unit tested.)
+    func testUsageStatsSwitch() {
+        let app = launch(["--open", "privacy"])
+        let toggle = app.switches["usage-stats-toggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "隱私與安全 has 「傳送匿名使用統計」")
+        for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
+        XCTAssertEqual(toggle.value as? String, "1", "On by default")
+        XCTAssertTrue(app.staticTexts["只傳匿名安裝碼、平台、App 版本、地區與開啟時間，每天最多一次；持股、金額與交易紀錄永遠不會上傳。"].exists, "It says what is sent")
+        sleep(1); capture(app, "usage-stats-settings")
     }
 }
