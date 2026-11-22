@@ -66,7 +66,6 @@ import UserNotifications
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
     @Environment(\.motionReduced) private var reduceMotion
-    @ObservedObject private var router = AppRouter.shared
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
 
@@ -97,6 +96,7 @@ struct RootView: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.scenePhase) private var phase
     @Environment(\.motionReduced) private var reduceMotion
+    @ObservedObject private var router = AppRouter.shared
     @Namespace private var lobby
     @State private var path: NavigationPath
     /// The feature at the bottom of the stack; nil in the lobby and on screens pushed straight from it.
