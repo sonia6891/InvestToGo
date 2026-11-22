@@ -284,7 +284,7 @@ final class ETFToGoUITests: XCTestCase {
         let row = app.staticTexts["元大台灣50"]
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
         XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The first visit plays the reveal")
-        XCTAssertTrue(app.staticTexts["+30 經驗"].exists, "The reveal names the experience")
+        XCTAssertTrue(app.descendants(matching: .any)["dex-reveal-reward"].label.contains("+30 經驗"), "The reveal names the experience")
         acceptDexReveal(app)
         XCTAssertTrue(app.staticTexts["detail-code"].exists)
         XCTAssertEqual(app.staticTexts["detail-code"].label, "0050")
@@ -332,7 +332,9 @@ final class ETFToGoUITests: XCTestCase {
         let row = app.staticTexts["元大台灣50"]
         XCTAssertTrue(row.waitForExistence(timeout: 5)); row.tap()
         XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The reveal plays")
-        XCTAssertTrue(app.staticTexts["+30 經驗"].waitForExistence(timeout: 5), "It shows the experience")
+        let reward = app.descendants(matching: .any)["dex-reveal-reward"]
+        XCTAssertTrue(reward.waitForExistence(timeout: 5), "It shows the reward")
+        XCTAssertTrue(reward.label.contains("+30 經驗"), "It names the experience: \(reward.label)")
         let accept = app.buttons["dex-reveal-accept"]
         XCTAssertTrue(accept.isHittable, "收下 can be tapped")
         accept.tap()
@@ -374,8 +376,10 @@ final class ETFToGoUITests: XCTestCase {
         }
         openFund(app, code: "00878")
         XCTAssertTrue(app.descendants(matching: .any)["dex-reveal"].waitForExistence(timeout: 5), "The fourth card still plays the reveal")
-        XCTAssertTrue(app.staticTexts["收進圖鑑"].waitForExistence(timeout: 5), "It says the card is collected")
-        XCTAssertFalse(app.staticTexts["+30 經驗"].exists, "No experience is promised")
+        let reward = app.descendants(matching: .any)["dex-reveal-reward"]
+        XCTAssertTrue(reward.waitForExistence(timeout: 5), "It shows the reward line")
+        XCTAssertTrue(reward.label.hasPrefix("收進圖鑑"), "It says the card is collected: \(reward.label)")
+        XCTAssertFalse(reward.label.contains("經驗"), "No experience is promised: \(reward.label)")
     }
 
     /// 找 ETF, the detail and the dex card in each skin, to compare with the canvas.
