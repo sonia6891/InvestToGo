@@ -13,7 +13,8 @@ import Foundation
 ///   on top of them someone a year in (`seedStoreGame`, `seedStore`).
 ///
 /// Read elsewhere: `--skin <id>` (SkinStore), `--open <feature>` (the root view), `--skip-onboarding`,
-/// `--open splash` and `--open onboarding [--page n]` (`Onboarding.start`), `--offline` and `--reduce-motion`.
+/// `--open splash` and `--open onboarding [--page n]` (`Onboarding.start`), `--offline` and `--reduce-motion`, and
+/// `--member-open <day>` (1–10: which day of 口袋會員前 7 天全開 it is, `MemberOpenDays.uiTestDay`; off without it).
 enum DemoArguments {
     /// `--quiet-toasts` with `--ui-testing`: the CI skin matrix captures pages without first-time notices.
     static let quietToasts: Bool = {

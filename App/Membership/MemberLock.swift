@@ -20,7 +20,8 @@ struct MemberLock<Content: View, Preview: View>: View {
 
     var body: some View {
         if membership.has(feature) {
-            content()
+            // Opened during 口袋會員前 7 天全開: counted for the summary after day 7 (nothing for a member).
+            content().onAppear { membership.noteUse(feature) }
         } else {
             VStack(spacing: 14) {
                 lockCard

@@ -63,7 +63,7 @@ struct SkinsView: View {
     @State private var focus: String? = SkinStore.current.id
 
     var body: some View {
-        let level = GameRules.level(xp: (store.data.game ?? GameState()).xp), member = membership.isMember
+        let level = GameRules.level(xp: (store.data.game ?? GameState()).xp), member = membership.wearsMemberSkins
         let focused = Skins.named(focus ?? skins.skin.id)
         let status = SkinStatus(focused, current: skins.skin.id, level: level, member: member)
         Page {

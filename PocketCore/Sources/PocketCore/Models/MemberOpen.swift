@@ -1,6 +1,6 @@
 import Foundation
 
-// 口袋會員前 7 天全開 (docs/superpowers/specs/2026-11-22-member-open-7-days-design.md), after 「喵的，又要上班了」's
+// 口袋會員前 7 天全開 (docs/superpowers/specs/2026-11-22-member-open-7-days-design.md), after the meow-work app's
 // 「前 7 天 PRO 全部免費開放」: every 口袋會員 tool is open for 7 × 24 h from the first open of the app on this phone.
 // No payment and no store offer is involved, nothing renews and nothing counts down by the second. This file holds the
 // days and the notes; `MembershipStore` opens its one gate with them, and the lobby shows them.
@@ -136,6 +136,9 @@ final class MemberOpenDays {
     }
 
     func info() -> MemberOpenInfo { MemberOpenInfo.of(start: record()?.start, now: now()) }
+
+    /// The clock the 7 days are judged by.
+    var date: Date { now() }
 
     /// The note to show now, if any. `member`: this Apple ID holds a plan (never a note for a member).
     func due(member: Bool) -> MemberOpenNote? {
