@@ -192,6 +192,11 @@ struct RootView: View {
         celebration != nil || levelUp != nil || store.data.game?.levelUpDue != nil
     }
 
+    /// 記一筆 is up or asked for: the rating sheet waits (`ReviewPrompt` hold "quickDCA", `QuickDCARoute.busy`).
+    private var quickDCABusy: Bool {
+        QuickDCARoute.busy(showing: router.quickDCAShowing, requested: router.quickDCARequested)
+    }
+
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
         let arguments = ProcessInfo.processInfo.arguments
@@ -254,7 +259,9 @@ struct RootView: View {
         .modifier(SkinKitLaunch())
         // App Store 評分視窗: never over LEVEL×UP, nor while it is on its way (waiting for a reward toast to finish).
         .onChange(of: levelUpComing, initial: true) { _, coming in ReviewPrompt.shared.hold("levelUp", while: coming) }
-        .onDisappear { ReviewPrompt.shared.release("levelUp") }
+        // Nor over 記一筆, from the tap (or tapped reminder) until the sheet has gone; its release asks again.
+        .onChange(of: quickDCABusy, initial: true) { _, busy in ReviewPrompt.shared.hold("quickDCA", while: busy) }
+        .onDisappear { ReviewPrompt.shared.release("levelUp"); ReviewPrompt.shared.release("quickDCA") }
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.

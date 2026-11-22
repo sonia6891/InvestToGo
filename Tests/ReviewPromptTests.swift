@@ -195,6 +195,26 @@ import XCTest
         XCTAssertEqual(askedAt, 7)
     }
 
+    /// 記一筆 up (hold "quickDCA", from the tap until the sheet has gone): no sheet over it; the wait gives up while it
+    /// is held, and closing 記一筆 asks again in this launch. 記一筆 never takes the launch's prompt, so it is still free.
+    func testHeldWhileQuickDCAIsUpAndAsksOnceItCloses() async {
+        let held = prompt()
+        var taken = false
+        held.launchFree = { !taken }
+        held.takeLaunch = { guard !taken else { return false }; taken = true; return true }
+        held.hold("quickDCA", while: QuickDCARoute.busy(showing: true, requested: false))
+        var asks = 0
+        let asked = await held.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertFalse(asked, "記一筆 is up: no rating sheet over it")
+        XCTAssertEqual(asks, 0)
+        XCTAssertFalse(taken, "Nothing took the launch's prompt")
+        held.hold("quickDCA", while: QuickDCARoute.busy(showing: false, requested: false))
+        XCTAssertTrue(held.holds.isEmpty)
+        for _ in 0..<400 where !held.state.asked { try? await Task.sleep(for: .milliseconds(5)) }
+        XCTAssertEqual(asks, 1, "Asked once 記一筆 has gone")
+        XCTAssertTrue(taken)
+    }
+
     /// The app left the front and came straight back: the new wait asks, the one it replaces stops.
     func testAQuickReTriggerIsNotTurnedAway() async {
         let shared = prompt()

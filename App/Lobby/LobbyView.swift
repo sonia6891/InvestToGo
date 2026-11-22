@@ -123,8 +123,9 @@ struct LobbyView: View {
         .modifier(FadeInWithReducedMotion())
         .background(skin.color(\.page).ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
-        // 口袋會員前 7 天全開's notes, each once, only while the lobby is in front with nothing over it or about to be.
-        .modifier(MemberOpenNotes(ready: onScreen && !covered && !replayer.playing && game.levelUpDue == nil && !store.recordsLocked))
+        // 口袋會員前 7 天全開's notes, each once, only while the lobby is in front with nothing over it or about to be
+        // (記一筆 up or asked for is checked by the notes themselves, live, from `AppRouter`).
+        .modifier(MemberOpenNotes(ready: onScreen && !covered && !modalPending && !replayer.playing && game.levelUpDue == nil && !store.recordsLocked))
         // Decided each time the lobby comes up, and again once StoreKit has said whether this is a member.
         .task(id: membership.has(.report)) { announceReport(now: Date()) }
         .onAppear {
@@ -142,6 +143,9 @@ struct LobbyView: View {
         .onChange(of: store.recordsLocked) { _, _ in presentQuickDCA() }
         .onChange(of: replayer.playing) { _, playing in if !playing { presentQuickDCA() } }
         .onChange(of: modalPending) { _, pending in if !pending { presentQuickDCAAfterCover() } }
+        // A 口袋會員全開 note has gone (its sheet's onDismiss): a request that waited for it opens now. After the same
+        // short wait as a cover, so a note whose button went to 會員 has taken the lobby off screen first.
+        .onChange(of: router.memberNoteShowing) { _, up in if !up { presentQuickDCAAfterCover() } }
         .onDisappear { onScreen = false; replayer.cancel(); ReviewPrompt.shared.release("replay") }
         // App Store 評分視窗: never over the lobby's replay (coins flying, the bar filling).
         .onChange(of: replayer.playing, initial: true) { _, playing in ReviewPrompt.shared.hold("replay", while: playing) }
@@ -162,15 +166,16 @@ struct LobbyView: View {
 
     /// The lobby can take 記一筆 now (`QuickDCARoute.lobbyFree`).
     private var lobbyFree: Bool {
-        QuickDCARoute.lobbyFree(onScreen: onScreen, covered: covered, modalPending: modalPending, replaying: replayer.playing,
-                                closing: sheetUp && !quickDCA)
+        QuickDCARoute.lobbyFree(onScreen: onScreen, covered: covered, modalPending: modalPending, note: router.memberNoteShowing,
+                                replaying: replayer.playing, closing: sheetUp && !quickDCA)
     }
 
     /// The one way 記一筆 opens, for the lobby's button and a tapped reminder alike (final review I2): a request
     /// (`router.quickDCARequested`) opens the sheet once the lobby is free (`lobbyFree`), so it is never up together
-    /// with LEVEL×UP or a replay, then the request is cleared. While the records are locked the request waits, and the
-    /// sheet opens once they are read (`onChange(of: store.recordsLocked)`): never records over the lock. Nothing is
-    /// saved by this; the person still taps 「記好了」.
+    /// with LEVEL×UP, a 口袋會員全開 note or a replay, then the request is cleared. While the records are locked the
+    /// request waits, and the sheet opens once they are read (`onChange(of: store.recordsLocked)`): never records over
+    /// the lock. Nothing is saved by this; the person still taps 「記好了」. It never takes `LaunchPrompt`: it is asked
+    /// for by the person, and only keeps the prompts that come by themselves away while it is up (`QuickDCARoute.busy`).
     private func presentQuickDCA() {
         guard router.quickDCARequested else { return }
         switch QuickDCARoute.decide(locked: store.recordsLocked, showing: quickDCA, free: lobbyFree) {

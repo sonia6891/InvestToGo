@@ -9,7 +9,9 @@ import SwiftUI
 //   · 3 days later, once, if still not a member: 「要不要再考慮一下口袋會員？」. Nothing after that.
 // The notes come up only over the lobby, once nothing else is over it: never over the opening, onboarding or the lock
 // screen (the lobby is built after them, and the lock is checked again here), LEVEL×UP, a sheet, a purchase or a
-// keyboard (all of which live on other screens). Each takes this launch's one big prompt (`LaunchPrompt`) and is
+// keyboard (all of which live on other screens), nor while 記一筆 is up or asked for (`QuickDCARoute.busy`; the note
+// comes later in this launch if the prompt is still free), and 記一筆 waits for a note in turn
+// (`AppRouter.memberNoteShowing`). Each takes this launch's one big prompt (`LaunchPrompt`) and is
 // marked seen once it is on screen. The two that sell come up only once the App Store has given the price
 // (`MembershipStore.memberOpenNoteWaiting`): without it the note waits for a later launch.
 
@@ -68,6 +70,9 @@ struct MemberOpenBanner: View {
 struct MemberOpenNotes: ViewModifier {
     let ready: Bool
     @ObservedObject private var membership = MembershipStore.shared
+    /// 記一筆 up or asked for keeps the notes away (read live, so a sheet asked for during the wait below wins), and a
+    /// note up keeps 記一筆 away (`memberNoteShowing`).
+    @ObservedObject private var router = AppRouter.shared
     @ObservedObject private var lock = AppLock.shared
     @ObservedObject private var skins = SkinStore.shared
     @Environment(\.lobbyNavigation) private var navigation
@@ -79,6 +84,7 @@ struct MemberOpenNotes: ViewModifier {
     /// Nothing stands in the way of a note, and none is up.
     private var clear: Bool {
         ready && note == nil && phase == .active && !lock.locked && !lock.covered && (membership.answered || memberOpenTesting)
+            && !QuickDCARoute.busy(showing: router.quickDCAShowing, requested: router.quickDCARequested)
     }
 
     private struct Moment: Equatable {
@@ -88,7 +94,11 @@ struct MemberOpenNotes: ViewModifier {
     func body(content: Content) -> some View {
         content
             // On every return to the front RootView reads the 7 days again, wherever the app is.
-            .onAppear { membership.refreshOpen() }
+            .onAppear {
+                membership.refreshOpen()
+                // A lobby that comes up without a note (rebuilt for a new skin, say) has none over it.
+                if note == nil { router.memberNoteClosed() }
+            }
             // Asked again whenever the way clears or the days move on; a short wait first, so the lobby has settled
             // (its entrance, a replay that is about to start) and the note never pops up in the middle of something.
             .task(id: Moment(clear: clear, day: membership.open.day, ended: membership.open.ended, member: membership.isMember)) {
@@ -100,9 +110,12 @@ struct MemberOpenNotes: ViewModifier {
                 // down): not seen, so a later launch shows it.
                 if !membership.memberOpenNoteWaiting { await membership.loadProducts() }
                 guard !Task.isCancelled, clear, !LaunchPrompt.taken, membership.memberOpenNoteWaiting else { return }
+                // From here until the sheet has gone, 記一筆 waits for it.
+                router.memberNoteOpened()
                 note = due
             }
             .sheet(item: $note, onDismiss: {
+                router.memberNoteClosed()
                 guard toMember else { return }
                 toMember = false
                 MemberOpenRoute.toMember(navigation)

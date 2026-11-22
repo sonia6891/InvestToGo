@@ -96,9 +96,9 @@ extension EnvironmentValues {
         get { self[LobbyCoveredKey.self] }
         set { self[LobbyCoveredKey.self] = newValue }
     }
-    /// A prompt from the root view is up or about to come up over the lobby (LEVEL×UP, or its wait for a toast). Every
-    /// later prompt over the lobby (the app lock, the member-open notes) joins this slot, so 記一筆 waits for it and a
-    /// waiting request opens once it clears.
+    /// A prompt from the root view is up or about to come up over the lobby (LEVEL×UP, or its wait for a toast): 記一筆
+    /// waits for it and a waiting request opens once it clears. The member-open notes, which the lobby itself presents,
+    /// are followed the same way through `AppRouter.memberNoteShowing`.
     var lobbyModalPending: Bool {
         get { self[LobbyModalPendingKey.self] }
         set { self[LobbyModalPendingKey.self] = newValue }
