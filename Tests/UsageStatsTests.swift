@@ -292,6 +292,22 @@ final class UsageStatsTests: XCTestCase {
         }
     }
 
+    // MARK: Privacy manifest
+
+    func testThePrivacyManifestDeclaresProductInteractionForAnalytics() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "PrivacyInfo", withExtension: "xcprivacy"), "The manifest ships in the app")
+        let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: Data(contentsOf: url), format: nil) as? [String: Any])
+        XCTAssertEqual(plist["NSPrivacyTracking"] as? Bool, false)
+        let types = try XCTUnwrap(plist["NSPrivacyCollectedDataTypes"] as? [[String: Any]])
+        let byType = Dictionary(uniqueKeysWithValues: types.compactMap { entry in (entry["NSPrivacyCollectedDataType"] as? String).map { ($0, entry) } })
+        let interaction = try XCTUnwrap(byType["NSPrivacyCollectedDataTypeProductInteraction"])
+        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypeLinked"] as? Bool, false)
+        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypeTracking"] as? Bool, false)
+        XCTAssertEqual(interaction["NSPrivacyCollectedDataTypePurposes"] as? [String], ["NSPrivacyCollectedDataTypePurposeAnalytics"])
+        XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeCrashData"], "The crash entries stay")
+        XCTAssertNotNil(byType["NSPrivacyCollectedDataTypeOtherDiagnosticData"])
+    }
+
     private func event(_ id: String) -> UsageEvent {
         UsageEvent(id: id, kind: "daily_open", at: "2026-11-22T03:04:05.125Z", iid: "x", pf: "ios", m: "TW", v: "1.0(7)")
     }

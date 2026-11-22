@@ -16,6 +16,15 @@
 <key>NSPrivacyCollectedDataTypeTracking</key><false/>
 <key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string></array>
 </dict>
+<!-- 產品工作站 (2026-11-22 design, App/Telemetry/UsageStats.swift): first_open once per install and daily_open once a day,
+     with a random install number, the app version and the region, for analytics only. Not linked to the user: no
+     account, e-mail, name or record is attached. Off with 設定 › 隱私與安全 › 傳送匿名使用統計. -->
+<dict>
+<key>NSPrivacyCollectedDataType</key><string>NSPrivacyCollectedDataTypeProductInteraction</string>
+<key>NSPrivacyCollectedDataTypeLinked</key><false/>
+<key>NSPrivacyCollectedDataTypeTracking</key><false/>
+<key>NSPrivacyCollectedDataTypePurposes</key><array><string>NSPrivacyCollectedDataTypePurposeAnalytics</string></array>
+</dict>
 </array>
 <!-- The app's own @AppStorage/UserDefaults, and Sentry's required-reason APIs: it is linked statically, so its own
      privacy manifest is not shipped and its reasons are declared here. -->
