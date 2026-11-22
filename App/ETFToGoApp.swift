@@ -242,6 +242,9 @@ struct RootView: View {
             guard phase == .active else { return }
             // The records could not be opened at a launch in the background (locked phone): read them now.
             store.reloadIfLocked()
+            // 口袋會員前 7 天全開: judged again on every return, wherever the app is (not only over the lobby), so the
+            // tools close at the end on any screen.
+            MembershipStore.shared.refreshOpen()
             guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
             store.live.start()
             await store.followMarket()
