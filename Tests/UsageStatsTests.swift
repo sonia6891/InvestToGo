@@ -67,7 +67,11 @@ final class UsageStatsTests: XCTestCase {
         let transport = FakeTransport(), clock = TestClock(noon)
         await reporter(transport, clock: clock).appOpened()
         let events = transport.events
+        // The workstation groups retention by an install's first daily_open day: the first launch sends both, together.
+        XCTAssertEqual(transport.bodyEvents.count, 1, "One request")
+        XCTAssertEqual(transport.bodyEvents.first?.map(\.kind), ["first_open", "daily_open"], "first_open and that day's daily_open in the same batch")
         XCTAssertEqual(events.map(\.kind), ["first_open", "daily_open"])
+        XCTAssertEqual(Set(events.map(\.at)).count, 1, "Both carry the launch time")
         let iid = UsageInstall.id(defaults: defaults)
         XCTAssertEqual(events.map(\.id), ["\(iid):first_open", "\(iid):daily_open:2026-11-22"])
         XCTAssertTrue(events.allSatisfy { $0.iid == iid && $0.pf == "ios" && $0.m == "TW" && $0.v == "1.0(7)" })
