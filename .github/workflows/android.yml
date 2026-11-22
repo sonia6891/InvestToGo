@@ -1,4 +1,4 @@
-name: Android core
+name: Android
 # Every change to the Android code, the shared vectors or PocketCore runs both sides: Kotlin checks itself against the
 # recorded vectors, and Swift checks the vectors still match PocketCore. Neither job writes anything back.
 on:
@@ -28,9 +28,9 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Kotlin core tests
+      - name: Kotlin core and app tests, debug build
         working-directory: android
-        run: ./gradlew :core:test
+        run: ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug
       - name: Upload test report
         if: failure()
         uses: actions/upload-artifact@v4
@@ -39,6 +39,8 @@ jobs:
           path: |
             android/core/build/reports/tests/test
             android/core/build/test-results/test
+            android/app/build/reports/tests
+            android/app/build/test-results
   swift:
     runs-on: ubuntu-latest
     timeout-minutes: 20
