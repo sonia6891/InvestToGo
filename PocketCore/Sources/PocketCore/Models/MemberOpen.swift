@@ -7,7 +7,7 @@ import Foundation
 
 /// What is kept about the 7 days, in one Keychain item on this device only (never restored to another device, never
 /// in an export): a reinstall reads the same start, so it never starts a new 7 days, and each note stays shown once.
-/// The two optional fields came later: a record kept without them decodes as before.
+/// The optional fields came later: a record kept without them decodes as before.
 struct MemberOpenRecord: Codable, Equatable {
     /// The first open of the app on this phone: day 1.
     var start: Date
@@ -20,6 +20,9 @@ struct MemberOpenRecord: Codable, Equatable {
     var latest: Date?
     /// This person has been a member on this phone (`quietForMember`).
     var wasMember: Bool?
+    /// When the 外觀主題 worn at the end went back to 黑金 (`takeSkinBackAtEnd`): that take-off, and only that one, gets
+    /// the 7 days' own notice.
+    var skinBack: Date?
 }
 
 enum MemberOpenRead: Equatable {
@@ -60,6 +63,12 @@ enum MemberOpenNote: String, CaseIterable, Identifiable {
     /// Three days after that, once: 「要不要再考慮一下口袋會員？」. Nothing after it.
     case again
     var id: String { rawValue }
+
+    /// The summary and 「再考慮」 sell the plan: they come up only with the App Store's price on them.
+    var sells: Bool { self == .ended || self == .again }
+
+    /// Whether this note can come up now: one that sells needs the price (`priced`); the others need nothing.
+    func canShow(priced: Bool) -> Bool { !sells || priced }
 }
 
 /// Where the 7 days stand at a moment.
@@ -237,6 +246,16 @@ final class MemberOpenDays {
         change(&record)
         memo = record
         try? vault.save(record)
+    }
+
+    /// The worn 外觀主題 is being taken off for want of a membership, after the 7 days ended, for someone who has
+    /// never been a member: true the first time only, so this take-off, the one the end caused, gets the 7 days' own
+    /// notice and any later one the usual wording.
+    func takeSkinBackAtEnd() -> Bool {
+        guard let record = record(), record.wasMember != true, record.skinBack == nil, info().ended else { return false }
+        let at = judged(record)
+        update { $0.skinBack = at }
+        return true
     }
 
     // MARK: `--member-open <day>`
