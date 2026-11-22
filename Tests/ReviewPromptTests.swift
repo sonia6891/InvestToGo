@@ -1,7 +1,7 @@
 import XCTest
 @testable import ETFToGo
 
-/// App Store 評分視窗: asked once ever, on the third distinct local day of use; a missed ask is tried again up to
+/// App Store 評分視窗: asked once ever, on day 1 (the first day of use); a missed ask is tried again up to
 /// calendar day 7 from the first open, never after; only on a free screen; not counted when no scene was in front.
 @MainActor final class ReviewPromptTests: XCTestCase {
     private var suite = ""
@@ -42,79 +42,62 @@ import XCTest
 
     func testDayRule() {
         var s = ReviewDays()
+        XCTAssertFalse(ReviewRules.eligible(s, today: "2026-11-22"), "Nothing counted yet")
         s = ReviewRules.counted(s, today: "2026-11-22")
         XCTAssertEqual(s, ReviewDays(first: "2026-11-22", days: 1, last: "2026-11-22", asked: false))
         XCTAssertEqual(ReviewRules.counted(s, today: "2026-11-22"), s, "The same day counts once")
-        s = ReviewRules.counted(s, today: "2026-11-23")
-        XCTAssertFalse(ReviewRules.eligible(s, today: "2026-11-23"), "Day 2 does not ask")
-        s = ReviewRules.counted(s, today: "2026-11-24")
-        XCTAssertTrue(ReviewRules.eligible(s, today: "2026-11-24"), "The third day of use asks")
+        XCTAssertTrue(ReviewRules.eligible(s, today: "2026-11-22"), "Day 1 asks")
         XCTAssertTrue(ReviewRules.eligible(s, today: "2026-11-28"), "Calendar day 7 still asks")
         XCTAssertFalse(ReviewRules.eligible(s, today: "2026-11-29"), "Calendar day 8 never")
         s.asked = true
-        XCTAssertFalse(ReviewRules.eligible(s, today: "2026-11-25"), "Only once")
+        XCTAssertFalse(ReviewRules.eligible(s, today: "2026-11-22"), "Only once")
         XCTAssertEqual(ReviewRules.calendarDay(first: "2026-11-22", today: "2026-11-22"), 1)
         XCTAssertEqual(ReviewRules.calendarDay(first: "2026-11-28", today: "2026-12-04"), 7, "Across a month")
     }
 
-    func testThirdDistinctDayMustFallWithinSevenDays() {
-        var s = ReviewDays()
-        for today in ["2026-11-22", "2026-11-25", "2026-11-28"] { s = ReviewRules.counted(s, today: today) }
-        XCTAssertTrue(ReviewRules.eligible(s, today: "2026-11-28"), "The third day of use on calendar day 7")
-        var late = ReviewDays()
-        for today in ["2026-11-22", "2026-11-25", "2026-11-29"] { late = ReviewRules.counted(late, today: today) }
-        XCTAssertFalse(ReviewRules.eligible(late, today: "2026-11-29"), "The third day of use on day 8: never")
-    }
-
     // MARK: Asking
 
-    func testDayThreeAsksOnceAndNeverAgain() async {
+    func testDayOneAsksOnceAndNeverAgain() async {
         var asks = 0
         let d1 = await open(onDay: 1, asks: &asks)
+        XCTAssertTrue(d1, "Day 1 asks")
+        let again = await open(onDay: 1, asks: &asks)
         let d2 = await open(onDay: 2, asks: &asks)
-        XCTAssertFalse(d1)
-        XCTAssertFalse(d2, "Day 2 does not ask")
-        let d3 = await open(onDay: 3, asks: &asks)
-        XCTAssertTrue(d3, "Day 3 asks")
-        let again = await open(onDay: 3, asks: &asks)
-        let d4 = await open(onDay: 4, asks: &asks)
+        let d5 = await open(onDay: 5, asks: &asks)
         XCTAssertFalse(again)
-        XCTAssertFalse(d4)
+        XCTAssertFalse(d2)
+        XCTAssertFalse(d5)
         XCTAssertEqual(asks, 1, "Once ever")
         XCTAssertTrue(prompt().state.asked)
     }
 
-    func testAMissedDayThreeIsTriedOnTheNextOpenUpToDaySeven() async {
+    func testAMissedDayOneIsTriedOnLaterOpensUpToDaySeven() async {
         var asks = 0
-        _ = await open(onDay: 1, asks: &asks)
-        _ = await open(onDay: 2, asks: &asks)
-        let busy = await open(onDay: 3, busy: { true }, asks: &asks)
+        let busy = await open(onDay: 1, busy: { true }, asks: &asks)
         XCTAssertFalse(busy, "The screen never came free: gave up")
         XCTAssertEqual(asks, 0)
-        let away = await open(onDay: 5, scene: false, asks: &asks)
+        let away = await open(onDay: 4, scene: false, asks: &asks)
         XCTAssertFalse(away, "No scene in front")
         XCTAssertFalse(prompt().state.asked, "Not counted as asked")
         let d7 = await open(onDay: 7, asks: &asks)
-        XCTAssertTrue(d7, "Tried again on the next open, still day 7")
+        XCTAssertTrue(d7, "Tried again on a later open, still day 7")
         XCTAssertEqual(asks, 2)
+        let d7again = await open(onDay: 7, asks: &asks)
+        XCTAssertFalse(d7again, "Only once")
     }
 
     func testNeverAfterDaySeven() async {
         var asks = 0
-        _ = await open(onDay: 1, asks: &asks)
-        _ = await open(onDay: 2, asks: &asks)
+        _ = await open(onDay: 1, busy: { true }, asks: &asks)
         _ = await open(onDay: 3, busy: { true }, asks: &asks)
         let d8 = await open(onDay: 8, asks: &asks)
         let d9 = await open(onDay: 9, asks: &asks)
-        XCTAssertFalse(d8)
+        XCTAssertFalse(d8, "Day 8 never")
         XCTAssertFalse(d9)
-        XCTAssertEqual(asks, 0, "Day 8 never")
+        XCTAssertEqual(asks, 0)
     }
 
     func testWaitsForTheScreenToBeFreeForSettleChecks() async {
-        _ = await prompt().opened(busy: { false }, request: { true })
-        day(2); _ = await prompt().opened(busy: { false }, request: { true })
-        day(3)
         // Busy for the first five checks, then free: asked on the third free check, the eighth in all.
         var checks = 0, askedAt = 0
         let asked = await prompt().opened(busy: { checks += 1; return checks <= 5 }, request: { askedAt = checks; return true })

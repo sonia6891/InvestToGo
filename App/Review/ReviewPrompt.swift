@@ -3,9 +3,10 @@ import UIKit
 
 // App Store 評分視窗 (owner, 2026-11-22: the rating sheet, the meow-work way): Apple's own rating sheet, asked for
 // once ever, as meow-work's assets/meow-v4-review.js does, adapted to an app without a trial:
-//   * on the third distinct local day the app is used (day 1 is the first open); a day-3 ask that did not happen (the
-//     screen never came free, or the app left the front) is tried again on the next open, up to calendar day 7 counted
-//     from the first open, never after;
+//   * on day 1, the first day of use (owner, 2026-11-22: moved from day 3 to day 1), once onboarding is finished and
+//     the person is in the app (never during the first-launch flow); an ask that did not happen (the screen never came
+//     free, or the app left the front) is tried again on later opens, up to calendar day 7 counted from the first open
+//     (day 1), never after;
 //   * never over the opening, the lock screen or privacy cover, onboarding, a sheet or full-screen cover (LEVEL×UP,
 //     記一筆), an alert, a purchase in progress or an open keyboard: it waits until the screen has been free of them for
 //     1.5 s, and gives up after 90 s (the next open tries again, while still in the window);
@@ -27,8 +28,8 @@ struct ReviewDays: Equatable {
 }
 
 enum ReviewRules {
-    /// The distinct day of use that asks.
-    static let askDay = 3
+    /// The distinct day of use that asks: the first (owner, 2026-11-22).
+    static let askDay = 1
     /// The last calendar day (counted from the first open, which is day 1) on which a missed ask is tried again.
     static let lastDay = 7
 
@@ -49,7 +50,7 @@ enum ReviewRules {
         return Int((now.timeIntervalSince(start) / 86_400).rounded()) + 1
     }
 
-    /// Not asked yet, the third distinct day of use or later, and still within calendar day 7.
+    /// Not asked yet, a day of use counted (`askDay`), and still within calendar day 7.
     static func eligible(_ state: ReviewDays, today: String) -> Bool {
         guard !state.asked, state.days >= askDay, let first = state.first,
               let day = calendarDay(first: first, today: today) else { return false }
