@@ -123,8 +123,63 @@ import XCTest
         XCTAssertNil(defaults.string(forKey: ReviewPrompt.firstKey), "Nothing counted")
     }
 
-    func testTheStateStaysOnThePhone() throws {
-        let backup = String(decoding: try JSONEncoder().encode(Portfolio()), as: UTF8.self)
-        XCTAssertFalse(backup.contains("review."))
+    // MARK: Holds and re-triggers
+
+    func testAHeldPromptDoesNotAsk() async {
+        let held = prompt()
+        held.hold("levelUp")
+        var asks = 0
+        let asked = await held.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertFalse(asked, "LEVEL×UP on its way: no sheet")
+        XCTAssertEqual(asks, 0)
+        XCTAssertFalse(held.state.asked, "Not counted: the next open tries again")
+        held.release("levelUp")
+        XCTAssertTrue(held.holds.isEmpty)
+    }
+
+    func testAReleaseLetsItAskAfterTheSettle() async {
+        let held = prompt()
+        held.hold("levelUp")
+        held.hold("replay", while: true)
+        held.hold("replay", while: false)
+        XCTAssertEqual(held.holds, ["levelUp"])
+        // Released on the fifth check: free on the fifth, sixth and seventh, asked on the seventh.
+        var checks = 0, askedAt = 0
+        let asked = await held.opened(busy: {
+            checks += 1
+            if checks == 5 { held.release("levelUp") }
+            return false
+        }, request: { askedAt = checks; return true })
+        XCTAssertTrue(asked)
+        XCTAssertEqual(askedAt, 7)
+    }
+
+    /// The app left the front and came straight back: the new wait asks, the one it replaces stops.
+    func testAQuickReTriggerIsNotTurnedAway() async {
+        let shared = prompt()
+        shared.limit = 10_000
+        let first = Task { await shared.opened(busy: { true }, request: { true }) }
+        try? await Task.sleep(for: .milliseconds(30))
+        let second = await shared.opened(busy: { false }, request: { true })
+        XCTAssertTrue(second, "The re-trigger asks")
+        let firstAsked = await first.value
+        XCTAssertFalse(firstAsked, "The older wait stopped")
+    }
+
+    /// Through the app's own export (資料備份與還原): the rating state stays on the phone.
+    func testTheStateStaysOutOfTheAppBackup() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("review-backup-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = PortfolioStore(url: directory.appendingPathComponent("records.json"))
+        try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))
+        let keys = [ReviewPrompt.firstKey, ReviewPrompt.daysKey, ReviewPrompt.lastKey, ReviewPrompt.askedKey]
+        let saved = keys.map { UserDefaults.standard.object(forKey: $0) }
+        defer { for (key, value) in zip(keys, saved) { UserDefaults.standard.set(value, forKey: key) } }
+        let phone = ReviewPrompt(defaults: .standard, allowed: true, now: { Date() }, timeZone: { .current })
+        phone.state = ReviewDays(first: "2026-11-22", days: 4, last: "2026-11-25", asked: true)
+        let backup = String(decoding: try Data(contentsOf: store.export()), as: UTF8.self)
+        XCTAssertTrue(backup.contains("0050"), "The export has the records")
+        XCTAssertFalse(backup.contains("review."), "but not the rating state")
+        XCTAssertFalse(backup.contains("2026-11-25"))
     }
 }

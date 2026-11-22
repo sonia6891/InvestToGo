@@ -73,7 +73,10 @@ enum ReviewRules {
 
     static let shared = ReviewPrompt(
         defaults: .standard,
-        allowed: UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment),
+        // Debug builds may ask (StoreKit always shows the sheet there, which is how it is checked by hand); never in UI
+        // tests, the unit-test host or previews.
+        allowed: UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment,
+                                   debug: false),
         now: { Date() }, timeZone: { TimeZone.current })
 
     /// One check of the screen; `settle` free checks in a row ask; `limit` checks at most (0.5 s × 3 = 1.5 s, × 180 = 90 s).
@@ -85,8 +88,12 @@ enum ReviewRules {
     private let allowed: Bool
     private let now: () -> Date
     private let timeZone: () -> TimeZone
-    private var waiting = false
+    /// Each `opened` takes the next number; an older wait that sees a newer one stops, so a quick re-trigger (the app
+    /// left the front and came straight back) is never turned away by the wait it replaces.
+    private var generation = 0
     private var keyboardUp = false
+    /// Moments the app knows are coming that the sheet must not cover (LEVEL×UP on its way, the lobby's replay).
+    private(set) var holds: Set<String> = []
     private var observers: [NSObjectProtocol] = []
 
     init(defaults: UserDefaults, allowed: Bool, now: @escaping () -> Date, timeZone: @escaping () -> TimeZone) {
@@ -104,6 +111,11 @@ enum ReviewRules {
             },
         ]
     }
+
+    /// The sheet waits while `reason` is held ("levelUp", "replay"…).
+    func hold(_ reason: String) { holds.insert(reason) }
+    func release(_ reason: String) { holds.remove(reason) }
+    func hold(_ reason: String, while on: Bool) { if on { hold(reason) } else { release(reason) } }
 
     var state: ReviewDays {
         get {
@@ -129,13 +141,14 @@ enum ReviewRules {
         guard allowed else { return false }
         let today = UsageClock.day(now(), timeZone: timeZone())
         state = ReviewRules.counted(state, today: today)
-        guard !waiting, ReviewRules.eligible(state, today: today) else { return false }
-        waiting = true
-        defer { waiting = false }
+        generation += 1
+        let mine = generation
+        guard ReviewRules.eligible(state, today: today) else { return false }
         var free = 0
         for _ in 0..<limit {
             do { try await Task.sleep(for: tick) } catch { return false }
-            if busy() || keyboardUp { free = 0; continue }
+            guard generation == mine else { return false }
+            if busy() || keyboardUp || !holds.isEmpty { free = 0; continue }
             free += 1
             guard free >= settle else { continue }
             guard ReviewRules.eligible(state, today: today), request() else { return false }
@@ -145,19 +158,21 @@ enum ReviewRules {
         return false
     }
 
-    /// Anything the sheet must never cover: the lock screen or cover, a purchase, a sheet, full-screen cover or alert
-    /// in any window, or no scene in front.
-    static func screenBusy() -> Bool {
-        let lock = AppLock.shared
-        if lock.locked || lock.covered || MembershipStore.shared.purchasing { return true }
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        guard scenes.contains(where: { $0.activationState == .foregroundActive }) else { return true }
-        for window in scenes.flatMap(\.windows) where !window.isHidden {
-            // The lock window above the app's (still fading out), or anything presented over a window's content.
-            if window.windowLevel > .normal { return true }
-            if window.rootViewController?.presentedViewController != nil { return true }
-        }
-        return false
+    /// Anything the sheet must never cover, one check each (another is one more line): the lock screen or cover, a
+    /// purchase, no scene in front, a window above the app's (the lock window fading out), or a sheet, full-screen
+    /// cover or alert presented in any window. The holds and the keyboard are checked in `opened`.
+    static let busyChecks: [@MainActor () -> Bool] = [
+        { AppLock.shared.locked || AppLock.shared.covered },
+        { MembershipStore.shared.purchasing },
+        { !ReviewPrompt.windowScenes().contains { $0.activationState == .foregroundActive } },
+        { ReviewPrompt.windowScenes().flatMap(\.windows).contains { !$0.isHidden && $0.windowLevel > .normal } },
+        { ReviewPrompt.windowScenes().flatMap(\.windows).contains { !$0.isHidden && $0.rootViewController?.presentedViewController != nil } },
+    ]
+
+    static func screenBusy() -> Bool { busyChecks.contains { $0() } }
+
+    fileprivate static func windowScenes() -> [UIWindowScene] {
+        UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
     }
 
     /// Apple's rating sheet in the scene in front; false (not asked) when no scene is in front.

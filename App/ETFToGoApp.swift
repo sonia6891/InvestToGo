@@ -8,6 +8,8 @@ import SwiftUI
     init() {
         // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
         CrashReporting.start()
+        // App Store 評分視窗: made at launch, so it follows the keyboard from the start (it never asks over one).
+        _ = ReviewPrompt.shared
         let args = ProcessInfo.processInfo.arguments
         let testing = args.contains("--ui-testing")
         let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
@@ -168,6 +170,11 @@ struct RootView: View {
     @State private var returningFrom: Feature?
     @ObservedObject private var connectivity = Connectivity.shared
 
+    /// LEVEL×UP is due, being prepared or on screen: the rating sheet waits (`ReviewPrompt` hold "levelUp").
+    private var levelUpComing: Bool {
+        celebration != nil || levelUp != nil || store.data.game?.levelUpDue != nil
+    }
+
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
         let arguments = ProcessInfo.processInfo.arguments
@@ -225,6 +232,9 @@ struct RootView: View {
                 .preferredColorScheme(skins.colorScheme)
         }
         .modifier(SkinKitLaunch())
+        // App Store 評分視窗: never over LEVEL×UP, nor while it is on its way (waiting for a reward toast to finish).
+        .onChange(of: levelUpComing, initial: true) { _, coming in ReviewPrompt.shared.hold("levelUp", while: coming) }
+        .onDisappear { ReviewPrompt.shared.release("levelUp") }
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
