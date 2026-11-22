@@ -110,14 +110,25 @@ enum PlanPrice {
         }
     }
 
-    /// The notice when a worn 外觀主題 is taken off: the 7 days' own once they have ended for someone who has never been
-    /// a member on this phone (`MemberOpenDays.wasMember`), else the lapsed membership's.
-    private var takeOffNotice: String {
-        !isMember && open.ended && !memberOpen.wasMember ? MemberOpenCopy.skinNotice : Self.lapseNotice
-    }
     /// The worn 外觀主題 went back to 黑金 at the end of the 7 days, at this launch: the summary says so too, since its
     /// sheet covers the notice.
     @Published private(set) var skinBackAtEnd = false
+
+    /// UI tests and screenshots: the summary and 「再考慮」 come up without the App Store's price (the CI simulator has
+    /// no products), showing 「口袋會員 —」 and 「看看口袋會員」. A real launch never shows them without a price.
+    var sellsWithoutPriceForUITests = ProcessInfo.processInfo.arguments.contains("--ui-testing")
+    /// Unit tests only: stands in for whether the App Store's product has loaded (a `Product` cannot be made in a test).
+    var planPriceLoadedForTests: Bool?
+    /// The App Store has given 口袋會員's monthly price.
+    var planPriceLoaded: Bool { planPriceLoadedForTests ?? (products[MembershipProducts.pocketMonthly] != nil) }
+
+    /// A 口袋會員全開 note would really come up on this launch once the lobby is free: day 1's or day 5's is due, or
+    /// the summary or 「再考慮」 is due and the price has loaded (or the UI-testing bypass applies). A due note that
+    /// cannot show (offline at day 8) does not count, so it never holds back another prompt (`LaunchPrompt`).
+    var memberOpenNoteWaiting: Bool {
+        guard let due = memberOpen.due(member: isMember || demoMember) else { return false }
+        return due.canShow(priced: planPriceLoaded || sellsWithoutPriceForUITests)
+    }
 
     /// Reads the prices and the membership, and follows purchases made elsewhere (renewals, Ask to Buy, refunds).
     func start() async {
@@ -188,10 +199,13 @@ enum PlanPrice {
 
     private func checkWornSkin() {
         guard checksWornSkin, !recordsLocked() else { return }
-        guard (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
-        let notice = takeOffNotice
-        if notice == MemberOpenCopy.skinNotice { skinBackAtEnd = true }
-        onLapse(notice)
+        let wardrobe = skins ?? SkinStore.shared, worn = wardrobe.skin
+        guard wardrobe.takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
+        // The 7 days' own notice only for the take-off their end caused: a skin a membership would keep on, taken off
+        // after the end, the first time, for someone never a member (`takeSkinBackAtEnd`). Any other: the lapse's.
+        let atEnd = !isMember && Skins.isUnlocked(worn, level: level(), member: true) && memberOpen.takeSkinBackAtEnd()
+        if atEnd { skinBackAtEnd = true }
+        onLapse(atEnd ? MemberOpenCopy.skinNotice : Self.lapseNotice)
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.

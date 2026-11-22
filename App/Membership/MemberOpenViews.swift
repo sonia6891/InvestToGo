@@ -9,9 +9,9 @@ import SwiftUI
 //   · 3 days later, once, if still not a member: 「要不要再考慮一下口袋會員？」. Nothing after that.
 // The notes come up only over the lobby, once nothing else is over it: never over the opening, onboarding or the lock
 // screen (the lobby is built after them, and the lock is checked again here), LEVEL×UP, a sheet, a purchase or a
-// keyboard (all of which live on other screens). Each is marked seen once it is on screen, and it takes this launch's
-// one big prompt (`LaunchPrompt`). The two that sell come up only once the App Store has given the price: without it
-// the note waits for a later launch.
+// keyboard (all of which live on other screens). Each takes this launch's one big prompt (`LaunchPrompt`) and is
+// marked seen once it is on screen. The two that sell come up only once the App Store has given the price
+// (`MembershipStore.memberOpenNoteWaiting`): without it the note waits for a later launch.
 
 /// To 會員 the way `--open member` stacks it: above 工具, so the bottom bar's 「‹ 大廳」 leads back.
 enum MemberOpenRoute {
@@ -23,9 +23,6 @@ enum MemberOpenRoute {
 
 /// UI tests: StoreKit's answer is not waited for (the simulator may never give one).
 private let memberOpenTesting = ProcessInfo.processInfo.arguments.contains("--ui-testing")
-/// UI tests and screenshots: the summary and 「再考慮」 come up without the App Store's price (the CI simulator has no
-/// products), showing 「口袋會員 —」 and 「看看口袋會員」. A real launch never shows them without a price.
-private let sellsWithoutPriceForUITests = memberOpenTesting
 
 /// The lobby's line on every day of the 7.
 struct MemberOpenBanner: View {
@@ -90,22 +87,19 @@ struct MemberOpenNotes: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            // On every return to the front RootView reads the 7 days again, wherever the app is.
             .onAppear { membership.refreshOpen() }
-            .onChange(of: phase) { _, value in if value == .active { membership.refreshOpen() } }
             // Asked again whenever the way clears or the days move on; a short wait first, so the lobby has settled
             // (its entrance, a replay that is about to start) and the note never pops up in the middle of something.
             .task(id: Moment(clear: clear, day: membership.open.day, ended: membership.open.ended, member: membership.isMember)) {
                 guard clear else { return }
                 try? await Task.sleep(for: .seconds(1.2))
-                guard !Task.isCancelled, clear,
+                guard !Task.isCancelled, clear, !LaunchPrompt.taken,
                       let due = membership.memberOpen.due(member: membership.isMember || membership.demoMember) else { return }
-                if (due == .ended || due == .again) && !sellsWithoutPriceForUITests {
-                    // They sell: only with the App Store's price on them. None (no network, StoreKit down): not seen,
-                    // so a later launch shows it.
-                    if membership.products[MembershipProducts.pocketMonthly] == nil { await membership.loadProducts() }
-                    guard !Task.isCancelled, clear, membership.products[MembershipProducts.pocketMonthly] != nil else { return }
-                }
-                guard LaunchPrompt.take() else { return }
+                // The summary and 「再考慮」 sell: only with the App Store's price on them. None (no network, StoreKit
+                // down): not seen, so a later launch shows it.
+                if !membership.memberOpenNoteWaiting { await membership.loadProducts() }
+                guard !Task.isCancelled, clear, !LaunchPrompt.taken, membership.memberOpenNoteWaiting else { return }
                 note = due
             }
             .sheet(item: $note, onDismiss: {
@@ -129,6 +123,8 @@ struct MemberOpenNoteSheet: View {
     let done: (Bool) -> Void
     @ObservedObject private var membership = MembershipStore.shared
     @Environment(\.skin) private var skin
+    /// `onAppear` has run once (it can run again, at a detent change).
+    @State private var appeared = false
     private static let demoStore = DemoArguments.has("--demo-store", in: ProcessInfo.processInfo.arguments)
 
     /// The summary and 「再考慮」 sell the plan: they show its price and period, the renewal line and the terms and
@@ -163,8 +159,13 @@ struct MemberOpenNoteSheet: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(note == .ended ? "member-open-summary" : "member-open-note")
         .task { if sells && membership.products.isEmpty { await membership.loadProducts() } }
-        // Seen once it is on screen, not when it was chosen: a sheet that never came up is shown at a later launch.
-        .onAppear { membership.memberOpen.markSeen(note) }
+        // The launch's prompt is taken and the note seen once it is on screen, not when it was chosen: a sheet that
+        // never came up is shown at a later launch. Another prompt got there first: away again, not seen.
+        .onAppear {
+            guard !appeared else { return }
+            appeared = true
+            if LaunchPrompt.take() { membership.memberOpen.markSeen(note) } else { done(false) }
+        }
     }
 
     private var title: String {

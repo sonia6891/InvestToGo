@@ -1082,6 +1082,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(summary.waitForExistence(timeout: 10), "The summary sheet comes up after day 7")
         XCTAssertTrue(app.staticTexts["7 天的口袋會員全開結束了"].exists)
         XCTAssertTrue(app.buttons["member-open-subscribe"].exists, "with its main button")
+        XCTAssertEqual(app.buttons["member-open-subscribe"].label, "看看口袋會員", "no App Store price here: not 訂閱口袋會員")
         XCTAssertTrue(app.buttons["先用免費版"].exists, "and a way to close it")
         capture(app, "member-open-summary")
         app.buttons["先用免費版"].tap()

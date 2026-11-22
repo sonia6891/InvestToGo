@@ -114,11 +114,38 @@ import XCTest
             } else {
                 XCTAssertEqual(notices, [MemberOpenCopy.skinNotice], "the 7 days' own notice")
                 XCTAssertTrue(store.skinBackAtEnd, "and the summary says so")
+                // A later take-off is not the end's: the usual wording.
+                skins.select("stitch")
+                store.apply([])
+                XCTAssertEqual(notices, [MemberOpenCopy.skinNotice, MembershipStore.lapseNotice])
             }
         }
     }
 
     // MARK: One big prompt per launch
+
+    /// The summary due with no price from the App Store is not waiting (it will not come up on this launch), so it
+    /// holds no other prompt back; with the price it is.
+    func testASellingNoteWaitsOnlyWithThePrice() {
+        let store = store(day: 8, clock: Clock(start))
+        store.sellsWithoutPriceForUITests = false
+        XCTAssertEqual(store.memberOpen.due(member: false), .ended)
+        store.planPriceLoadedForTests = false
+        XCTAssertFalse(store.memberOpenNoteWaiting, "no price: the summary will not come up")
+        store.planPriceLoadedForTests = true
+        XCTAssertTrue(store.memberOpenNoteWaiting, "with the price it will")
+    }
+
+    /// Day 1's note needs no price; nothing due, nothing waiting.
+    func testTheOtherNotesWaitWithoutAPrice() {
+        let first = store(day: 1, clock: Clock(start))
+        first.sellsWithoutPriceForUITests = false
+        first.planPriceLoadedForTests = false
+        XCTAssertEqual(first.memberOpen.due(member: false), .day1)
+        XCTAssertTrue(first.memberOpenNoteWaiting)
+        first.memberOpen.markSeen(.day1)
+        XCTAssertFalse(first.memberOpenNoteWaiting, "nothing due")
+    }
 
     func testOnlyOnePromptIsTakenPerLaunch() {
         LaunchPrompt.taken = false
