@@ -249,7 +249,7 @@ jobs:
           sleep 5
           xcrun simctl io "$DEVICE" screenshot "build/screens/screen-dex-reveal.png"
       - name: Capture the skin kit sheet in every skin
-        timeout-minutes: 3
+        timeout-minutes: 2
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -261,6 +261,15 @@ jobs:
             sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
           done
+      # 圖鑑卡翻面: the reveal in every 外觀主題. Its own step (a launch can take over a minute on a busy runner), and the
+      # check after the tests fails the job when one of the four is missing or blank.
+      - name: Capture the card reveal in every skin
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -euo pipefail
           # The card reveal in every 外觀主題, to check the face, the reward and both buttons read in each.
           for SKIN in blackgold voxel stitch sketch; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
@@ -431,6 +440,11 @@ jobs:
         run: |
           set -euo pipefail
           build/venv/bin/python Scripts/screens.py check build/screens/screen-{goalPlanner,backtest,priceAlerts,activeTracking,report,exposure,backtest-locked,report-locked}.png
+      - name: Check the card reveal pictures were captured
+        # The capture step is continue-on-error; a cut-off one leaves pictures missing, which fails the job here.
+        run: |
+          set -euo pipefail
+          build/venv/bin/python Scripts/screens.py check build/screens/screen-dex-reveal.png build/screens/dex-reveal-{blackgold,voxel,stitch,sketch}.png
       - name: Check the ten App Store screens that need no network
         # store-backtest and store-overlap are left out: they depend on other people's sites.
         run: |
