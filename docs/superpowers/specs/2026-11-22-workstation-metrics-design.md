@@ -20,7 +20,7 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 
 | meow-work | 投資袋著走 |
 |---|---|
-| `app_daily_opens` and the RPC `meow_daily_open`: anonymous install code, day, platform, version, language, country; 13-month retention; the 「傳送匿名使用統計」 switch | The same table and RPC (`investtogo_daily_open`). It is written once a day from the SwiftUI app. Same switch, under 設定 › 隱私. |
+| `app_daily_opens` and the RPC `meow_daily_open`: anonymous install code, day, platform, version, country; 13-month retention; the 「傳送匿名使用統計」 switch | The same table and RPC (`investtogo_daily_open`). It is written once a day from the SwiftUI app. Same switch, under 設定 › 隱私. |
 | `store_subscription_events` and the edge function `app-store-notifications-v2` (Apple V2, signature verified, Production and Sandbox) | The same table and function for `com.sonia.etftogo`, with the product `tw.sonia.etftogo.member.pocket.monthly`. |
 | `appAccountToken` = account id, to tie a store event to a version | `appAccountToken` = the anonymous install code (a UUID). This gives "關閉自動續訂的人用哪一版" without an account. |
 | `asc_report_rows` (Apple daily sales reports, whole developer account) | Already fetched by meow-work. Add App Store ID 6822974128 to `workstation.export_linked_store()` and `private.store_report_links`, as is done for 額度雷達. |
@@ -35,7 +35,7 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 
 ## Privacy
 
-- The app sends only the anonymous install code, platform, app version, language and country, once a day, and the install code on a purchase. It never sends holdings, amounts, trades or ETF lists.
+- The app sends only the anonymous install code, platform, app version, the iPhone's region and the open time, at most once a day, and the install code on a purchase. It never sends holdings, amounts, trades or ETF lists.
 - The 「傳送匿名使用統計」 switch is on by default, as in meow-work. Turned off, nothing is sent.
 - **Update before release:**
   - The privacy policy on the official site (investtogo.pocketjoystudio.com/privacy/).
@@ -46,7 +46,7 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 
 ## Steps
 
-1. Create the Supabase project `investtogo` (owner confirms the US$10 a month first).
+1. No new project: the existing workstation project `bpovoxjdqdwhhlfwgpep` is used (the owner's ruling, 2026-11-22), with no extra cost.
 2. Migrations: `app_daily_opens` and its RPC, `store_subscription_events`, the `workstation` schema and the exports. Push key on both sides.
 3. Edge function `app-store-notifications-v2`, then set the URL in App Store Connect (production and sandbox).
 4. App: the daily open ping, the switch, the install code as `appAccountToken`, the privacy manifest, with tests on CI.

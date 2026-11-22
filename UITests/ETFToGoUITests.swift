@@ -1235,7 +1235,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(toggle.waitForExistence(timeout: 10), "隱私與安全 has 「傳送匿名使用統計」")
         for _ in 0..<6 where !(toggle.exists && toggle.isHittable) { app.swipeUp() }
         XCTAssertEqual(toggle.value as? String, "1", "On by default")
-        XCTAssertTrue(app.staticTexts["只傳匿名安裝碼、版本、語言、地區，每天一次；持股與金額永遠不會上傳。"].exists, "It says what is sent")
+        XCTAssertTrue(app.staticTexts["只傳匿名安裝碼、平台、App 版本、地區與開啟時間，每天最多一次；持股、金額與交易紀錄永遠不會上傳。"].exists, "It says what is sent")
         sleep(1); capture(app, "usage-stats-settings")
     }
 }

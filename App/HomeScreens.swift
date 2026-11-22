@@ -497,7 +497,7 @@ struct UsageStatsSettingsCard: View {
                 .labelsHidden().tint(Palette.blue)
                 .accessibilityIdentifier("usage-stats-toggle")
             }
-            Text("只傳匿名安裝碼、版本、語言、地區，每天一次；持股與金額永遠不會上傳。")
+            Text("只傳匿名安裝碼、平台、App 版本、地區與開啟時間，每天最多一次；持股、金額與交易紀錄永遠不會上傳。")
                 .font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6)
         }
     }
