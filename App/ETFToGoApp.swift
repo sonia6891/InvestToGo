@@ -8,6 +8,8 @@ import SwiftUI
     init() {
         // Sentry (Task 14): off without a DSN (Debug, CI), with --ui-testing and under XCTest.
         CrashReporting.start()
+        // App Store 評分視窗: made at launch, so it follows the keyboard from the start (it never asks over one).
+        _ = ReviewPrompt.shared
         let args = ProcessInfo.processInfo.arguments
         let testing = args.contains("--ui-testing")
         let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
@@ -74,6 +76,22 @@ struct LaunchGate: View {
     /// A later launch's opening is in front of the lobby. The lobby is built only once it has gone, so its entrance and
     /// LEVEL×UP are never spent behind the opening.
     @State private var opening: Bool
+    /// The first launch's splash has gone (the onboarding pages are showing).
+    @State private var pastSplash = false
+
+    /// 產品工作站 (2026-11-22 design): the app is in front, past the opening (the splash on the first launch) and the
+    /// lock screen. Each time this turns true the day's anonymous open is reported (`UsageStats`), at most once a day.
+    private var usageReady: Bool {
+        guard phase == .active, !opening, !lock.locked else { return false }
+        return start == nil ? lock.lobbyReleased : pastSplash
+    }
+
+    /// App Store 評分視窗: the app is in front past the opening, onboarding and the lock (and its cover). Each time this
+    /// turns true the day of use is counted and, on an eligible day, the rating sheet waits for a free moment
+    /// (`ReviewPrompt`); turning false cancels the wait.
+    private var reviewReady: Bool {
+        phase == .active && !opening && start == nil && lock.lobbyReleased && !lock.locked && !lock.covered
+    }
 
     init() {
         let arguments = ProcessInfo.processInfo.arguments
@@ -97,7 +115,7 @@ struct LaunchGate: View {
                 }
                 .transition(.opacity)
             } else if let start {
-                FirstLaunchView(start: start, play: play) {
+                FirstLaunchView(start: start, play: play, onPastSplash: { pastSplash = true }) {
                     onboarded = true
                     UserDefaults.standard.synchronize()
                     withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
@@ -118,6 +136,17 @@ struct LaunchGate: View {
         .onChange(of: phase, initial: true) { _, value in lock.scene(value) }
         .onAppear { if !opening { lock.openingEnded(onboarding: start != nil) } }
         .onChange(of: opening) { _, value in if !value { lock.openingEnded(onboarding: start != nil) } }
+        // A moment after, so a lock that comes up as the app returns cancels it; the work itself runs in the
+        // background and never holds up the screen. Nothing is sent under --ui-testing (`UsageGate`).
+        .task(id: usageReady) {
+            guard usageReady else { return }
+            try? await Task.sleep(for: .seconds(1))
+            if !Task.isCancelled { UsageStats.appOpened() }
+        }
+        .task(id: reviewReady) {
+            guard reviewReady else { return }
+            await ReviewPrompt.shared.opened()
+        }
     }
 }
 
@@ -140,6 +169,11 @@ struct RootView: View {
     /// The feature last on screen above the lobby: the lobby's replay flies its coins from that object.
     @State private var returningFrom: Feature?
     @ObservedObject private var connectivity = Connectivity.shared
+
+    /// LEVEL×UP is due, being prepared or on screen: the rating sheet waits (`ReviewPrompt` hold "levelUp").
+    private var levelUpComing: Bool {
+        celebration != nil || levelUp != nil || store.data.game?.levelUpDue != nil
+    }
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
@@ -198,6 +232,9 @@ struct RootView: View {
                 .preferredColorScheme(skins.colorScheme)
         }
         .modifier(SkinKitLaunch())
+        // App Store 評分視窗: never over LEVEL×UP, nor while it is on its way (waiting for a reward toast to finish).
+        .onChange(of: levelUpComing, initial: true) { _, coming in ReviewPrompt.shared.hold("levelUp", while: coming) }
+        .onDisappear { ReviewPrompt.shared.release("levelUp") }
         .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.

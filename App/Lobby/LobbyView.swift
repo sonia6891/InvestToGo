@@ -125,7 +125,9 @@ struct LobbyView: View {
             if !opening { bounceReturning() }
             arrive(lead: opening ? 0.5 : 0.15)
         }
-        .onDisappear { onScreen = false; replayer.cancel() }
+        .onDisappear { onScreen = false; replayer.cancel(); ReviewPrompt.shared.release("replay") }
+        // App Store 評分視窗: never over the lobby's replay (coins flying, the bar filling).
+        .onChange(of: replayer.playing, initial: true) { _, playing in ReviewPrompt.shared.hold("replay", while: playing) }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { opensAgain = true } else if phase == .active, onScreen { playOpening() }
         }

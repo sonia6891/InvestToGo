@@ -474,9 +474,32 @@ struct PrivacyView: View {
             Card { Text("富果金鑰").font(.headline).foregroundStyle(Palette.ink); Text("使用 iOS Keychain 保存，只傳給富果官方 API，不寫入備份。").font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6) }
             // App 上鎖 (2026-11-22 design): the passcode, Face ID and 變更密碼.
             AppLockSettingsCard()
+            // 產品工作站 (2026-11-22 design): the anonymous daily open, on by default.
+            UsageStatsSettingsCard()
             Link("隱私權政策", destination: MemberView.privacy).font(.subheadline.bold()).accessibilityIdentifier("privacy-policy")
         }
         .navigationTitle("隱私與安全").navigationBarTitleDisplayMode(.inline)
+    }
+}
+/// 「傳送匿名使用統計」: turned off, nothing is sent and the waiting events are cleared (`UsageReporter`).
+struct UsageStatsSettingsCard: View {
+    @AppStorage(UsageReporter.enabledKey) private var on = true
+
+    var body: some View {
+        Card {
+            HStack(spacing: 12) {
+                Text("傳送匿名使用統計").font(.headline).foregroundStyle(Palette.ink)
+                Spacer(minLength: 8)
+                Toggle("傳送匿名使用統計", isOn: Binding(get: { on }, set: { value in
+                    on = value
+                    UsageStats.switched(on: value)
+                }))
+                .labelsHidden().tint(Palette.blue)
+                .accessibilityIdentifier("usage-stats-toggle")
+            }
+            Text("只傳匿名安裝碼、平台、App 版本、地區與開啟時間，每天最多一次；持股、金額與交易紀錄永遠不會上傳。")
+                .font(.subheadline).foregroundStyle(Palette.muted).padding(.top, 6)
+        }
     }
 }
 struct AboutView: View {
