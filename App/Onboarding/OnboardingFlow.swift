@@ -418,24 +418,11 @@ enum DCAReminders {
     /// The pending ids this reminder owns, the two old repeating ones included.
     static func ownIDs(in pending: [String]) -> [String] { pending.filter { $0.hasPrefix(DCAReminderPlan.prefix) } }
 
-    /// Replaces every pending debit-day reminder with the plan for `inputs` (nil: just removes them). Nothing happens
-    /// in UI tests.
+    /// Replaces every pending debit-day reminder with the plan for `inputs` (nil: just removes them), through the one
+    /// runner (`DCAReminderSync`), so overlapping calls end with the latest inputs only. Nothing happens in UI tests.
     static func sync(_ inputs: DCAReminderInputs?) async {
         guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
-        let center = UNUserNotificationCenter.current()
-        let pending = await center.pendingNotificationRequests().map(\.identifier)
-        center.removePendingNotificationRequests(withIdentifiers: ownIDs(in: pending))
-        guard let inputs else { return }
-        for request in DCAReminderPlan.requests(inputs, now: Date()) {
-            let content = UNMutableNotificationContent()
-            content.title = request.title
-            content.body = request.body
-            content.userInfo = request.userInfo
-            content.sound = .default
-            let parts = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: request.fire)
-            try? await center.add(UNNotificationRequest(identifier: request.id, content: content,
-                                                        trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)))
-        }
+        await DCAReminderSync.shared.sync(inputs)
     }
     static func clear() async { await sync(nil) }
 }
