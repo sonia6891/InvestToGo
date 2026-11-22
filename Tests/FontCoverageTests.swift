@@ -19,7 +19,10 @@ final class FontCoverageTests: XCTestCase {
 
     /// Characters of `wanted` that `fontName` has no glyph for.
     private func missing(_ wanted: Set<Unicode.Scalar>, in fontName: String) -> String {
-        let set = CTFontCopyCharacterSet(CTFontCreateWithName(fontName as CFString, 17, nil)) as CharacterSet
+        let font = CTFontCreateWithName(fontName as CFString, 17, nil)
+        // CTFontCreateWithName falls back to a system font for a misspelt name, which would make every check pass.
+        XCTAssertEqual(CTFontCopyPostScriptName(font) as String, fontName, "\(fontName) did not resolve to that font")
+        let set = CTFontCopyCharacterSet(font) as CharacterSet
         return String(String.UnicodeScalarView(wanted.filter { !set.contains($0) }.sorted { $0.value < $1.value }))
     }
 

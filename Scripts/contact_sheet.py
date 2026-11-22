@@ -32,7 +32,7 @@ SCREENS = [
     ("pocket", "口袋"),
     ("dividends", "配息"),
     ("tools", "工具"),
-    ("skins", "換膚"),
+    ("skins", "外觀主題"),
     ("achievements", "成就"),
     ("report", "月報"),
     ("priceAlerts", "到價提醒"),
