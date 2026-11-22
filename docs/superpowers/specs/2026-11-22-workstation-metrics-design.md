@@ -20,11 +20,10 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 
 | meow-work | 投資袋著走 |
 |---|---|
-| `app_daily_opens` and the RPC `meow_daily_open`: anonymous install code, day, platform, version, country; 13-month retention; the 「傳送匿名使用統計」 switch | The same table and RPC (`investtogo_daily_open`). It is written once a day from the SwiftUI app. Same switch, under 設定 › 隱私. |
-| `store_subscription_events` and the edge function `app-store-notifications-v2` (Apple V2, signature verified, Production and Sandbox) | The same table and function for `com.sonia.etftogo`, with the product `tw.sonia.etftogo.member.pocket.monthly`. |
+| `app_daily_opens` and the RPC `meow_daily_open`: anonymous install code, day, platform, version, country; 13-month retention; the 「傳送匿名使用統計」 switch | The event kinds `first_open` and `daily_open`, sent from the SwiftUI app to the workstation's `ingest_app_events` RPC (product `94265929d4b69a431c5a`) and kept in `private.app_events`, at most once a day. Same switch, under 設定 › 隱私與安全. |
+| `store_subscription_events` and the edge function `app-store-notifications-v2` (Apple V2, signature verified, Production and Sandbox) | The workstation project's own `app-store-notifications` function, as for 額度雷達, for `com.sonia.etftogo` and the product `tw.sonia.etftogo.member.pocket.monthly`. |
 | `appAccountToken` = account id, to tie a store event to a version | `appAccountToken` = the anonymous install code (a UUID). This gives "關閉自動續訂的人用哪一版" without an account. |
 | `asc_report_rows` (Apple daily sales reports, whole developer account) | Already fetched by meow-work. Add App Store ID 6822974128 to `workstation.export_linked_store()` and `private.store_report_links`, as is done for 額度雷達. |
-| `workstation` schema, `push-common.sql`, `export_rows` / `export_events` / `export_usage`, cron jobs `workstation-push-live`, `-full`, `-usage` | The same, with the product `investtogo` and its own push key. |
 | Sentry → Bug 追蹤 (`sentry-sync` SOURCES) | Add the existing 投資袋著走 Sentry project. |
 | Google Play RTDN and `play_install_rows` | Later, once the Android app is on Google Play. |
 
@@ -39,7 +38,7 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 - The 「傳送匿名使用統計」 switch is on by default, as in meow-work. Turned off, nothing is sent.
 - **Update before release:**
   - The privacy policy on the official site (investtogo.pocketjoystudio.com/privacy/).
-  - `PrivacyInfo.xcprivacy`: Product Interaction, not linked, not tracking, analytics.
+  - `PrivacyInfo.xcprivacy`: Product Interaction, Purchase History and Device ID, each not linked, not tracking, analytics.
   - The App Store privacy label.
   - The store review notes, which say "All user data stays on the device".
 - This replaces the earlier rule 「App 的網路請求只帶 ETF 代碼與日期」. The owner decided it on 2026-11-22.
@@ -47,8 +46,8 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
 ## Steps
 
 1. No new project: the existing workstation project `bpovoxjdqdwhhlfwgpep` is used (the owner's ruling, 2026-11-22), with no extra cost.
-2. Migrations: `app_daily_opens` and its RPC, `store_subscription_events`, the `workstation` schema and the exports. Push key on both sides.
-3. Edge function `app-store-notifications-v2`, then set the URL in App Store Connect (production and sandbox).
+2. Server: the product `94265929d4b69a431c5a` registered for `ingest_app_events`, and the `daily_open` kind kept in `private.app_events`.
+3. Apple's App Store Server Notifications for `com.sonia.etftogo` go to the workstation's `app-store-notifications` function: set its URL in App Store Connect (production and sandbox).
 4. App: the daily open ping, the switch, the install code as `appAccountToken`, the privacy manifest, with tests on CI.
 5. Workstation: the product entry, the linked store report for 6822974128, the Sentry source.
 6. Privacy policy and App Store label: show the text to the owner before publishing.
@@ -60,5 +59,5 @@ The owner reads downloads, subscriptions, cancellations, revenue, version use, r
   - Nothing is sent with the switch off.
   - Nothing is sent under `--ui-testing`.
   - The install code is stable, and `appAccountToken` equals it.
-- **SQL:** the RPC rejects a malformed code; anon cannot read either table.
+- **SQL:** `ingest_app_events` refuses an invalid event (22023) and an unknown product (42501); anon cannot read `private.app_events`.
 - **End to end:** a sandbox purchase on TestFlight appears in 退訂紀錄 after it is cancelled.
