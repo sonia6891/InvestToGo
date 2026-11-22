@@ -25,8 +25,9 @@ final class UsageStatsTests: XCTestCase {
     private let noon = Date(timeIntervalSince1970: 1_795_316_645.125)
 
     private func reporter(_ transport: FakeTransport, clock: TestClock, allowed: Bool = true, region: String = "TW") -> UsageReporter {
-        UsageReporter(defaults: defaults, transport: transport, allowed: allowed, version: "1.0(7)",
-                      now: { clock.date }, timeZone: { [taipei] in taipei }, region: { region })
+        let zone = taipei
+        return UsageReporter(defaults: defaults, transport: transport, allowed: allowed, version: "1.0(7)",
+                      now: { clock.date }, timeZone: { zone }, region: { region })
     }
 
     // MARK: Events
