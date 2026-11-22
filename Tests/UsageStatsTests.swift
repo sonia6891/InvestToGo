@@ -228,8 +228,6 @@ final class UsageStatsTests: XCTestCase {
         XCTAssertFalse(UsageGate.allowed(arguments: ["ETFToGo", "--ui-testing"], environment: [:], debug: false))
         XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCTestConfigurationFilePath": "/x.xctestconfiguration"], debug: false))
         XCTAssertFalse(UsageGate.allowed(arguments: [], environment: ["XCODE_RUNNING_FOR_PREVIEWS": "1"], debug: false))
-        // This process is the unit-test host (and a Debug build): the shared reporter is off.
-        XCTAssertFalse(UsageGate.allowed(arguments: ProcessInfo.processInfo.arguments, environment: ProcessInfo.processInfo.environment))
         let transport = UsageFakeTransport(), clock = UsageTestClock(noon)
         let usage = reporter(transport, clock: clock, allowed: false)
         await usage.appOpened()

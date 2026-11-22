@@ -1,3 +1,4 @@
+import UIKit
 import XCTest
 @testable import ETFToGo
 
@@ -128,16 +129,53 @@ import XCTest
 
     // MARK: Holds and re-triggers
 
-    func testAHeldPromptDoesNotAsk() async {
+    func testAHeldPromptDoesNotAskAndItsReleaseAfterTheGiveUpStillAsksThisLaunch() async {
         let held = prompt()
         held.hold("levelUp")
         var asks = 0
         let asked = await held.opened(busy: { false }, request: { asks += 1; return true })
-        XCTAssertFalse(asked, "LEVEL×UP on its way: no sheet")
+        XCTAssertFalse(asked, "LEVEL×UP on its way: no sheet, and the wait gave up")
         XCTAssertEqual(asks, 0)
-        XCTAssertFalse(held.state.asked, "Not counted: the next open tries again")
+        XCTAssertFalse(held.state.asked, "Not counted")
+        // LEVEL×UP closes after the give-up: the release starts the wait again, so this launch still asks.
         held.release("levelUp")
         XCTAssertTrue(held.holds.isEmpty)
+        for _ in 0..<400 where !held.state.asked { try? await Task.sleep(for: .milliseconds(5)) }
+        XCTAssertEqual(asks, 1, "Asked once after the release")
+        XCTAssertTrue(held.state.asked)
+        // Nothing left to re-arm: another hold and release asks nothing more.
+        held.hold("replay")
+        held.release("replay")
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(asks, 1)
+    }
+
+    func testAGiveUpWithNothingHeldIsNotReArmed() async {
+        let busy = prompt()
+        var asks = 0
+        let asked = await busy.opened(busy: { true }, request: { asks += 1; return true })
+        XCTAssertFalse(asked)
+        busy.hold("replay")
+        busy.release("replay")
+        try? await Task.sleep(for: .milliseconds(50))
+        XCTAssertEqual(asks, 0, "The next open tries again, not a release")
+    }
+
+    /// A keyboardDidHide that never came (the app left the front with the keyboard up) does not block the rest of the
+    /// process: becoming active clears it.
+    func testBecomingActiveClearsAKeyboardThatNeverSaidItHid() async {
+        let typed = prompt()
+        NotificationCenter.default.post(name: UIResponder.keyboardWillShowNotification, object: nil)
+        try? await Task.sleep(for: .milliseconds(10))
+        var asks = 0
+        let blocked = await typed.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertFalse(blocked, "The keyboard is up: no sheet")
+        XCTAssertEqual(asks, 0)
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        try? await Task.sleep(for: .milliseconds(10))
+        let asked = await typed.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertTrue(asked, "Back in front: the stale keyboard no longer blocks")
+        XCTAssertEqual(asks, 1)
     }
 
     func testAReleaseLetsItAskAfterTheSettle() async {
@@ -176,10 +214,12 @@ import XCTest
         XCTAssertFalse(ReviewPrompt.launchFree(taken: false, noteWaiting: true), "A 7 days' note coming up on this launch goes first")
         XCTAssertFalse(ReviewPrompt.launchFree(taken: true, noteWaiting: false), "Another prompt took this launch")
         XCTAssertFalse(ReviewPrompt.launchFree(taken: true, noteWaiting: true))
-        // The app's own gate reads the store: in the unit-test host no 7 days' note is waiting (no record, or a member).
-        let store = MembershipStore.shared
-        XCTAssertEqual(ReviewPrompt(defaults: defaults, allowed: true, now: { Date() }, timeZone: { .current }).launchFree(),
-                       !LaunchPrompt.taken && !store.memberOpenNoteWaiting)
+        // The app's own gate reads the real LaunchPrompt: once another prompt took this launch, it is closed.
+        let saved = LaunchPrompt.taken
+        defer { LaunchPrompt.taken = saved }
+        LaunchPrompt.taken = true
+        XCTAssertFalse(ReviewPrompt(defaults: defaults, allowed: true, now: { Date() }, timeZone: { .current }).launchFree(),
+                       "The default gate reads LaunchPrompt.taken")
     }
 
     func testNoAskWhileAMemberOpenNoteIsWaitingAndNothingRecorded() async {

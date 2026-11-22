@@ -94,6 +94,9 @@ enum ReviewRules {
     private var keyboardUp = false
     /// Moments the app knows are coming that the sheet must not cover (LEVEL×UP on its way, the lobby's replay).
     private(set) var holds: Set<String> = []
+    /// A wait that gave up while something was held: the release that frees the screen starts it again, so this launch
+    /// can still ask (LEVEL×UP waited for longer than 90 s on a feature screen).
+    private var rearm: (@MainActor () -> Void)?
     private var observers: [NSObjectProtocol] = []
 
     init(defaults: UserDefaults, allowed: Bool, now: @escaping () -> Date, timeZone: @escaping () -> TimeZone) {
@@ -109,12 +112,22 @@ enum ReviewRules {
             center.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.keyboardUp = false }
             },
+            // A keyboardDidHide missed (the app left the front with the keyboard up, a hardware keyboard) never blocks
+            // the rest of the process: back in front, a keyboard that is really up says so again with keyboardWillShow.
+            center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.keyboardUp = false }
+            },
         ]
     }
 
     /// The sheet waits while `reason` is held ("levelUp", "replay"…).
     func hold(_ reason: String) { holds.insert(reason) }
-    func release(_ reason: String) { holds.remove(reason) }
+    func release(_ reason: String) {
+        holds.remove(reason)
+        guard holds.isEmpty, let again = rearm else { return }
+        rearm = nil
+        again()
+    }
     func hold(_ reason: String, while on: Bool) { if on { hold(reason) } else { release(reason) } }
 
     var state: ReviewDays {
@@ -136,13 +149,14 @@ enum ReviewRules {
     /// `busy` and `request` are the screen and StoreKit; `request` returns false when there was no active scene.
     /// Returns true when the sheet was asked for.
     @discardableResult
-    func opened(busy: @MainActor () -> Bool = ReviewPrompt.screenBusy,
-                request: @MainActor () -> Bool = ReviewPrompt.requestReview) async -> Bool {
+    func opened(busy: @escaping @MainActor () -> Bool = ReviewPrompt.screenBusy,
+                request: @escaping @MainActor () -> Bool = ReviewPrompt.requestReview) async -> Bool {
         guard allowed else { return false }
         let today = UsageClock.day(now(), timeZone: timeZone())
         state = ReviewRules.counted(state, today: today)
         generation += 1
         let mine = generation
+        rearm = nil
         guard ReviewRules.eligible(state, today: today) else { return false }
         var free = 0
         for _ in 0..<limit {
@@ -158,6 +172,12 @@ enum ReviewRules {
             guard launchFree(), takeLaunch(), request() else { return false }
             state.asked = true
             return true
+        }
+        // Gave up while something was still held: its release tries again in this launch.
+        if !holds.isEmpty, generation == mine {
+            rearm = { [weak self] in
+                _ = Task { @MainActor in await self?.opened(busy: busy, request: request) }
+            }
         }
         return false
     }
