@@ -195,7 +195,14 @@ struct LiveStatus: Equatable {
     /// The last real trade of each symbol, saved instead of a trial-match price when the app leaves.
     private var lastReal: [String: Quote] = [:]
 
-    init(store: PortfolioStore) { self.store = store }
+    private let readKey: () -> String
+    /// True while the 2.5 s loop task exists. Without a key there is nothing to poll, so it stays false.
+    var isLooping: Bool { loop != nil }
+
+    init(store: PortfolioStore, readKey: @escaping () -> String = { (try? SecureKey.read()) ?? "" }) {
+        self.store = store
+        self.readKey = readKey
+    }
 
     private var wanted: Bool {
         active && !apiKey.isEmpty && TaiwanMarket.isOpen() && !ProcessInfo.processInfo.arguments.contains("--ui-testing")
@@ -207,8 +214,9 @@ struct LiveStatus: Equatable {
     func start() {
         guard !active else { return }
         active = true
-        apiKey = (try? SecureKey.read()) ?? ""
-        if loop == nil {
+        apiKey = readKey()
+        // No key, no loop: nothing to poll or stream. Saving a key calls restart(), which starts it.
+        if loop == nil, !apiKey.isEmpty {
             loop = Task { [weak self] in
                 while !Task.isCancelled {
                     try? await Task.sleep(nanoseconds: 2_500_000_000)

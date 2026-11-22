@@ -58,7 +58,7 @@ struct PocketHero: View {
             root.addChild(numeral)
             root.addChild(pocketGroup)
             content.add(root)
-            if let environment = try? await Self.studioEnvironment() {
+            if let environment = await Self.environment() {
                 root.components.set(ImageBasedLightComponent(source: .single(environment), intensityExponent: 1))
                 root.components.set(ImageBasedLightReceiverComponent(imageBasedLight: root))
             }
@@ -195,6 +195,17 @@ struct PocketHero: View {
         boss.orientation = body.orientation
         coin.addChild(body); coin.addChild(boss)
         return coin
+    }
+
+    /// The studio environment is built once per process; concurrent callers await the same task and a failed build stays nil.
+    @MainActor static private(set) var environmentBuilds = 0
+    @MainActor private static var environmentTask: Task<EnvironmentResource?, Never>?
+    @MainActor static func environment() async -> EnvironmentResource? {
+        if let task = environmentTask { return await task.value }
+        environmentBuilds += 1
+        let task = Task { @MainActor in try? await studioEnvironment() }
+        environmentTask = task
+        return await task.value
     }
 
     /// A soft studio: a bright top, two light boxes and a dark floor, so polished metal has something to reflect.
