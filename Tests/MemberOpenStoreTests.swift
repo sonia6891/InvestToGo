@@ -85,6 +85,49 @@ import XCTest
         XCTAssertNil(store.memberOpen.due(member: store.isMember))
     }
 
+    // MARK: The worn 外觀主題 at the end
+
+    /// A member skin worn at day 8 by someone who was never a member: taken off with the 7 days' own notice, and the
+    /// summary says so too. Someone whose membership lapsed hears the lapse notice instead.
+    func testTheSkinNoticeAtTheEndIsTheSevenDaysOwn() {
+        let savedSkin = UserDefaults.standard.string(forKey: SkinStore.skinKey)
+        defer {
+            if let savedSkin { UserDefaults.standard.set(savedSkin, forKey: SkinStore.skinKey) } else { UserDefaults.standard.removeObject(forKey: SkinStore.skinKey) }
+            SkinStore.current = SkinStore.shared.skin
+        }
+        for wasMember in [false, true] {
+            let clock = Clock(start), vault = MemoryMemberOpenVault(MemberOpenRecord(start: start, wasMember: wasMember ? true : nil))
+            clock.now = start.addingTimeInterval(7 * day + 60)
+            let store = MembershipStore(memberOpen: MemberOpenDays(vault: vault, now: { clock.now }))
+            store.demoMember = false
+            let skins = SkinStore()
+            store.skins = skins
+            store.checksWornSkin = true
+            var notices: [String] = []
+            store.onLapse = { notices.append($0) }
+            skins.select("stitch")
+            store.apply([])
+            XCTAssertEqual(skins.skin.id, "blackgold", "taken off at the end")
+            if wasMember {
+                XCTAssertEqual(notices, [MembershipStore.lapseNotice], "a lapsed member's notice")
+                XCTAssertFalse(store.skinBackAtEnd)
+            } else {
+                XCTAssertEqual(notices, [MemberOpenCopy.skinNotice], "the 7 days' own notice")
+                XCTAssertTrue(store.skinBackAtEnd, "and the summary says so")
+            }
+        }
+    }
+
+    // MARK: One big prompt per launch
+
+    func testOnlyOnePromptIsTakenPerLaunch() {
+        LaunchPrompt.taken = false
+        defer { LaunchPrompt.taken = false }
+        XCTAssertTrue(LaunchPrompt.take(), "the first prompt of the launch")
+        XCTAssertTrue(LaunchPrompt.taken)
+        XCTAssertFalse(LaunchPrompt.take(), "nothing after it")
+    }
+
     // MARK: Launches
 
     /// UI tests have the 7 days off unless `--member-open <day>` says which day it is; existing tests that check a

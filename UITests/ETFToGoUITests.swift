@@ -1073,14 +1073,15 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(tool.descendants(matching: .any)["member-lock-backtest"].exists, "with no lock card")
     }
 
-    /// Day 8 (`--member-open 8`): the summary sheet comes up over the lobby with 「訂閱口袋會員」, the line is gone, and
+    /// Day 8 (`--member-open 8`): the summary sheet comes up over the lobby with its main button (「看看口袋會員」 here: the
+    /// simulator has no App Store price; a real launch shows it only with the price and 「訂閱口袋會員」), the line is gone, and
     /// the member tool is locked again.
     func testMemberOpenEnds() {
         let app = launch(["--member-open", "8"])
         let summary = app.descendants(matching: .any)["member-open-summary"].firstMatch
         XCTAssertTrue(summary.waitForExistence(timeout: 10), "The summary sheet comes up after day 7")
         XCTAssertTrue(app.staticTexts["7 天的口袋會員全開結束了"].exists)
-        XCTAssertTrue(app.buttons["member-open-subscribe"].exists, "with 訂閱口袋會員")
+        XCTAssertTrue(app.buttons["member-open-subscribe"].exists, "with its main button")
         XCTAssertTrue(app.buttons["先用免費版"].exists, "and a way to close it")
         capture(app, "member-open-summary")
         app.buttons["先用免費版"].tap()

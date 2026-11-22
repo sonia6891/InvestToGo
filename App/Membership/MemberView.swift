@@ -110,14 +110,14 @@ enum PlanPrice {
         }
     }
 
-    /// The notice when a worn 外觀主題 is taken off: the 7 days' own in the week after they ended for a non-member,
-    /// else the lapsed membership's.
+    /// The notice when a worn 外觀主題 is taken off: the 7 days' own once they have ended for someone who has never been
+    /// a member on this phone (`MemberOpenDays.wasMember`), else the lapsed membership's.
     private var takeOffNotice: String {
-        if !isMember, open.ended, let end = open.end, memberOpen.date.timeIntervalSince(end) < 7 * MemberOpenInfo.dayLength {
-            return MemberOpenCopy.skinNotice
-        }
-        return Self.lapseNotice
+        !isMember && open.ended && !memberOpen.wasMember ? MemberOpenCopy.skinNotice : Self.lapseNotice
     }
+    /// The worn 外觀主題 went back to 黑金 at the end of the 7 days, at this launch: the summary says so too, since its
+    /// sheet covers the notice.
+    @Published private(set) var skinBackAtEnd = false
 
     /// Reads the prices and the membership, and follows purchases made elsewhere (renewals, Ask to Buy, refunds).
     func start() async {
@@ -188,7 +188,10 @@ enum PlanPrice {
 
     private func checkWornSkin() {
         guard checksWornSkin, !recordsLocked() else { return }
-        if (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: wearsMemberSkins) { onLapse(takeOffNotice) }
+        guard (skins ?? SkinStore.shared).takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
+        let notice = takeOffNotice
+        if notice == MemberOpenCopy.skinNotice { skinBackAtEnd = true }
+        onLapse(notice)
     }
 
     /// The App Store's own purchase sheet; the full flow (server confirmation, 2026-11-11 文件 5.5) is a later task.

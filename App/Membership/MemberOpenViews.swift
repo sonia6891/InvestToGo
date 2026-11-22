@@ -9,7 +9,9 @@ import SwiftUI
 //   · 3 days later, once, if still not a member: 「要不要再考慮一下口袋會員？」. Nothing after that.
 // The notes come up only over the lobby, once nothing else is over it: never over the opening, onboarding or the lock
 // screen (the lobby is built after them, and the lock is checked again here), LEVEL×UP, a sheet, a purchase or a
-// keyboard (all of which live on other screens). Each is marked seen as it comes up.
+// keyboard (all of which live on other screens). Each is marked seen once it is on screen, and it takes this launch's
+// one big prompt (`LaunchPrompt`). The two that sell come up only once the App Store has given the price: without it
+// the note waits for a later launch.
 
 /// To 會員 the way `--open member` stacks it: above 工具, so the bottom bar's 「‹ 大廳」 leads back.
 enum MemberOpenRoute {
@@ -21,6 +23,9 @@ enum MemberOpenRoute {
 
 /// UI tests: StoreKit's answer is not waited for (the simulator may never give one).
 private let memberOpenTesting = ProcessInfo.processInfo.arguments.contains("--ui-testing")
+/// UI tests and screenshots: the summary and 「再考慮」 come up without the App Store's price (the CI simulator has no
+/// products), showing 「口袋會員 —」 and 「看看口袋會員」. A real launch never shows them without a price.
+private let sellsWithoutPriceForUITests = memberOpenTesting
 
 /// The lobby's line on every day of the 7.
 struct MemberOpenBanner: View {
@@ -94,7 +99,13 @@ struct MemberOpenNotes: ViewModifier {
                 try? await Task.sleep(for: .seconds(1.2))
                 guard !Task.isCancelled, clear,
                       let due = membership.memberOpen.due(member: membership.isMember || membership.demoMember) else { return }
-                membership.memberOpen.markSeen(due)
+                if (due == .ended || due == .again) && !sellsWithoutPriceForUITests {
+                    // They sell: only with the App Store's price on them. None (no network, StoreKit down): not seen,
+                    // so a later launch shows it.
+                    if membership.products[MembershipProducts.pocketMonthly] == nil { await membership.loadProducts() }
+                    guard !Task.isCancelled, clear, membership.products[MembershipProducts.pocketMonthly] != nil else { return }
+                }
+                guard LaunchPrompt.take() else { return }
                 note = due
             }
             .sheet(item: $note, onDismiss: {
@@ -152,6 +163,8 @@ struct MemberOpenNoteSheet: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier(note == .ended ? "member-open-summary" : "member-open-note")
         .task { if sells && membership.products.isEmpty { await membership.loadProducts() } }
+        // Seen once it is on screen, not when it was chosen: a sheet that never came up is shown at a later launch.
+        .onAppear { membership.memberOpen.markSeen(note) }
     }
 
     private var title: String {
@@ -187,6 +200,7 @@ struct MemberOpenNoteSheet: View {
                 list(used.map { Row(title: $0.title, detail: $0.pitch) })
             }
             lead(MemberOpenCopy.endedKept)
+            if membership.skinBackAtEnd { lead(MemberOpenCopy.endedSkin) }
             terms
         case .again:
             priceLine
@@ -227,13 +241,13 @@ struct MemberOpenNoteSheet: View {
         }
     }
 
-    /// The App Store's own price and period, once it has answered (the screenshots' price under `--demo-store`). Before
-    /// that no price is said: 「訂閱口袋會員」 opens the 會員 page, which shows it.
-    @ViewBuilder private var priceLine: some View {
-        if let price {
-            Text("口袋會員 \(price)").skinFont(.title(16)).skinForeground(\.ink)
-                .frame(maxWidth: .infinity)
-        }
+    /// The App Store's own price and period (the screenshots' price under `--demo-store`). These sheets come up only
+    /// with it; should one ever be up without it, 「…」 while asking and 「—」 after, as the 會員 page does, and the
+    /// button says 「看看口袋會員」 instead of offering to subscribe at no stated price.
+    private var priceLine: some View {
+        Text("口袋會員 \(price ?? PlanPrice.text(product: nil, loading: membership.loading, demoStore: false))")
+            .skinFont(.title(16)).skinForeground(\.ink)
+            .frame(maxWidth: .infinity)
     }
 
     private var price: String? {
@@ -262,8 +276,8 @@ struct MemberOpenNoteSheet: View {
             switch note {
             case .day1: return (MemberOpenCopy.start, false, MemberOpenCopy.look, true)
             case .day5: return (MemberOpenCopy.look, true, MemberOpenCopy.gotIt, false)
-            case .ended: return (MemberOpenCopy.subscribe, true, MemberOpenCopy.stayFree, false)
-            case .again: return (MemberOpenCopy.subscribe, true, MemberOpenCopy.noThanks, false)
+            case .ended: return (price == nil ? MemberOpenCopy.look : MemberOpenCopy.subscribe, true, MemberOpenCopy.stayFree, false)
+            case .again: return (price == nil ? MemberOpenCopy.look : MemberOpenCopy.subscribe, true, MemberOpenCopy.noThanks, false)
             }
         }()
         return VStack(spacing: 8) {
