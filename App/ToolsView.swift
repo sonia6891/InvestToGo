@@ -327,6 +327,8 @@ struct GoalView: View {
 }
 enum DividendReminders {
     static let key = "dividendReminders"
+    /// Leaves room under the 64 pending notifications iOS allows for the twelve months of debit-day reminders.
+    static let limit = 40
     private static let prefix = "dividend-"
     static func syncIfEnabled(_ dividends: [Dividend]) async {
         guard UserDefaults.standard.bool(forKey: key) else { return }
@@ -341,7 +343,7 @@ enum DividendReminders {
         let center = UNUserNotificationCenter.current()
         let now = Date()
         var scheduled = 0
-        for item in dividends.filter({ $0.status != .paid }).sorted(by: { $0.date < $1.date }) where scheduled < 60 {
+        for item in dividends.filter({ $0.status != .paid }).sorted(by: { $0.date < $1.date }) where scheduled < limit {
             var parts = Calendar.current.dateComponents([.year, .month, .day], from: item.date)
             parts.hour = 9
             guard let fire = Calendar.current.date(from: parts), fire > now else { continue }
@@ -370,6 +372,7 @@ struct ReminderCenterView: View {
     @AppStorage(Onboarding.dayKey) private var dcaDay = 0
     @AppStorage(Onboarding.remindMinutesKey) private var dcaMinutes = 9 * 60
     @AppStorage(Onboarding.remindEveKey) private var dcaEve = false
+    @AppStorage(DCAReminders.showAmountKey) private var dcaShowAmount = true
     @State private var dcaNote: String?
     private var upcoming: [Dividend] {
         let today = Calendar.current.startOfDay(for: Date())
@@ -399,7 +402,7 @@ struct ReminderCenterView: View {
             }
         }.navigationTitle("提醒中心").navigationBarTitleDisplayMode(.inline)
     }
-    /// 定期定額扣款日提醒: on or off, the day and the time, and the day before; every change reschedules it.
+    /// 定期定額扣款日提醒: on or off, the day and the time, and the day before; changes only write the keys, and `RootView` replans.
     private var dcaCard: some View {
         Card {
             Toggle(isOn: Binding(get: { dcaOn }, set: { value in Task { await setDCA(value) } })) {
@@ -408,37 +411,32 @@ struct ReminderCenterView: View {
                     Text(DCAReminders.summary(on: dcaOn, day: shownDay, minutes: dcaMinutes, dayBefore: dcaEve)).font(.caption).foregroundStyle(Palette.muted)
                 }
             }.tint(Palette.blue).disabled(working).accessibilityIdentifier("reminder-dca-toggle")
-            Picker("扣款日", selection: Binding(get: { shownDay }, set: { dcaDay = $0; reschedule() })) {
+            Picker("扣款日", selection: Binding(get: { shownDay }, set: { dcaDay = $0 })) {
                 ForEach(Onboarding.days, id: \.self) { Text("每月 \($0) 日").tag($0) }
             }
             .padding(.top, 8)
             .disabled(!dcaOn)
             .accessibilityIdentifier("reminder-dca-day")
-            DatePicker("提醒時間", selection: Binding(get: { DCAReminders.time(dcaMinutes) }, set: { dcaMinutes = DCAReminders.minutes($0); reschedule() }), displayedComponents: .hourAndMinute)
+            DatePicker("提醒時間", selection: Binding(get: { DCAReminders.time(dcaMinutes) }, set: { dcaMinutes = DCAReminders.minutes($0) }), displayedComponents: .hourAndMinute)
                 .disabled(!dcaOn)
                 .accessibilityIdentifier("reminder-dca-time")
-            Toggle("前一天也提醒", isOn: Binding(get: { dcaEve }, set: { dcaEve = $0; reschedule() })).tint(Palette.blue).disabled(!dcaOn)
+            Toggle("前一天也提醒", isOn: $dcaEve).tint(Palette.blue).disabled(!dcaOn)
+            Toggle("通知顯示金額", isOn: $dcaShowAmount).tint(Palette.blue).disabled(!dcaOn).accessibilityIdentifier("reminder-dca-show-amount")
             if let dcaNote { Text(dcaNote).font(.caption).foregroundStyle(Palette.muted).padding(.top, 6) }
         }
     }
     /// The saved day, or the first offered one before any was chosen.
     private var shownDay: Int { Onboarding.days.contains(dcaDay) ? dcaDay : (Onboarding.days.first ?? 6) }
-    private func reschedule() {
-        guard dcaOn else { return }
-        let (day, minutes, eve) = (shownDay, dcaMinutes, dcaEve)
-        Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: eve) }
-    }
     private func setDCA(_ value: Bool) async {
         working = true
         defer { working = false }
         if value {
             guard await DividendReminders.requestAccess() else { dcaOn = false; dcaNote = "未取得通知權限，可到 iPhone 設定 › 通知 開啟。"; return }
             dcaDay = shownDay; dcaOn = true; dcaNote = nil
-            await DCAReminders.schedule(day: dcaDay, minutes: dcaMinutes, dayBefore: dcaEve)
             ConfirmFeedback.confirm(SkinStore.shared.skin)
         } else {
             dcaOn = false
-            DCAReminders.clear()
+            await DCAReminders.clear()
             dcaNote = "已關閉扣款日提醒。"
         }
     }

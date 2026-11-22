@@ -14,7 +14,7 @@ enum Onboarding {
     static let remindKey = "onboarding.remind"
     static let remindMinutesKey = "onboarding.remindMinutes"
     static let remindEveKey = "onboarding.remindEve"
-    static let keys = [doneKey, monthlyKey, symbolKey, dayKey, remindKey, remindMinutesKey, remindEveKey]
+    static let keys = [doneKey, monthlyKey, symbolKey, dayKey, remindKey, remindMinutesKey, remindEveKey, DCAReminders.showAmountKey]
 
     static let amounts = [1000, 3000, 5000, 10000]
     /// The monthly amount picked on page 2, if any: 股息複利試算's default before a plan is saved.
@@ -373,18 +373,16 @@ struct OnboardingFlow: View {
         defaults.set(minutes, forKey: Onboarding.remindMinutesKey)
         defaults.set(remindEve, forKey: Onboarding.remindEveKey)
         if let habit { try? store.updateGame { $0.habit = habit } }
-        // Off, or no day: no debit-day reminder is left over from an earlier choice.
-        if remind, let day { Task { await DCAReminders.schedule(day: day, minutes: minutes, dayBefore: remindEve) } }
-        else { DCAReminders.clear() }
+        // The reminders themselves are planned from these keys by `RootView` (`DCAReminders.sync`).
         if confirm { ConfirmFeedback.confirm(SkinStore.shared.skin) }
         onFinish()
     }
 }
 
-/// The monthly debit-day reminder chosen in onboarding (and changed in 工具 › 提醒), repeating every month at the
-/// chosen time.
+/// The monthly debit-day reminder chosen in onboarding (and changed in 工具 › 提醒): twelve months of one-shot
+/// notifications, replaced from the current records whenever its inputs change.
 enum DCAReminders {
-    static let ids = ["dca-reminder", "dca-reminder-eve"]
+    static let showAmountKey = "dcaReminder.showAmount"
     /// 「每月 6 日 09:00 通知，前一天也提醒」, or what turning it on does.
     static func summary(on: Bool, day: Int, minutes: Int, dayBefore: Bool) -> String {
         guard on else { return "每月扣款日通知你確認定期定額" }
@@ -398,20 +396,46 @@ enum DCAReminders {
         let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
         return (parts.hour ?? 9) * 60 + (parts.minute ?? 0)
     }
-    static func clear() { UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids) }
-    static func schedule(day: Int, minutes: Int, dayBefore: Bool) async {
+
+    /// What the schedule depends on; nil when the reminder is off or has no valid day.
+    static func inputs(_ p: Portfolio, defaults: UserDefaults = .standard, now: Date = Date()) -> DCAReminderInputs? {
+        guard defaults.bool(forKey: Onboarding.remindKey) else { return nil }
+        let day = defaults.integer(forKey: Onboarding.dayKey)
+        guard Onboarding.days.contains(day) else { return nil }
+        let monthly = defaults.integer(forKey: Onboarding.monthlyKey)
+        let known = QuickDCA.defaults(preset: p.quickDCA, onboardingSymbol: defaults.string(forKey: Onboarding.symbolKey),
+                                      onboardingMonthly: monthly > 0 ? monthly : nil, portfolio: p)
+        let month = YearMonth(now)
+        return DCAReminderInputs(
+            day: day,
+            minutes: defaults.object(forKey: Onboarding.remindMinutesKey) == nil ? 9 * 60 : defaults.integer(forKey: Onboarding.remindMinutesKey),
+            dayBefore: defaults.bool(forKey: Onboarding.remindEveKey),
+            showAmount: defaults.object(forKey: showAmountKey) == nil ? true : defaults.bool(forKey: showAmountKey),
+            amount: known.amount, symbol: known.symbol,
+            month: month.key, loggedThisMonth: p.dcaLogged(in: month))
+    }
+
+    /// The pending ids this reminder owns, the two old repeating ones included.
+    static func ownIDs(in pending: [String]) -> [String] { pending.filter { $0.hasPrefix(DCAReminderPlan.prefix) } }
+
+    /// Replaces every pending debit-day reminder with the plan for `inputs` (nil: just removes them). Nothing happens
+    /// in UI tests.
+    static func sync(_ inputs: DCAReminderInputs?) async {
+        guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
         let center = UNUserNotificationCenter.current()
-        clear()
-        var requests = [(ids[0], day, "今天是每月 \(day) 日的扣款日，記得確認定期定額。")]
-        if dayBefore { requests.append((ids[1], day - 1, "明天是每月 \(day) 日的扣款日。")) }
-        for (id, fireDay, body) in requests {
-            var parts = DateComponents()
-            parts.day = fireDay; parts.hour = minutes / 60; parts.minute = minutes % 60
+        let pending = await center.pendingNotificationRequests().map(\.identifier)
+        center.removePendingNotificationRequests(withIdentifiers: ownIDs(in: pending))
+        guard let inputs else { return }
+        for request in DCAReminderPlan.requests(inputs, now: Date()) {
             let content = UNMutableNotificationContent()
-            content.title = "定期定額提醒"
-            content.body = body
+            content.title = request.title
+            content.body = request.body
+            content.userInfo = request.userInfo
             content.sound = .default
-            try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: true)))
+            let parts = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: request.fire)
+            try? await center.add(UNNotificationRequest(identifier: request.id, content: content,
+                                                        trigger: UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)))
         }
     }
+    static func clear() async { await sync(nil) }
 }

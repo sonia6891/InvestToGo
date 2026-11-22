@@ -670,11 +670,17 @@ final class ETFToGoUITests: XCTestCase {
 
     /// 工具 › 提醒 has the debit-day reminder chosen in onboarding: on or off, the day and the time (final review I5).
     func testReminderCenterHasTheDebitDayReminder() {
-        let app = launch(["--open", "reminders"])
+        // The reminder is on from the start (a launch default), so no notification permission prompt gets in the way.
+        let app = launch(["-onboarding.remind", "YES", "--open", "reminders"])
         let toggle = app.switches["reminder-dca-toggle"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 10), "提醒 lists 定期定額扣款日提醒")
         XCTAssertTrue(app.descendants(matching: .any)["reminder-dca-day"].exists, "with its day")
         XCTAssertTrue(app.descendants(matching: .any)["reminder-dca-time"].exists, "and its time")
+        let amount = app.switches["reminder-dca-show-amount"]
+        XCTAssertTrue(amount.exists, "and 通知顯示金額")
+        XCTAssertEqual(toggle.value as? String, "1", "the reminder is on")
+        let on = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == '1'"), object: amount)
+        XCTAssertEqual(XCTWaiter().wait(for: [on], timeout: 5), .completed, "通知顯示金額 is on once the reminder is: \(String(describing: amount.value))")
         sleep(1); capture(app, "reminders-dca")
     }
 

@@ -102,6 +102,15 @@ struct RootView: View {
     /// The feature last on screen above the lobby: the lobby's replay flies its coins from that object.
     @State private var returningFrom: Feature?
     @ObservedObject private var connectivity = Connectivity.shared
+    // The debit-day reminder's settings: a change re-runs `.task(id: reminderInputs)`.
+    @AppStorage(Onboarding.remindKey) private var remindOn = false
+    @AppStorage(Onboarding.dayKey) private var remindDay = 0
+    @AppStorage(Onboarding.remindMinutesKey) private var remindMinutes = 9 * 60
+    @AppStorage(Onboarding.remindEveKey) private var remindEve = false
+    @AppStorage(DCAReminders.showAmountKey) private var remindShowAmount = true
+    @AppStorage(Onboarding.monthlyKey) private var monthly = 0
+    @AppStorage(Onboarding.symbolKey) private var onboardingSymbol = ""
+    private var reminderInputs: DCAReminderInputs? { DCAReminders.inputs(store.data) }
 
     init() {
         // `--open <feature>` starts on a feature (UI tests, screenshots); otherwise the lobby.
@@ -167,6 +176,7 @@ struct RootView: View {
             guard phase == .active else { return }
             // The records could not be opened at a launch in the background (locked phone): read them now.
             store.reloadIfLocked()
+            if !store.recordsLocked { await DCAReminders.sync(reminderInputs) }
             guard !ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
             store.live.start()
             await store.followMarket()
@@ -174,6 +184,8 @@ struct RootView: View {
             // apart at least).
             await PriceAlertMonitor.checkOnReturn()
         }
+        // Rebuilt from the records, so logging a DCA (or deleting it) and a new month change what is pending.
+        .task(id: reminderInputs) { if !store.recordsLocked { await DCAReminders.sync(reminderInputs) } }
         .onChange(of: phase) { _, value in if value == .background { store.live.stop(); PriceAlertMonitor.scheduleNext() } }
         // Locked records are empty, not gone: the reminders already scheduled stay until they can be read.
         .task(id: store.data.dividends.map(\.id)) { if !store.recordsLocked { await DividendReminders.syncIfEnabled(store.data.dividends) } }
