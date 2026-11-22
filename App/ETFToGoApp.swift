@@ -28,8 +28,8 @@ import UserNotifications
         DemoArguments.seedHeld(store, args: args)
         DemoArguments.seedActive(store, args: args)
         DemoArguments.seedStore(store, args: args, now: Date())
-        // `--ui-testing --open quickDCA`: as if the debit-day reminder had just been tapped.
-        if testing, let i = args.firstIndex(of: "--open"), args.indices.contains(i + 1), args[i + 1] == "quickDCA" {
+        // `--ui-testing --open quickDCA`: as if the debit-day reminder had just been tapped (also beside `--open levelup`).
+        if testing, args.indices.contains(where: { args[$0] == "--open" && args.indices.contains($0 + 1) && args[$0 + 1] == "quickDCA" }) {
             AppRouter.shared.quickDCARequested = true
         }
         _store = StateObject(wrappedValue: store)
@@ -150,6 +150,7 @@ struct RootView: View {
             .environment(\.celebrateIfDue, celebrateIfDue)
             .environment(\.returningFrom, returningFrom)
             .environment(\.lobbyCovered, levelUp != nil)
+            .environment(\.lobbyModalPending, levelUp != nil || celebration != nil)
             .tint(Palette.blue)
             .id(skins.skin.id)
             // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑
@@ -203,9 +204,10 @@ struct RootView: View {
     }
 
     /// LEVEL×UP, when one is due and the lobby is the screen in front (spec 5.4): never over a feature screen, where it
-    /// waits for the next time the lobby is seen. The lobby calls this once its bar has filled.
+    /// waits for the next time the lobby is seen, nor over 記一筆, after which the lobby asks again (its `onDismiss`).
+    /// The lobby calls this once its bar has filled.
     private func celebrateIfDue() {
-        guard path.isEmpty, levelUp == nil, celebration == nil, store.data.game?.levelUpDue != nil else { return }
+        guard path.isEmpty, levelUp == nil, celebration == nil, !router.quickDCAShowing, store.data.game?.levelUpDue != nil else { return }
         celebration = Task {
             await celebrateWhenDue()
             celebration = nil
@@ -225,7 +227,8 @@ struct RootView: View {
             try? await Task.sleep(for: .milliseconds(150)); waits += 1
         }
         if hadReward { try? await Task.sleep(for: .seconds(2)) }
-        guard !Task.isCancelled, levelUp == nil, path.isEmpty, let level = store.data.game?.levelUpDue else { return }
+        // 記一筆 came up meanwhile: it is held, and the lobby asks again once the sheet has gone.
+        guard !Task.isCancelled, levelUp == nil, path.isEmpty, !router.quickDCAShowing, let level = store.data.game?.levelUpDue else { return }
         try? store.updateGame { _ = $0.refreshAchievements(store.data, now: Date()) }
         levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, now: Date())
     }

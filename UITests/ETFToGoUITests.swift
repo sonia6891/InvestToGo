@@ -438,6 +438,25 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.buttons["lobby-quick-dca"].exists, "Nothing was saved: 記一筆 is still offered")
     }
 
+    /// A LEVEL×UP due at launch and a tapped reminder at once: 記一筆 comes up alone, and LEVEL×UP only once it has gone.
+    func testQuickDCAAndLevelUpNeverTogether() {
+        let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "--demo-level", "3", "-onboarding.monthly", "5000",
+                          "--open", "levelup", "--open", "quickDCA"])
+        let save = app.buttons["quick-dca-save"], level = app.staticTexts["levelup-level"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10), "The reminder opens the sheet")
+        XCTAssertFalse(level.waitForExistence(timeout: 3), "LEVEL×UP waits while 記一筆 is up")
+        let title = app.staticTexts["記一筆定投"].firstMatch
+        XCTAssertTrue(title.exists, "The sheet has its title")
+        let start = title.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: 600)))
+        XCTAssertTrue(save.waitForNonExistence(timeout: 5), "The sheet is gone")
+        XCTAssertTrue(level.waitForExistence(timeout: 10), "Then LEVEL×UP comes up")
+        XCTAssertFalse(save.exists, "Never both at once")
+        app.buttons["levelup-accept"].tap()
+        XCTAssertTrue(level.waitForNonExistence(timeout: 5), "收下 closes it")
+        XCTAssertTrue(app.buttons["lobby-quick-dca"].waitForExistence(timeout: 5), "Nothing was saved: 記一筆 is still offered")
+    }
+
     func testQuickDCARefusesUnknownCode() {
         let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000"])
         let open = app.buttons["lobby-quick-dca"]

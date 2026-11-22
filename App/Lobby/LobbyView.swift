@@ -49,6 +49,8 @@ struct LobbyView: View {
     @State private var bouncing: Feature?
     /// LEVEL×UP covers the lobby (a full-screen cover from the root view: no `onDisappear` here).
     @Environment(\.lobbyCovered) private var covered
+    /// LEVEL×UP is up or about to come up (and, later, any other prompt from the root view): 記一筆 waits for it.
+    @Environment(\.lobbyModalPending) private var modalPending
     /// A tapped debit-day reminder asks for 記一筆 here.
     @ObservedObject private var router = AppRouter.shared
     @Environment(\.celebrateIfDue) private var celebrateIfDue
@@ -127,10 +129,15 @@ struct LobbyView: View {
             playOpening()
             if !opening { bounceReturning() }
             arrive(lead: opening ? 0.5 : 0.15)
-            openRequestedQuickDCA()
+            // A lobby that comes up without its sheet (rebuilt for a new skin, say) has no 記一筆 on screen.
+            if !sheetUp { router.quickDCAClosed() }
+            presentQuickDCA()
         }
-        .onChange(of: router.quickDCARequested) { _, _ in openRequestedQuickDCA() }
-        .onChange(of: store.recordsLocked) { _, _ in openRequestedQuickDCA() }
+        // A waiting request opens as soon as the lobby is free: asked for, the records read, a replay or a prompt over.
+        .onChange(of: router.quickDCARequested) { _, _ in presentQuickDCA() }
+        .onChange(of: store.recordsLocked) { _, _ in presentQuickDCA() }
+        .onChange(of: replayer.playing) { _, playing in if !playing { presentQuickDCA() } }
+        .onChange(of: modalPending) { _, pending in if !pending { presentQuickDCAAfterCover() } }
         .onDisappear { onScreen = false; replayer.cancel() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { opensAgain = true } else if phase == .active, onScreen { playOpening() }
@@ -138,27 +145,45 @@ struct LobbyView: View {
         // Earned while the lobby is in front (or the records were read late): replayed there and then.
         .onChange(of: LobbySnapshot.of(game, records: store.data, now: now)) { _, _ in arrive(lead: 0.15) }
         .onChange(of: covered) { _, isCovered in
-            if isCovered { replayer.coverOpened() } else { replayer.coverClosed(); arrive(lead: 0.15); openRequestedQuickDCA() }
+            if isCovered { replayer.coverOpened() } else { replayer.coverClosed(); arrive(lead: 0.15); presentQuickDCAAfterCover() }
         }
-        // 記一筆: what it earns is replayed once the sheet has gone (spec 3.2), never under it.
-        .sheet(isPresented: $quickDCA, onDismiss: { sheetUp = false; arrive(lead: 0.15) }) {
+        // 記一筆: what it earns is replayed once the sheet has gone (spec 3.2), never under it. A LEVEL×UP held while it
+        // was up follows the replay (or comes at once, with nothing to replay).
+        .sheet(isPresented: $quickDCA, onDismiss: { sheetUp = false; router.quickDCAClosed(); arrive(lead: 0.15); presentQuickDCA() }) {
             QuickDCASheet { quickDCA = false }
         }
     }
 
-    /// A tapped reminder asked for 記一筆: the sheet opens once the lobby is in front and nothing covers it, then the
-    /// request is cleared. While the records are locked it is cleared without opening: never records over the lock.
-    /// Nothing is saved by this; the person still taps 「記好了」.
-    private func openRequestedQuickDCA() {
+    /// The lobby can take 記一筆 now (`QuickDCARoute.lobbyFree`).
+    private var lobbyFree: Bool {
+        QuickDCARoute.lobbyFree(onScreen: onScreen, covered: covered, modalPending: modalPending, replaying: replayer.playing,
+                                closing: sheetUp && !quickDCA)
+    }
+
+    /// The one way 記一筆 opens, for the lobby's button and a tapped reminder alike (final review I2): a request
+    /// (`router.quickDCARequested`) opens the sheet once the lobby is free (`lobbyFree`), so it is never up together
+    /// with LEVEL×UP or a replay, then the request is cleared. While the records are locked the request waits, and the
+    /// sheet opens once they are read (`onChange(of: store.recordsLocked)`): never records over the lock. Nothing is
+    /// saved by this; the person still taps 「記好了」.
+    private func presentQuickDCA() {
         guard router.quickDCARequested else { return }
-        if store.recordsLocked { router.quickDCARequested = false; return }
-        guard onScreen, !covered else { return }
-        router.quickDCARequested = false
-        guard !quickDCA, !sheetUp else { return }
-        let game = store.data.game ?? GameState(), month = YearMonth(Date())
-        ticksAtOpen = Set(Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
-            .filter { game.isDone($0, in: month, records: store.data) }.map(\.id))
-        quickDCA = true; sheetUp = true
+        switch QuickDCARoute.decide(locked: store.recordsLocked, showing: quickDCA, free: lobbyFree) {
+        case .wait: return
+        case .drop: router.quickDCARequested = false
+        case .open:
+            router.quickDCARequested = false
+            let game = store.data.game ?? GameState(), month = YearMonth(Date())
+            ticksAtOpen = Set(Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
+                .filter { game.isDone($0, in: month, records: store.data) }.map(\.id))
+            quickDCA = true; sheetUp = true
+            router.quickDCAOpened()
+        }
+    }
+
+    /// Once a cover over the lobby has finished going away: a sheet asked for in the middle of it may not come up.
+    private func presentQuickDCAAfterCover() {
+        guard router.quickDCARequested else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { presentQuickDCA() }
     }
 
     /// Back from a feature: its object swells once and settles, as the coins start to fly from it. Still under Reduce
@@ -379,8 +404,10 @@ struct LobbyView: View {
                     if quest.trigger == .dcaLogged, !game.isDone(quest, in: month, records: store.data), !store.recordsLocked {
                         if stretch { Spacer(minLength: 8) }
                         Button {
-                            ticksAtOpen = Set(quests.filter { game.isDone($0, in: month, records: store.data) }.map(\.id))
-                            quickDCA = true; sheetUp = true
+                            // As any tap during the replay does: the final numbers at once, then the sheet.
+                            replayer.cancel()
+                            router.quickDCARequested = true
+                            presentQuickDCA()
                         } label: {
                             SkinTag("記一筆").padding(.vertical, 6).contentShape(Rectangle())
                         }

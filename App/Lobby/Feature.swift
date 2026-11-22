@@ -74,6 +74,7 @@ private struct LobbyNamespaceKey: EnvironmentKey { static let defaultValue: Name
 private struct CelebrateIfDueKey: EnvironmentKey { static let defaultValue: () -> Void = {} }
 private struct ReturningFromKey: EnvironmentKey { static let defaultValue: Feature? = nil }
 private struct LobbyCoveredKey: EnvironmentKey { static let defaultValue = false }
+private struct LobbyModalPendingKey: EnvironmentKey { static let defaultValue = false }
 
 extension EnvironmentValues {
     /// Shows LEVEL×UP when one is due and the lobby is the screen in front (spec 5.4). Set by the root view; the lobby
@@ -92,6 +93,13 @@ extension EnvironmentValues {
     var lobbyCovered: Bool {
         get { self[LobbyCoveredKey.self] }
         set { self[LobbyCoveredKey.self] = newValue }
+    }
+    /// A prompt from the root view is up or about to come up over the lobby (LEVEL×UP, or its wait for a toast). Every
+    /// later prompt over the lobby (the app lock, the member-open notes) joins this slot, so 記一筆 waits for it and a
+    /// waiting request opens once it clears.
+    var lobbyModalPending: Bool {
+        get { self[LobbyModalPendingKey.self] }
+        set { self[LobbyModalPendingKey.self] = newValue }
     }
     var lobbyNavigation: LobbyNavigation {
         get { self[LobbyNavigationKey.self] }
