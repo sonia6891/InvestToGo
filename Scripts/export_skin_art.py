@@ -23,7 +23,7 @@ import stat
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageChops, features
+from PIL import Image, ImageChops
 
 ROOT = Path(__file__).resolve().parent.parent
 D3 = ROOT / "design" / "3d"
@@ -65,13 +65,18 @@ def mapping(skin):
 
 SKINS = ["blackgold", "voxel", "stitch", "sketch"]
 
-# The two 3D skins ship raster art. Each PNG is written losslessly first; one that is still over BUDGET_BYTES is
-# quantized to a 256-colour palette. PSNR is measured on the image as the skin shows it, composited on its page colour.
+# The two 3D skins ship raster art. Each PNG is written losslessly first (fully transparent pixels carry no colour);
+# one that is still over BUDGET_BYTES keeps its full alpha but has its colour rounded to 6 bits per channel, which is
+# at most 2 levels of error. Palette quantizing (256 colours) was tried and rejected: it stepped the soft edges.
+# Quality is the PSNR of the image as the skin shows it, composited on its page colour, over the object's pixels
+# (alpha > 0) and over its semi-transparent edge pixels (0 < alpha < 255); whole-image PSNR is flattered by the flat
+# page colour around the object.
 BUDGET_BYTES = 150_000
-PSNR_FLOOR = 36.0
+COLOR_BITS = 6
+PSNR_FLOOR = 36.0       # object pixels
+EDGE_FLOOR = 33.0       # semi-transparent edge pixels
 TOTAL_LIMIT = 4_000_000
 PAGE_COLOR = {"blackgold": (0x1A, 0x1A, 0x1D), "voxel": (0x1B, 0x1F, 0x4B)}  # colors.page in skins.json
-QUANTIZER = (Image.Quantize.LIBIMAGEQUANT if features.check("libimagequant") else Image.Quantize.FASTOCTREE)
 
 
 def budget(src):
@@ -83,29 +88,50 @@ def on_page(image, page):
     return Image.alpha_composite(base, image.convert("RGBA")).convert("RGB")
 
 
-def psnr(a, b):
-    """PSNR in dB of two RGB images of the same size; infinity when they are identical."""
-    hist = ImageChops.difference(a, b).histogram()
+def psnr(a, b, mask):
+    """PSNR in dB of two RGB images over the pixels `mask` selects; infinity when they match, None when it is empty."""
+    pixels = mask.histogram()[255]
+    if pixels == 0:
+        return None
+    hist = ImageChops.difference(a, b).histogram(mask)
     squares = sum(count * (i % 256) ** 2 for i, count in enumerate(hist))
     if squares == 0:
         return math.inf
-    return 10 * math.log10(255 ** 2 / (squares / (a.width * a.height * 3)))
+    return 10 * math.log10(255 ** 2 / (squares / (pixels * 3)))
+
+
+def scores(original, written, page):
+    """(object PSNR, edge PSNR) of `written` against `original`; None for an image with no edge pixels."""
+    alpha = original.convert("RGBA").getchannel("A")
+    solid = alpha.point(lambda v: 255 if v else 0)
+    edge = alpha.point(lambda v: 255 if 0 < v < 255 else 0)
+    a, b = on_page(original, page), on_page(written, page)
+    return psnr(a, b, solid), psnr(a, b, edge)
+
+
+def reduced(image, bits):
+    """`image` with fully transparent pixels cleared and, when bits < 8, colour rounded to `bits` bits per channel."""
+    r, g, b, a = image.convert("RGBA").split()
+    step = 1 << (8 - bits)
+    bands = [band.point(lambda v: min(255, (v + step // 2) // step * step)) if bits < 8 else band for band in (r, g, b)]
+    clear = Image.new("L", image.size, 0)
+    seen = a.point(lambda v: 255 if v else 0)
+    return Image.merge("RGBA", [Image.composite(band, clear, seen) for band in bands] + [a])
 
 
 def optimize_png(src, dst, page):
-    """Write `src` to `dst` as a PNG and return (bytes written, PSNR against the original on `page`).
+    """Write `src` to `dst` as a PNG and return (bytes written, object PSNR, edge PSNR) against the original on `page`.
 
-    Lossless when that fits budget(src); otherwise quantized to 256 colours with Floyd-Steinberg dithering.
+    Lossless when that fits budget(src); otherwise colour is rounded to COLOR_BITS bits per channel.
     """
     original = Image.open(src)
     original.load()
-    original.save(dst, optimize=True)
+    reduced(original, 8).save(dst, optimize=True)
     if dst.stat().st_size > budget(src):
-        rgba = original.convert("RGBA")
-        rgba.quantize(256, method=QUANTIZER, dither=Image.Dither.FLOYDSTEINBERG).save(dst, optimize=True)
+        reduced(original, COLOR_BITS).save(dst, optimize=True)
     with Image.open(dst) as written:
-        score = psnr(on_page(original, page), on_page(written, page))
-    return dst.stat().st_size, score
+        solid, edge = scores(original, written, page)
+    return dst.stat().st_size, solid, edge
 
 
 def _clear_readonly(func, path, _exc):
@@ -136,7 +162,7 @@ def main():
     write_json(OUT / "Contents.json", {"info": INFO, "properties": {"provides-namespace": True}})
     count = 0
     png_total = 0
-    scores = []
+    results = []
     for skin in SKINS:
         folder = OUT / skin
         folder.mkdir()
@@ -153,19 +179,22 @@ def main():
                 (imageset / filename).write_text(asset_svg(src.read_text(encoding="utf-8")), encoding="utf-8")
                 contents["properties"] = {"preserves-vector-representation": True}
             else:
-                size, score = optimize_png(src, imageset / filename, PAGE_COLOR[skin])
+                size, solid, edge = optimize_png(src, imageset / filename, PAGE_COLOR[skin])
                 png_total += size
-                scores.append((score, f"{skin}/{name}", size))
+                results.append((f"{skin}/{name}", size, solid, edge))
             write_json(imageset / "Contents.json", contents)
             count += 1
     print(f"exported {count} images into {OUT.relative_to(ROOT)}")
     failed = False
-    for score, label, size in sorted(scores):
-        flag = "  <-- below floor" if score < PSNR_FLOOR else ""
-        failed = failed or bool(flag)
-        print(f"  {label:<24} {size:>9,} bytes  PSNR {score:6.2f} dB{flag}")
-    worst = min((s for s, _, _ in scores), default=math.inf)
-    print(f"PNG total {png_total:,} bytes (limit {TOTAL_LIMIT:,}); worst PSNR {worst:.2f} dB (floor {PSNR_FLOOR})")
+    for label, size, solid, edge in sorted(results, key=lambda r: r[2]):
+        low = solid < PSNR_FLOOR or (edge is not None and edge < EDGE_FLOOR)
+        failed = failed or low
+        shown = "  none" if edge is None else f"{edge:6.2f}"
+        print(f"  {label:<24} {size:>9,} bytes  object {solid:6.2f} dB  edge {shown} dB" + ("  <-- below floor" if low else ""))
+    worst = min((r[2] for r in results), default=math.inf)
+    worst_edge = min((r[3] for r in results if r[3] is not None), default=math.inf)
+    print(f"PNG total {png_total:,} bytes (limit {TOTAL_LIMIT:,}); worst object PSNR {worst:.2f} dB (floor {PSNR_FLOOR}), "
+          f"worst edge PSNR {worst_edge:.2f} dB (floor {EDGE_FLOOR})")
     if png_total > TOTAL_LIMIT:
         print("PNG total is over the limit", file=sys.stderr)
         failed = True
