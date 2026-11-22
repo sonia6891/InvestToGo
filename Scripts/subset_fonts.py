@@ -259,7 +259,7 @@ def subset(source: Path | None) -> int:
     return 0
 
 
-def check(source: Path | None = None) -> int:
+def check() -> int:
     """Every CJK character and symbol the app ships is in each Traditional Chinese font's cmap."""
     # CJK compatibility ideographs (U+F900-FAFF, e.g. 金 U+F90A in official fund names) are checked as their NFC
     # unified form: the full fonts never had most of them, so they fell back to the system font before subsetting too.
@@ -271,9 +271,10 @@ def check(source: Path | None = None) -> int:
     ascii_chars = {chr(cp) for cp in range(0x20, 0x7F)}
     for name in SUBSET:
         if name in LATIN:
-            had = set(TTFont(io.BytesIO(original(name, source))).getBestCmap())
+            # All five originals had every printable ASCII character (checked when they were recorded), so each
+            # subset must too. Needs no git history, which CI's shallow checkout lacks.
             cmap = TTFont(str(FONTS / name)).getBestCmap()
-            gone = sorted(c for c in ascii_chars if ord(c) in had and ord(c) not in cmap)
+            gone = sorted(c for c in ascii_chars if ord(c) not in cmap)
             if gone:
                 failed = True
                 print(f"FAIL {name}: printable ASCII missing: {''.join(gone)}")
@@ -317,7 +318,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="verify coverage of the bundled fonts; change nothing")
     parser.add_argument("--source", type=Path, help="folder with the full fonts (default: git history)")
     args = parser.parse_args()
-    return check(args.source) if args.check else subset(args.source)
+    return check() if args.check else subset(args.source)
 
 
 if __name__ == "__main__":
