@@ -50,13 +50,32 @@ extension PortfolioStore {
     }
 }
 
-/// Lets a 到價提醒 show as a banner while the app is open: the check on returning to the app is the one that runs most
-/// often, and iOS shows nothing for a notification that arrives in the foreground unless the app says to. Every
-/// other notification (配息提醒, 扣款日提醒) stays as it was: not shown over the open app.
-final class PriceAlertPresenter: NSObject, UNUserNotificationCenterDelegate {
+/// The app's notification delegate. A 到價提醒 and a 扣款日提醒 show as a banner while the app is open (the check on
+/// returning to the app is the one that runs most often, and iOS shows nothing for a notification that arrives in
+/// the foreground unless the app says to); every other notification stays as it was: not shown over the open app.
+/// Tapping a reminder that asks for 記一筆 (`route` = `quickDCA`) asks the lobby to open it.
+final class NotificationRouter: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = NotificationRouter()
+
+    static func presentation(for identifier: String) -> UNNotificationPresentationOptions {
+        identifier.hasPrefix(PriceAlertMonitor.notificationPrefix) || identifier.hasPrefix(DCAReminderPlan.prefix) ? [.banner, .list, .sound] : []
+    }
+
+    static func wantsQuickDCA(_ userInfo: [AnyHashable: Any]) -> Bool {
+        userInfo["route"] as? String == "quickDCA"
+    }
+
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(notification.request.identifier.hasPrefix(PriceAlertMonitor.notificationPrefix) ? [.banner, .list, .sound] : [])
+        completionHandler(Self.presentation(for: notification.request.identifier))
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        if Self.wantsQuickDCA(response.notification.request.content.userInfo) {
+            Task { @MainActor in AppRouter.shared.quickDCARequested = true }
+        }
+        completionHandler()
     }
 }
 
@@ -104,14 +123,12 @@ enum PriceAlertMonitor {
     @MainActor private static weak var store: PortfolioStore?
     /// The background task has its launch handler: only then may a request be submitted (iOS stops the app otherwise).
     @MainActor private static var registered = false
-    @MainActor private static let presenter = PriceAlertPresenter()
 
     /// Once, from the app's `init`: iOS wants the task's handler registered before launch ends. With `testing`
     /// (`--ui-testing`) only the store is kept: no background task, no notifications.
     @MainActor static func start(_ store: PortfolioStore, testing: Bool) {
         self.store = store
         guard !testing, !registered else { return }
-        UNUserNotificationCenter.current().delegate = presenter
         registered = registerTask()
     }
 

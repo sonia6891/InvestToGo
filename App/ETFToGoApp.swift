@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 @main struct ETFToGoApp: App {
     @StateObject private var store: PortfolioStore
@@ -27,6 +28,10 @@ import SwiftUI
         DemoArguments.seedHeld(store, args: args)
         DemoArguments.seedActive(store, args: args)
         DemoArguments.seedStore(store, args: args, now: Date())
+        // `--ui-testing --open quickDCA`: as if the debit-day reminder had just been tapped.
+        if testing, let i = args.firstIndex(of: "--open"), args.indices.contains(i + 1), args[i + 1] == "quickDCA" {
+            AppRouter.shared.quickDCARequested = true
+        }
         _store = StateObject(wrappedValue: store)
         // A launch in the background on a locked phone reads the records later; the two steps above are then redone.
         // The worn skin was not judged while they were locked (the level read 1): it is now.
@@ -37,6 +42,8 @@ import SwiftUI
         }
         // 到價提醒: iOS wants the background task's handler before launch ends. Nothing is registered in UI tests.
         PriceAlertMonitor.start(store, testing: testing)
+        // Banners over the open app, and a tapped reminder opening 記一筆: also in UI tests.
+        UNUserNotificationCenter.current().delegate = NotificationRouter.shared
         // StoreKit is followed from launch (Apple asks for the Transaction.updates listener then), so renewals and Ask
         // to Buy answers that arrive during the splash or onboarding are not missed. Once StoreKit has answered, a skin
         // the player may no longer wear is taken off, with a notice.
@@ -59,6 +66,7 @@ import SwiftUI
 struct LaunchGate: View {
     @AppStorage(Onboarding.doneKey) private var onboarded = false
     @Environment(\.motionReduced) private var reduceMotion
+    @ObservedObject private var router = AppRouter.shared
     /// Decided once per launch, so finishing the flow is what leaves it (also when a screenshot forced it open).
     @State private var start: OnboardingStart?
 
@@ -160,6 +168,8 @@ struct RootView: View {
                 .animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: skins.tryOn)
         }
         // Back in the lobby, the feature that was last above it is where the replay's coins come from.
+        // A tapped reminder: back to the lobby, which opens 記一筆 there.
+        .onChange(of: router.quickDCARequested) { if $1 { navigation.toLobby() } }
         .onChange(of: path) { _, value in if value.isEmpty { feature = nil } else { returningFrom = feature } }
         // Crossing a whole level shows LEVEL×UP once, over the lobby when its bar fills (spec 5.4).
         .fullScreenCover(item: $levelUp) { moment in

@@ -424,6 +424,16 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts.matching(NSPredicate(format: "label == '買進'")).count, 2)
     }
 
+    /// A tapped reminder (`--open quickDCA`) opens 記一筆 over the lobby, saves nothing, and the sheet swipes away.
+    func testReminderRouteOpensQuickDCAOverLobby() {
+        let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000", "--open", "quickDCA"])
+        XCTAssertTrue(app.buttons["quick-dca-save"].waitForExistence(timeout: 10), "The reminder opens the sheet")
+        app.buttons["quick-dca-save"].swipeDown()
+        let find = app.buttons["lobby-find"]
+        XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: find)], timeout: 10), .completed, "The lobby is under the sheet")
+        XCTAssertTrue(app.buttons["lobby-quick-dca"].exists, "Nothing was saved: 記一筆 is still offered")
+    }
+
     func testQuickDCARefusesUnknownCode() {
         let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000"])
         let open = app.buttons["lobby-quick-dca"]

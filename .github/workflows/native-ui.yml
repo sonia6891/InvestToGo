@@ -192,8 +192,7 @@ jobs:
             sleep 5
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-$SCREEN.png"
           done
-          # 記一筆: this month's DCA still to log, with the sheet open (`--open quickDCA` arrives with the reminders work;
-          # until then this is the lobby with 「記一筆」 in its quest card).
+          # 記一筆: this month's DCA still to log, with the sheet open (`--open quickDCA` is a tapped debit-day reminder).
           xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
           xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --skip-onboarding --demo-streak 3 --demo-unlogged --demo-held -onboarding.monthly 5000 --open quickDCA
           sleep 5
