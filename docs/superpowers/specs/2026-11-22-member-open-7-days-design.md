@@ -8,7 +8,7 @@ This copies 「喵的，又要上班了」's 「前 7 天 PRO 全部免費開放
 
 ## Intent
 
-A new user gets every 口袋會員 tool free for the first 7 days, so they try the paid tools before deciding. The rating sheet already asks on day 3, on branch `claude/workstation-events`, which lines up with meow's day 3 of the 7.
+A new user gets every 口袋會員 tool free for the first 7 days, so they try the paid tools before deciding. The rating sheet (branch `claude/workstation-events`) asks on day 1 and gives way to the 7 days' note: when that note will really come up on the same launch (`memberOpenNoteWaiting`), the rating waits for a later launch (one big prompt per launch, `LaunchPrompt`).
 
 ## Design
 

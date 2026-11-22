@@ -151,12 +151,27 @@ enum ReviewRules {
             if busy() || keyboardUp || !holds.isEmpty { free = 0; continue }
             free += 1
             guard free >= settle else { continue }
-            guard ReviewRules.eligible(state, today: today), request() else { return false }
+            guard ReviewRules.eligible(state, today: today) else { return false }
+            // One big prompt per launch, and a 口袋會員全開 note that will come up on this launch goes first: then nothing
+            // is recorded and a later launch asks. Taken just before the request (the scene was in front a moment ago,
+            // in the same busy check).
+            guard launchFree(), takeLaunch(), request() else { return false }
             state.asked = true
             return true
         }
         return false
     }
+
+    /// This launch's one prompt is free: nothing has taken it, and no 7 days' note is waiting to come up
+    /// (`LaunchPrompt`, `MembershipStore.memberOpenNoteWaiting`; a note that cannot show, such as the summary with no
+    /// price from the App Store, holds nothing back).
+    var launchFree: @MainActor () -> Bool = {
+        ReviewPrompt.launchFree(taken: LaunchPrompt.taken, noteWaiting: MembershipStore.shared.memberOpenNoteWaiting)
+    }
+    /// Takes this launch's prompt (`LaunchPrompt.take`).
+    var takeLaunch: @MainActor () -> Bool = { LaunchPrompt.take() }
+
+    nonisolated static func launchFree(taken: Bool, noteWaiting: Bool) -> Bool { !taken && !noteWaiting }
 
     /// Anything the sheet must never cover, one check each (another is one more line): the lock screen or cover, a
     /// purchase, no scene in front, a window above the app's (the lock window fading out), or a sheet, full-screen

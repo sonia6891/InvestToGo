@@ -24,6 +24,9 @@ import XCTest
         prompt.tick = .milliseconds(1)
         prompt.settle = 3
         prompt.limit = 20
+        // This launch's one prompt is free unless a test says otherwise (the real LaunchPrompt is process-wide).
+        prompt.launchFree = { true }
+        prompt.takeLaunch = { true }
         return prompt
     }
 
@@ -164,6 +167,59 @@ import XCTest
         XCTAssertTrue(second, "The re-trigger asks")
         let firstAsked = await first.value
         XCTAssertFalse(firstAsked, "The older wait stopped")
+    }
+
+    // MARK: One big prompt per launch (LaunchPrompt)
+
+    func testTheLaunchGate() {
+        XCTAssertTrue(ReviewPrompt.launchFree(taken: false, noteWaiting: false))
+        XCTAssertFalse(ReviewPrompt.launchFree(taken: false, noteWaiting: true), "A 7 days' note coming up on this launch goes first")
+        XCTAssertFalse(ReviewPrompt.launchFree(taken: true, noteWaiting: false), "Another prompt took this launch")
+        XCTAssertFalse(ReviewPrompt.launchFree(taken: true, noteWaiting: true))
+        // The app's own gate reads the store: in the unit-test host no 7 days' note is waiting (no record, or a member).
+        let store = MembershipStore.shared
+        XCTAssertEqual(ReviewPrompt(defaults: defaults, allowed: true, now: { Date() }, timeZone: { .current }).launchFree(),
+                       !LaunchPrompt.taken && !store.memberOpenNoteWaiting)
+    }
+
+    func testNoAskWhileAMemberOpenNoteIsWaitingAndNothingRecorded() async {
+        let gated = prompt()
+        var took = 0, asks = 0
+        gated.launchFree = { ReviewPrompt.launchFree(taken: false, noteWaiting: true) }
+        gated.takeLaunch = { took += 1; return true }
+        let asked = await gated.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertFalse(asked)
+        XCTAssertEqual(asks, 0)
+        XCTAssertEqual(took, 0, "This launch's prompt is left for the note")
+        XCTAssertFalse(gated.state.asked, "Nothing recorded")
+        // A later launch, the note seen: the rating asks, taking the launch's prompt just before.
+        gated.launchFree = { ReviewPrompt.launchFree(taken: false, noteWaiting: false) }
+        day(2)
+        let later = await gated.opened(busy: { false }, request: { asks += 1; return took == 1 })
+        XCTAssertTrue(later)
+        XCTAssertEqual(asks, 1)
+        XCTAssertTrue(gated.state.asked)
+    }
+
+
+    func testNoAskOnceLaunchPromptIsTakenAndNothingRecorded() async {
+        let saved = LaunchPrompt.taken
+        defer { LaunchPrompt.taken = saved }
+        LaunchPrompt.taken = false
+        XCTAssertTrue(LaunchPrompt.take(), "A 7 days' note took this launch's prompt")
+        let gated = prompt()
+        gated.launchFree = { ReviewPrompt.launchFree(taken: LaunchPrompt.taken, noteWaiting: false) }
+        gated.takeLaunch = { LaunchPrompt.take() }
+        var asks = 0
+        let asked = await gated.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertFalse(asked)
+        XCTAssertEqual(asks, 0)
+        XCTAssertFalse(gated.state.asked, "Nothing recorded: a later launch asks")
+        // The next cold launch starts free.
+        LaunchPrompt.taken = false
+        let next = await gated.opened(busy: { false }, request: { asks += 1; return true })
+        XCTAssertTrue(next)
+        XCTAssertTrue(LaunchPrompt.taken, "The rating took this launch's prompt")
     }
 
     /// Through the app's own export (資料備份與還原): the rating state stays on the phone.
