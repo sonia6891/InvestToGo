@@ -33,6 +33,7 @@ struct DexRevealItem: Identifiable, Equatable {
 }
 
 /// The first 詳情 visit of a fund (spec 7): the card's back, a flip to its face, the reward, then 收下 / 看圖鑑.
+/// A tap anywhere while it plays jumps to the end; 收下 and 看圖鑑 take their own taps at any moment.
 struct DexRevealView: View {
     let item: DexRevealItem
     let onAccept: () -> Void
@@ -45,29 +46,43 @@ struct DexRevealView: View {
     @State private var ranking: (facts: DexFacts, funds: [Fund])?
     @State private var angle = 0.0
     @State private var showFace: Bool
+    @State private var faceOpacity: Double
+    @State private var skipped = false
+    /// Opened on a given phase by tests: the facts are then built at render time (ImageRenderer never runs `.task`).
+    private let seeded: Bool
     @AccessibilityFocusState private var acceptFocused: Bool
 
     init(item: DexRevealItem, onAccept: @escaping () -> Void, onOpen: @escaping () -> Void) {
+        self.init(item: item, startPhase: nil, onAccept: onAccept, onOpen: onOpen)
+    }
+
+    init(item: DexRevealItem, startPhase: DexRevealPhase?, onAccept: @escaping () -> Void, onOpen: @escaping () -> Void) {
         self.item = item
         self.onAccept = onAccept
         self.onOpen = onOpen
+        seeded = startPhase != nil
         let start = DexReveal.start(reduceMotion: MotionPreference.forced || UIAccessibility.isReduceMotionEnabled,
                                     uiTesting: AmbientMotion.uiTesting)
-        _phase = State(initialValue: start)
-        _showFace = State(initialValue: start >= .face)
+        let first = startPhase ?? start
+        _phase = State(initialValue: first)
+        _showFace = State(initialValue: first >= .face)
+        // Reduce Motion: the face fades straight in.
+        _faceOpacity = State(initialValue: startPhase == nil && first == .face ? 0 : 1)
     }
 
     var body: some View {
         let fund = store.dexFund(item.symbol)
+        let shown = ranking ?? (seeded ? (facts: store.dexFacts(), funds: store.dexFunds) : nil)
         VStack(spacing: 16) {
             ZStack {
                 if showFace {
                     ScrollView {
                         Group {
-                            if let ranking {
-                                DexCard(fund: fund, facts: ranking.facts, among: ranking.funds)
+                            if let shown {
+                                DexCard(fund: fund, facts: shown.facts, among: shown.funds)
                             }
                         }
+                        .opacity(faceOpacity)
                         .padding(.horizontal, 20).padding(.vertical, 8)
                     }
                     .scrollBounceBehavior(.basedOnSize)
@@ -93,16 +108,19 @@ struct DexRevealView: View {
                     .accessibilityIdentifier("dex-reveal-open")
             }
             .opacity(phase >= .buttons ? 1 : 0)
-            .allowsHitTesting(phase >= .buttons)
             .accessibilityHidden(phase < .buttons)
             .padding(.bottom, 12)
         }
         .padding(.top, 24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(skin.color(\.page).ignoresSafeArea())
+        // The buttons are children, so their own taps win over this one.
+        .contentShape(Rectangle())
+        .onTapGesture { skip() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("dex-reveal")
         .onChange(of: phase) { _, now in if now == .buttons { acceptFocused = true } }
+        .onAppear { if phase == .buttons { acceptFocused = true } }
         .task { await play() }
     }
 
@@ -121,36 +139,47 @@ struct DexRevealView: View {
         .accessibilityHidden(true)
     }
 
+    /// The final state at once: face shown and settled, reward and buttons visible. Stops the timer's later writes.
+    private func skip() {
+        guard phase < .buttons else { return }
+        skipped = true
+        if ranking == nil { ranking = (store.dexFacts(), store.dexFunds) }
+        withAnimation(.easeOut(duration: 0.2)) {
+            showFace = true; angle = 0; faceOpacity = 1; phase = .buttons
+        }
+    }
+
     private func play() async {
         if ranking == nil { ranking = (store.dexFacts(), store.dexFunds) }
         if AmbientMotion.uiTesting { return }
+        func wait(_ ms: Int) async -> Bool {
+            try? await Task.sleep(for: .milliseconds(ms))
+            return !Task.isCancelled && !skipped
+        }
         if reduceMotion {
+            guard !skipped else { return }
             land()
-            try? await Task.sleep(for: .milliseconds(250))
-            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.25)) { faceOpacity = 1 }
+            guard await wait(250) else { return }
             withAnimation(.easeOut(duration: 0.25)) { phase = .reward }
-            try? await Task.sleep(for: .milliseconds(300))
-            guard !Task.isCancelled else { return }
+            guard await wait(300) else { return }
             withAnimation(.easeOut(duration: 0.25)) { phase = .buttons }
             return
         }
         let motion = SkinMotion.of(skin)
-        try? await Task.sleep(for: .milliseconds(700))
-        guard !Task.isCancelled else { return }
-        // Edge-on, swap to the face, then turn it the rest of the way.
+        guard await wait(700) else { return }
+        // Turn the back edge-on, swap to the face in a step of its own, then turn the face the rest of the way.
         withAnimation(.easeIn(duration: 0.22)) { angle = 90 }
-        try? await Task.sleep(for: .milliseconds(230))
-        guard !Task.isCancelled else { return }
+        guard await wait(230) else { return }
         var swap = Transaction()
         swap.disablesAnimations = true
         withTransaction(swap) { showFace = true; angle = -90 }
+        guard await wait(40) else { return }
         withAnimation(motion.spring) { angle = 0; phase = .face }
         land()
-        try? await Task.sleep(for: .milliseconds(450))
-        guard !Task.isCancelled else { return }
+        guard await wait(450) else { return }
         withAnimation(motion.spring) { phase = .reward }
-        try? await Task.sleep(for: .milliseconds(450))
-        guard !Task.isCancelled else { return }
+        guard await wait(450) else { return }
         withAnimation(.easeOut(duration: 0.25)) { phase = .buttons }
     }
 

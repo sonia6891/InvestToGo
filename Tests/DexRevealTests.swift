@@ -35,7 +35,19 @@ final class DexRevealTests: XCTestCase {
                 .environment(\.skin, skin)
             let renderer = ImageRenderer(content: view)
             renderer.scale = 1
-            XCTAssertNotNil(renderer.uiImage, "\(skin.id) reveal did not render")
+            XCTAssertNotNil(renderer.uiImage, "\(skin.id) reveal back did not render")
+            // The end state (face, reward, buttons): ImageRenderer never runs .task, so a seam opens there.
+            let end = DexRevealView(item: DexRevealItem(symbol: "0050", visit: FundVisit(new: true, cardXP: 30)),
+                                    startPhase: .buttons, onAccept: {}, onOpen: {})
+                .frame(width: 390, height: 844)
+                .environmentObject(store)
+                .environment(\.skin, skin)
+            let endRenderer = ImageRenderer(content: end)
+            endRenderer.scale = 1
+            XCTAssertNotNil(endRenderer.uiImage, "\(skin.id) reveal end state did not render")
+            if let a = renderer.uiImage?.pngData(), let b = endRenderer.uiImage?.pngData() {
+                XCTAssertNotEqual(a, b, "\(skin.id) the end state differs from the back")
+            }
         }
     }
 }
