@@ -5,8 +5,9 @@ import Foundation
 // No payment and no store offer is involved, nothing renews and nothing counts down by the second. This file holds the
 // days and the notes; `MembershipStore` opens its one gate with them, and the lobby shows them.
 
-/// What is kept about the 7 days, in one Keychain item on this device only (never in a backup or an export): a
-/// reinstall reads the same start, so it never starts a new 7 days, and each note stays shown once.
+/// What is kept about the 7 days, in one Keychain item on this device only (never restored to another device, never
+/// in an export): a reinstall reads the same start, so it never starts a new 7 days, and each note stays shown once.
+/// The two optional fields came later: a record kept without them decodes as before.
 struct MemberOpenRecord: Codable, Equatable {
     /// The first open of the app on this phone: day 1.
     var start: Date
@@ -14,6 +15,11 @@ struct MemberOpenRecord: Codable, Equatable {
     var seen: [String: Date] = [:]
     /// The member tools opened during the 7 days, by `MemberFeature.rawValue`: the summary after day 7 lists them.
     var used: [String: Int] = [:]
+    /// The latest moment the phone's clock has shown (written at most once an hour, and when the 7 days end): the days
+    /// are judged at `max(now, latest)`, so a clock put back never opens them again.
+    var latest: Date?
+    /// This person has been a member on this phone (`quietForMember`).
+    var wasMember: Bool?
 }
 
 enum MemberOpenRead: Equatable {
@@ -105,9 +111,13 @@ final class MemberOpenDays {
     /// A note missed on its own day still shows later (day 1's note until day 4). UI tests, which set the day
     /// themselves, see a note only on its own day, so one never sits over a test that is about something else.
     let catchUp: Bool
-    /// The record once read or started: a Keychain that later fails to save still ends the 7 days instead of starting
-    /// them again at every read.
+    /// The record once read or started.
     private var memo: MemberOpenRecord?
+    /// The start could not be kept (the vault refused it): the 7 days are off for this launch, and the next launch,
+    /// which cannot keep it either, does not start them again. Fails closed.
+    private var closed = false
+    /// How far the clock moves on before `latest` is written again.
+    static let latestStep: TimeInterval = 3_600
 
     init(vault: MemberOpenVault, now: @escaping () -> Date = Date.init, starts: Bool = true, catchUp: Bool = true) {
         self.vault = vault
@@ -120,6 +130,7 @@ final class MemberOpenDays {
     /// nothing is kept and `starts` is false.
     func record() -> MemberOpenRecord? {
         if let memo { return memo }
+        guard !closed else { return nil }
         switch vault.read() {
         case .found(let record):
             memo = record
@@ -128,22 +139,52 @@ final class MemberOpenDays {
             return nil
         case .missing:
             guard starts else { return nil }
-            let record = MemberOpenRecord(start: now())
+            let at = now()
+            let record = MemberOpenRecord(start: at, latest: at)
+            do {
+                try vault.save(record)
+            } catch {
+                // Not kept, it would start again at every cold launch: off instead.
+                closed = true
+                return nil
+            }
             memo = record
-            try? vault.save(record)
             return record
         }
     }
 
-    func info() -> MemberOpenInfo { MemberOpenInfo.of(start: record()?.start, now: now()) }
+    /// Where the 7 days stand, judged at `date`. Moves `latest` on as the clock does.
+    func info() -> MemberOpenInfo {
+        guard let record = record() else { return .off }
+        let at = judged(record)
+        advanceLatest(record, judged: at)
+        return MemberOpenInfo.of(start: record.start, now: at)
+    }
 
-    /// The clock the 7 days are judged by.
-    var date: Date { now() }
+    /// The moment the 7 days are judged at: the clock, never earlier than the latest moment it has already shown.
+    var date: Date { judged(record()) }
+
+    /// This person has been a member on this phone.
+    var wasMember: Bool { record()?.wasMember == true }
+
+    private func judged(_ record: MemberOpenRecord?) -> Date {
+        let clock = now()
+        guard let latest = record?.latest else { return clock }
+        return max(clock, latest)
+    }
+
+    /// Keeps the latest moment seen: once the clock has moved on an hour, and the first time it is past the end.
+    private func advanceLatest(_ record: MemberOpenRecord, judged at: Date) {
+        let kept = record.latest ?? record.start
+        let end = record.start.addingTimeInterval(MemberOpenInfo.length)
+        guard at > kept, at.timeIntervalSince(kept) >= Self.latestStep || (at >= end && kept < end) else { return }
+        update { $0.latest = at }
+    }
 
     /// The note to show now, if any. `member`: this Apple ID holds a plan (never a note for a member).
     func due(member: Bool) -> MemberOpenNote? {
         guard !member, let record = record() else { return nil }
-        let at = now(), info = MemberOpenInfo.of(start: record.start, now: at)
+        let at = judged(record), info = MemberOpenInfo.of(start: record.start, now: at)
         func seen(_ note: MemberOpenNote) -> Date? { record.seen[note.rawValue] }
         if info.ended {
             guard let summary = seen(.ended) else { return .ended }
@@ -160,24 +201,29 @@ final class MemberOpenDays {
 
     /// The note is on screen: it is never shown again.
     func markSeen(_ note: MemberOpenNote) {
-        update { $0.seen[note.rawValue] = now() }
+        guard let record = record(), record.seen[note.rawValue] == nil else { return }
+        let at = judged(record)
+        update { $0.seen[note.rawValue] = at }
     }
 
     /// A member (subscribed during the 7 days or before): the summary and 「再考慮」 are about a plan never bought, so
     /// they are marked seen without a word, and a subscription that lapses months later does not bring them up.
     func quietForMember() {
-        guard let record = record(), record.seen[MemberOpenNote.ended.rawValue] == nil || record.seen[MemberOpenNote.again.rawValue] == nil else { return }
+        guard let record = record(), record.wasMember != true || record.seen[MemberOpenNote.ended.rawValue] == nil
+                || record.seen[MemberOpenNote.again.rawValue] == nil else { return }
+        let at = judged(record)
         update {
-            let at = now()
+            $0.wasMember = true
             if $0.seen[MemberOpenNote.ended.rawValue] == nil { $0.seen[MemberOpenNote.ended.rawValue] = at }
             if $0.seen[MemberOpenNote.again.rawValue] == nil { $0.seen[MemberOpenNote.again.rawValue] = at }
         }
     }
 
-    /// A member tool opened during the 7 days, counted on the device for the summary. Nothing outside them.
+    /// A member tool opened during the 7 days, kept on the device for the summary. Nothing outside them, and nothing
+    /// written again once that tool is kept (the summary only says which were used).
     func noteUse(_ feature: MemberFeature) {
-        guard info().active else { return }
-        update { $0.used[feature.rawValue, default: 0] += 1 }
+        guard (record()?.used[feature.rawValue] ?? 0) == 0, info().active else { return }
+        update { $0.used[feature.rawValue] = 1 }
     }
 
     /// The member tools opened during the 7 days, in `MemberFeature` order.
@@ -258,10 +304,12 @@ enum MemberOpenCopy {
     static let againDefault: [MemberFeature] = [.backtest, .goalPlanner, .priceAlerts]
     /// The notice when a 外觀主題 worn during the 7 days goes back to 黑金 at their end.
     static let skinNotice = "口袋會員全開結束，外觀主題已換回黑金"
+    /// The summary's line when the worn 外觀主題 went back to 黑金 at the end (the notice itself is under the sheet).
+    static let endedSkin = "你穿的外觀主題已換回黑金，訂閱後可以再換上。"
 
     static var everything: [String] {
         [day1Title, day1Ends("11/29（日）14:30"), noPayment, day1Lead, day1After, day5Title(3), day5Lead, day5After, endedTitle,
          endedUsed, endedNone, endedKept, againTitle, againLead, againKept, renews, subscribe, look, start, gotIt, stayFree,
-         noThanks, close, skinNotice] + free
+         noThanks, close, skinNotice, endedSkin] + free
     }
 }
