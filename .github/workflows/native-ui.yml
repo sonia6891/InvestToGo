@@ -271,6 +271,31 @@ jobs:
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-lock-$SKIN.png" || true
           done
           xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+      # 口袋會員前 7 天全開 (2026-11-22 design): the lobby's line on day 2 (`--member-open 2`) and the summary after day 7
+      # (`--member-open 8`) in every 外觀主題, and day 1's and day 5's notes. Their own step, so the screens above are
+      # untouched.
+      - name: Capture 口袋會員全開 in every skin
+        timeout-minutes: 4
+        continue-on-error: true
+        env:
+          DEVICE: ${{ steps.device.outputs.udid }}
+        run: |
+          set -uo pipefail
+          shot() {
+            local name="$1"; shift
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --quiet-toasts --skip-onboarding --demo-streak 12 --demo-level 7 "$@" || echo "::warning::launch failed for $name"
+            # The notes wait for the lobby to settle (about a second and a half) before they come up.
+            sleep 7
+            xcrun simctl io "$DEVICE" screenshot "build/screens/screen-member-open-$name.png" || true
+          }
+          for SKIN in blackgold voxel stitch sketch; do
+            shot "banner-$SKIN" --member-open 2 --skin "$SKIN"
+            shot "summary-$SKIN" --member-open 8 --skin "$SKIN"
+          done
+          shot day1 --member-open 1
+          shot day5 --member-open 5
+          xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
       # 開場動畫 as video, for watching the motion itself: a later launch in each skin (--opening plays it under
       # --ui-testing, then holds on 略過) and the first launch (ends on 輕點開始). Its own folder and artifact: the
       # screenshots above are untouched.
