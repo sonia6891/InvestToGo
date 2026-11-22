@@ -1051,6 +1051,50 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertFalse(shown(app).exists, "A non-member does not see \(route) itself", file: file, line: line)
         app.terminate()
     }
+    // MARK: 口袋會員前 7 天全開 (docs/superpowers/specs/2026-11-22-member-open-7-days-design.md)
+
+    /// Day 2 of the 7 (`--member-open 2`): the lobby's line says when they end and how many days are left, opens 會員,
+    /// and a member tool opens without its lock card. Day 2 has no note over the lobby.
+    func testMemberOpenBanner() {
+        let app = launch(["--member-open", "2"])
+        let banner = app.buttons["member-open-banner"]
+        XCTAssertTrue(banner.waitForExistence(timeout: 10), "The lobby has the 7 days' line")
+        XCTAssertTrue(banner.label.hasPrefix("口袋會員全開中・"), banner.label)
+        XCTAssertTrue(banner.label.contains(" 結束・"), "The end is said with its time: \(banner.label)")
+        XCTAssertTrue(banner.label.hasSuffix("還剩 6 天"), banner.label)
+        capture(app, "member-open-banner")
+        XCTAssertFalse(app.descendants(matching: .any)["member-open-note"].firstMatch.exists, "No note on day 2")
+        banner.tap()
+        XCTAssertTrue(app.buttons["member-buy"].waitForExistence(timeout: 5), "The line opens 會員")
+        app.terminate()
+
+        let tool = launch(["--member-open", "2", "--open", "backtest"])
+        XCTAssertTrue(tool.buttons["backtest-run"].waitForExistence(timeout: 10), "回測 opens during the 7 days")
+        XCTAssertFalse(tool.descendants(matching: .any)["member-lock-backtest"].exists, "with no lock card")
+    }
+
+    /// Day 8 (`--member-open 8`): the summary sheet comes up over the lobby with 「訂閱口袋會員」, the line is gone, and
+    /// the member tool is locked again.
+    func testMemberOpenEnds() {
+        let app = launch(["--member-open", "8"])
+        let summary = app.descendants(matching: .any)["member-open-summary"].firstMatch
+        XCTAssertTrue(summary.waitForExistence(timeout: 10), "The summary sheet comes up after day 7")
+        XCTAssertTrue(app.staticTexts["7 天的口袋會員全開結束了"].exists)
+        XCTAssertTrue(app.buttons["member-open-subscribe"].exists, "with 訂閱口袋會員")
+        XCTAssertTrue(app.buttons["先用免費版"].exists, "and a way to close it")
+        capture(app, "member-open-summary")
+        app.buttons["先用免費版"].tap()
+        XCTAssertTrue(summary.waitForNonExistence(timeout: 5), "The sheet closes")
+        XCTAssertFalse(app.buttons["member-open-banner"].exists, "No line after the 7 days")
+        app.terminate()
+
+        let tool = launch(["--member-open", "8", "--open", "backtest"])
+        // The summary waits for the lobby; should it come up over this screen anyway, it is closed first.
+        let late = tool.buttons["先用免費版"]
+        if late.waitForExistence(timeout: 3) { late.tap() }
+        XCTAssertTrue(tool.descendants(matching: .any)["member-lock-backtest"].waitForExistence(timeout: 10), "回測 is locked again")
+        XCTAssertFalse(tool.buttons["backtest-run"].exists, "and its form is not shown")
+    }
     /// 組合試算's 基準 is free; 保守, 樂觀 and 壓力測試 are the member's (`MemberFeature.scenarios`). A non-member who
     /// picks one of them sees the lock instead of its figures and can go back to 基準; a member sees every scenario.
     func testScenarioLockInCombo() {
