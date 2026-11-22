@@ -74,6 +74,15 @@ struct LaunchGate: View {
     /// A later launch's opening is in front of the lobby. The lobby is built only once it has gone, so its entrance and
     /// LEVEL×UP are never spent behind the opening.
     @State private var opening: Bool
+    /// The first launch's splash has gone (the onboarding pages are showing).
+    @State private var pastSplash = false
+
+    /// 產品工作站 (2026-11-22 design): the app is in front, past the opening (the splash on the first launch) and the
+    /// lock screen. Each time this turns true the day's anonymous open is reported (`UsageStats`), at most once a day.
+    private var usageReady: Bool {
+        guard phase == .active, !opening, !lock.locked else { return false }
+        return start == nil ? lock.lobbyReleased : pastSplash
+    }
 
     init() {
         let arguments = ProcessInfo.processInfo.arguments
@@ -97,7 +106,7 @@ struct LaunchGate: View {
                 }
                 .transition(.opacity)
             } else if let start {
-                FirstLaunchView(start: start, play: play) {
+                FirstLaunchView(start: start, play: play, onPastSplash: { pastSplash = true }) {
                     onboarded = true
                     UserDefaults.standard.synchronize()
                     withAnimation(.easeOut(duration: reduceMotion ? 0.2 : 0.35)) { self.start = nil }
@@ -118,6 +127,13 @@ struct LaunchGate: View {
         .onChange(of: phase, initial: true) { _, value in lock.scene(value) }
         .onAppear { if !opening { lock.openingEnded(onboarding: start != nil) } }
         .onChange(of: opening) { _, value in if !value { lock.openingEnded(onboarding: start != nil) } }
+        // A moment after, so a lock that comes up as the app returns cancels it; the work itself runs in the
+        // background and never holds up the screen. Nothing is sent under --ui-testing (`UsageGate`).
+        .task(id: usageReady) {
+            guard usageReady else { return }
+            try? await Task.sleep(for: .seconds(1))
+            if !Task.isCancelled { UsageStats.appOpened() }
+        }
     }
 }
 

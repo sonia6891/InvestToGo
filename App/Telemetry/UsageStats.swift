@@ -2,7 +2,7 @@ import Foundation
 import StoreKit
 
 // 產品工作站 (docs/superpowers/specs/2026-11-22-workstation-metrics-design.md): the owner's dashboard counts
-// downloads, version use and retention from a few anonymous events, as 「喵的，又要上班了」 and 額度雷達 do. The client
+// downloads, version use and retention from a few anonymous events, as meow-work and 額度雷達 (quotaradar) do. The client
 // mirrors 額度雷達's (quotaradar-app src/core/workstation.ts):
 //   first_open  the app was opened for the first time on this phone (downloads), once per install
 //   daily_open  the app was opened on this local calendar day (version use, retention), once a day
