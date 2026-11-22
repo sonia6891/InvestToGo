@@ -351,6 +351,8 @@ struct ComboResultView: View {
             switcher(c, current)
             methodology(c)
         }
+        // A member scenario seen during 口袋會員前 7 天全開 counts for the summary after day 7.
+        .task(id: current) { if current != .base { membership.noteUse(.scenarios) } }
         .navigationTitle("試算結果").navigationBarTitleDisplayMode(.inline)
     }
     @ViewBuilder private func figures(_ c: ComboSettings, _ current: ComboScenario) -> some View {
