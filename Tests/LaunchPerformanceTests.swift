@@ -81,6 +81,45 @@ final class LaunchPerformanceTests: XCTestCase {
         XCTAssertEqual(store.daily?.quotes["0050"]?.price, 130)
     }
 
+    /// A cached official record older than the bundled one does not replace it.
+    @MainActor func testOlderCachedOfficialDoesNotReplaceBundled() async throws {
+        let bundled = OfficialDividends.bundled()
+        _ = try XCTUnwrap(bundled.sources["twse"], "the bundled record names its TWSE source day")
+        var old = bundled
+        old.sources["twse"] = "2000-01-01"
+        old.sources["tpex"] = "2000-01-01"
+        old.sources["since"] = "2000-01-01"
+        old.events["0050"] = [OfficialDistribution(ex: "2000-01-01", pay: "2000-01-02", amount: 1)]
+        try JSONEncoder().encode(old).write(to: file.appendingPathExtension("official"))
+        let store = PortfolioStore(url: file)
+        await store.ensureSideFiles()
+        XCTAssertEqual(store.official.sources, bundled.sources)
+        XCTAssertFalse((store.official.events["0050"] ?? []).contains { $0.ex == "2000-01-01" })
+    }
+
+    /// An index quote the live feed already published is not replaced by the older cached one.
+    @MainActor func testNewerLiveIndexWinsOverCachedIndex() async throws {
+        let cached = Quote(symbol: "taiex", price: 100, changePercent: nil, date: "2026-01-02", fetchedAt: Date(timeIntervalSinceNow: -86400))
+        try JSONEncoder().encode(OpenData.Day(quotes: [:], indices: ["taiex": cached], fetchedAt: Date())).write(to: file.appendingPathExtension("daily"))
+        let store = PortfolioStore(url: file)
+        store.indices["taiex"] = Quote(symbol: "taiex", price: 150, changePercent: nil, date: DataChecks.day(), fetchedAt: Date())
+        await store.ensureSideFiles()
+        XCTAssertEqual(store.indices["taiex"]?.price, 150)
+    }
+
+    /// The `--demo-store` announcements stay on top of a newer cached official record that is read later.
+    @MainActor func testDemoOfficialOverlaySurvivesTheSideFileRead() async throws {
+        var newer = OfficialDividends.bundled()
+        newer.sources["twse"] = "9999-12-31"
+        newer.sources["since"] = newer.sources["since"] ?? "2026-01-01"
+        try JSONEncoder().encode(newer).write(to: file.appendingPathExtension("official"))
+        let store = PortfolioStore(url: file)
+        store.showOfficial(["0050": [OfficialDistribution(ex: "2099-01-01", pay: "2099-02-01", amount: 1)]])
+        await store.ensureSideFiles()
+        XCTAssertEqual(store.official.sources["twse"], "9999-12-31", "the newer cached record was applied")
+        XCTAssertTrue(store.official.list("0050").contains { $0.ex == "2099-01-01" })
+    }
+
     @MainActor func testMigrateTwiceWritesOnce() throws {
         let store = PortfolioStore(url: file)
         try store.save(Holding(symbol: "0050", name: "元大台灣50", shares: 1000, unitCost: 50, broker: "", strategy: .saving))

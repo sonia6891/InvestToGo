@@ -199,13 +199,18 @@ struct LiveStatus: Equatable {
     /// True while the 2.5 s loop task exists. Without a key there is nothing to poll, so it stays false.
     var isLooping: Bool { loop != nil }
 
-    init(store: PortfolioStore, readKey: @escaping () -> String = { (try? SecureKey.read()) ?? "" }) {
+    /// Injected so tests never reach a real socket during the Taiwan trading session.
+    private let marketOpen: () -> Bool
+
+    init(store: PortfolioStore, readKey: @escaping () -> String = { (try? SecureKey.read()) ?? "" },
+         marketOpen: @escaping () -> Bool = { TaiwanMarket.isOpen() }) {
         self.store = store
         self.readKey = readKey
+        self.marketOpen = marketOpen
     }
 
     private var wanted: Bool {
-        active && !apiKey.isEmpty && TaiwanMarket.isOpen() && !ProcessInfo.processInfo.arguments.contains("--ui-testing")
+        active && !apiKey.isEmpty && marketOpen() && !ProcessInfo.processInfo.arguments.contains("--ui-testing")
     }
     private var limit: Int { min(cap, paid == true ? 280 : 5) }
 
@@ -519,7 +524,7 @@ struct LiveStatus: Equatable {
     private func publish() {
         var status = LiveStatus()
         status.running = wanted
-        status.marketOpen = TaiwanMarket.isOpen()
+        status.marketOpen = marketOpen()
         status.connecting = socket != nil && !authed
         status.reconnecting = socket == nil && reconnectAt != nil
         status.subscribed = Set(subs.keys)

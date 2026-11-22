@@ -79,7 +79,7 @@ import SwiftUI
     }
     private func applySideFiles(_ loaded: SideFiles) {
         if let cached = loaded.catalog, !catalogPublished { catalog = cached }
-        if let cached = loaded.official, cached.isNewer(than: official) { official = cached }
+        if let cached = loaded.official, cached.isNewer(than: official) { official = overlaid(cached) }
         if let cached = loaded.daily {
             if daily == nil { daily = cached }
             indices.merge(cached.indices) { current, old in current.fetchedAt >= old.fetchedAt ? current : old }
@@ -416,7 +416,7 @@ import SwiftUI
             fresh.fetchedAt = Date()
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(fresh).write(to: url.appendingPathExtension("official"), options: .atomic)
-            official = fresh; officialMessage = "已更新官方配息資料。"; officialFailed = false
+            official = overlaid(fresh); officialMessage = "已更新官方配息資料。"; officialFailed = false
         } catch {
             officialMessage = error is URLError ? "無法更新官方配息資料，保留原本資料。\(error.localizedDescription)" : error.localizedDescription
             officialFailed = true
@@ -426,13 +426,19 @@ import SwiftUI
     /// Announcements shown on top of the record for this launch only; nothing is saved. `--demo-store`'s 「即將除息」
     /// (`DemoArguments.seedStore`), which is the only caller.
     func showOfficial(_ extra: [String: [OfficialDistribution]]) {
-        var next = official
-        for (symbol, events) in extra {
+        for (symbol, events) in extra { officialExtra[symbol, default: []].append(contentsOf: events) }
+        official = overlaid(official)
+    }
+    /// The demo announcements from `showOfficial`, kept so a later cached or refreshed record cannot wipe them.
+    private var officialExtra: [String: [OfficialDistribution]] = [:]
+    private func overlaid(_ base: OfficialDividends) -> OfficialDividends {
+        var next = base
+        for (symbol, events) in officialExtra {
             var list = next.events[symbol] ?? []
             for event in events where !list.contains(where: { $0.ex == event.ex }) { list.append(event) }
             next.events[symbol] = list
         }
-        official = next
+        return next
     }
     func saveDaily() {
         guard let daily else { return }

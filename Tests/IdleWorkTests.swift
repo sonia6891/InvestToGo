@@ -15,7 +15,7 @@ final class IdleWorkTests: XCTestCase {
 
     @MainActor func testNoKeyNoLoop() {
         let store = PortfolioStore(url: directory.appendingPathComponent("p.json"))
-        let feed = LiveFeed(store: store, readKey: { "" })
+        let feed = LiveFeed(store: store, readKey: { "" }, marketOpen: { false })
         feed.start()
         XCTAssertFalse(feed.isLooping)
         XCTAssertFalse(store.liveStatus.hasKey)
@@ -26,15 +26,17 @@ final class IdleWorkTests: XCTestCase {
     @MainActor func testKeyAddedStartsTheLoop() {
         let store = PortfolioStore(url: directory.appendingPathComponent("p.json"))
         var key = ""
-        let feed = LiveFeed(store: store, readKey: { key })
+        let feed = LiveFeed(store: store, readKey: { key }, marketOpen: { false })
         feed.start()
         XCTAssertFalse(feed.isLooping)
         key = "abc"
         feed.restart()
         XCTAssertTrue(feed.isLooping)
+        XCTAssertTrue(store.liveStatus.hasKey)
         key = ""
         feed.restart()
         XCTAssertFalse(feed.isLooping)
+        XCTAssertFalse(store.liveStatus.hasKey)
         key = "abc"
         feed.restart()
         feed.stop()
@@ -45,8 +47,10 @@ final class IdleWorkTests: XCTestCase {
         let before = PocketHero.environmentBuilds
         async let a = PocketHero.environment()
         async let b = PocketHero.environment()
-        _ = await (a, b)
-        _ = await PocketHero.environment()
+        let (x, y) = await (a, b)
+        let z = await PocketHero.environment()
         XCTAssertLessThanOrEqual(PocketHero.environmentBuilds - before, 1)
+        XCTAssertGreaterThanOrEqual(PocketHero.environmentBuilds, 1)
+        if let x, let y, let z { XCTAssertTrue(x === y && y === z) }
     }
 }

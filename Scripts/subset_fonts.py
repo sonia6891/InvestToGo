@@ -8,7 +8,12 @@ The full fonts are not kept in the working tree. They are read from git history 
 they were added from google/fonts and the LXGW WenKai TC release), or from `--source <dir>` if you have the files.
 The subsets replace the bundled files in place, with the same file names, family names and PostScript names, so
 `Font.custom` lookups and UIAppFonts in project.yml are unchanged. Nothing is renamed, so the OFL Reserved Font Name
-clause (Noto Sans TC reserves "Source") is not touched.
+(RFN) clause matters for every font that is subset, because a subset is a Modified Version and may not keep an RFN:
+  * Noto Sans TC reserves "Source" only, a name these fonts do not carry, so subsetting them is fine.
+  * Bree Serif reserves "Bree" and "Bree Serif", and Press Start 2P reserves "Press Start 2P". Both names are the
+    fonts' own family names, which code references and cannot be renamed. So these two are shipped UNMODIFIED, the
+    original files from a5573d2, and are not subset (not in ORIGINALS, SUBSET or LATIN below).
+The other fonts (Anton, Caveat, JetBrains Mono, DotGothic16, LXGW WenKai TC, Noto Serif TC) are subset in place.
 
 Character set kept (each font keeps only the glyphs it has of these):
   * ASCII, Latin-1, general punctuation, letterlike, number forms, arrows, math operators, enclosed alphanumerics,
@@ -19,7 +24,7 @@ Character set kept (each font keeps only the glyphs it has of these):
   * every CJK character of the bundled catalogue and WebPreview/etf-data.json (NFC);
   * an insurance list: the first INSURANCE characters of Scripts/common-chars.txt (most frequent first), for fund
     names that arrive at runtime. INSURANCE is the largest multiple of 50 that keeps the 4,000,000 byte size gate green
-    with at least 50 KB to spare.
+    with at least 50 KB to spare, counting the two unmodified fonts.
 
 Needs fontTools (pyftsubset). `--check` needs only fontTools and the repo.
 """
@@ -42,7 +47,7 @@ FONTS = ROOT / "App" / "Resources" / "Fonts"
 FULL_FONTS_COMMIT = "a5573d2"
 TOTAL_LIMIT = 4_000_000
 # How many characters of Scripts/common-chars.txt are kept on top of the app's own text.
-INSURANCE = 700
+INSURANCE = 550
 
 # The full fonts the subsets are made from: where they came from (ruling R7), their version string (name ID 5) and the
 # sha256 of the file in FULL_FONTS_COMMIT. Task 2 did not record the exact download URL of each file, so `source` is
@@ -78,11 +83,6 @@ ORIGINALS = {
         "version": "Version 2.116; ttfautohint (v1.8.3)",
         "sha256": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab",
         "commit": "a5573d2"},
-    "BreeSerif-Regular.ttf": {
-        "source": "https://github.com/google/fonts/tree/main/ofl/breeserif",
-        "version": "Version 1.002",
-        "sha256": "fd080582d70112ef479ba4ddd72407f9a4fcbcec4caa7d29de259b13eeb5f431",
-        "commit": "a5573d2"},
     "Caveat-Variable.ttf": {
         "source": "https://github.com/google/fonts/tree/main/ofl/caveat (variable font, wght axis)",
         "version": "Version 2.000",
@@ -93,19 +93,13 @@ ORIGINALS = {
         "version": "Version 2.304; ttfautohint (v1.8.4.7-5d5b)",
         "sha256": "a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f",
         "commit": "a5573d2"},
-    "PressStart2P-Regular.ttf": {
-        "source": "https://github.com/google/fonts/tree/main/ofl/pressstart2p",
-        "version": "Version 3.000",
-        "sha256": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d",
-        "commit": "a5573d2"},
 }
 
 # Fonts that are subset, the Latin ones too. DotGothic16 is a Japanese font: it keeps what it has of the same set, and
 # the app's Chinese characters it never had fall back to the system font exactly as before (CHECK_EXEMPT).
 SUBSET = list(ORIGINALS)
 CHECK_EXEMPT = {"DotGothic16-Regular.ttf"}
-LATIN = {"Anton-Regular.ttf", "BreeSerif-Regular.ttf", "Caveat-Variable.ttf", "JetBrainsMono-Regular.ttf",
-         "PressStart2P-Regular.ttf"}
+LATIN = {"Anton-Regular.ttf", "Caveat-Variable.ttf", "JetBrainsMono-Regular.ttf"}
 
 RANGES = [
     (0x0020, 0x007E),  # ASCII
@@ -271,7 +265,7 @@ def check() -> int:
     ascii_chars = {chr(cp) for cp in range(0x20, 0x7F)}
     for name in SUBSET:
         if name in LATIN:
-            # All five originals had every printable ASCII character (checked when they were recorded), so each
+            # All three originals had every printable ASCII character (checked when they were recorded), so each
             # subset must too. Needs no git history, which CI's shallow checkout lacks.
             cmap = TTFont(str(FONTS / name)).getBestCmap()
             gone = sorted(c for c in ascii_chars if ord(c) not in cmap)
