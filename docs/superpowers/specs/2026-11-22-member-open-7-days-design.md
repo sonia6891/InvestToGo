@@ -19,7 +19,7 @@ A new user gets every 口袋會員 tool free for the first 7 days, so they try t
 - No payment and no store offer are involved, and nothing renews. Nothing counts down by the second.
 
 **What the person sees**
-- **大廳 banner, on every day of the 7.** One line: 「口袋會員全開中・11/29（六）14:30 結束・還剩 N 天」. Tapping it opens the 會員 page.
+- **大廳 banner, on every day of the 7.** One line: 「口袋會員全開中・11/29（日）14:30 結束・還剩 N 天」. Tapping it opens the 會員 page.
   - The end is stated with its time, because the 7 days are 7 × 24 h; a date alone reads as the whole day.
   - The weekday is Chinese, and the date is Gregorian in POSIX digits.
 - **Day 1 note, once.** It says the 7 days started, when they end, and that every record stays afterwards; only the 口袋會員 tools lock again.

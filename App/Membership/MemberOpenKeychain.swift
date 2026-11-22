@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 /// 口袋會員前 7 天全開's record (`MemberOpenRecord`) in the Keychain: on this device only and readable after the
-/// phone's first unlock (a price-alert check in the background reads it too). Never in a device backup, never in
+/// phone's first unlock (a price-alert check in the background reads it too). Never restored to another device, never in
 /// iCloud Keychain, never in the app's own backup file; the Keychain outlives the app, so deleting and reinstalling it
 /// does not start a new 7 days.
 final class KeychainMemberOpenVault: MemberOpenVault {
