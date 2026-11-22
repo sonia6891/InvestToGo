@@ -26,6 +26,7 @@ extension PortfolioStore {
     /// viewer asks (`manual`) at most once a minute. Returns whether data is at hand.
     @discardableResult
     func refreshDaily(manual: Bool = false) async -> Bool {
+        await ensureSideFiles()
         if ProcessInfo.processInfo.arguments.contains("--ui-testing") { return daily != nil }
         let behind = (daily?.settledDay ?? "") < OpenData.expectedDay()
         let since = dailyAttemptAt.map { Date().timeIntervalSince($0) } ?? .infinity
@@ -50,6 +51,7 @@ extension PortfolioStore {
     /// On every return to the app: the latest closes, and with a Fugle key the indices outside the session
     /// (during it LiveFeed streams).
     func followMarket() async {
+        await ensureSideFiles()
         await refreshDaily()
         if hasFugleKey && !TaiwanMarket.isOpen() { await refreshIndices() }
     }

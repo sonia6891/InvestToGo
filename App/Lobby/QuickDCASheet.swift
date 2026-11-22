@@ -79,7 +79,8 @@ struct QuickDCASheet: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .presentationDetents([.medium, .large])
-        .onAppear(perform: load)
+        // The cached closes are read after the first screen: the default price waits for them (usually already done).
+        .task { await store.ensureSideFiles(); load() }
         .onChange(of: symbol) { _, _ in estimate() }
         .onChange(of: amountText) { _, _ in estimate() }
     }

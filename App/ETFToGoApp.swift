@@ -262,7 +262,11 @@ struct RootView: View {
         // Nor over 記一筆, from the tap (or tapped reminder) until the sheet has gone; its release asks again.
         .onChange(of: quickDCABusy, initial: true) { _, busy in ReviewPrompt.shared.hold("quickDCA", while: busy) }
         .onDisappear { ReviewPrompt.shared.release("levelUp"); ReviewPrompt.shared.release("quickDCA") }
-        .task { if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) } }
+        .task {
+            // The cached lists are read after the first screen is up; the fetch below judges what they already hold.
+            await store.ensureSideFiles()
+            if !ProcessInfo.processInfo.arguments.contains("--ui-testing") { await store.refreshCatalog(automatic: true) }
+        }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
         .task(id: phase) {

@@ -44,13 +44,50 @@ import SwiftUI
     lazy var live = LiveFeed(store: self)
     var funds: [Fund] { catalog?.funds ?? [] }
     private let url: URL
+    /// How many times the three side files (`.catalog`, `.official`, `.daily`) have been read from disk; tests only.
+    private(set) var sideFileReads = 0
+    private var sideFileTask: Task<Void, Never>?
+    /// A catalogue fetched on this run has been published: an older cached one must not replace it.
+    private var catalogPublished = false
+    /// Reads the cached catalogue, official dividends and day's closes off the main thread, once, and publishes them.
+    /// `init` no longer does this, so the first screen does not wait for it. Every caller, including concurrent ones,
+    /// awaits the same task. Whatever a refresh has already published wins over the older cached copy.
+    func ensureSideFiles() async {
+        if let running = sideFileTask { await running.value; return }
+        let base = url
+        let task = Task { @MainActor in
+            sideFileReads += 1
+            let loaded = await Task.detached(priority: .userInitiated) { Self.readSideFiles(base) }.value
+            applySideFiles(loaded)
+        }
+        sideFileTask = task
+        await task.value
+    }
+    private struct SideFiles {
+        var catalog: CatalogSnapshot?
+        var official: OfficialDividends?
+        var daily: OpenData.Day?
+    }
+    /// The rules `init` used to apply: a missing or invalid file is skipped.
+    nonisolated private static func readSideFiles(_ base: URL) -> SideFiles {
+        var found = SideFiles()
+        if let bytes = try? Data(contentsOf: base.appendingPathExtension("catalog")), let cached = try? JSONDecoder().decode(CatalogSnapshot.self, from: bytes), (try? cached.validate()) != nil { found.catalog = cached }
+        if let bytes = try? Data(contentsOf: base.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil { found.official = cached }
+        if let bytes = try? Data(contentsOf: base.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
+           cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { found.daily = cached }
+        return found
+    }
+    private func applySideFiles(_ loaded: SideFiles) {
+        if let cached = loaded.catalog, !catalogPublished { catalog = cached }
+        if let cached = loaded.official, cached.isNewer(than: official) { official = cached }
+        if let cached = loaded.daily {
+            if daily == nil { daily = cached }
+            indices.merge(cached.indices) { current, old in current.fetchedAt >= old.fetchedAt ? current : old }
+        }
+    }
     init(url: URL? = nil, reset: Bool = false) {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         self.url = url ?? base.appendingPathComponent("ETFToGo/portfolio.json")
-        if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("catalog")), let cached = try? JSONDecoder().decode(CatalogSnapshot.self, from: bytes), (try? cached.validate()) != nil { catalog = cached }
-        if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("official")), let cached = try? JSONDecoder().decode(OfficialDividends.self, from: bytes), cached.since != nil, cached.isNewer(than: official) { official = cached }
-        if let bytes = try? Data(contentsOf: self.url.appendingPathExtension("daily")), let cached = try? JSONDecoder().decode(OpenData.Day.self, from: bytes),
-           cached.quotes.allSatisfy({ $0.key == $0.value.symbol && $0.value.isValid }), cached.indices.values.allSatisfy(\.isValid) { daily = cached; indices = cached.indices }
         if reset { try? FileManager.default.removeItem(at: self.url); try? FileManager.default.removeItem(at: historiesURL); try? FileManager.default.removeItem(at: componentHistoryURL); try? FileManager.default.removeItem(at: alertsURL) }
         // The alerts first: whether they have a file of their own decides what is done with any still in the records.
         loadAlerts()
@@ -369,6 +406,7 @@ import SwiftUI
     }
     func removeTrade(_ trade: Trade) throws { var next = data; next.trades?.removeAll { $0.id == trade.id }; try commit(next) }
     func refreshOfficial() async {
+        await ensureSideFiles()
         guard !officialRefreshing else { return }
         officialRefreshing = true; defer { officialRefreshing = false }
         do {
@@ -480,6 +518,7 @@ import SwiftUI
     }
     /// `automatic` (at launch) skips the three requests when today's list is already on the device; the 立即更新 buttons always fetch.
     func refreshCatalog(automatic: Bool = false) async {
+        await ensureSideFiles()
         guard !catalogRefreshing, !(automatic && catalog?.fetchedDay == DataChecks.day()) else { return }
         catalogRefreshing = true; defer { catalogRefreshing = false }
         do {
@@ -494,7 +533,7 @@ import SwiftUI
             }
             try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(next).write(to: url.appendingPathExtension("catalog"), options: .atomic)
-            catalog = next; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
+            catalog = next; catalogPublished = true; catalogMessage = "已更新上市與上櫃 ETF 名單。"; catalogFailed = false
         } catch { catalogMessage = error.localizedDescription; catalogFailed = true; CrashReporting.capture(error, context: "catalog", offline: Connectivity.shared.offline) }
     }
     /// Saves an ETF's holdings as its current ones and files them in its history (12 newest dates, one per date).
@@ -507,6 +546,7 @@ import SwiftUI
     /// `quiet` (到價提醒's own check, which nobody asked for by hand): the quotes are refreshed and saved the same way,
     /// but nothing is said on screen and nothing is reported, whatever happens.
     func refresh(symbols: [String]? = nil, inline: Bool = false, quiet: Bool = false) async {
+        await ensureSideFiles()
         guard beginRefresh(quiet: quiet) else { return }
         defer { endRefresh(quiet: quiet) }
         if !quiet { message = nil }
