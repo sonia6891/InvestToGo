@@ -6,3 +6,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ETFToGo"
 include(":core")
+include(":app")
