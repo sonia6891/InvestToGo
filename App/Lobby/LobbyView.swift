@@ -49,8 +49,10 @@ struct LobbyView: View {
     @State private var bouncing: Feature?
     /// LEVEL×UP covers the lobby (a full-screen cover from the root view: no `onDisappear` here).
     @Environment(\.lobbyCovered) private var covered
-    /// LEVEL×UP is up or about to come up (and, later, any other prompt from the root view): 記一筆 waits for it.
+    /// LEVEL×UP is up or about to come up: 記一筆 waits for it (as it does for a member-open note and the app lock).
     @Environment(\.lobbyModalPending) private var modalPending
+    /// The app lock screen or its privacy cover is up: 記一筆 waits, and a waiting request opens once it has gone.
+    @ObservedObject private var appLock = AppLock.shared
     /// A tapped debit-day reminder asks for 記一筆 here.
     @ObservedObject private var router = AppRouter.shared
     @Environment(\.celebrateIfDue) private var celebrateIfDue
@@ -62,6 +64,8 @@ struct LobbyView: View {
     /// 記一筆 is up (`quickDCA`) or still closing (`sheetUp`): the replay waits until it is gone, never plays under it.
     @State private var quickDCA = false
     @State private var sheetUp = false
+    /// 記一筆's content came on screen (`SheetWatchdog`: a presentation UIKit dropped is let go).
+    @State private var quickDCAAppeared = false
     /// The quests that were ticked when 記一筆 opened: nothing new ticks until the replay, after the sheet has gone.
     @State private var ticksAtOpen: Set<String> = []
     private let shownStore = LobbyShownStore()
@@ -145,7 +149,10 @@ struct LobbyView: View {
         .onChange(of: modalPending) { _, pending in if !pending { presentQuickDCAAfterCover() } }
         // A 口袋會員全開 note has gone (its sheet's onDismiss): a request that waited for it opens now. After the same
         // short wait as a cover, so a note whose button went to 會員 has taken the lobby off screen first.
-        .onChange(of: router.memberNoteShowing) { _, up in if !up { presentQuickDCAAfterCover() } }
+        // What was earned meanwhile is replayed then (LEVEL×UP waited for the note too).
+        .onChange(of: router.memberNoteShowing) { _, up in if !up { arrive(lead: 0.15); presentQuickDCAAfterCover() } }
+        // Unlocked (or the privacy cover gone): a request that came in under the lock opens now.
+        .onChange(of: appLock.locked || appLock.covered) { _, locked in if !locked { presentQuickDCAAfterCover() } }
         .onDisappear { onScreen = false; replayer.cancel(); ReviewPrompt.shared.release("replay") }
         // App Store 評分視窗: never over the lobby's replay (coins flying, the bar filling).
         .onChange(of: replayer.playing, initial: true) { _, playing in ReviewPrompt.shared.hold("replay", while: playing) }
@@ -161,18 +168,27 @@ struct LobbyView: View {
         // was up follows the replay (or comes at once, with nothing to replay).
         .sheet(isPresented: $quickDCA, onDismiss: { sheetUp = false; router.quickDCAClosed(); arrive(lead: 0.15); presentQuickDCA() }) {
             QuickDCASheet { quickDCA = false }
+                .onAppear { quickDCAAppeared = true }
+        }
+        // Asked for but never on screen: let go, so 記一筆 (and the prompts that wait for it) are not stuck for the launch.
+        .task(id: quickDCA) {
+            guard quickDCA else { return }
+            try? await Task.sleep(for: SheetWatchdog.grace)
+            guard !Task.isCancelled, quickDCA, SheetWatchdog.dropped(asked: quickDCA, appeared: quickDCAAppeared) else { return }
+            quickDCA = false; sheetUp = false
+            router.quickDCAClosed()
         }
     }
 
     /// The lobby can take 記一筆 now (`QuickDCARoute.lobbyFree`).
     private var lobbyFree: Bool {
         QuickDCARoute.lobbyFree(onScreen: onScreen, covered: covered, modalPending: modalPending, note: router.memberNoteShowing,
-                                replaying: replayer.playing, closing: sheetUp && !quickDCA)
+                                locked: appLock.locked || appLock.covered, replaying: replayer.playing, closing: sheetUp && !quickDCA)
     }
 
     /// The one way 記一筆 opens, for the lobby's button and a tapped reminder alike (final review I2): a request
     /// (`router.quickDCARequested`) opens the sheet once the lobby is free (`lobbyFree`), so it is never up together
-    /// with LEVEL×UP, a 口袋會員全開 note or a replay, then the request is cleared. While the records are locked the
+    /// with LEVEL×UP, a 口袋會員全開 note, the app lock or a replay, then the request is cleared. While the records are locked the
     /// request waits, and the sheet opens once they are read (`onChange(of: store.recordsLocked)`): never records over
     /// the lock. Nothing is saved by this; the person still taps 「記好了」. It never takes `LaunchPrompt`: it is asked
     /// for by the person, and only keeps the prompts that come by themselves away while it is up (`QuickDCARoute.busy`).
@@ -182,12 +198,12 @@ struct LobbyView: View {
         case .wait: return
         case .drop: router.quickDCARequested = false
         case .open:
-            router.quickDCARequested = false
             let game = store.data.game ?? GameState(), month = YearMonth(Date())
             ticksAtOpen = Set(Quests.forMonth(month, habit: game.habit ?? .dca, isNewbie: game.isNewbie)
                 .filter { game.isDone($0, in: month, records: store.data) }.map(\.id))
+            quickDCAAppeared = false
             quickDCA = true; sheetUp = true
-            router.quickDCAOpened()
+            router.openQuickDCA()
         }
     }
 
@@ -211,7 +227,7 @@ struct LobbyView: View {
     /// once. Nothing to replay: LEVEL×UP right away, if one is due. Reduce Motion and `--ui-testing` show the final
     /// numbers at once and go straight to LEVEL×UP.
     private func arrive(lead: Double) {
-        guard onScreen, !covered, !quickDCA, !sheetUp, !replayer.playing, !store.recordsLocked else { return }
+        guard onScreen, !covered, !quickDCA, !sheetUp, !router.memberNoteShowing, !replayer.playing, !store.recordsLocked else { return }
         let game = store.data.game ?? GameState(), date = Date()
         let order = Quests.forMonth(YearMonth(date), habit: game.habit ?? .dca, isNewbie: game.isNewbie).map(\.id)
         let snapshot = LobbySnapshot.of(game, records: store.data, now: date)

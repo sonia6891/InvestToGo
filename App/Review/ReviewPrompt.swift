@@ -194,11 +194,14 @@ enum ReviewRules {
     nonisolated static func launchFree(taken: Bool, noteWaiting: Bool) -> Bool { !taken && !noteWaiting }
 
     /// Anything the sheet must never cover, one check each (another is one more line): the lock screen or cover, a
-    /// purchase, no scene in front, a window above the app's (the lock window fading out), or a sheet, full-screen
+    /// purchase, 記一筆, no scene in front, a window above the app's (the lock window fading out), or a sheet, full-screen
     /// cover or alert presented in any window. The holds and the keyboard are checked in `opened`.
     static let busyChecks: [@MainActor () -> Bool] = [
         { AppLock.shared.locked || AppLock.shared.covered },
         { MembershipStore.shared.purchasing },
+        // 記一筆 up or asked for, read live: the "quickDCA" hold lands a render after the tap (it stays, as only holds
+        // re-arm after a give-up).
+        { QuickDCARoute.busy(showing: AppRouter.shared.quickDCAShowing, requested: AppRouter.shared.quickDCARequested) },
         { !ReviewPrompt.windowScenes().contains { $0.activationState == .foregroundActive } },
         { ReviewPrompt.windowScenes().flatMap(\.windows).contains { !$0.isHidden && $0.windowLevel > .normal } },
         { ReviewPrompt.windowScenes().flatMap(\.windows).contains { !$0.isHidden && $0.rootViewController?.presentedViewController != nil } },

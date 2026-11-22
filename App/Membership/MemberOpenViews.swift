@@ -78,6 +78,8 @@ struct MemberOpenNotes: ViewModifier {
     @Environment(\.lobbyNavigation) private var navigation
     @Environment(\.scenePhase) private var phase
     @State private var note: MemberOpenNote?
+    /// The note's sheet came on screen (`SheetWatchdog`: a presentation UIKit dropped is let go).
+    @State private var presented = false
     /// The note's button went to 會員: it opens once the sheet has gone.
     @State private var toMember = false
 
@@ -112,9 +114,27 @@ struct MemberOpenNotes: ViewModifier {
                 guard !Task.isCancelled, clear, !LaunchPrompt.taken, membership.memberOpenNoteWaiting else { return }
                 // From here until the sheet has gone, 記一筆 waits for it.
                 router.memberNoteOpened()
+                presented = false
                 note = due
             }
+            // Chosen but never on screen: let go (not seen, so it comes again), so 記一筆 is not stuck behind it.
+            .task(id: note) {
+                guard note != nil else { return }
+                try? await Task.sleep(for: SheetWatchdog.grace)
+                guard !Task.isCancelled, SheetWatchdog.dropped(asked: note != nil, appeared: presented) else { return }
+                note = nil
+                router.memberNoteClosed()
+            }
+            .onDisappear {
+                guard SheetWatchdog.dropped(asked: note != nil, appeared: presented) else { return }
+                note = nil
+                router.memberNoteClosed()
+            }
             .sheet(item: $note, onDismiss: {
+                presented = false
+                // Its button went to 會員: a 記一筆 request that waited for the note is dropped (the person chose to go
+                // elsewhere); otherwise it opens now. Cleared before the flag, which is what opens it.
+                if !QuickDCARoute.keepsRequest(afterNoteToMember: toMember) { router.quickDCARequested = false }
                 router.memberNoteClosed()
                 guard toMember else { return }
                 toMember = false
@@ -126,6 +146,7 @@ struct MemberOpenNotes: ViewModifier {
                 }
                 .environment(\.skin, skins.skin)
                 .preferredColorScheme(skins.colorScheme)
+                .onAppear { presented = true }
             }
     }
 }

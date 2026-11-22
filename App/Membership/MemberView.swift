@@ -500,7 +500,7 @@ struct MemberView: View {
     }
 
     /// The detail on one line when the card is wide enough, else on two or three lines that each end at a 「・」: a
-    /// line never breaks inside a word, so no 「部皮膚」 is left alone on the last one.
+    /// line never breaks inside a word, so no 「主題」 of 外觀主題 is left alone on the last one.
     @ViewBuilder private func detailText(_ item: Plan) -> some View {
         if item.detail.contains(Self.detailSeparator) {
             ViewThatFits(in: .horizontal) {

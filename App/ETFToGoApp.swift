@@ -289,10 +289,12 @@ struct RootView: View {
     }
 
     /// LEVEL×UP, when one is due and the lobby is the screen in front (spec 5.4): never over a feature screen, where it
-    /// waits for the next time the lobby is seen, nor over 記一筆, after which the lobby asks again (its `onDismiss`).
+    /// waits for the next time the lobby is seen, nor over 記一筆 or a 口袋會員全開 note, after which the lobby asks again
+    /// (their `onDismiss`).
     /// The lobby calls this once its bar has filled.
     private func celebrateIfDue() {
-        guard path.isEmpty, levelUp == nil, celebration == nil, !router.quickDCAShowing, store.data.game?.levelUpDue != nil else { return }
+        guard path.isEmpty, levelUp == nil, celebration == nil, !router.quickDCAShowing, !router.memberNoteShowing,
+              store.data.game?.levelUpDue != nil else { return }
         celebration = Task {
             await celebrateWhenDue()
             celebration = nil
@@ -312,8 +314,9 @@ struct RootView: View {
             try? await Task.sleep(for: .milliseconds(150)); waits += 1
         }
         if hadReward { try? await Task.sleep(for: .seconds(2)) }
-        // 記一筆 came up meanwhile: it is held, and the lobby asks again once the sheet has gone.
-        guard !Task.isCancelled, levelUp == nil, path.isEmpty, !router.quickDCAShowing, let level = store.data.game?.levelUpDue else { return }
+        // 記一筆 or a note came up meanwhile: it is held, and the lobby asks again once the sheet has gone.
+        guard !Task.isCancelled, levelUp == nil, path.isEmpty, !router.quickDCAShowing, !router.memberNoteShowing,
+              let level = store.data.game?.levelUpDue else { return }
         try? store.updateGame { _ = $0.refreshAchievements(store.data, now: Date()) }
         levelUp = LevelUp.moment(store.data.game ?? GameState(), level: level, now: Date())
     }

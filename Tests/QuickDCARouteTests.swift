@@ -4,9 +4,9 @@ import XCTest
 /// When a request for 記一筆 (the lobby's button, or a tapped debit-day reminder) opens the sheet (final review I2, I3).
 final class QuickDCARouteTests: XCTestCase {
     private func free(onScreen: Bool = true, covered: Bool = false, modalPending: Bool = false, note: Bool = false,
-                      replaying: Bool = false, closing: Bool = false) -> Bool {
+                      locked: Bool = false, replaying: Bool = false, closing: Bool = false) -> Bool {
         QuickDCARoute.lobbyFree(onScreen: onScreen, covered: covered, modalPending: modalPending, note: note,
-                                replaying: replaying, closing: closing)
+                                locked: locked, replaying: replaying, closing: closing)
     }
 
     func testLobbyFreeOnlyWithNothingElseUp() {
@@ -15,6 +15,7 @@ final class QuickDCARouteTests: XCTestCase {
         XCTAssertFalse(free(covered: true), "Under LEVEL×UP")
         XCTAssertFalse(free(modalPending: true), "LEVEL×UP is about to come up")
         XCTAssertFalse(free(note: true), "A 口袋會員全開 note is up or about to come up")
+        XCTAssertFalse(free(locked: true), "Under the app lock screen or its privacy cover")
         XCTAssertFalse(free(replaying: true), "The replay is playing")
         XCTAssertFalse(free(closing: true), "The sheet is still closing")
     }
@@ -39,6 +40,27 @@ final class QuickDCARouteTests: XCTestCase {
         XCTAssertEqual(QuickDCARoute.decide(locked: false, showing: false, free: free(note: false)), .open, "The note has gone")
     }
 
+    /// A reminder tapped on a warm return past the lock's grace: the request waits under the lock, and opens once it is
+    /// passed (merge follow-up M1).
+    func testWaitsForTheAppLockThenOpens() {
+        XCTAssertEqual(QuickDCARoute.decide(locked: false, showing: false, free: free(locked: true)), .wait, "Locked")
+        XCTAssertEqual(QuickDCARoute.decide(locked: false, showing: false, free: free(locked: false)), .open, "Unlocked")
+    }
+
+    /// The note's button went to 會員: a request that waited for the note is dropped; any other close keeps it.
+    func testANoteThatGoesToMemberDropsTheWaitingRequest() {
+        XCTAssertFalse(QuickDCARoute.keepsRequest(afterNoteToMember: true), "The person chose to go elsewhere")
+        XCTAssertTrue(QuickDCARoute.keepsRequest(afterNoteToMember: false), "Closed: 記一筆 opens now")
+    }
+
+    /// A sheet asked for whose content never came on screen is let go; one that came up, or none asked for, is not.
+    func testSheetWatchdog() {
+        XCTAssertTrue(SheetWatchdog.dropped(asked: true, appeared: false), "UIKit dropped the presentation")
+        XCTAssertFalse(SheetWatchdog.dropped(asked: true, appeared: true), "On screen")
+        XCTAssertFalse(SheetWatchdog.dropped(asked: false, appeared: false), "Nothing asked for")
+        XCTAssertGreaterThanOrEqual(SheetWatchdog.grace, .seconds(1), "Longer than a sheet takes to come up")
+    }
+
     /// 記一筆 up, or asked for and on its way: the notes and the rating sheet give way to it.
     func testBusyWhileUpOrAskedFor() {
         XCTAssertFalse(QuickDCARoute.busy(showing: false, requested: false))
@@ -47,19 +69,20 @@ final class QuickDCARouteTests: XCTestCase {
         XCTAssertTrue(QuickDCARoute.busy(showing: true, requested: true))
     }
 
-    /// 記一筆 is asked for by the person: it never takes this launch's one big prompt, so a note or the rating sheet
-    /// can still come up after it in the same launch.
+    /// 記一筆 is asked for by the person: opening it (`AppRouter.openQuickDCA`, the lobby's one way in) never takes this
+    /// launch's one big prompt, so a note or the rating sheet can still come up after it in the same launch.
     @MainActor func testOpeningTheSheetLeavesTheLaunchPromptFree() {
         let taken = LaunchPrompt.taken
         defer { LaunchPrompt.taken = taken }
         LaunchPrompt.taken = false
         let router = AppRouter()
         router.quickDCARequested = true
-        XCTAssertEqual(QuickDCARoute.decide(locked: false, showing: router.quickDCAShowing, free: free()), .open)
-        router.quickDCARequested = false
-        router.quickDCAOpened()
+        router.openQuickDCA()
+        XCTAssertFalse(router.quickDCARequested, "The request is answered")
+        XCTAssertTrue(router.quickDCAShowing)
+        XCTAssertFalse(LaunchPrompt.taken, "記一筆 did not take the launch's prompt")
+        XCTAssertTrue(LaunchPrompt.take(), "A note or the rating sheet still can")
         router.quickDCAClosed()
-        XCTAssertFalse(LaunchPrompt.taken)
     }
 
     @MainActor func testRouterPublishesTheSheet() {
