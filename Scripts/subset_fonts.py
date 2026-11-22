@@ -12,15 +12,14 @@ clause (Noto Sans TC reserves "Source") is not touched.
 
 Character set kept (each font keeps only the glyphs it has of these):
   * ASCII, Latin-1, general punctuation, letterlike, number forms, arrows, math operators, enclosed alphanumerics,
-    geometric shapes (▲▼), misc symbols and dingbats, CJK symbols and punctuation, Bopomofo, fullwidth forms;
-  * Big5 level 1 (0xA440-0xC67E, 5,401 characters), the encoding's frequently-used set, built from the Ministry of
-    Education's 常用國字標準字體表 (4,808) plus common extras; read from Python's own big5 codec, so no download;
-  * the Big5 symbol rows (0xA140-0xA3BF);
-  * a supplement for names: every CJK character of the TWSE/TPEx listed company names in WebPreview/stock-data.json
-    (Big5 level 2 characters such as 碁 瑋 鈦 錸 鎧), plus a curated list of colloquial characters and characters common
-    in company and fund names (SUPPLEMENT);
+    geometric shapes (▲▼), misc symbols and dingbats, CJK symbols and punctuation, Bopomofo, fullwidth forms, and the
+    Big5 symbol rows (0xA140-0xA3BF);
   * every non-ASCII character in the app's sources and data: App/**, PocketCore/** (Swift, skins.json, the bundled
-    catalogue with every ETF name, dividends, fees, market data), project.yml and Scripts/contact_sheet.py.
+    catalogue with every ETF name, dividends, fees, market data), project.yml and Scripts/contact_sheet.py;
+  * every CJK character of the bundled catalogue and WebPreview/etf-data.json (NFC);
+  * an insurance list: the first INSURANCE characters of Scripts/common-chars.txt (most frequent first), for fund
+    names that arrive at runtime. INSURANCE is the largest multiple of 50 that keeps the 4,000,000 byte size gate green
+    with at least 50 KB to spare.
 
 Needs fontTools (pyftsubset). `--check` needs only fontTools and the repo.
 """
@@ -41,10 +40,14 @@ ROOT = Path(__file__).resolve().parent.parent
 FONTS = ROOT / "App" / "Resources" / "Fonts"
 # The commit that added the full fonts; `git show` reads them back from history.
 FULL_FONTS_COMMIT = "a5573d2"
+TOTAL_LIMIT = 4_000_000
+# How many characters of Scripts/common-chars.txt are kept on top of the app's own text.
+INSURANCE = 700
 
 # The full fonts the subsets are made from: where they came from (ruling R7), their version string (name ID 5) and the
 # sha256 of the file in FULL_FONTS_COMMIT. Task 2 did not record the exact download URL of each file, so `source` is
-# the upstream project; the version and hash identify the file. A source file with another hash is refused.
+# the upstream project; the version and hash identify the file. A source file with another hash is refused. `commit`
+# is where the full file was added to git (default FULL_FONTS_COMMIT).
 ORIGINALS = {
     "NotoSansTC-Bold.ttf": {
         "source": "https://github.com/google/fonts/tree/main/ofl/notosanstc (static instance)",
@@ -70,12 +73,39 @@ ORIGINALS = {
         "source": "https://github.com/google/fonts/tree/main/ofl/dotgothic16",
         "version": "Version 1.100",
         "sha256": "3ad9af88726d42b40f7f365f0dcac785af73cf20ea6f1d5b44e57cc21150b8f1"},
+    "Anton-Regular.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/anton",
+        "version": "Version 2.116; ttfautohint (v1.8.3)",
+        "sha256": "a4ba3a92350ebb031da0cb47630ac49eb265082ca1bc0450442f4a83ab947cab",
+        "commit": "a5573d2"},
+    "BreeSerif-Regular.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/breeserif",
+        "version": "Version 1.002",
+        "sha256": "fd080582d70112ef479ba4ddd72407f9a4fcbcec4caa7d29de259b13eeb5f431",
+        "commit": "a5573d2"},
+    "Caveat-Variable.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/caveat (variable font, wght axis)",
+        "version": "Version 2.000",
+        "sha256": "0bdb6b660482d31531b3945849fba5916b3ef8695da7024a9e6b9ee3c4157988",
+        "commit": "a5573d2"},
+    "JetBrainsMono-Regular.ttf": {
+        "source": "https://github.com/JetBrains/JetBrainsMono (Regular)",
+        "version": "Version 2.304; ttfautohint (v1.8.4.7-5d5b)",
+        "sha256": "a0bf60ef0f83c5ed4d7a75d45838548b1f6873372dfac88f71804491898d138f",
+        "commit": "a5573d2"},
+    "PressStart2P-Regular.ttf": {
+        "source": "https://github.com/google/fonts/tree/main/ofl/pressstart2p",
+        "version": "Version 3.000",
+        "sha256": "034c77f1f05ec89421e4a63f0e3a4ca1ecf852cc6d2bf611f126f275728e017d",
+        "commit": "a5573d2"},
 }
 
-# Fonts that are subset. DotGothic16 is a Japanese font: it keeps what it has of the same set, and the app's Chinese
-# characters it never had fall back to the system font exactly as before (CHECK_EXEMPT).
+# Fonts that are subset, the Latin ones too. DotGothic16 is a Japanese font: it keeps what it has of the same set, and
+# the app's Chinese characters it never had fall back to the system font exactly as before (CHECK_EXEMPT).
 SUBSET = list(ORIGINALS)
 CHECK_EXEMPT = {"DotGothic16-Regular.ttf"}
+LATIN = {"Anton-Regular.ttf", "BreeSerif-Regular.ttf", "Caveat-Variable.ttf", "JetBrainsMono-Regular.ttf",
+         "PressStart2P-Regular.ttf"}
 
 RANGES = [
     (0x0020, 0x007E),  # ASCII
@@ -96,10 +126,9 @@ RANGES = [
     (0xFFE0, 0xFFE6),  # fullwidth signs (￥)
 ]
 
-# Colloquial characters, and characters common in company and fund names, outside Big5 level 1.
-SUPPLEMENT = "欸啥碁滙晟瑋鈦鈀堃淼喆峯粧菓犇"
-# Listed company names (TWSE and TPEx) the repo already has; their characters are kept for names fetched at runtime.
-NAME_SOURCES = ["WebPreview/stock-data.json", "WebPreview/etf-data.json"]
+# ETF names the repo already has; their CJK characters are always kept.
+NAME_SOURCES = ["PocketCore/Sources/PocketCore/Resources/catalog.json", "WebPreview/etf-data.json"]
+COMMON_CHARS = ROOT / "Scripts" / "common-chars.txt"
 
 SCAN_ROOTS = ["App", "PocketCore"]
 SCAN_FILES = ["project.yml", "Scripts/contact_sheet.py"]
@@ -137,14 +166,9 @@ def big5_rows(lead: range) -> set[str]:
     return chars
 
 
-def common_traditional() -> set[str]:
-    """Big5 level 1: 0xA440 to 0xC67E."""
-    return {c for c in big5_rows(range(0xA4, 0xC7)) if is_cjk(c) and c.encode("big5") <= b"\xc6\x7e"}
-
-
 def name_characters() -> set[str]:
-    """The supplement: CJK characters of listed company and ETF names in the repo, plus SUPPLEMENT (all in NFC)."""
-    chars = set(SUPPLEMENT)
+    """CJK characters of the ETF names in the bundled catalogue and etf-data.json (NFC)."""
+    chars: set[str] = set()
     for name in NAME_SOURCES:
         path = ROOT / name
         if path.exists():
@@ -152,12 +176,18 @@ def name_characters() -> set[str]:
     return chars
 
 
-def charset() -> set[str]:
+def insurance_characters(count: int | None = None) -> list[str]:
+    """The first `count` (default INSURANCE) characters of common-chars.txt, most frequent first."""
+    lines = [ln.strip() for ln in COMMON_CHARS.read_text(encoding="utf-8").splitlines()]
+    return [ln for ln in lines if ln and not ln.startswith("#")][: INSURANCE if count is None else count]
+
+
+def charset(insurance: int | None = None) -> set[str]:
     chars = {chr(cp) for lo, hi in RANGES for cp in range(lo, hi + 1)}
     chars |= big5_rows(range(0xA1, 0xA4))  # Big5 symbols
-    chars |= common_traditional()
-    chars |= name_characters()
     chars |= app_characters()
+    chars |= name_characters()
+    chars |= set(insurance_characters(insurance))
     return chars
 
 
@@ -169,7 +199,7 @@ def original(name: str, source: Path | None) -> bytes:
             raise SystemExit(f"{path} is missing. Put the full fonts ({', '.join(SUBSET)}) in that folder.")
         data = path.read_bytes()
     else:
-        where = f"{FULL_FONTS_COMMIT}:App/Resources/Fonts/{name}"
+        where = f"{ORIGINALS[name].get('commit', FULL_FONTS_COMMIT)}:App/Resources/Fonts/{name}"
         try:
             data = subprocess.run(["git", "show", where], cwd=ROOT, check=True, capture_output=True).stdout
         except (OSError, subprocess.CalledProcessError) as error:
@@ -195,9 +225,9 @@ def names(font: TTFont) -> list[tuple[int, int, int, int, str]]:
 def subset(source: Path | None) -> int:
     chars = charset()
     unicodes = sorted({ord(c) for c in chars})
-    print(f"character set: {len(unicodes)} code points ({len(common_traditional())} Big5 level 1, "
-          f"{len(name_characters() - common_traditional())} more from names, "
-          f"{len({c for c in app_characters() if is_cjk(c)})} CJK in the app)")
+    print(f"character set: {len(unicodes)} code points ({len({c for c in app_characters() if is_cjk(c)})} CJK in the app, "
+          f"{len(name_characters())} CJK in ETF names, {len(insurance_characters())} insurance)")
+    print(f"INSURANCE = {INSURANCE}")
     total_before = total_after = 0
     for name in SUBSET:
         data = original(name, source)
@@ -229,16 +259,27 @@ def subset(source: Path | None) -> int:
     return 0
 
 
-def check() -> int:
+def check(source: Path | None = None) -> int:
     """Every CJK character and symbol the app ships is in each Traditional Chinese font's cmap."""
     # CJK compatibility ideographs (U+F900-FAFF, e.g. 金 U+F90A in official fund names) are checked as their NFC
     # unified form: the full fonts never had most of them, so they fell back to the system font before subsetting too.
     wanted = {unicodedata.normalize("NFC", c) for c in app_characters()
               if is_cjk(c) or 0x3000 <= ord(c) <= 0x303F or 0xFF01 <= ord(c) <= 0xFF5E}
     wanted |= set("▲▼－×・→←…「」『』")
-    wanted |= set(SUPPLEMENT)
+    wanted |= name_characters()
     failed = False
+    ascii_chars = {chr(cp) for cp in range(0x20, 0x7F)}
     for name in SUBSET:
+        if name in LATIN:
+            had = set(TTFont(io.BytesIO(original(name, source))).getBestCmap())
+            cmap = TTFont(str(FONTS / name)).getBestCmap()
+            gone = sorted(c for c in ascii_chars if ord(c) in had and ord(c) not in cmap)
+            if gone:
+                failed = True
+                print(f"FAIL {name}: printable ASCII missing: {''.join(gone)}")
+            else:
+                print(f"ok   {name}: printable ASCII present")
+            continue
         if name in CHECK_EXEMPT:
             continue
         cmap = TTFont(str(FONTS / name)).getBestCmap()
@@ -251,12 +292,18 @@ def check() -> int:
     skins = (ROOT / "PocketCore/Sources/PocketCore/Resources/skins.json").read_text(encoding="utf-8")
     skin_chars = {unicodedata.normalize("NFC", c) for c in skins if is_cjk(c)}
     for name in SUBSET:
-        if name in CHECK_EXEMPT:
+        if name in CHECK_EXEMPT or name in LATIN:
             continue
         cmap = TTFont(str(FONTS / name)).getBestCmap()
         if any(ord(c) not in cmap for c in skin_chars):
             failed = True
             print(f"FAIL {name}: a skins.json character is missing")
+    total = sum(p.stat().st_size for p in FONTS.iterdir() if p.suffix in {".ttf", ".otf"})
+    if total > TOTAL_LIMIT:
+        failed = True
+        print(f"FAIL fonts total {total} bytes > {TOTAL_LIMIT}")
+    else:
+        print(f"ok   fonts total {total} bytes <= {TOTAL_LIMIT}")
     if failed:
         print("Re-run `python Scripts/subset_fonts.py` so the new characters are kept.")
         return 1
@@ -270,7 +317,7 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="verify coverage of the bundled fonts; change nothing")
     parser.add_argument("--source", type=Path, help="folder with the full fonts (default: git history)")
     args = parser.parse_args()
-    return check() if args.check else subset(args.source)
+    return check(args.source) if args.check else subset(args.source)
 
 
 if __name__ == "__main__":
