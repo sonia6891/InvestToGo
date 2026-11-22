@@ -428,7 +428,11 @@ final class ETFToGoUITests: XCTestCase {
     func testReminderRouteOpensQuickDCAOverLobby() {
         let app = launch(["--demo-streak", "3", "--demo-unlogged", "--demo-held", "-onboarding.monthly", "5000", "--open", "quickDCA"])
         XCTAssertTrue(app.buttons["quick-dca-save"].waitForExistence(timeout: 10), "The reminder opens the sheet")
-        app.buttons["quick-dca-save"].swipeDown()
+        // Dragged from the sheet's title, which is not a scroll view: the whole sheet follows the finger down.
+        let title = app.staticTexts["記一筆定投"].firstMatch
+        XCTAssertTrue(title.exists, "The sheet has its title")
+        let start = title.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: 600)))
         let find = app.buttons["lobby-find"]
         XCTAssertEqual(XCTWaiter().wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "isHittable == true"), object: find)], timeout: 10), .completed, "The lobby is under the sheet")
         XCTAssertTrue(app.buttons["lobby-quick-dca"].exists, "Nothing was saved: 記一筆 is still offered")
