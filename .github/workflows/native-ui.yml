@@ -27,6 +27,12 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/asc"
           "$RUNNER_TEMP/asc/bin/pip" install --quiet cryptography
           "$RUNNER_TEMP/asc/bin/python" -m unittest discover -s Scripts -p 'test_asc_signing.py' -v
+      - name: The harvest art is reproducible
+        # 收成's SVGs are generated; the committed files must be exactly what the script writes.
+        run: |
+          set -euo pipefail
+          node design/3d/skins/harvest/harvest.mjs "$RUNNER_TEMP/harvest"
+          diff -r "$RUNNER_TEMP/harvest" design/3d/skins/harvest --exclude=harvest.mjs
   skin-matrix:
     # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
     # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the

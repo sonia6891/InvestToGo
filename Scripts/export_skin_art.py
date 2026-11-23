@@ -9,6 +9,7 @@ Sources:
   voxel      design/3d/skins/voxel/*.png
   stitch     design/3d/skins/stitch/*.svg         (node stitch.mjs <dir>)
   sketch     design/3d/skins/sketch_doodle/*.svg  (node draw.mjs <dir>)
+  harvest    design/3d/skins/harvest/*.svg        (node harvest.mjs <dir>; its badge is harvest/badge.svg)
   badge      design/3d/skins/badges/<skin>.svg    (node badges.mjs <dir>)
 
 PNGs go in the universal slot at their rendered size (no @2x/@3x re-render yet). SVGs keep their vector data.
@@ -50,6 +51,13 @@ def mapping(skin):
         m.update({k: src / f"{v}.png" for k, v in ICONS.items()})
         m["badge"] = SK / "badges" / "pixel.svg"
         return m
+    if skin == "harvest":
+        src = SK / "harvest"
+        m = {"hero_dollar": src / "dollar.svg", "pocket": src / "pocket_icon.svg", "pocket_icon": src / "pocket_icon.svg"}
+        m.update({k: src / f"{v}.svg" for k, v in ICONS.items()})
+        m["badge"] = src / "badge.svg"
+        m.update({name: src / f"{name}.svg" for name in [f"digit_{n}" for n in range(10)] + ["patch"]})
+        return m
     src = SK / ("stitch" if skin == "stitch" else "sketch_doodle")
     m = {"hero_dollar": src / "dollar.svg", "pocket": src / "pocket_icon.svg", "pocket_icon": src / "pocket_icon.svg"}
     m.update({k: src / f"{v}.svg" for k, v in ICONS.items()})
@@ -63,7 +71,7 @@ def mapping(skin):
     return m
 
 
-SKINS = ["blackgold", "voxel", "stitch", "sketch"]
+SKINS = ["blackgold", "voxel", "stitch", "sketch", "harvest"]
 
 # The two 3D skins ship raster art. Each PNG is written losslessly first (fully transparent pixels carry no colour);
 # one that is still over BUDGET_BYTES keeps its full alpha but has its colour rounded to 6 bits per channel, which is
