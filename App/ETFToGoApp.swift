@@ -283,7 +283,7 @@ struct RootView: View {
             store.reloadIfLocked()
             // Also asks the widget to read its file again, written or not (a tile drawn before the first unlock).
             WidgetSync.shared.returned(store.data)
-            if !store.recordsLocked { await DCAReminders.sync(reminderInputs) }
+            if !store.recordsLocked && !store.readFailed { await DCAReminders.sync(reminderInputs) }
             // 口袋會員前 7 天全開: judged again on every return, wherever the app is (not only over the lobby), so the
             // tools close at the end on any screen.
             MembershipStore.shared.refreshOpen()
@@ -295,7 +295,7 @@ struct RootView: View {
             await PriceAlertMonitor.checkOnReturn()
         }
         // Rebuilt from the records, so logging a DCA (or deleting it) and a new month change what is pending.
-        .task(id: reminderInputs) { if !store.recordsLocked { await DCAReminders.sync(reminderInputs) } }
+        .task(id: reminderInputs) { if !store.recordsLocked && !store.readFailed { await DCAReminders.sync(reminderInputs) } }
         .onChange(of: phase) { _, value in if value == .background { store.live.stop(); PriceAlertMonitor.scheduleNext() } }
         // Locked records are empty, not gone: the reminders already scheduled stay until they can be read.
         .task(id: store.data.dividends.map(\.id)) { if !store.recordsLocked { await DividendReminders.syncIfEnabled(store.data.dividends) } }
