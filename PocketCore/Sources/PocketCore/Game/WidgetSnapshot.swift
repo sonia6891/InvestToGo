@@ -90,16 +90,20 @@ struct WidgetSnapshot: Codable, Equatable {
     }
 }
 
-/// The big number on the widget and the words around it; never a bare 0.
+/// The big number on the widget and the words around it; never a bare 0. A newbie, or anyone whose run broke, sees
+/// the lobby's words (LobbyHero): 「今天開始」 over the 1 and 「第 1 個月」 under it, and after a break the medium
+/// tile, which has the room, also their best run.
 struct WidgetHero: Equatable {
     var top: String
     var value: Int
-    var bottom: String?
+    var bottom: String
+    /// 「最長紀錄 5 個月」 after a break; drawn on the medium tile only.
+    var record: String? = nil
 
     static func of(_ s: WidgetSnapshot) -> WidgetHero {
         if s.streak > 0 { return WidgetHero(top: "連續定投", value: s.streak, bottom: "個月") }
-        if s.isNewbie { return WidgetHero(top: "今天開始", value: 1, bottom: nil) }
-        return WidgetHero(top: "今天開始", value: 1, bottom: "最長紀錄 \(max(s.longestStreak, 1)) 個月")
+        let record = s.isNewbie ? nil : "最長紀錄 \(max(s.longestStreak, 1)) 個月"
+        return WidgetHero(top: "今天開始", value: 1, bottom: "第 1 個月", record: record)
     }
 }
 

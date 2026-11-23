@@ -72,7 +72,7 @@ final class WidgetSnapshotTests: XCTestCase {
         let s = WidgetSnapshot.of(portfolio(g), skinID: "voxel", now: at(2026, 10, 20))
         let d = s.display(at: at(2026, 12, 2))
         XCTAssertEqual(d.streak, 0)
-        XCTAssertEqual(WidgetHero.of(d), WidgetHero(top: "今天開始", value: 1, bottom: "最長紀錄 5 個月"))
+        XCTAssertEqual(WidgetHero.of(d), WidgetHero(top: "今天開始", value: 1, bottom: "第 1 個月", record: "最長紀錄 5 個月"))
     }
 
     func testNewbieQuestsStayDoneAcrossMonths() {
@@ -107,13 +107,17 @@ final class WidgetSnapshotTests: XCTestCase {
         var s = running(); s.version = 2
         XCTAssertNil(WidgetSnapshot.decode(try JSONEncoder().encode(s)))
         XCTAssertEqual(WidgetSnapshot.decode(try JSONEncoder().encode(running())), running())
-        XCTAssertEqual(WidgetHero.of(.newbie(now: now)), WidgetHero(top: "今天開始", value: 1, bottom: nil))
+        XCTAssertEqual(WidgetHero.of(.newbie(now: now)), WidgetHero(top: "今天開始", value: 1, bottom: "第 1 個月", record: nil))
     }
 
+    /// The lobby's words (LobbyHero, 「第 1 個月，今天開始」): the 1 always has its unit under it.
     func testHeroCopy() {
-        XCTAssertEqual(WidgetHero.of(running()), WidgetHero(top: "連續定投", value: 12, bottom: "個月"))
+        XCTAssertEqual(WidgetHero.of(running()), WidgetHero(top: "連續定投", value: 12, bottom: "個月", record: nil))
         var broken = running(); broken.streak = 0; broken.longestStreak = 0; broken.isNewbie = false
-        XCTAssertEqual(WidgetHero.of(broken).bottom, "最長紀錄 1 個月")
+        XCTAssertEqual(WidgetHero.of(broken), WidgetHero(top: "今天開始", value: 1, bottom: "第 1 個月", record: "最長紀錄 1 個月"))
+        broken.longestStreak = 5
+        XCTAssertEqual(WidgetHero.of(broken).record, "最長紀錄 5 個月")
+        XCTAssertEqual(WidgetHero.of(.newbie(now: now)), WidgetHero(top: "今天開始", value: 1, bottom: "第 1 個月", record: nil))
     }
 
     func testQuestLine() {

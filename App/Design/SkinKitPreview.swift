@@ -101,8 +101,8 @@ struct SkinKitPreview: View {
 
 #if DEBUG
 /// 連續定投 widget: its small and medium tiles drawn in the current skin, at the home screen's sizes, for three states
-/// (running, broken, newbie). The unsigned simulator build has no App Group, so this is how tests and screenshots see
-/// the widget. `--open widgetPreview`.
+/// (running, broken, newbie; broken in both sizes, since only the medium tile shows the best run). The unsigned simulator build may have no App Group container, so this is how tests and
+/// screenshots see the widget. `--open widgetPreview`.
 struct WidgetPreview: View {
     @Environment(\.skin) private var skin
     @Environment(\.dismiss) private var dismiss
@@ -115,12 +115,16 @@ struct WidgetPreview: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Text("\(skin.code) · \(skin.name)").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
-                tile("widget-preview-small-running", running, medium: false)
+                // Two small tiles side by side, so all five fit one screenshot.
+                HStack(spacing: 16) {
+                    tile("widget-preview-small-running", running, medium: false)
+                    tile("widget-preview-small-broken", broken, medium: false)
+                }
                 tile("widget-preview-medium-running", running, medium: true)
-                tile("widget-preview-small-broken", broken, medium: false)
+                tile("widget-preview-medium-broken", broken, medium: true)
                 tile("widget-preview-small-newbie", newbie, medium: false)
             }
-            .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 40)
+            .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 40)
         }
         .accessibilityIdentifier("widget-preview-root")
         .background(skin.color(\.page).ignoresSafeArea())

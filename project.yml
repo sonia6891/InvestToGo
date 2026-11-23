@@ -56,7 +56,7 @@ targets:
           UIColorName: LaunchBackground
         # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
         SentryDSN: '$(SENTRY_DSN)'
-        # The App Group the widget's file lives in; WidgetSync reads it (no container in the unsigned simulator build).
+        # The App Group the widget's file lives in (WidgetFile); the unsigned simulator build may have no container.
         ETFAppGroup: '$(APP_GROUP_ID)'
         # The widget opens the lobby through etftogo://lobby (AppURL).
         CFBundleURLTypes:

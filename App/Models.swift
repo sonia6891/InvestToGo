@@ -206,6 +206,9 @@ import SwiftUI
     }
 
     private var readFailure = false
+    /// The records file is there but could not be read: a damaged file (「無法讀取既有資料」), or a locked phone
+    /// (`recordsLocked` too). `data` is then empty, so the widget's file is not written from it.
+    var readFailed: Bool { readFailure }
     /// The records could not be opened at launch because the phone was locked (they are saved with complete file
     /// protection). Until `reloadIfLocked` reads them, `data` is empty and nothing can be saved.
     private(set) var recordsLocked = false

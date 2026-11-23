@@ -23,10 +23,12 @@ struct StreakWidgetBackground: View {
     }
 }
 
-/// The big number and the words around it.
+/// The big number and the words around it. The medium tile, which has the room, also shows the best run after a
+/// break (「最長紀錄 5 個月」).
 struct StreakSmallView: View {
     let snapshot: WidgetSnapshot
     let skin: Skin
+    var showsRecord = false
     var body: some View {
         let hero = WidgetHero.of(snapshot)
         VStack(alignment: .leading, spacing: 0) {
@@ -39,12 +41,18 @@ struct StreakSmallView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
                 .foregroundStyle(Color(widgetRGB: skin.colors.ink))
-            if let bottom = hero.bottom {
-                Text(bottom)
-                    .font(.system(size: 13, weight: .medium))
+            Text(hero.bottom)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color(widgetRGB: skin.colors.sub))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            if showsRecord, let record = hero.record {
+                Text(record)
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(Color(widgetRGB: skin.colors.sub))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
+                    .padding(.top, 2)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -57,7 +65,7 @@ struct StreakMediumView: View {
     let skin: Skin
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            StreakSmallView(snapshot: snapshot, skin: skin).frame(width: 116)
+            StreakSmallView(snapshot: snapshot, skin: skin, showsRecord: true).frame(width: 116)
             VStack(alignment: .leading, spacing: 8) {
                 Text(snapshot.questLine)
                     .font(.system(size: 13, weight: .semibold))
@@ -86,11 +94,15 @@ struct StreakWidgetView: View {
     let snapshot: WidgetSnapshot
     let skin: Skin
     let family: WidgetFamily
+    /// The widget could not read the app's file yet (`StreakWidgetLoad.unreadable`): the tile is drawn as a redacted
+    /// placeholder and VoiceOver says only the widget's name, so no made-up number is shown or spoken.
+    var redacted = false
 
     var body: some View {
         content
+            .redacted(reason: redacted ? .placeholder : [])
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Self.spoken(snapshot, family: family))
+            .accessibilityLabel(redacted ? Self.placeholderLabel : Self.spoken(snapshot, family: family))
             .widgetURL(AppURL.lobby)
             .containerBackground(for: .widget) { StreakWidgetBackground(skin: skin) }
     }
@@ -99,15 +111,18 @@ struct StreakWidgetView: View {
         if family == .systemMedium { StreakMediumView(snapshot: snapshot, skin: skin) } else { StreakSmallView(snapshot: snapshot, skin: skin) }
     }
 
-    /// 「連續定投 12 個月」, 「今天開始，最長紀錄 5 個月」 or 「今天開始」; the medium widget adds 「，本月任務 2/3」.
+    /// What VoiceOver says for the redacted placeholder.
+    static let placeholderLabel = "連續定投"
+
+    /// 「連續定投 12 個月」 or 「第 1 個月，今天開始」 (the lobby's words); after a break the medium widget, which shows
+    /// it, adds 「，最長紀錄 5 個月」, and the medium widget always ends with 「，本月任務 2/3」.
     static func spoken(_ s: WidgetSnapshot, family: WidgetFamily) -> String {
         let hero = WidgetHero.of(s)
+        let medium = family == .systemMedium
         var line: String
-        if s.streak > 0 { line = "\(hero.top) \(hero.value) \(hero.bottom ?? "")" }
-        else if let bottom = hero.bottom { line = "\(hero.top)，\(bottom)" }
-        else { line = hero.top }
-        line = line.trimmingCharacters(in: .whitespaces)
-        if family == .systemMedium { line += "，\(s.questLine)" }
+        if s.streak > 0 { line = "\(hero.top) \(hero.value) \(hero.bottom)" }
+        else { line = [hero.bottom, hero.top, medium ? hero.record : nil].compactMap { $0 }.joined(separator: "，") }
+        if medium { line += "，\(s.questLine)" }
         return line
     }
 }

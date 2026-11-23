@@ -16,7 +16,8 @@ import UserNotifications
         let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
         // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
         let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
-        WidgetSync.shared.locked = { [weak store] in store?.recordsLocked ?? true }
+        // Nothing is written from records that are locked or failed to read (a damaged file): the widget keeps its streak.
+        WidgetSync.shared.locked = WidgetSync.locked(by: store)
         store.onCommit = { WidgetSync.shared.sync($0) }
         Onboarding.reset(args)
         ReportSettings.reset(args)
@@ -279,7 +280,8 @@ struct RootView: View {
             guard phase == .active else { return }
             // The records could not be opened at a launch in the background (locked phone): read them now.
             store.reloadIfLocked()
-            WidgetSync.shared.sync(store.data)
+            // Also asks the widget to read its file again, written or not (a tile drawn before the first unlock).
+            WidgetSync.shared.returned(store.data)
             if !store.recordsLocked { await DCAReminders.sync(reminderInputs) }
             // 口袋會員前 7 天全開: judged again on every return, wherever the app is (not only over the lobby), so the
             // tools close at the end on any screen.

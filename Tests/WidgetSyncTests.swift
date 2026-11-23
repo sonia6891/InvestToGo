@@ -8,6 +8,7 @@ import XCTest
     private var skin = "stitch"
     private var clock = WidgetSyncTests.at(2026, 11, 21)
     private var isLocked = false
+    private var reported: [WidgetSyncError] = []
 
     private static func at(_ y: Int, _ m: Int, _ d: Int) -> Date {
         GameRules.taipei.date(from: DateComponents(year: y, month: m, day: d, hour: 12))!
@@ -16,16 +17,17 @@ import XCTest
     override func setUp() {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("widget-\(UUID().uuidString)", isDirectory: true)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        reloads = 0; skin = "stitch"; clock = Self.at(2026, 11, 21); isLocked = false
+        reloads = 0; skin = "stitch"; clock = Self.at(2026, 11, 21); isLocked = false; reported = []
     }
 
     override func tearDown() {
         try? FileManager.default.removeItem(at: directory)
     }
 
-    private func makeSync(noContainer: Bool = false) -> WidgetSync {
-        WidgetSync(directory: noContainer ? nil : directory, reload: { [unowned self] in reloads += 1 },
-                   skinID: { [unowned self] in skin }, locked: { [unowned self] in isLocked }, now: { [unowned self] in clock })
+    private func makeSync(noContainer: Bool = false, in folder: URL? = nil) -> WidgetSync {
+        WidgetSync(directory: noContainer ? nil : (folder ?? directory), reload: { [unowned self] in reloads += 1 },
+                   skinID: { [unowned self] in skin }, locked: { [unowned self] in isLocked }, now: { [unowned self] in clock },
+                   report: { [unowned self] in reported.append($0) })
     }
 
     private func portfolio(buy: Bool = false) -> Portfolio {
@@ -40,7 +42,7 @@ import XCTest
         return p
     }
 
-    private var file: URL { directory.appendingPathComponent(WidgetSync.fileName) }
+    private var file: URL { directory.appendingPathComponent(WidgetFile.name) }
 
     func testWritesTheSnapshot() throws {
         let sync = makeSync(); let p = portfolio(buy: true)
@@ -92,6 +94,82 @@ import XCTest
         sync.sync(portfolio(buy: true))
         XCTAssertEqual(sync.writes, 0)
         XCTAssertEqual(reloads, 0)
+    }
+
+    /// A build without its App Group says so once (to Sentry, in Release), with nothing of the snapshot.
+    func testNoContainerIsReportedOnce() {
+        let sync = makeSync(noContainer: true)
+        sync.sync(portfolio(buy: true))
+        sync.sync(portfolio(buy: false))
+        XCTAssertEqual(reported, [.noContainer])
+        XCTAssertEqual(WidgetSyncError.noContainer.context, "widget-container")
+    }
+
+    func testFailedWriteIsReportedWithoutTheSnapshot() {
+        let gone = directory.appendingPathComponent("no-such-folder", isDirectory: true)
+        let sync = makeSync(in: gone)
+        sync.sync(portfolio(buy: true))
+        XCTAssertEqual(sync.writes, 0)
+        XCTAssertEqual(reloads, 0)
+        XCTAssertEqual(reported.count, 1)
+        guard case .writeFailed(let domain, _) = reported.first else { return XCTFail("\(reported)") }
+        XCTAssertFalse(domain.isEmpty)
+        let info = (reported[0] as NSError).userInfo
+        XCTAssertNotNil(info["underlyingDomain"]); XCTAssertNotNil(info["underlyingCode"])
+        XCTAssertNil(info[NSFilePathErrorKey]); XCTAssertNil(info[NSUnderlyingErrorKey])
+        XCTAssertEqual(reported[0].context, "widget-write")
+    }
+
+    func testLockedRecordsReportNothing() {
+        isLocked = true
+        let sync = makeSync(noContainer: true)
+        sync.sync(portfolio(buy: true))
+        XCTAssertEqual(reported, [])
+    }
+
+    /// A return to the foreground asks the widget to read its file again even when nothing changed (I-2: a tile drawn
+    /// before the first unlock is replaced as soon as the app is opened).
+    func testReturnReloadsEvenWhenUnchanged() {
+        let sync = makeSync(); let p = portfolio(buy: true)
+        sync.returned(p)
+        XCTAssertEqual(sync.writes, 1)
+        XCTAssertEqual(reloads, 1, "a write reloads once, not twice")
+        sync.returned(p)
+        XCTAssertEqual(sync.writes, 1)
+        XCTAssertEqual(reloads, 2)
+    }
+
+    func testReturnReloadsWhileLocked() {
+        isLocked = true
+        let sync = makeSync()
+        sync.returned(portfolio(buy: true))
+        XCTAssertEqual(sync.writes, 0)
+        XCTAssertEqual(reloads, 1)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
+    }
+
+    /// M-1: records that failed to read (a damaged file) leave `data` empty; the widget's file is never written from it.
+    func testReadFailedStoreNeverWrites() throws {
+        let records = directory.appendingPathComponent("damaged.json")
+        try Data("not json".utf8).write(to: records)
+        let store = PortfolioStore(url: records)
+        XCTAssertTrue(store.readFailed)
+        XCTAssertFalse(store.recordsLocked)
+        let sync = makeSync()
+        sync.locked = WidgetSync.locked(by: store)
+        sync.sync(store.data)
+        sync.returned(store.data)
+        XCTAssertEqual(sync.writes, 0)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
+    }
+
+    func testReadableStoreWrites() {
+        let store = PortfolioStore(url: directory.appendingPathComponent("fresh.json"))
+        XCTAssertFalse(store.readFailed)
+        let sync = makeSync()
+        sync.locked = WidgetSync.locked(by: store)
+        sync.sync(portfolio(buy: true))
+        XCTAssertEqual(sync.writes, 1)
     }
 
     func testFileProtectionClass() throws {

@@ -4,23 +4,19 @@ import WidgetKit
 struct StreakEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetSnapshot
+    /// The file was there but could not be read (a phone not unlocked since it restarted): drawn as a placeholder.
+    var redacted = false
 }
 
 /// Reads the app's `widget.json` from the App Group; makes no network request. Without the file (an unsigned build,
-/// a first launch, a locked phone) it shows the newbie state.
+/// a first launch) it shows the newbie state until the month turns; with a file it cannot read yet, a redacted
+/// placeholder that is tried again in 15 minutes (`StreakWidgetLoad`).
 struct StreakProvider: TimelineProvider {
-    /// The same name the app writes (`WidgetSync.fileName`).
-    private static let fileName = "widget.json"
-
-    static func load(now: Date) -> WidgetSnapshot {
-        guard let id = Bundle.main.object(forInfoDictionaryKey: "ETFAppGroup") as? String, !id.isEmpty, !id.contains("$("),
-              let directory = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: id),
-              let data = try? Data(contentsOf: directory.appendingPathComponent(fileName)),
-              let snapshot = WidgetSnapshot.decode(data) else { return .newbie(now: now) }
-        return snapshot
-    }
-
     private static func sample(_ now: Date) -> WidgetSnapshot { .sample(streak: 12, done: 2, now: now) }
+
+    private static func load(now: Date) -> StreakWidgetLoad {
+        StreakWidgetLoad.load(directory: WidgetFile.groupDirectory(), now: now)
+    }
 
     func placeholder(in context: Context) -> StreakEntry {
         StreakEntry(date: Date(), snapshot: Self.sample(Date()))
@@ -28,15 +24,20 @@ struct StreakProvider: TimelineProvider {
 
     func getSnapshot(in context: Context, completion: @escaping (StreakEntry) -> Void) {
         let now = Date()
-        completion(StreakEntry(date: now, snapshot: context.isPreview ? Self.sample(now) : Self.load(now: now).display(at: now)))
+        if context.isPreview { return completion(StreakEntry(date: now, snapshot: Self.sample(now))) }
+        let load = Self.load(now: now)
+        completion(StreakEntry(date: now, snapshot: load.snapshot(now: now).display(at: now), redacted: load.redacted))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<StreakEntry>) -> Void) {
         let now = Date()
-        let next = WidgetSnapshot.nextMonthStart(after: now)
-        let snapshot = Self.load(now: now)
-        let entries = [now, next].map { StreakEntry(date: $0, snapshot: snapshot.display(at: $0)) }
-        completion(Timeline(entries: entries, policy: .after(next)))
+        let load = Self.load(now: now)
+        let reload = load.reloadDate(after: now)
+        let snapshot = load.snapshot(now: now)
+        // One entry now and, for a file read (or none), one at the next Taipei month start, where the timeline ends.
+        let dates = load.redacted ? [now] : [now, reload]
+        let entries = dates.map { StreakEntry(date: $0, snapshot: snapshot.display(at: $0), redacted: load.redacted) }
+        completion(Timeline(entries: entries, policy: .after(reload)))
     }
 }
 
@@ -44,7 +45,7 @@ struct StreakEntryView: View {
     @Environment(\.widgetFamily) private var family
     let entry: StreakEntry
     var body: some View {
-        StreakWidgetView(snapshot: entry.snapshot, skin: Skins.named(entry.snapshot.skinID), family: family)
+        StreakWidgetView(snapshot: entry.snapshot, skin: Skins.named(entry.snapshot.skinID), family: family, redacted: entry.redacted)
     }
 }
 
