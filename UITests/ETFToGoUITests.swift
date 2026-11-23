@@ -161,6 +161,19 @@ final class ETFToGoUITests: XCTestCase {
         }
     }
 
+    /// The 連續定投 widget's tiles in the app (the unsigned build has no App Group): running, broken and newbie.
+    func testWidgetPreviewStates() {
+        let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--open", "widgetPreview"]; app.launch()
+        XCTAssertTrue(app.descendants(matching: .any)["widget-preview-small-running"].firstMatch.waitForExistence(timeout: 5), "The running tile is drawn")
+        for id in ["widget-preview-medium-running", "widget-preview-small-broken", "widget-preview-small-newbie"] {
+            XCTAssertTrue(app.descendants(matching: .any)[id].firstMatch.exists, "\(id) is drawn")
+        }
+        for text in ["連續定投", "12", "個月", "本月任務 2/3", "最長紀錄 5 個月", "今天開始"] {
+            XCTAssertTrue(app.staticTexts[text].firstMatch.exists, "\(text) is on a tile")
+        }
+        capture(app, "widget-preview")
+    }
+
     // MARK: Lobby and quick pick (spec 4.2, 4.3)
 
     func testLobbyEntriesAndBack() {

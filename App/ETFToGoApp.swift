@@ -259,6 +259,8 @@ struct RootView: View {
                 .preferredColorScheme(skins.colorScheme)
         }
         .modifier(SkinKitLaunch())
+        // A tap on the 連續定投 widget (etftogo://lobby): back to the lobby.
+        .onOpenURL { if AppURL.opensLobby($0) { navigation.toLobby() } }
         // App Store 評分視窗: never over LEVEL×UP, nor while it is on its way (waiting for a reward toast to finish).
         .onChange(of: levelUpComing, initial: true) { _, coming in ReviewPrompt.shared.hold("levelUp", while: coming) }
         // Nor over 記一筆, from the tap (or tapped reminder) until the sheet has gone; its release asks again.

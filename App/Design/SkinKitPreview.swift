@@ -4,14 +4,19 @@ import SwiftUI
 /// (debug builds only; release builds pass the content through).
 struct SkinKitLaunch: ViewModifier {
     #if DEBUG
-    @State private var open: Bool = {
+    /// `--open skinKit` or `--open widgetPreview`.
+    @State private var route: AppRoute? = {
         let args = ProcessInfo.processInfo.arguments
-        guard args.contains("--ui-testing"), let i = args.firstIndex(of: "--open"), args.indices.contains(i + 1) else { return false }
-        return args[i + 1] == "skinKit"
+        guard args.contains("--ui-testing"), let i = args.firstIndex(of: "--open"), args.indices.contains(i + 1) else { return nil }
+        switch args[i + 1] {
+        case "skinKit": return .skinKitPreview
+        case "widgetPreview": return .widgetPreview
+        default: return nil
+        }
     }()
     func body(content: Content) -> some View {
-        content.fullScreenCover(isPresented: $open) {
-            NavigationStack { RouteView(route: .skinKitPreview) }
+        content.fullScreenCover(isPresented: Binding(get: { route != nil }, set: { if !$0 { route = nil } })) {
+            NavigationStack { if let route { RouteView(route: route) } }
                 .environment(\.skin, SkinStore.shared.skin)
         }
     }
@@ -90,6 +95,50 @@ struct SkinKitPreview: View {
 
     private func quest(_ done: Bool, _ title: String) -> some View {
         HStack(spacing: 7) { SkinCheck(done: done, size: 18); Text(title).skinFont(.body(12)) }
+    }
+}
+#endif
+
+#if DEBUG
+/// 連續定投 widget: its small and medium tiles drawn in the current skin, at the home screen's sizes, for three states
+/// (running, broken, newbie). The unsigned simulator build has no App Group, so this is how tests and screenshots see
+/// the widget. `--open widgetPreview`.
+struct WidgetPreview: View {
+    @Environment(\.skin) private var skin
+    @Environment(\.dismiss) private var dismiss
+    private let now = Date()
+
+    var body: some View {
+        let running = WidgetSnapshot.sample(streak: 12, done: 2, skinID: skin.id, now: now)
+        let broken = WidgetSnapshot.sample(streak: 0, longest: 5, done: 0, skinID: skin.id, now: now)
+        let newbie = WidgetSnapshot.newbie(now: now)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("\(skin.code) · \(skin.name)").skinFont(.mono(11)).tracking(1.5).skinForeground(\.sub)
+                tile("widget-preview-small-running", running, medium: false)
+                tile("widget-preview-medium-running", running, medium: true)
+                tile("widget-preview-small-broken", broken, medium: false)
+                tile("widget-preview-small-newbie", newbie, medium: false)
+            }
+            .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 40)
+        }
+        .accessibilityIdentifier("widget-preview-root")
+        .background(skin.color(\.page).ignoresSafeArea())
+        .navigationTitle("連續定投小工具").navigationBarTitleDisplayMode(.inline)
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("關閉") { dismiss() } } }
+    }
+
+    private func tile(_ id: String, _ snapshot: WidgetSnapshot, medium: Bool) -> some View {
+        Group {
+            if medium { StreakMediumView(snapshot: snapshot, skin: skin) } else { StreakSmallView(snapshot: snapshot, skin: skin) }
+        }
+        .padding(16)
+        .frame(width: medium ? 338 : 158, height: 158)
+        .background { StreakWidgetBackground(skin: skin) }
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(skin.color(\.line), lineWidth: 1) }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(id)
     }
 }
 #endif

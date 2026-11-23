@@ -169,6 +169,12 @@ jobs:
           RELEASE_DSN=$(sed -n 's/^ *SENTRY_DSN = //p' build/release-settings.txt | head -n 1)
           test "$RELEASE_DSN" = 'https://879ab668f46097254e4b9af68234f109@o4512394043260928.ingest.us.sentry.io/4512422000197632' || { echo "::error::Release SENTRY_DSN resolved to '$RELEASE_DSN'"; exit 1; }
           echo 'Verified full SENTRY_DSN in Release'
+          # The 連續定投 widget: embedded in the app, named after it, and without the fund data it never reads.
+          APPEX=build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoWidget.appex
+          test -f "$APPEX/Info.plist" || { echo "::error::$APPEX is missing"; exit 1; }
+          python3 -c "import plistlib, sys; from pathlib import Path; p=plistlib.loads(Path(sys.argv[1]).read_bytes()); assert p['CFBundleIdentifier']=='tw.sonia.etftogo.uireview.widget', p['CFBundleIdentifier']; print('Verified the widget extension', p['CFBundleIdentifier'])" "$APPEX/Info.plist"
+          test -z "$(find "$APPEX" -name catalog.json)" || { echo "::error::the widget carries catalog.json"; exit 1; }
+          echo 'Verified the widget extension holds no catalog.json'
       - name: Set up Pillow for the blank-frame checks
         run: |
           set -euo pipefail
@@ -255,7 +261,7 @@ jobs:
           sleep 5
           xcrun simctl io "$DEVICE" screenshot "build/screens/screen-dex-reveal.png"
       - name: Capture the skin kit sheet in every skin
-        timeout-minutes: 2
+        timeout-minutes: 4
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -266,6 +272,11 @@ jobs:
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open skinKit
             sleep 8
             xcrun simctl io "$DEVICE" screenshot "build/screens/skinkit-$SKIN.png"
+            # 連續定投 widget: its three states in this 外觀主題, to check the text reads on every page colour.
+            xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
+            xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open widgetPreview
+            sleep 8
+            xcrun simctl io "$DEVICE" screenshot "build/screens/widget-$SKIN.png"
           done
       # 圖鑑卡翻面: the reveal in every 外觀主題. Its own step (a launch can take over a minute on a busy runner), and the
       # check after the tests fails the job when one of the four is missing or blank.

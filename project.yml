@@ -26,9 +26,12 @@ targets:
     dependencies:
       - package: Sentry
         product: Sentry
+      # The 連續定投 widget, embedded in the app.
+      - target: ETFToGoWidget
     # PocketCore's sources and data are compiled into the app; the same files form a SwiftPM package for Linux tests.
     sources:
       - App
+      - WidgetShared
       - PocketCore/Sources/PocketCore
     # Skin fonts (App/Resources/Fonts, OFL licences beside them). XcodeGen writes this plist; Xcode merges it with
     # the generated Info.plist keys below.
@@ -55,6 +58,11 @@ targets:
         SentryDSN: '$(SENTRY_DSN)'
         # The App Group the widget's file lives in; WidgetSync reads it (no container in the unsigned simulator build).
         ETFAppGroup: '$(APP_GROUP_ID)'
+        # The widget opens the lobby through etftogo://lobby (AppURL).
+        CFBundleURLTypes:
+          - CFBundleURLName: tw.sonia.etftogo
+            CFBundleURLSchemes:
+              - etftogo
         # 到價提醒 (PriceAlertMonitor): the background refresh task that checks prices when iOS allows it. The
         # identifier is the one the code registers; it does not have to match the bundle id.
         BGTaskSchedulerPermittedIdentifiers:
@@ -86,6 +94,40 @@ targets:
         # App 上鎖 (2026-11-22 design): what iOS shows when it first asks to allow Face ID.
         INFOPLIST_KEY_NSFaceIDUsageDescription: 用 Face ID 解鎖投資袋著走
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  # The 連續定投 widget (small and medium). It compiles PocketCore's sources for the streak rules and the skins, but not the
+  # fund data (it never reads it); it reads only the amount-free widget.json in the App Group.
+  ETFToGoWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widget
+      - WidgetShared
+      - App/Widget/AppURL.swift
+      - path: PocketCore/Sources/PocketCore
+        excludes:
+          - Resources/catalog.json
+          - Resources/annual-fees.json
+          - Resources/official-dividends.json
+    info:
+      path: Support/ETFToGoWidget-Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        ETFAppGroup: '$(APP_GROUP_ID)'
+    entitlements:
+      path: Support/ETFToGoWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - '$(APP_GROUP_ID)'
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(ETF_APP_BUNDLE_ID).widget
+        # Empty by default (Automatic signing ignores it); the TestFlight run names the widget's manual profile.
+        PROVISIONING_PROFILE_SPECIFIER: $(WIDGET_PROFILE_SPECIFIER)
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: 投資袋著走
+        TARGETED_DEVICE_FAMILY: '1'
+        APPLICATION_EXTENSION_API_ONLY: YES
   ETFToGoTests:
     type: bundle.unit-test
     platform: iOS

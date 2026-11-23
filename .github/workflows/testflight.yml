@@ -120,6 +120,23 @@ jobs:
             done
           fi
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only archive', p['CFBundleShortVersionString'], p['CFBundleVersion'])"
+          # The 連續定投 widget rides in the app: <id>.widget, the app's build number, and (signed) the App Group in both.
+          APP_DIR=build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app
+          APPEX_DIR="$APP_DIR/PlugIns/ETFToGoWidget.appex"
+          python3 - "$APP_DIR/Info.plist" "$APPEX_DIR/Info.plist" "$ETF_BUNDLE_ID" <<'PY'
+          import plistlib, sys
+          from pathlib import Path
+          app, ext = (plistlib.loads(Path(p).read_bytes()) for p in sys.argv[1:3])
+          assert ext['CFBundleIdentifier'] == sys.argv[3] + '.widget', ext['CFBundleIdentifier']
+          assert ext['CFBundleVersion'] == app['CFBundleVersion'], (ext['CFBundleVersion'], app['CFBundleVersion'])
+          print('Verified the widget extension', ext['CFBundleIdentifier'], ext['CFBundleVersion'])
+          PY
+          if [[ "${SIGNING:-}" != "cloud" ]]; then
+            for bundle in "$APP_DIR" "$APPEX_DIR"; do
+              codesign -d --entitlements - --xml "$bundle" 2>/dev/null | grep -q "group.$ETF_BUNDLE_ID" || { echo "::error::$bundle lacks the App Group group.$ETF_BUNDLE_ID"; exit 1; }
+              echo "Verified group.$ETF_BUNDLE_ID in $(basename "$bundle")"
+            done
+          fi
       - name: Upload archive to App Store Connect
         run: |
           set -euo pipefail

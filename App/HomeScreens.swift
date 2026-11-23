@@ -20,6 +20,8 @@ enum AppRoute: Hashable {
     #if DEBUG
     /// Every skin-kit component for the current skin (debug builds only; UI tests open it with `--open skinKit`).
     case skinKitPreview
+    /// The 連續定投 widget's states drawn in the current skin (debug builds only; `--open widgetPreview`).
+    case widgetPreview
     #endif
     case combo, comboAdding(String), comboSettings, comboResult, trades, allocation
 }
@@ -73,6 +75,7 @@ struct RouteView: View {
         case .allocation: Page { AllocationSection() }.navigationTitle("資產配置").navigationBarTitleDisplayMode(.inline)
         #if DEBUG
         case .skinKitPreview: SkinKitPreview()
+        case .widgetPreview: WidgetPreview()
         #endif
         }
     }
