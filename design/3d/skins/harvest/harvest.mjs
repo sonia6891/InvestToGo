@@ -86,7 +86,6 @@ function lens(c, a, len, wid, n = 7) {
   for (let i = n - 1; i > 0; i--) { const t = i / n, x = (t - 0.5) * len, y = -(Math.sin(Math.PI * t) ** 0.8) * wid / 2; pts.push([c[0] + ux * x - uy * y, c[1] + uy * x + ux * y]); }
   return pts;
 }
-const moved = (ring, dx, dy) => ring.map(([x, y]) => [x + dx, y + dy]);
 
 // ---- paper pieces (each returns SVG markup)
 // One cut: its soft shadow, then the paper. Several rings cut as one piece use the even-odd rule (holes).
@@ -275,7 +274,7 @@ I.badge = () => {
 // behind the digits, so it fills its frame (a 6-unit margin for the shadow) and carries nothing that would distort.
 I.patch = () => svg(260, 210, cut(rect(0, 0, 260, 210), C.green, { seg: 10 }) + cut(rect(8, 8, 244, 194), C.paper, { seg: 10 }), 6);
 
-// ---- digits 0–9: chunky scissor-cut numerals on an 86×116 grid, gold on a deep-gold under-layer
+// ---- digits 0–9: chunky scissor-cut numerals on an 86×116 grid, gold inside a continuous ink outline
 const flip = pts => pts.map(([x, y]) => [86 - x, 116 - y]);
 const DIGITS = [
   [[[16, 0], [70, 0], [86, 16], [86, 100], [70, 116], [16, 116], [0, 100], [0, 16]], [[32, 26], [54, 26], [60, 32], [60, 84], [54, 90], [32, 90], [26, 84], [26, 32]]],
@@ -290,8 +289,11 @@ const DIGITS = [
     [[26, 22], [60, 22], [60, 46], [26, 46]], [[26, 70], [60, 70], [60, 94], [26, 94]]],
 ];
 DIGITS.push([flip(DIGITS[6][0]), flip(DIGITS[6][1])]);
-// The under-layer is the glyph grown by 4 (its holes shrunk by 4) and dropped 3 down-right, so a deep-gold rim shows.
-const numeral = rings => cut(rings.map((r, i) => moved(inset(r, i ? 4 : -4), 2, 3)), C.deep, { seg: 12 }) + cut(rings, C.gold, { seg: 12 });
+// The under-layer is the glyph grown by OUTLINE all round (its holes shrunk by the same), centred, so an ink rim of
+// even width outlines the whole gold face: gold alone is about 1.6:1 on the paper slip, the ink rim about 13:1.
+// 5.5 keeps at least ~2.5 units of ink showing where the two jittered edges lean towards each other.
+const OUTLINE = 5.5;
+const numeral = rings => cut(rings.map((r, i) => inset(r, i ? OUTLINE : -OUTLINE)), C.ink, { seg: 12 }) + cut(rings, C.gold, { seg: 12 });
 DIGITS.forEach((rings, n) => { I[`digit_${n}`] = () => svg(86, 116, numeral(rings), 22); });
 
 const OUT = process.argv.slice(2);
