@@ -172,9 +172,22 @@ jobs:
           # The 連續定投 widget: embedded in the app, named after it, and without the fund data it never reads.
           APPEX=build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/PlugIns/ETFToGoWidget.appex
           test -f "$APPEX/Info.plist" || { echo "::error::$APPEX is missing"; exit 1; }
-          python3 -c "import plistlib, sys; from pathlib import Path; p=plistlib.loads(Path(sys.argv[1]).read_bytes()); assert p['CFBundleIdentifier']=='tw.sonia.etftogo.uireview.widget', p['CFBundleIdentifier']; print('Verified the widget extension', p['CFBundleIdentifier'])" "$APPEX/Info.plist"
-          test -z "$(find "$APPEX" -name catalog.json)" || { echo "::error::the widget carries catalog.json"; exit 1; }
-          echo 'Verified the widget extension holds no catalog.json'
+          # Its id, the app's version and build (App Store Connect rejects a mismatch), and the app's App Group.
+          python3 - "$APPEX/Info.plist" "build/DerivedData/Build/Products/Debug-iphonesimulator/ETFToGo.app/Info.plist" <<'PY'
+          import plistlib, sys
+          from pathlib import Path
+          ext, app = (plistlib.loads(Path(p).read_bytes()) for p in sys.argv[1:3])
+          assert ext['CFBundleIdentifier'] == 'tw.sonia.etftogo.uireview.widget', ext['CFBundleIdentifier']
+          for key in ('CFBundleVersion', 'CFBundleShortVersionString'):
+              assert ext[key] == app[key], (key, ext[key], app[key])
+          assert ext['ETFAppGroup'] == 'group.tw.sonia.etftogo.uireview', ext['ETFAppGroup']
+          assert app['ETFAppGroup'] == ext['ETFAppGroup'], (app['ETFAppGroup'], ext['ETFAppGroup'])
+          print('Verified the widget extension', ext['CFBundleIdentifier'], ext['CFBundleShortVersionString'], ext['CFBundleVersion'], ext['ETFAppGroup'])
+          PY
+          for fund in catalog.json annual-fees.json official-dividends.json; do
+            test -z "$(find "$APPEX" -name "$fund")" || { echo "::error::the widget carries $fund"; exit 1; }
+          done
+          echo 'Verified the widget extension holds none of catalog.json, annual-fees.json and official-dividends.json'
       - name: Set up Pillow for the blank-frame checks
         run: |
           set -euo pipefail
