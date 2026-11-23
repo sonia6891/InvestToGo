@@ -92,8 +92,11 @@ struct DexRevealView: View {
             }
             .rotation3DEffect(.degrees(angle), axis: (x: 0, y: 1, z: 0), perspective: 0.6)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            Text(DexReveal.rewardText(item.visit))
-                .skinFont(.title(20)).foregroundStyle(skin.color(\.accent))
+            // The skin's own tag, as LEVEL×UP draws its reason: ink, or a block or seam, never the bare accent on the page
+            // (the sketch skin's pale yellow would not read on paper).
+            SkinTag(DexReveal.rewardText(item.visit))
+                .scaleEffect(1.5)
+                .padding(.vertical, 8)
                 .opacity(phase >= .reward ? 1 : 0)
                 .offset(y: phase >= .reward || reduceMotion ? 0 : 8)
                 .accessibilityLabel(DexReveal.spoken(fund, visit: item.visit))
