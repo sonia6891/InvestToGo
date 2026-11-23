@@ -379,7 +379,7 @@ struct WatchlistView: View {
 
 /// ETF 詳情 (spec 5.5): the big code, name, series tag, price and move; tabs 走勢／持股／配息／資訊; the skin's trend
 /// line with 1月／3月／1年／5年／全部 and four facts; 「加入口袋」 and 「用 0050 試算定期定額」. The first visit collects the
-/// fund's dex card (spec 6.4) and shows 「收進圖鑑 +30 經驗」 once.
+/// fund's dex card (spec 6.4) and plays the card reveal once.
 struct FundDetail: View {
     @EnvironmentObject var store: PortfolioStore
     @Environment(\.skin) private var skin
@@ -551,7 +551,6 @@ struct FundDetail: View {
         .padding(.top, 8)
         .background(skin.color(\.page).ignoresSafeArea(edges: .bottom))
     }
-    /// 「收進圖鑑 +30 經驗」, or just 「收進圖鑑」 once this month's experience-earning cards are used up (ruling R34).
     /// Presents or dismisses the reveal; with Reduce Motion the cover appears and goes without animation.
     private func setReveal(_ item: DexRevealItem?) {
         var transaction = Transaction()

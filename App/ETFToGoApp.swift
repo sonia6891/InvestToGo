@@ -230,8 +230,8 @@ struct RootView: View {
             .environment(\.lobbyModalPending, levelUp != nil || celebration != nil)
             .tint(Palette.blue)
             .id(skins.skin.id)
-            // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as 「收進圖鑑
-            // +30 經驗」. On the stack, not the whole column, so while offline it sits below 「離線中」 and never hides it.
+            // The toast region (ruling R25): 記一筆配息's coin drop and 「+20」, and one-line notices such as the
+            // membership lapse. On the stack, not the whole column, so while offline it sits below 「離線中」 and never hides it.
             .overlay(alignment: .top) { RewardToast() }
         }
         .overlay(alignment: .bottom) {

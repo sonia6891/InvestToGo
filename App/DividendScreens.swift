@@ -271,7 +271,7 @@ struct DividendsView: View {
 /// - 記一筆配息: when the store reports experience earned by a new dividend record, it waits for the form to close,
 ///   then drops a coin and shows 「記一筆配息 +20 經驗」 on whatever page the viewer is on. Rewards that arrive together
 ///   are shown as one sum; one arriving while the toast is up replaces it and restarts its timer.
-/// - one-line notices from `store.pendingNotice` (「收進圖鑑 +30 經驗」 on a fund's first 詳情), without a coin.
+/// - one-line notices from `store.pendingNotice` (such as a membership lapse), without a coin.
 /// With Reduce Motion the toast and coin only fade.
 struct RewardToast: View {
     @EnvironmentObject var store: PortfolioStore

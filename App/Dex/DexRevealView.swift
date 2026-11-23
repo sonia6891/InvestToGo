@@ -33,7 +33,8 @@ struct DexRevealItem: Identifiable, Equatable {
 }
 
 /// The first 詳情 visit of a fund (spec 7): the card's back, a flip to its face, the reward, then 收下 / 看圖鑑.
-/// A tap anywhere while it plays jumps to the end; 收下 and 看圖鑑 take their own taps at any moment.
+/// A tap anywhere while it plays jumps to the final state; the buttons are hidden until then, so that first tap only
+/// skips and 收下 / 看圖鑑 take taps once they show. The two-finger VoiceOver escape does what 收下 does.
 struct DexRevealView: View {
     let item: DexRevealItem
     let onAccept: () -> Void
@@ -48,6 +49,8 @@ struct DexRevealView: View {
     @State private var showFace: Bool
     @State private var faceOpacity: Double
     @State private var skipped = false
+    /// The reward tag's own size before it is scaled up.
+    @State private var tagSize = CGSize.zero
     /// Opened on a given phase by tests: the facts are then built at render time (ImageRenderer never runs `.task`).
     private let seeded: Bool
     @AccessibilityFocusState private var acceptFocused: Bool
@@ -95,7 +98,11 @@ struct DexRevealView: View {
             // The skin's own tag, as LEVEL×UP draws its reason: ink, or a block or seam, never the bare accent on the page
             // (the sketch skin's pale yellow would not read on paper).
             SkinTag(DexReveal.rewardText(item.visit))
+                .fixedSize()
+                .onGeometryChange(for: CGSize.self) { $0.size } action: { tagSize = $0 }
                 .scaleEffect(1.5)
+                // scaleEffect takes no layout room, so the frame grows to the scaled height (large text sizes).
+                .frame(height: tagSize.height > 0 ? tagSize.height * 1.5 : nil)
                 .padding(.vertical, 8)
                 .opacity(phase >= .reward ? 1 : 0)
                 .offset(y: phase >= .reward || reduceMotion ? 0 : 8)
@@ -121,6 +128,7 @@ struct DexRevealView: View {
         .contentShape(Rectangle())
         .onTapGesture { skip() }
         .accessibilityElement(children: .contain)
+        .accessibilityAction(.escape) { onAccept() }
         .accessibilityIdentifier("dex-reveal")
         .onChange(of: phase) { _, now in if now == .buttons { acceptFocused = true } }
         .onAppear { if phase == .buttons { acceptFocused = true } }

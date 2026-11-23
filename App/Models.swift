@@ -8,7 +8,7 @@ import SwiftUI
     /// 記一筆配息 rewards earned but not yet shown, in experience. In memory only: the root-level `RewardToast`
     /// shows them wherever the viewer is once the form has closed, then clears them (ruling R25).
     @Published var pendingReward = 0
-    /// A one-line notice for the same root toast region (e.g. 「收進圖鑑 +30 經驗」), shown once and cleared.
+    /// A one-line notice for the same root toast region (e.g. a membership lapse), shown once and cleared.
     @Published var pendingNotice: String?
     /// A refresh somebody asked for is under way: 更新報價 and 立即更新 say 「更新中…」 and wait.
     @Published var refreshing = false

@@ -9,7 +9,7 @@ import Foundation
 /// - `--open levelup`: the current level's LEVEL×UP is still to be shown (needs a level above 1).
 /// - `--demo-pocket`: four sample holdings, one of them at a loss, and a year of received dividends (`seedPocket`).
 /// - `--demo-active`: 00982A in the favourites with two days of holdings (`seedActive`), for 主動式追蹤.
-/// - `--quiet-toasts`: no first-time notices (「收進圖鑑 +30 經驗」), so screenshots are the same every run.
+/// - `--quiet-toasts`: no first-time notices and no dex card reveal, so screenshots are the same every run.
 /// - `--demo-store`: the App Store screenshots' state. `--demo-member`, `--demo-pocket` and `--demo-active` in one, and
 ///   on top of them someone a year in (`seedStoreGame`, `seedStore`).
 ///
