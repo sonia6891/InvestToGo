@@ -17,7 +17,7 @@ final class OpeningTests: XCTestCase {
     }
 
     func testPoseStartsHiddenAndEndsOnTheFinalFrameInEverySkin() {
-        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+        for id in Skins.all.map(\.id) {
             let motion = SkinMotion.of(Skins.named(id))
             let start = OpeningPose.at(0, motion: motion)
             XCTAssertEqual(start.ringOpacity, 0, id)
