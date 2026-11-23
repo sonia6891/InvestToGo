@@ -60,7 +60,7 @@ final class SkinsTests: XCTestCase {
     }
     /// Black-gold is free, sketch opens at LV.5, pixel at LV.10, stitch only for members; members get all four.
     func testIsUnlocked() {
-        func open(_ level: Int, member: Bool) -> [String] { Skins.all.filter { Skins.isUnlocked($0, level: level, member: member) }.map(\.id) }
+        func open(_ level: Int, member: Bool) -> [String] { Skins.all.filter { Skins.isUnlocked($0, level: level, member: member, achievements: []) }.map(\.id) }
         XCTAssertEqual(open(1, member: false), ["blackgold"])
         XCTAssertEqual(open(4, member: false), ["blackgold"])
         XCTAssertEqual(open(5, member: false), ["blackgold", "sketch"])

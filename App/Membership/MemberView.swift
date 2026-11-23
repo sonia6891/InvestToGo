@@ -205,7 +205,7 @@ enum PlanPrice {
         guard wardrobe.takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
         // The 7 days' own notice only for the take-off their end caused: a skin a membership would keep on, taken off
         // after the end, the first time, for someone never a member (`takeSkinBackAtEnd`). Any other: the lapse's.
-        let atEnd = !isMember && Skins.isUnlocked(worn, level: level(), member: true) && memberOpen.takeSkinBackAtEnd()
+        let atEnd = !isMember && Skins.isUnlocked(worn, level: level(), member: true, achievements: []) && memberOpen.takeSkinBackAtEnd()
         if atEnd { skinBackAtEnd = true }
         onLapse(atEnd ? MemberOpenCopy.skinNotice : Self.lapseNotice)
     }

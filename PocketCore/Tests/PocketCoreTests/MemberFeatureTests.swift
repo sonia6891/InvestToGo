@@ -41,9 +41,9 @@ final class MemberFeatureTests: XCTestCase {
         XCTAssertFalse(Upcoming.visible)
         let wall = Achievements.shown()
         XCTAssertFalse(wall.contains { $0.comingSoon })
-        XCTAssertEqual(wall.map(\.id), ["dividendStreak", "holdingAnniversary", "dcaPunchCard", "steadyYear", "reconcileMaster", "feeSaver", "dexCollector", "dividendMilestone"])
+        XCTAssertEqual(wall.map(\.id), ["dividendStreak", "holdingAnniversary", "dcaPunchCard", "steadyYear", "reconcileMaster", "feeSaver", "dexCollector", "exDividendSkin", "dividendMilestone"])
         XCTAssertEqual(Achievements.shown(upcoming: true).count, Achievements.all.count, "Nothing was deleted")
-        XCTAssertEqual(Achievements.shown(upcoming: false).count, Achievements.all.count - 3)
+        XCTAssertEqual(Achievements.shown(upcoming: false).count, Achievements.all.count - 2)
     }
 
     /// The pitch says what the screen shows (holdings added, dropped, reweighted), not a daily list of trades.

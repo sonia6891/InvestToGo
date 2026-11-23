@@ -851,15 +851,18 @@ final class ETFToGoUITests: XCTestCase {
         let locked = app.descendants(matching: .any)
             .matching(NSPredicate(format: "identifier BEGINSWITH 'achievement-' AND value MATCHES %@", "^[0-9]+ / [0-9]+$"))
         XCTAssertGreaterThan(locked.count, 0, "A locked achievement shows its progress as numbers")
-        // No feature counts 體檢完成, 除息季限定皮膚 or 口袋年報 yet: they are not on the wall, and nothing on it says
-        // 「即將推出」 (App Review, guideline 2.1). The count is out of the eight that can be reached.
-        XCTAssertTrue(app.staticTexts["achievements-count"].label.hasSuffix(" / 8"), app.staticTexts["achievements-count"].label)
+        // No feature counts 體檢完成 or 口袋年報 yet: they are not on the wall, and nothing on it says 「即將推出」
+        // (App Review, guideline 2.1). 除息季限定外觀主題 is on it. The count is out of the nine that can be reached.
+        XCTAssertTrue(app.staticTexts["achievements-count"].label.hasSuffix(" / 9"), app.staticTexts["achievements-count"].label)
         let last = app.descendants(matching: .any)["achievement-dividendMilestone"]
         if !last.exists { app.swipeUp() }
         XCTAssertTrue(last.waitForExistence(timeout: 5), "The last one on the wall is in view, so the whole wall has been drawn")
-        for hidden in ["checkupDone", "exDividendSkin", "yearReport"] {
+        for hidden in ["checkupDone", "yearReport"] {
             XCTAssertFalse(app.descendants(matching: .any)["achievement-\(hidden)"].exists, "\(hidden) is not shown")
         }
+        let season = app.descendants(matching: .any)["achievement-exDividendSkin"]
+        XCTAssertTrue(season.exists, "除息季限定外觀主題 is on the wall")
+        XCTAssertEqual(season.value as? String, "0 / 1")
         XCTAssertEqual(app.descendants(matching: .any).matching(NSPredicate(format: "value == %@ OR label CONTAINS %@", "即將推出", "即將推出")).count, 0)
         sleep(1); capture(app, "achievements")
     }

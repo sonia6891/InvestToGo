@@ -236,10 +236,10 @@ final class GameTriggerTests: XCTestCase {
     // MARK: Coming soon
 
     func testAchievementsWithoutAFeatureAreComingSoonAndNeverUnlock() {
-        XCTAssertEqual(Set(Achievements.all.filter(\.comingSoon).map(\.id)), ["checkupDone", "exDividendSkin", "yearReport"])
+        XCTAssertEqual(Set(Achievements.all.filter(\.comingSoon).map(\.id)), ["checkupDone", "yearReport"])
         var g = GameState()
         g.count(.checkup); g.count(.exDividendSeason); g.count(.yearReport)
         let fresh = g.refreshAchievements(Portfolio(), now: now)
-        for id in ["checkupDone", "exDividendSkin", "yearReport"] { XCTAssertFalse(fresh.contains(id), id) }
+        for id in ["checkupDone", "yearReport"] { XCTAssertFalse(fresh.contains(id), id) }
     }
 }

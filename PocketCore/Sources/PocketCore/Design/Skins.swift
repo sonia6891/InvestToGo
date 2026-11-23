@@ -90,13 +90,16 @@ struct SkinFeedback: Equatable, Decodable {
 
 enum SkinUnlock: Equatable, Decodable {
     case free, level(Int), member
-    private enum Keys: String, CodingKey { case kind, level }
+    /// Opens for good once this achievement is unlocked (and for members), e.g. 收成 with 除息季.
+    case achievement(String)
+    private enum Keys: String, CodingKey { case kind, level, id }
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: Keys.self)
         switch try c.decode(String.self, forKey: .kind) {
         case "free": self = .free
         case "member": self = .member
         case "level": self = .level(try c.decode(Int.self, forKey: .level))
+        case "achievement": self = .achievement(try c.decode(String.self, forKey: .id))
         case let other: throw DecodingError.dataCorruptedError(forKey: .kind, in: c, debugDescription: "Unknown unlock \(other)")
         }
     }
@@ -153,12 +156,13 @@ enum Skins {
     static func named(_ id: String) -> Skin { all.first { $0.id == id } ?? all.first { $0.id == "blackgold" } ?? all[0] }
     static let carouselOrder = ["voxel", "blackgold", "stitch", "sketch"]
     /// Whether a skin can be worn: black-gold always, a level skin from its level on (G3, G6), and every skin for
-    /// members (2026-11-11 文件第 7 節).
-    static func isUnlocked(_ skin: Skin, level: Int, member: Bool) -> Bool {
+    /// members (2026-11-11 文件第 7 節). 收成 opens with its achievement (除息季) or for members.
+    static func isUnlocked(_ skin: Skin, level: Int, member: Bool, achievements: Set<String>) -> Bool {
         switch skin.unlock {
         case .free: return true
         case .level(let needed): return member || level >= needed
         case .member: return member
+        case .achievement(let id): return member || achievements.contains(id)
         }
     }
 }

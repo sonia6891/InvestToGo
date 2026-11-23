@@ -18,7 +18,7 @@ let feeSaverGoal = 3
 let checkupDoneGoal = 1
 /// Dex cards collected. Source: spec 6.5 ETF 圖鑑 (controller ruling).
 let dexCollectorGoal = 10
-/// Ex-dividend season skin unlocked. Source: spec 6.5 除息季限定皮膚.
+/// Ex-dividend season theme unlocked. Source: spec 6.5 除息季限定外觀主題.
 let exDividendSkinGoal = 1
 /// Year reports opened. Source: spec 6.5 口袋年報.
 let yearReportGoal = 1
@@ -41,6 +41,9 @@ struct Achievement: Identifiable {
 }
 
 enum Achievements {
+    /// The id of 除息季限定外觀主題, spelled once for skins.json and Swift.
+    static let exDividendSkinID = "exDividendSkin"
+
     /// Longest run of consecutive months that have at least one paid dividend.
     static func longestDividendRun(_ p: Portfolio) -> Int {
         let months = Set(p.dividends.filter { $0.status == .paid }.map { YearMonth($0.date) })
@@ -74,7 +77,7 @@ enum Achievements {
         Achievement(id: "feeSaver", title: "省費達人", goal: feeSaverGoal) { g, _, _ in g.counter(.feeCompared) },
         Achievement(id: "checkupDone", title: "體檢完成", goal: checkupDoneGoal, comingSoon: true) { g, _, _ in g.counter(.checkup) },
         Achievement(id: "dexCollector", title: "ETF 圖鑑", goal: dexCollectorGoal) { g, _, _ in g.collected.count },
-        Achievement(id: "exDividendSkin", title: "除息季限定外觀主題", goal: exDividendSkinGoal, comingSoon: true) { g, _, _ in g.counter(.exDividendSeason) },
+        Achievement(id: "exDividendSkin", title: "除息季限定外觀主題", goal: exDividendSkinGoal) { g, _, _ in g.counter(.exDividendSeason) },
         Achievement(id: "yearReport", title: "口袋年報", goal: yearReportGoal, comingSoon: true) { g, _, _ in g.counter(.yearReport) },
         Achievement(id: "dividendMilestone", title: "累計領息里程碑", goal: dividendMilestoneGoal) { _, p, _ in p.dividends.filter { $0.status == .paid }.count }
     ]

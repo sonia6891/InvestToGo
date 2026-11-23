@@ -6,7 +6,7 @@ enum SkinStatus: Equatable {
 
     init(_ skin: Skin, current: String, level: Int, member: Bool) {
         if skin.id == current { self = .wearing }
-        else if Skins.isUnlocked(skin, level: level, member: member) { self = .unlocked }
+        else if Skins.isUnlocked(skin, level: level, member: member, achievements: []) { self = .unlocked }
         else if case .level(let needed) = skin.unlock { self = .needsLevel(needed) }
         else { self = .needsMember }
     }

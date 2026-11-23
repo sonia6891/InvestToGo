@@ -23,6 +23,18 @@ extension GameState {
         if migration < 1 { backfillDCA(from: p) }
         if migratedAt == nil { migratedAt = now }
         migration = max(migration, GameMigration.current)
+        recordDividendSeason(p, now: now)
+    }
+
+    /// 除息季: a dividend whose payment date falls in July to September (Taipei time, any year, any status) counts once
+    /// and unlocks 收成 for good. It is not experience: no xp, coins or monthly cap. True only on the call that unlocks.
+    @discardableResult mutating func recordDividendSeason(_ p: Portfolio, now: Date) -> Bool {
+        guard counter(.exDividendSeason) == 0,
+              p.dividends.contains(where: { (7...9).contains(GameRules.taipei.component(.month, from: $0.date)) })
+        else { return false }
+        count(.exDividendSeason)
+        if unlocked[Achievements.exDividendSkinID] == nil { unlocked[Achievements.exDividendSkinID] = now }
+        return true
     }
 
     /// Every month with a buy in the records (the trade log's buys and the holdings' purchase dates) becomes a DCA
