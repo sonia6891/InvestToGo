@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>NSPrivacyTracking</key><false/>
+<key>NSPrivacyTrackingDomains</key><array/>
+<key>NSPrivacyCollectedDataTypes</key><array/>
+<!-- The widget collects nothing and tracks nothing. PocketCore is compiled into it, and PocketCore's SellCosts reads
+     UserDefaults.standard (the app's own settings), so the binary can reference it: CA92.1. Nothing else in
+     PocketCore touches file timestamps, disk space, system boot time or active keyboards. -->
+<key>NSPrivacyAccessedAPITypes</key><array>
+<dict>
+<key>NSPrivacyAccessedAPIType</key><string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+<key>NSPrivacyAccessedAPITypeReasons</key><array><string>CA92.1</string></array>
+</dict>
+</array>
+</dict></plist>

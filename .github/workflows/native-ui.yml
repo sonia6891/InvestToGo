@@ -195,6 +195,10 @@ jobs:
             test -z "$(find "$APPEX" -name "$fund")" || { echo "::error::the widget carries $fund"; exit 1; }
           done
           echo 'Verified the widget extension holds none of catalog.json, annual-fees.json and official-dividends.json'
+          # The widget's own privacy manifest: App Store Connect scans each bundle's required-reason APIs by itself.
+          test -f "$APPEX/PrivacyInfo.xcprivacy" || { echo "::error::the widget has no PrivacyInfo.xcprivacy"; exit 1; }
+          python3 -c "import plistlib,sys; p=plistlib.loads(open(sys.argv[1],'rb').read()); assert p['NSPrivacyTracking'] is False and p['NSPrivacyCollectedDataTypes']==[] and [a['NSPrivacyAccessedAPIType'] for a in p['NSPrivacyAccessedAPITypes']]==['NSPrivacyAccessedAPICategoryUserDefaults'], p" "$APPEX/PrivacyInfo.xcprivacy"
+          echo 'Verified the widget extension carries its privacy manifest'
       - name: Set up Pillow for the blank-frame checks
         run: |
           set -euo pipefail
