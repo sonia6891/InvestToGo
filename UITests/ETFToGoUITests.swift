@@ -152,7 +152,7 @@ final class ETFToGoUITests: XCTestCase {
     }
     /// The skin kit's component sheet in each skin, to compare with the four-skin canvas.
     func testSkinKitSheet() {
-        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+        for id in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--skin", id, "--open", "skinKit"]; app.launch()
             XCTAssertTrue(app.descendants(matching: .any)["skinkit-root"].waitForExistence(timeout: 10), "\(id): the skin kit sheet opens")
             sleep(1)
@@ -232,7 +232,7 @@ final class ETFToGoUITests: XCTestCase {
     }
 
     func testHugeStreakFits() {
-        for skin in ["blackgold", "voxel", "stitch", "sketch"] {
+        for skin in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = launch(["--demo-streak", "120", "--skin", skin])
             let hero = app.descendants(matching: .any)["連續定投 120 個月"]
             XCTAssertTrue(hero.waitForExistence(timeout: 10), "\(skin): the hero shows 120")
@@ -398,7 +398,7 @@ final class ETFToGoUITests: XCTestCase {
 
     /// 找 ETF, the detail and the dex card in each skin, to compare with the canvas.
     func testFindDetailAndDexInEverySkin() {
-        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+        for id in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = launch(["--skin", id, "--open", "find"])
             let search = app.textFields["fund-search"]
             XCTAssertTrue(search.waitForExistence(timeout: 10), "\(id): 找 ETF opens")
@@ -418,7 +418,7 @@ final class ETFToGoUITests: XCTestCase {
 
     /// The lobby and the quick pick in each skin, to compare with the canvas.
     func testLobbyAndQuickPickInEverySkin() {
-        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+        for id in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = launch(["--demo-streak", "12", "--demo-level", "7", "--skin", id])
             XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 10), "\(id): the lobby opens")
             sleep(2); capture(app, "lobby-\(id)")
@@ -570,7 +570,7 @@ final class ETFToGoUITests: XCTestCase {
     /// 口袋 and 配息 with sample holdings in each skin, to compare with the canvas. A loss is shown honestly: ▼ and
     /// its size, spoken as 下跌.
     func testPocketAndDividendsInEverySkin() {
-        for id in ["blackgold", "voxel", "stitch", "sketch"] {
+        for id in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = launch(["--demo-pocket", "--skin", id, "--open", "pocket"])
             let total = app.staticTexts["portfolio-value"]
             XCTAssertTrue(total.waitForExistence(timeout: 10), "\(id): the pocket shows its total")
@@ -652,7 +652,7 @@ final class ETFToGoUITests: XCTestCase {
         waitForLabel(status, containing: "使用中")
         waitForLabel(apply, "← 滑動試穿 →")
         sleep(1); capture(app, "skins-blackgold")
-        for id in ["voxel", "blackgold", "stitch", "sketch"] { XCTAssertTrue(app.buttons["skin-badge-\(id)"].exists, "\(id) has a style badge") }
+        for id in ["voxel", "blackgold", "stitch", "sketch", "harvest"] { XCTAssertTrue(app.buttons["skin-badge-\(id)"].exists, "\(id) has a style badge") }
         app.buttons["skin-badge-stitch"].tap()
         waitForLabel(status, containing: "會員")
         waitForLabel(apply, "看會員")
@@ -672,11 +672,38 @@ final class ETFToGoUITests: XCTestCase {
                                     "The lobby is on sketch paper: \(colours.map { String(format: "%06X", $0) })")
     }
 
+    /// 收成 before the season: its tag names the way in, the button goes to the wall, and nothing says 「即將推出」.
+    func testHarvestLockedShowsTheSeason() {
+        let app = launch(["--demo-level", "7", "--open", "skins"])
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "外觀主題 opens")
+        app.buttons["skin-badge-harvest"].tap()
+        waitForLabel(app.descendants(matching: .any)["skin-status"], "7–9 月記一筆配息解鎖")
+        waitForLabel(app.buttons["skin-apply"], "看成就")
+        let promised = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS '即將推出' OR value CONTAINS '即將推出'"))
+        XCTAssertEqual(promised.count, 0, "Never 「即將推出」")
+        app.buttons["skin-apply"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["achievement-exDividendSkin"].waitForExistence(timeout: 5), "看成就 opens the wall at 除息季")
+    }
+
+    /// --demo-pocket saves last year's July and August sample dividends, so 收成 is open and can be worn.
+    func testHarvestOpenAfterASeasonDividend() {
+        let app = launch(["--demo-level", "7", "--demo-pocket", "--open", "skins"])
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "外觀主題 opens")
+        app.buttons["skin-badge-harvest"].tap()
+        waitForLabel(app.descendants(matching: .any)["skin-status"], containing: "除息季成就 · 已解鎖")
+        waitForLabel(app.buttons["skin-apply"], "換上這套")
+        app.buttons["skin-apply"].tap()
+        XCTAssertTrue(app.buttons["lobby-find"].waitForExistence(timeout: 5), "換上這套 goes back to the lobby")
+        sleep(2); capture(app, "lobby-after-harvest")
+        XCTAssertTrue(sameColour(pixel(app, CGVector(dx: 0.5, dy: 0.15)), 0xF5EEDC), "The lobby is on rice paper")
+    }
+
     /// The carousel cards show no figures (spec 5.13): no label on the page is a bare number.
     func testCarouselShowsNoNumbers() {
         let app = launch(["--demo-level", "7", "--demo-streak", "12", "--open", "tools"])
         openSkins(app)
-        for id in ["voxel", "blackgold", "stitch", "sketch"] {
+        for id in ["voxel", "blackgold", "stitch", "sketch", "harvest"] {
             app.buttons["skin-badge-\(id)"].tap(); sleep(1)
             let labels: [String] = app.staticTexts.allElementsBoundByIndex.map { $0.label }
             let bare = labels.filter(isBareNumber)

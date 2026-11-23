@@ -2,17 +2,18 @@ import SwiftUI
 
 /// Where a skin stands for this player: worn now, free to put on, or locked behind a level or membership.
 enum SkinStatus: Equatable {
-    case wearing, unlocked, needsLevel(Int), needsMember
+    case wearing, unlocked, needsLevel(Int), needsMember, needsAchievement
 
-    init(_ skin: Skin, current: String, level: Int, member: Bool) {
+    init(_ skin: Skin, current: String, level: Int, member: Bool, achievements: Set<String>) {
         if skin.id == current { self = .wearing }
-        else if Skins.isUnlocked(skin, level: level, member: member, achievements: []) { self = .unlocked }
+        else if Skins.isUnlocked(skin, level: level, member: member, achievements: achievements) { self = .unlocked }
         else if case .level(let needed) = skin.unlock { self = .needsLevel(needed) }
+        else if case .achievement = skin.unlock { self = .needsAchievement }
         else { self = .needsMember }
     }
 
     /// The tag under the name, e.g. 「LV.5 已解鎖 · 你是 LV.7」.
-    func tag(_ skin: Skin, level: Int, member: Bool) -> String {
+    func tag(_ skin: Skin, level: Int, member: Bool, achievements: Set<String> = []) -> String {
         switch self {
         case .wearing: return skin.unlock == .free ? "預設外觀主題 · 使用中" : "使用中"
         case .unlocked:
@@ -20,10 +21,11 @@ enum SkinStatus: Equatable {
             case .free: return "預設外觀主題 · 已解鎖"
             case .level(let needed): return member && level < needed ? "會員 · 已解鎖" : "LV.\(needed) 已解鎖 · 你是 LV.\(level)"
             case .member: return "會員 · 已解鎖"
-            case .achievement: return member ? "會員 · 已解鎖" : "已解鎖"
+            case .achievement(let id): return member && !achievements.contains(id) ? "會員 · 已解鎖" : "除息季成就 · 已解鎖"
             }
         case .needsLevel(let needed): return "LV.\(needed) 解鎖 · 你是 LV.\(level)"
         case .needsMember: return "會員專屬"
+        case .needsAchievement: return "7–9 月記一筆配息解鎖"
         }
     }
 
@@ -34,6 +36,7 @@ enum SkinStatus: Equatable {
         case .unlocked: return "已解鎖"
         case .needsLevel(let needed): return "LV.\(needed)"
         case .needsMember: return "會員"
+        case .needsAchievement: return "除息季"
         }
     }
 }
@@ -45,12 +48,13 @@ extension Skin {
         case "voxel": return "方塊疊出來的世界，硬陰影配 8-bit 的「叮」。"
         case "stitch": return "牛皮紙剪貼，一圈縫線，硬幣被縫進口袋。"
         case "sketch": return "白紙上的鉛筆塗鴉，最安靜的一套。"
+        case "harvest": return "剪紙稻穗配米白紙底，風一吹就輕輕擺動。"
         default: return "啞光黑黏土配漆金，金幣掉進錢袋。"
         }
     }
 }
 
-/// 換膚 (spec 5.13): the four skins as cards, then the focused one's name, status, a sentence, the style badges and
+/// 換膚 (spec 5.13): the skins as cards, then the focused one's name, status, a sentence, the style badges and
 /// one button. Holding a card tries the skin on full screen until the finger lifts; only 「換上這套」 changes the app.
 struct SkinsView: View {
     @EnvironmentObject var store: PortfolioStore
@@ -66,7 +70,8 @@ struct SkinsView: View {
     var body: some View {
         let level = GameRules.level(xp: (store.data.game ?? GameState()).xp), member = membership.wearsMemberSkins
         let focused = Skins.named(focus ?? skins.skin.id)
-        let status = SkinStatus(focused, current: skins.skin.id, level: level, member: member)
+        let achievements = Set((store.data.game?.unlocked ?? [:]).keys)
+        let status = SkinStatus(focused, current: skins.skin.id, level: level, member: member, achievements: achievements)
         Page {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text("外觀主題").skinFont(.title(30)).skinForeground(\.ink)
@@ -77,13 +82,13 @@ struct SkinsView: View {
                 pageDots(focused.id)
                 Text(focused.name).skinFont(.title(28)).skinForeground(\.ink)
                     .accessibilityIdentifier("skin-name")
-                SkinTag(status.tag(focused, level: level, member: member))
+                SkinTag(status.tag(focused, level: level, member: member, achievements: achievements))
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(status.tag(focused, level: level, member: member))
+                    .accessibilityLabel(status.tag(focused, level: level, member: member, achievements: achievements))
                     .accessibilityIdentifier("skin-status")
                 Text(focused.pitch).skinFont(.body(13)).skinForeground(\.sub)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                badges(level: level, member: member)
+                badges(level: level, member: member, achievements: achievements)
                 applyButton(focused, status: status)
                     .padding(.top, 4)
             }
@@ -94,7 +99,7 @@ struct SkinsView: View {
         .task { await membership.start() }
     }
 
-    /// One dot per skin, the focused one long, and 「n / 4」.
+    /// One dot per skin, the focused one long, and 「n / m」.
     private func pageDots(_ id: String) -> some View {
         let order = Skins.carouselOrder, index = order.firstIndex(of: id) ?? 0
         return HStack(spacing: 7) {
@@ -109,11 +114,11 @@ struct SkinsView: View {
     }
 
     /// The four style badges, each in its own skin's drawing on its own page colour; tapping one turns to its card.
-    private func badges(level: Int, member: Bool) -> some View {
+    private func badges(level: Int, member: Bool, achievements: Set<String>) -> some View {
         HStack(spacing: 18) {
             ForEach(Skins.carouselOrder, id: \.self) { id in
                 let item = Skins.named(id), on = id == (focus ?? skins.skin.id)
-                let status = SkinStatus(item, current: skins.skin.id, level: level, member: member)
+                let status = SkinStatus(item, current: skins.skin.id, level: level, member: member, achievements: achievements)
                 Button {
                     withAnimation(reduceMotion ? nil : .snappy) { focus = id }
                     SoundFX.tick(enabled: skins.soundOn)
@@ -160,6 +165,10 @@ struct SkinsView: View {
         case .needsMember:
             // 換膚 is opened from 會員, one step back.
             SkinButton("看會員", primary: false) { dismiss() }
+                .accessibilityIdentifier("skin-apply")
+        case .needsAchievement:
+            // 除息季 lives on the wall of achievements.
+            SkinButton("看成就", primary: false) { navigation.open(.achievements) }
                 .accessibilityIdentifier("skin-apply")
         }
     }

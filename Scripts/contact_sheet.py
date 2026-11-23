@@ -20,6 +20,7 @@ SKINS = [
     ("voxel", "像素", "SKN 002"),
     ("stitch", "縫線", "SKN 003"),
     ("sketch", "手繪", "SKN 004"),
+    ("harvest", "收成", "SKN 005"),
 ]
 # Columns, left to right, in the order of the brief (Task 13), then two 口袋會員 pages as a member: (file id, label).
 SCREENS = [

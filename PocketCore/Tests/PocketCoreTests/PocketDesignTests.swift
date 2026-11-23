@@ -26,7 +26,7 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.all.map(\.id), ["blackgold", "voxel", "stitch", "sketch", "harvest"])
         XCTAssertEqual(Skins.all.map(\.name), ["黑金", "像素", "縫線", "手繪", "收成"])
         XCTAssertEqual(Skins.default.id, "blackgold")
-        XCTAssertEqual(Skins.carouselOrder, ["voxel", "blackgold", "stitch", "sketch"])
+        XCTAssertEqual(Skins.carouselOrder, ["voxel", "blackgold", "stitch", "sketch", "harvest"])
     }
     func testColorsMatchSpec() {
         let gold = Skins.named("blackgold").colors

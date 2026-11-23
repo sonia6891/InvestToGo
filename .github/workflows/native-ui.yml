@@ -34,12 +34,12 @@ jobs:
           node design/3d/skins/harvest/harvest.mjs "$RUNNER_TEMP/harvest"
           diff -r "$RUNNER_TEMP/harvest" design/3d/skins/harvest --exclude=harvest.mjs
   skin-matrix:
-    # The four-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
+    # The five-skin screenshot matrix (Task 13): every skin × the screens on the design canvas, named
     # <skin>-<screen>.png, then one contact sheet laid out like the canvas. Its own job beside `simulator` so the
-    # 52 launches never push that job past its limit.
+    # 65 launches never push that job past its limit.
     needs: core
     runs-on: macos-26
-    timeout-minutes: 40
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
       - name: Generate complete Xcode project
@@ -71,9 +71,9 @@ jobs:
           set -euo pipefail
           python3 -m venv build/venv
           build/venv/bin/pip install --quiet pillow==12.3.0
-      - name: Capture four skins × thirteen screens
-        # No continue-on-error: fewer than 52 shots fails the job (the artifact is still published below).
-        timeout-minutes: 20
+      - name: Capture five skins × thirteen screens
+        # No continue-on-error: fewer than 65 shots fails the job (the artifact is still published below).
+        timeout-minutes: 25
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
@@ -88,7 +88,7 @@ jobs:
           # `SkinCard`, and these shots are where that is judged in every skin.
           SCREENS="splash onboarding lobby find detail dex pocket dividends tools skins achievements report priceAlerts"
           # Rows in the global-constraints order, as the skinKit loop.
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             for SCREEN in $SCREENS; do
               case "$SCREEN" in
                 onboarding) OPEN="onboarding --page 1"; NAME=onboarding1 ;;
@@ -116,8 +116,8 @@ jobs:
             done
           done
           COUNT=$(ls build/matrix/*.png 2>/dev/null | wc -l | tr -d ' ')
-          echo "captured $COUNT of 52"
-          if [ "$COUNT" -ne 52 ]; then echo "::error::skin matrix has $COUNT of 52 shots"; exit 1; fi
+          echo "captured $COUNT of 65"
+          if [ "$COUNT" -ne 65 ]; then echo "::error::skin matrix has $COUNT of 65 shots"; exit 1; fi
       - name: Lay out the contact sheet
         if: always()
         run: build/venv/bin/python Scripts/contact_sheet.py build/matrix build/matrix/contact-sheet.png
@@ -135,7 +135,7 @@ jobs:
     runs-on: macos-26
     # 55 + the Release compile and the App Store screens below (up to about 15 more: two of them wait for real
     # data, a first 回測 download alone takes about four minutes).
-    timeout-minutes: 90
+    timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
       - name: Generate complete Xcode project
@@ -280,13 +280,13 @@ jobs:
           sleep 5
           xcrun simctl io "$DEVICE" screenshot "build/screens/screen-dex-reveal.png"
       - name: Capture the skin kit sheet in every skin
-        timeout-minutes: 4
+        timeout-minutes: 5
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open skinKit
             sleep 8
@@ -300,14 +300,14 @@ jobs:
       # 圖鑑卡翻面: the reveal in every 外觀主題. Its own step (a launch can take over a minute on a busy runner), and the
       # check after the tests fails the job when one of the four is missing or blank.
       - name: Capture the card reveal in every skin
-        timeout-minutes: 12
+        timeout-minutes: 15
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
         run: |
           set -euo pipefail
           # The card reveal in every 外觀主題, to check the face, the reward and both buttons read in each.
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --skin "$SKIN" --open detail --symbol 0050
             sleep 6
@@ -316,7 +316,7 @@ jobs:
       # App 上鎖 (2026-11-22 design): 設定 › 隱私與安全 with its 「App 上鎖」 card, and the lock screen (`--lock`) in every
       # 外觀主題. Their own step, so the screens above are untouched.
       - name: Capture the app lock in every skin
-        timeout-minutes: 3
+        timeout-minutes: 4
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -326,7 +326,7 @@ jobs:
           xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --open privacy || echo "::warning::launch failed for privacy"
           sleep 5
           xcrun simctl io "$DEVICE" screenshot "build/screens/screen-privacy.png" || true
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             xcrun simctl terminate "$DEVICE" tw.sonia.etftogo.uireview || true
             xcrun simctl launch "$DEVICE" tw.sonia.etftogo.uireview --ui-testing --reset --skip-onboarding --lock --skin "$SKIN" || echo "::warning::launch failed for lock-$SKIN"
             sleep 5
@@ -337,7 +337,7 @@ jobs:
       # (`--member-open 8`) in every 外觀主題, and day 1's and day 5's notes. Their own step, so the screens above are
       # untouched.
       - name: Capture 口袋會員全開 in every skin
-        timeout-minutes: 4
+        timeout-minutes: 5
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -351,7 +351,7 @@ jobs:
             sleep 7
             xcrun simctl io "$DEVICE" screenshot "build/screens/screen-member-open-$name.png" || true
           }
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             shot "banner-$SKIN" --member-open 2 --skin "$SKIN"
             shot "summary-$SKIN" --member-open 8 --skin "$SKIN"
           done
@@ -362,7 +362,7 @@ jobs:
       # --ui-testing, then holds on 略過) and the first launch (ends on 輕點開始). Its own folder and artifact: the
       # screenshots above are untouched.
       - name: Record the opening in every skin
-        timeout-minutes: 4
+        timeout-minutes: 5
         continue-on-error: true
         env:
           DEVICE: ${{ steps.device.outputs.udid }}
@@ -382,7 +382,7 @@ jobs:
             kill -INT "$recorder" || true
             wait "$recorder" || true
           }
-          for SKIN in blackgold voxel stitch sketch; do
+          for SKIN in blackgold voxel stitch sketch harvest; do
             record "$SKIN" --ui-testing --reset --skip-onboarding --opening --skin "$SKIN"
           done
           record first-launch --ui-testing --reset --opening

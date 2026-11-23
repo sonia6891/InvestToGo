@@ -154,7 +154,7 @@ enum Skins {
     static var `default`: Skin { named("blackgold") }
     /// Unknown or retired ids fall back to black-gold.
     static func named(_ id: String) -> Skin { all.first { $0.id == id } ?? all.first { $0.id == "blackgold" } ?? all[0] }
-    static let carouselOrder = ["voxel", "blackgold", "stitch", "sketch"]
+    static let carouselOrder = ["voxel", "blackgold", "stitch", "sketch", "harvest"]
     /// Whether a skin can be worn: black-gold always, a level skin from its level on (G3, G6), and every skin for
     /// members (2026-11-11 文件第 7 節). 收成 opens with its achievement (除息季) or for members.
     static func isUnlocked(_ skin: Skin, level: Int, member: Bool, achievements: Set<String>) -> Bool {
