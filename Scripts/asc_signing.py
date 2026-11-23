@@ -1,9 +1,10 @@
 """Temporary App Store signing from an App Store Connect API key alone, for the TestFlight workflow.
 
-prepare: finds the app's Bundle ID (and with it the team), creates an Apple Distribution certificate for a new key and an
-App Store provisioning profile for it, and leaves them for the keychain and the export: certificate.p12 and
-ExportOptions.plist in $RUNNER_TEMP/etf-signing, the profile in the provisioning folders, names and IDs in $GITHUB_ENV.
-cleanup: deletes that profile and revokes that certificate, so each run starts clean and the account's certificate limit
+prepare: finds the app's Bundle ID (and with it the team) and the home-screen widget's (<id>.widget), checks that both have
+App Groups on, creates an Apple Distribution certificate for a new key and an App Store provisioning profile for each
+bundle, and leaves them for the keychain and the export: certificate.p12 and ExportOptions.plist in
+$RUNNER_TEMP/etf-signing, the profiles in the provisioning folders, names and IDs in $GITHUB_ENV.
+cleanup: deletes those profiles and revokes that certificate, so each run starts clean and the account's certificate limit
 is never reached. Builds already uploaded are not affected: Apple re-signs them for TestFlight and the App Store.
 
 Environment: ASC_KEY_ID, ASC_ISSUER_ID, ETF_BUNDLE_ID, RUNNER_TEMP, GITHUB_ENV; the key in $RUNNER_TEMP/etf-signing/AuthKey.p8.
@@ -75,13 +76,57 @@ def write_env(**values: str) -> None:
             env.write(f"{name}={value}\n")
 
 
+def find_bundle(identifier: str) -> tuple[str, str]:
+    """(resource id, team seedId) of a Bundle ID; ApiError when the account has none."""
+    listed = call("GET", "bundleIds?limit=200&filter[identifier]=" + urllib.parse.quote(identifier))["data"]
+    found = [item for item in listed if item["attributes"]["identifier"] == identifier]
+    if not found:
+        if identifier.endswith(".widget"):
+            main = identifier[:-len(".widget")]
+            raise ApiError(f"App Store Connect 找不到小工具的 Bundle ID {identifier}；請先在開發者網站註冊它並開啟 App Groups（group.{main}）。")
+        raise ApiError(f"App Store Connect 找不到 Bundle ID {identifier}；請確認變數 ETF_BUNDLE_ID 與 App Store Connect 的 App 相同。")
+    return found[0]["id"], found[0]["attributes"]["seedId"]
+
+
+def require_app_groups(resource_id: str, identifier: str) -> None:
+    """ApiError unless the Bundle ID has the App Groups capability (the widget shares the app's data through one)."""
+    capabilities = call("GET", f"bundleIds/{resource_id}/bundleIdCapabilities")["data"]
+    if not any(c["attributes"].get("capabilityType") == "APP_GROUPS" for c in capabilities):
+        main = identifier[:-len(".widget")] if identifier.endswith(".widget") else identifier
+        raise ApiError(f"Bundle ID {identifier} 沒有開啟 App Groups；請在開發者網站開啟並指定 group.{main}。")
+
+
+def make_profile(bundle_resource_id: str, cert_id: str, name: str) -> tuple[str, str]:
+    """An App Store profile for one Bundle ID and the certificate, installed in both provisioning folders; (uuid, name)."""
+    profile = call("POST", "profiles", {"data": {"type": "profiles",
+        "attributes": {"name": name, "profileType": "IOS_APP_STORE"},
+        "relationships": {"bundleId": {"data": {"type": "bundleIds", "id": bundle_resource_id}},
+                          "certificates": {"data": [{"type": "certificates", "id": cert_id}]}}}})["data"]
+    write_env(**{"ASC_WIDGET_PROFILE_ID" if "Widget" in name else "ASC_PROFILE_ID": profile["id"]})  # recorded as soon as it exists, so cleanup deletes it even if a later step fails
+    uuid = profile["attributes"]["uuid"]
+    content = base64.b64decode(profile["attributes"]["profileContent"])
+    for directory in ("Library/Developer/Xcode/UserData/Provisioning Profiles", "Library/MobileDevice/Provisioning Profiles"):
+        target = pathlib.Path.home() / directory
+        target.mkdir(parents=True, exist_ok=True)
+        (target / f"{uuid}.mobileprovision").write_bytes(content)
+    return uuid, name
+
+
+def export_options(bundle: str, team: str, app_profile: str, widget_profile: str) -> dict:
+    return dict(method="app-store-connect", destination="upload", teamID=team, signingStyle="manual",
+                signingCertificate="Apple Distribution",
+                provisioningProfiles={bundle: app_profile, bundle + ".widget": widget_profile},
+                manageAppVersionAndBuildNumber=False, uploadSymbols=True, stripSwiftSymbols=True)
+
+
 def prepare() -> None:
     bundle = os.environ["ETF_BUNDLE_ID"]
-    listed = call("GET", "bundleIds?limit=200&filter[identifier]=" + urllib.parse.quote(bundle))["data"]
-    found = [item for item in listed if item["attributes"]["identifier"] == bundle]
-    if not found:
-        raise ApiError(f"App Store Connect 找不到 Bundle ID {bundle}；請確認變數 ETF_BUNDLE_ID 與 App Store Connect 的 App 相同。")
-    bundle_id, team = found[0]["id"], found[0]["attributes"]["seedId"]
+    widget = bundle + ".widget"
+    # Both ids and their App Groups are checked before anything is created, so a missing portal step costs nothing.
+    bundle_id, team = find_bundle(bundle)
+    widget_id, _ = find_bundle(widget)
+    require_app_groups(bundle_id, bundle)
+    require_app_groups(widget_id, widget)
 
     # What the account already holds: the distribution certificate limit is per team.
     existing = [c for c in call("GET", "certificates?limit=200")["data"]
@@ -116,25 +161,14 @@ def prepare() -> None:
                   .build(password.encode()))
     (folder / "certificate.p12").write_bytes(pkcs12.serialize_key_and_certificates(b"ETFToGo TestFlight", key, certificate, None, encryption))
 
-    name = f"ETFToGo TestFlight {os.environ.get('GITHUB_RUN_ID', int(time.time()))}"
-    profile = call("POST", "profiles", {"data": {"type": "profiles",
-        "attributes": {"name": name, "profileType": "IOS_APP_STORE"},
-        "relationships": {"bundleId": {"data": {"type": "bundleIds", "id": bundle_id}},
-                          "certificates": {"data": [{"type": "certificates", "id": cert["id"]}]}}}})["data"]
-    write_env(ASC_PROFILE_ID=profile["id"])
-    uuid = profile["attributes"]["uuid"]
-    content = base64.b64decode(profile["attributes"]["profileContent"])
-    for directory in ("Library/Developer/Xcode/UserData/Provisioning Profiles", "Library/MobileDevice/Provisioning Profiles"):
-        target = pathlib.Path.home() / directory
-        target.mkdir(parents=True, exist_ok=True)
-        (target / f"{uuid}.mobileprovision").write_bytes(content)
-
-    export = dict(method="app-store-connect", destination="upload", teamID=team, signingStyle="manual",
-                  signingCertificate="Apple Distribution", provisioningProfiles={bundle: name},
-                  manageAppVersionAndBuildNumber=False, uploadSymbols=True, stripSwiftSymbols=True)
-    (folder / "ExportOptions.plist").write_bytes(plistlib.dumps(export))
-    write_env(APPLE_TEAM_ID=team, PROFILE_UUID=uuid, PROFILE_NAME=name, P12_PASSWORD=password)
-    print(f"Prepared signing for {bundle} (team {team}) with a temporary certificate and profile.")
+    run = os.environ.get("GITHUB_RUN_ID", int(time.time()))
+    name, widget_name = f"ETFToGo TestFlight {run}", f"ETFToGo Widget TestFlight {run}"
+    uuid, _ = make_profile(bundle_id, cert["id"], name)
+    widget_uuid, _ = make_profile(widget_id, cert["id"], widget_name)
+    (folder / "ExportOptions.plist").write_bytes(plistlib.dumps(export_options(bundle, team, name, widget_name)))
+    write_env(APPLE_TEAM_ID=team, PROFILE_UUID=uuid, PROFILE_NAME=name, WIDGET_PROFILE_UUID=widget_uuid,
+              WIDGET_PROFILE_NAME=widget_name, P12_PASSWORD=password)
+    print(f"Prepared signing for {bundle} (team {team}) with a temporary certificate and profiles.")
 
 
 def cloud(bundle: str, team: str) -> None:
@@ -148,7 +182,7 @@ def cloud(bundle: str, team: str) -> None:
 
 
 def cleanup() -> None:
-    for kind, name in (("profiles", "ASC_PROFILE_ID"), ("certificates", "ASC_CERT_ID")):
+    for kind, name in (("profiles", "ASC_PROFILE_ID"), ("profiles", "ASC_WIDGET_PROFILE_ID"), ("certificates", "ASC_CERT_ID")):
         if os.environ.get(name):
             try:
                 call("DELETE", f"{kind}/{os.environ[name]}")

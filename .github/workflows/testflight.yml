@@ -102,11 +102,11 @@ jobs:
           if [[ "${SIGNING:-}" == "cloud" ]]; then
             SIGN=(CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO)
           else
-            SIGN=(CODE_SIGN_STYLE=Manual "CODE_SIGN_IDENTITY=Apple Distribution" "PROVISIONING_PROFILE_SPECIFIER=$PROFILE_NAME")
+            SIGN=(CODE_SIGN_STYLE=Manual "CODE_SIGN_IDENTITY=Apple Distribution" "APP_PROFILE_SPECIFIER=$PROFILE_NAME" "WIDGET_PROFILE_SPECIFIER=$WIDGET_PROFILE_NAME")
           fi
           xcodebuild archive -project ETFToGo.xcodeproj -scheme ETFToGo -configuration Release \
             -destination 'generic/platform=iOS' -archivePath build/ETFToGo.xcarchive \
-            "${SIGN[@]}" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$ETF_BUNDLE_ID" \
+            "${SIGN[@]}" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" ETF_APP_BUNDLE_ID="$ETF_BUNDLE_ID" \
             CURRENT_PROJECT_VERSION="3.$GITHUB_RUN_NUMBER" 2>&1 | tee build/archive.log
           if [[ "${SIGNING:-}" == "cloud" ]]; then
             # An unsigned archive still carries each prebuilt framework's vendor signature (Sentry's), already broken
@@ -141,6 +141,7 @@ jobs:
         run: |
           security delete-keychain "$RUNNER_TEMP/etf-signing/build.keychain-db" || true
           if [[ -n "${PROFILE_UUID:-}" ]]; then rm -f "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$PROFILE_UUID.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"; fi
+          if [[ -n "${WIDGET_PROFILE_UUID:-}" ]]; then rm -f "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$WIDGET_PROFILE_UUID.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$WIDGET_PROFILE_UUID.mobileprovision"; fi
           if [[ -x "$RUNNER_TEMP/asc-venv/bin/python" && -f "$RUNNER_TEMP/etf-signing/AuthKey.p8" ]]; then "$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_signing.py cleanup || true; fi
           rm -rf "$RUNNER_TEMP/etf-signing"
   # Renames the app in App Store Connect, waits for the newest build to finish processing and gives it to the
