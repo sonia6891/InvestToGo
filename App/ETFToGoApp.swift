@@ -16,6 +16,8 @@ import UserNotifications
         let testURL = testing ? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("ETFToGo/ui-test.json") : nil
         // `--reset` wipes the records only in UI tests: a stale scheme argument never empties the real file.
         let store = PortfolioStore(url: testURL, reset: testing && args.contains("--reset"))
+        WidgetSync.shared.locked = { [weak store] in store?.recordsLocked ?? true }
+        store.onCommit = { WidgetSync.shared.sync($0) }
         Onboarding.reset(args)
         ReportSettings.reset(args)
         LobbyShownStore.reset(args)
@@ -269,10 +271,13 @@ struct RootView: View {
         }
         // Live prices while the app is in front during the trading session; stopped in the background, where iOS
         // would suspend the connection anyway. Indices and prices are also refreshed once on every return.
+        // The widget's file follows the worn skin; this also runs on first appear (the first write after an update).
+        .task(id: skins.skin.id) { WidgetSync.shared.sync(store.data) }
         .task(id: phase) {
             guard phase == .active else { return }
             // The records could not be opened at a launch in the background (locked phone): read them now.
             store.reloadIfLocked()
+            WidgetSync.shared.sync(store.data)
             if !store.recordsLocked { await DCAReminders.sync(reminderInputs) }
             // 口袋會員前 7 天全開: judged again on every return, wherever the app is (not only over the lobby), so the
             // tools close at the end on any screen.

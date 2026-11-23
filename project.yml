@@ -53,12 +53,19 @@ targets:
           UIColorName: LaunchBackground
         # Sentry's DSN; empty in Debug (and so in CI, which builds Debug), the project DSN in Release.
         SentryDSN: '$(SENTRY_DSN)'
+        # The App Group the widget's file lives in; WidgetSync reads it (no container in the unsigned simulator build).
+        ETFAppGroup: '$(APP_GROUP_ID)'
         # 到價提醒 (PriceAlertMonitor): the background refresh task that checks prices when iOS allows it. The
         # identifier is the one the code registers; it does not have to match the bundle id.
         BGTaskSchedulerPermittedIdentifiers:
           - tw.sonia.etftogo.alerts
         UIBackgroundModes:
           - fetch
+    entitlements:
+      path: Support/ETFToGo.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - '$(APP_GROUP_ID)'
     settings:
       configs:
         # Written into project.pbxproj as a quoted string, not an .xcconfig, so the `//` is not a comment there.

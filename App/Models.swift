@@ -211,6 +211,8 @@ import SwiftUI
     private(set) var recordsLocked = false
     /// Run after `reloadIfLocked` has read the records: what launch does with them (set by the app).
     var onRecordsRead: (PortfolioStore) -> Void = { _ in }
+    /// Called with the records after every save (the widget's file follows them).
+    var onCommit: ((Portfolio) -> Void)?
     /// The file exists but may not be read: the phone is locked, not a damaged file.
     private static func isProtected(_ error: Error) -> Bool {
         let cocoa = error as NSError
@@ -275,6 +277,7 @@ import SwiftUI
         }
         try encoded.write(to: url, options: [.atomic, .completeFileProtection])
         data = next
+        onCommit?(next)
     }
     /// Changes the game progress and saves it with the records; nothing is written when it does not change.
     func updateGame(_ change: (inout GameState) -> Void) throws {
