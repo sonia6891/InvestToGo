@@ -404,7 +404,7 @@ struct MemberView: View {
                     SkinImage(.badge).frame(width: 44, height: 44).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("外觀主題").skinFont(.title(16))
-                        Text("目前：\(skins.skin.name)・四套世界任你換").skinFont(.body(12)).skinForeground(\.sub)
+                        Text("目前：\(skins.skin.name)・\(ThemeCount.phrase)").skinFont(.body(12)).skinForeground(\.sub)
                     }
                     Spacer(minLength: 0)
                     Text("›").skinFont(.title(20)).skinForeground(\.sub).accessibilityHidden(true)
