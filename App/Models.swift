@@ -326,11 +326,18 @@ import SwiftUI
         if next.favorites.contains(symbol) { next.favorites.remove(symbol) } else { next.favorites.insert(symbol) }
         do { try commit(next) } catch { message = error.localizedDescription }
     }
-    func record(_ dividend: Dividend) throws { var next = data; next.dividends.append(dividend); try commit(next) }
+    /// 除息季: a dividend paid in July to September, saved by any flow (or arriving in a backup), unlocks 收成 in the
+    /// same write. No experience, so nothing else changes.
+    private func withDividendSeason(_ next: inout Portfolio, now: Date) {
+        var game = next.game ?? GameState()
+        if game.recordDividendSeason(next, now: now) { next.game = game }
+    }
+    func record(_ dividend: Dividend) throws { var next = data; next.dividends.append(dividend); withDividendSeason(&next, now: Date()); try commit(next) }
     func markPaid(_ dividend: Dividend) throws {
         var next = data
         guard let i = next.dividends.firstIndex(where: { $0.id == dividend.id }) else { return }
         next.dividends[i].status = .paid
+        withDividendSeason(&next, now: Date())
         try commit(next)
     }
     func addToComparison(_ symbol: String) {
@@ -358,6 +365,7 @@ import SwiftUI
                 earned = game.xp - before
             }
         }
+        withDividendSeason(&next, now: now)
         try commit(next)
         if earned > 0 { pendingReward += earned }
     }
@@ -368,6 +376,7 @@ import SwiftUI
         next.dividends[i].status = .paid
         next.dividends[i].source = DividendSource.broker.rawValue
         if next.dividends[i].date > Date() { next.dividends[i].date = Calendar.current.startOfDay(for: Date()) }
+        withDividendSeason(&next, now: Date())
         try commit(next)
         return next.dividends[i]
     }
@@ -511,6 +520,7 @@ import SwiftUI
         // backup's whole; one that has its own keeps it untouched and the message says so.
         let game = GameState.afterImport(local: data.game, incoming: incoming.game)
         next.game = game.game
+        withDividendSeason(&next, now: Date())
         try saveRecovery()
         try commit(next)
         // The lobby shows the restored numbers as they are, without replaying them (spec 5.3); reset with the records, so a

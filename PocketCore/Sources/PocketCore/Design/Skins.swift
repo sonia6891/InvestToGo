@@ -53,7 +53,7 @@ struct SkinStyle: Equatable, Decodable {
     enum CheckKind: String, Decodable { case disc, square, stitchDisc, sketchCircle }
     enum QuickKind: String, Decodable { case goldHex, pinkBlock, stitchDisc, sketchDot }
     enum ChartKind: String, Decodable { case smooth, stepped, plain, pencil }
-    enum DecorKind: String, Decodable { case rays, pixelStars, seams, doodles }
+    enum DecorKind: String, Decodable { case rays, pixelStars, seams, doodles, stalks }
     var tag: TagKind
     var button: ButtonKind
     var stage: StageKind
@@ -143,7 +143,7 @@ struct Skin: Identifiable, Equatable, Decodable {
     }
 }
 
-/// The four skins, loaded once from the shared skins.json.
+/// The five skins, loaded once from the shared skins.json.
 enum Skins {
     static let all: [Skin] = {
         guard let url = CoreBundle.bundle.url(forResource: "skins", withExtension: "json") else { fatalError("skins.json is missing from the bundle") }

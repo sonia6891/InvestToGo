@@ -22,9 +22,9 @@ final class PocketShapeTests: XCTestCase {
 }
 
 final class SkinsTests: XCTestCase {
-    func testFourSkinsInOrder() {
-        XCTAssertEqual(Skins.all.map(\.id), ["blackgold", "voxel", "stitch", "sketch"])
-        XCTAssertEqual(Skins.all.map(\.name), ["黑金", "像素", "縫線", "手繪"])
+    func testFiveSkinsInOrder() {
+        XCTAssertEqual(Skins.all.map(\.id), ["blackgold", "voxel", "stitch", "sketch", "harvest"])
+        XCTAssertEqual(Skins.all.map(\.name), ["黑金", "像素", "縫線", "手繪", "收成"])
         XCTAssertEqual(Skins.default.id, "blackgold")
         XCTAssertEqual(Skins.carouselOrder, ["voxel", "blackgold", "stitch", "sketch"])
     }
@@ -38,6 +38,9 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(stitch.extra, [0x2F4A6D, 0xE3A82B, 0xF7F0E1])
         let sketch = Skins.named("sketch").colors
         XCTAssertEqual(sketch.page, 0xFAF8F3); XCTAssertEqual(sketch.ink, 0x1F1F1F); XCTAssertEqual(sketch.accent, 0xF2D16B)
+        let harvest = Skins.named("harvest").colors
+        XCTAssertEqual(harvest.page, 0xF5EEDC); XCTAssertEqual(harvest.ink, 0x3A2614); XCTAssertEqual(harvest.accent, 0xB7791F)
+        XCTAssertEqual(harvest.extra, [0x5E7D32, 0xE9C46A, 0xFFFAEC])
     }
     func testSkinTextContrast() {
         for skin in Skins.all {
@@ -57,20 +60,22 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.named("sketch").unlock, .level(5))
         XCTAssertEqual(Skins.named("voxel").unlock, .level(10))
         XCTAssertEqual(Skins.named("stitch").unlock, .member)
+        XCTAssertEqual(Skins.named("harvest").unlock, .achievement("exDividendSkin"))
     }
     /// Black-gold is free, sketch opens at LV.5, pixel at LV.10, stitch only for members; members get all four.
     func testIsUnlocked() {
-        func open(_ level: Int, member: Bool) -> [String] { Skins.all.filter { Skins.isUnlocked($0, level: level, member: member, achievements: []) }.map(\.id) }
+        func open(_ level: Int, member: Bool, _ a: Set<String> = []) -> [String] { Skins.all.filter { Skins.isUnlocked($0, level: level, member: member, achievements: a) }.map(\.id) }
         XCTAssertEqual(open(1, member: false), ["blackgold"])
         XCTAssertEqual(open(4, member: false), ["blackgold"])
         XCTAssertEqual(open(5, member: false), ["blackgold", "sketch"])
         XCTAssertEqual(open(9, member: false), ["blackgold", "sketch"])
         XCTAssertEqual(open(10, member: false), ["blackgold", "voxel", "sketch"])
         XCTAssertEqual(open(40, member: false), ["blackgold", "voxel", "sketch"], "Stitch never opens by level")
-        XCTAssertEqual(open(1, member: true), ["blackgold", "voxel", "stitch", "sketch"])
+        XCTAssertEqual(open(1, member: false, ["exDividendSkin"]), ["blackgold", "harvest"])
+        XCTAssertEqual(open(1, member: true), ["blackgold", "voxel", "stitch", "sketch", "harvest"])
     }
     func testOnlyVectorSkinsHaveNoMetal() {
-        for id in ["stitch", "sketch"] {
+        for id in ["stitch", "sketch", "harvest"] {
             XCTAssertEqual(Skins.named(id).art.kind, .vector, id); XCTAssertNil(Skins.named(id).metal, id)
         }
         for id in ["blackgold", "voxel"] { XCTAssertNotNil(Skins.named(id).metal, id) }
@@ -82,18 +87,20 @@ final class SkinsTests: XCTestCase {
         XCTAssertEqual(Skins.named("stitch").fonts, SkinFonts(big: "BreeSerif-Regular", title: "NotoSerifTC-Bold", body: "NotoSerifTC-Medium", mono: "BreeSerif-Regular"))
         XCTAssertEqual(Skins.named("sketch").fonts, SkinFonts(big: "Caveat-Regular", title: "LXGWWenKaiTC-Medium", body: "LXGWWenKaiTC-Medium", mono: "LXGWWenKaiTC-Medium",
                                                                  bigBold: true, bigOverhang: 0.12))
+        XCTAssertEqual(Skins.named("harvest").fonts, SkinFonts(big: "BreeSerif-Regular", title: "NotoSerifTC-Bold", body: "NotoSerifTC-Medium", mono: "BreeSerif-Regular"))
         // Only the sketch skin's big face is drawn bold and needs room for its overhang; the others keep the defaults.
-        for id in ["blackgold", "voxel", "stitch"] {
+        for id in ["blackgold", "voxel", "stitch", "harvest"] {
             XCTAssertFalse(Skins.named(id).fonts.bigBold, id); XCTAssertEqual(Skins.named(id).fonts.bigOverhang, 0, id)
         }
-        XCTAssertEqual(Skins.all.map(\.feedback.sound), ["thud", "chip", "snip", "scribble"])
+        XCTAssertEqual(Skins.all.map(\.feedback.sound), ["thud", "chip", "snip", "scribble", "scribble"])
         XCTAssertEqual(Skins.named("sketch").feedback.haptic, .faint)
+        XCTAssertEqual(Skins.named("harvest").feedback.haptic, .faint)
         XCTAssertEqual(Skins.named("stitch").art.folder, "Skins/stitch")
     }
     func testArtNamesAndFolders() {
         XCTAssertEqual(SkinArtName.allCases.map(\.rawValue), ["hero_dollar", "pocket", "pocket_icon", "find", "dividends", "tools", "achievements",
                                                              "crown", "calc", "fees", "reminder", "goal", "badge"])
-        XCTAssertEqual(Skins.all.map(\.art.folder), ["Skins/blackgold", "Skins/voxel", "Skins/stitch", "Skins/sketch"])
+        XCTAssertEqual(Skins.all.map(\.art.folder), ["Skins/blackgold", "Skins/voxel", "Skins/stitch", "Skins/sketch", "Skins/harvest"])
         XCTAssertEqual(Skins.named("stitch").art.image(.find), "Skins/stitch/find")
         XCTAssertEqual(Skins.named("sketch").art.image(named: "tally_5"), "Skins/sketch/tally_5")
     }

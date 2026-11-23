@@ -4,7 +4,7 @@ import SwiftUI
 // style, staggered entrances, an idle bob and rising particles. Decorative only: never tied to price movement, never
 // blocking taps, hidden from VoiceOver.
 
-enum MotionParticle { case dust, square, dot, stroke }
+enum MotionParticle { case dust, square, dot, stroke, grain }
 
 /// How a skin moves: smooth and rich (black-gold), stepped like 8-bit (voxel), bouncy (stitch), jittery (sketch).
 struct SkinMotion: Equatable {
@@ -14,12 +14,15 @@ struct SkinMotion: Equatable {
     var bobAmplitude: CGFloat
     var particle: MotionParticle
     var jitter: Bool
+    /// How far, in degrees, a bobbing object leans to each side from its foot, like a stalk in the wind (0 = no lean).
+    var sway: Double = 0
 
     static func of(_ skin: Skin) -> SkinMotion {
         switch skin.id {
         case "voxel": return SkinMotion(bounce: 0, stepped: true, stepsPerSecond: 8, bobAmplitude: 6, particle: .square, jitter: false)
         case "stitch": return SkinMotion(bounce: 0.55, stepped: false, stepsPerSecond: 0, bobAmplitude: 6, particle: .dot, jitter: false)
         case "sketch": return SkinMotion(bounce: 0.25, stepped: false, stepsPerSecond: 0, bobAmplitude: 6, particle: .stroke, jitter: true)
+        case "harvest": return SkinMotion(bounce: 0.1, stepped: false, stepsPerSecond: 0, bobAmplitude: 2, particle: .grain, jitter: false, sway: 2.5)
         default: return SkinMotion(bounce: 0.2, stepped: false, stepsPerSecond: 0, bobAmplitude: 6, particle: .dust, jitter: false)
         }
     }
@@ -107,7 +110,8 @@ private struct AmbientBob: ViewModifier {
         let motion = SkinMotion.of(skin)
         TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             let o = Self.offsets(time: timeline.date.timeIntervalSinceReferenceDate, phase: phase, motion: motion, enabled: enabled)
-            content.offset(y: o.dy).rotationEffect(.degrees(o.rotation))
+            // A swaying skin leans from the foot, like a stalk; the others turn about the middle.
+            content.offset(y: o.dy).rotationEffect(.degrees(o.rotation), anchor: motion.sway > 0 ? .bottom : .center)
         }
     }
 
@@ -124,6 +128,7 @@ private struct AmbientBob: ViewModifier {
             rotation = (r - 0.5) * 2.4
             dy += CGFloat(r - 0.5) * 1.5
         }
+        if motion.sway > 0 { rotation += sin(cycle * 2 * .pi + .pi / 2) * motion.sway }
         return (dy, rotation)
     }
 }
@@ -144,7 +149,7 @@ struct AmbientParticles: View {
 
     var body: some View {
         let motion = SkinMotion.of(skin)
-        let tint = skin.color(\.accent)
+        let tint = motion.particle == .grain ? skin.extra(1, or: \.accent) : skin.color(\.accent)
         TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             Canvas { context, size in
                 guard enabled, size.width > 0, size.height > 0 else { return }
@@ -154,7 +159,8 @@ struct AmbientParticles: View {
                     let p = ((now / period) + Double(i) / Double(Self.count)).truncatingRemainder(dividingBy: 1)
                     let seed = Double((i * 7919) % 97) / 97
                     let x = size.width * (0.05 + 0.9 * seed) + CGFloat(sin(p * 2 * .pi + seed * 6)) * 8
-                    let y = size.height * (1.05 - 1.1 * p)
+                    // Grains fall (top to bottom); everything else rises.
+                    let y = size.height * (motion.particle == .grain ? -0.05 + 1.1 * p : 1.05 - 1.1 * p)
                     let s: CGFloat = 3 + CGFloat(i % 3) * 1.5
                     let rect = CGRect(x: x - s / 2, y: y - s / 2, width: s, height: s)
                     var layer = context
@@ -162,6 +168,11 @@ struct AmbientParticles: View {
                     switch motion.particle {
                     case .square: layer.fill(Path(rect), with: .color(tint))
                     case .dot, .dust: layer.fill(Path(ellipseIn: rect), with: .color(tint))
+                    case .grain:
+                        // A 2:1 ellipse turned by the seed.
+                        let grain = CGRect(x: -s, y: -s / 2, width: s * 2, height: s)
+                        let turn = CGAffineTransform(translationX: x, y: y).rotated(by: seed * 2 * .pi)
+                        layer.fill(Path(ellipseIn: grain).applying(turn), with: .color(tint))
                     case .stroke:
                         var path = Path()
                         path.move(to: CGPoint(x: x - s, y: y + s / 2))

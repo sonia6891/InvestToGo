@@ -54,6 +54,8 @@ enum PlanPrice {
     private var loadTask: Task<Void, Never>?
     /// The player's level, for the level skins a non-member may still wear; set at launch.
     var level: () -> Int = { 1 }
+    /// The ids of the achievements unlocked, for the skins an achievement opens (收成); set at launch.
+    var achievements: () -> Set<String> = { [] }
     /// Where the 「會員已到期」 notice goes (the root toast); set at launch.
     var onLapse: (String) -> Void = { _ in }
     /// The skin store whose worn skin is checked; the app's own outside tests.
@@ -202,7 +204,7 @@ enum PlanPrice {
     private func checkWornSkin() {
         guard checksWornSkin, !recordsLocked() else { return }
         let wardrobe = skins ?? SkinStore.shared, worn = wardrobe.skin
-        guard wardrobe.takeOffLocked(level: level(), member: wearsMemberSkins) else { return }
+        guard wardrobe.takeOffLocked(level: level(), member: wearsMemberSkins, achievements: achievements()) else { return }
         // The 7 days' own notice only for the take-off their end caused: a skin a membership would keep on, taken off
         // after the end, the first time, for someone never a member (`takeSkinBackAtEnd`). Any other: the lapse's.
         let atEnd = !isMember && Skins.isUnlocked(worn, level: level(), member: true, achievements: []) && memberOpen.takeSkinBackAtEnd()

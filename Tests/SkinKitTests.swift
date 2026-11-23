@@ -22,7 +22,7 @@ import UIKit
     }
 
     func testEveryStyleKindHasARendering() {
-        XCTAssertEqual(Skins.all.count, 4)
+        XCTAssertEqual(Skins.all.count, 5)
         for skin in Skins.all {
             // A missing font or image would still "render" (as a fallback), so check the resources themselves.
             for name in [skin.fonts.big, skin.fonts.title, skin.fonts.body, skin.fonts.mono] {

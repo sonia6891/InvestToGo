@@ -24,7 +24,7 @@ final class PocketReportViewTests: XCTestCase {
 
     /// The picture has no screen behind it to take a skin from: it is drawn in the skin it is handed, at one size.
     @MainActor func testPictureIsDrawnInTheSkinItIsHanded() throws {
-        XCTAssertEqual(Skins.all.count, 4)
+        XCTAssertEqual(Skins.all.count, 5)
         for skin in Skins.all {
             let image = try XCTUnwrap(PocketReportView.picture(of: card, heading: "口袋月報", isMonth: true, showDividends: true, skin: skin), skin.id)
             XCTAssertEqual(image.size.width, 360, skin.id)

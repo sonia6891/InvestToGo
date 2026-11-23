@@ -21,4 +21,11 @@ final class MotionTests: XCTestCase {
         XCTAssertGreaterThan(stitch.bounce, gold.bounce)
         XCTAssertEqual(SkinMotion.of(Skins.named("nope")), gold)
     }
+
+    func testHarvestSwaysAndDropsGrain() {
+        let harvest = SkinMotion.of(Skins.named("harvest"))
+        XCTAssertEqual(harvest.particle, .grain); XCTAssertGreaterThan(harvest.sway, 0); XCTAssertFalse(harvest.stepped); XCTAssertFalse(harvest.jitter)
+        XCTAssertLessThan(harvest.bobAmplitude, SkinMotion.of(Skins.named("stitch")).bobAmplitude)
+        XCTAssertEqual(SkinMotion.of(Skins.named("stitch")).sway, 0)
+    }
 }

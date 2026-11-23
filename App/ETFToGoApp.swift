@@ -54,6 +54,7 @@ import UserNotifications
         // the player may no longer wear is taken off, with a notice.
         let membership = MembershipStore.shared
         membership.level = { [weak store] in GameRules.level(xp: store?.data.game?.xp ?? 0) }
+        membership.achievements = { [weak store] in Set((store?.data.game?.unlocked ?? [:]).keys) }
         membership.recordsLocked = { [weak store] in store?.recordsLocked ?? false }
         membership.onLapse = { [weak store] notice in store?.pendingNotice = notice }
         Task { await membership.start() }

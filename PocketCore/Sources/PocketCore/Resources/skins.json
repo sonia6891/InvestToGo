@@ -44,5 +44,16 @@
     "feedback": { "sound": "scribble", "haptic": "faint" },
     "unlock": { "kind": "level", "level": 5 },
     "burst": ["#1F1F1F", "#F2D16B", "#FFFFFF"]
+  },
+  {
+    "id": "harvest", "name": "收成", "code": "SKN 005",
+    "colors": { "page": "#F5EEDC", "ink": "#3A2614", "sub": "#6B5536", "dim": "#A89878", "card": "#FFFAEC", "line": "#E3D6B4",
+                "accent": "#B7791F", "up": "#B0322A", "down": "#2F6B3A", "extra": ["#5E7D32", "#E9C46A", "#FFFAEC"] },
+    "fonts": { "big": "BreeSerif-Regular", "title": "NotoSerifTC-Bold", "body": "NotoSerifTC-Medium", "mono": "BreeSerif-Regular" },
+    "style": { "tag": "paperStrip", "button": "paperStitch", "stage": "paperDisc", "check": "stitchDisc", "quick": "stitchDisc", "chart": "plain", "decor": "stalks" },
+    "art": { "kind": "vector", "folder": "Skins/harvest" },
+    "feedback": { "sound": "scribble", "haptic": "faint" },
+    "unlock": { "kind": "achievement", "id": "exDividendSkin" },
+    "burst": ["#E9C46A", "#B7791F", "#5E7D32", "#FFFAEC"]
   }
 ]

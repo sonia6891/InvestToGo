@@ -11,11 +11,12 @@ final class SkinArtTests: XCTestCase {
         var names = (0...9).map { "digit_\($0)" }
         if skin.id == "stitch" { names += (0...9).map { "digit_\($0)_b" } + ["patch"] }
         if skin.id == "sketch" { names += (1...5).map { "tally_\($0)" } }
+        if skin.id == "harvest" { names += ["patch"] }
         return names
     }
 
     func testEveryNamedImageExistsForEverySkin() {
-        XCTAssertEqual(Skins.all.count, 4)
+        XCTAssertEqual(Skins.all.count, 5)
         for skin in Skins.all {
             for name in SkinArtName.allCases {
                 XCTAssertNotNil(UIImage(named: skin.art.image(name)), "\(skin.id) has no \(name.rawValue)")
@@ -26,6 +27,7 @@ final class SkinArtTests: XCTestCase {
         }
         XCTAssertEqual(extraNames(Skins.named("stitch")).count, 21)
         XCTAssertEqual(extraNames(Skins.named("sketch")).count, 15)
+        XCTAssertEqual(extraNames(Skins.named("harvest")).count, 11)
     }
 
     func testFontsAreRegistered() {

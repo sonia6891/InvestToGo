@@ -393,6 +393,7 @@ struct SkinDecor: View {
             case .pixelStars: pixelStars(&context, frame)
             case .seams: seams(&context, frame)
             case .doodles: doodles(&context, frame)
+            case .stalks: stalks(&context, frame)
             }
         }
         .modifier(DecorDrift(enabled: drifts))
@@ -490,6 +491,35 @@ struct SkinDecor: View {
             cross.move(to: f.pt(x - 7, y - 7)); cross.addLine(to: f.pt(x + 7, y + 7))
             cross.move(to: f.pt(x + 7, y - 7)); cross.addLine(to: f.pt(x - 7, y + 7))
             context.stroke(cross, with: .color(colors[i % colors.count]), style: StrokeStyle(lineWidth: 3 * f.scale, lineCap: .round))
+        }
+    }
+
+    /// Harvest: thin rice stalks with drooping ears rise from the bottom corners of the zone, in rice green and gold at the
+    /// opacity of stitch's seam. The lobby gets three a side, other pages one.
+    private func stalks(_ context: inout GraphicsContext, _ f: Frame) {
+        let green = skin.extra(0, or: \.down).opacity(0.55), gold = skin.extra(1, or: \.accent).opacity(0.55)
+        let base = f.half
+        // (x at the foot, height, lean toward the page's middle), in design points
+        let left: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(18, 120, 10)] : [(14, 150, 12), (32, 110, 8), (50, 80, 6)]
+        let right: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(372, 120, -10)] : [(376, 150, -12), (358, 110, -8), (340, 80, -6)]
+        let stroke = StrokeStyle(lineWidth: 2 * f.scale, lineCap: .round)
+        for (x, h, lean) in left + right {
+            let top = CGPoint(x: x + lean, y: base - h)
+            var stem = Path()
+            stem.move(to: f.pt(x, base))
+            stem.addQuadCurve(to: f.pt(top.x, top.y), control: f.pt(x - lean * 0.2, base - h * 0.55))
+            context.stroke(stem, with: .color(green), style: stroke)
+            // The ear droops from the tip, away from the lean, as a short curve with a few grains along it.
+            let droop: CGFloat = lean > 0 ? 1 : -1
+            var ear = Path()
+            ear.move(to: f.pt(top.x, top.y))
+            ear.addQuadCurve(to: f.pt(top.x + droop * 16, top.y + 22), control: f.pt(top.x + droop * 14, top.y - 8))
+            context.stroke(ear, with: .color(gold), style: StrokeStyle(lineWidth: 3 * f.scale, lineCap: .round))
+            for k in 1...3 {
+                let t = CGFloat(k) / 4
+                let gx = top.x + droop * 16 * t + droop * 3, gy = top.y + 22 * t * t + 2
+                context.fill(Path(ellipseIn: f.rect(gx - 2.5, gy - 4, 5, 8)), with: .color(gold))
+            }
         }
     }
 

@@ -36,8 +36,9 @@ extension Color {
     func select(_ id: String) { skin = Skins.named(id) }
     /// Takes off a skin this player may no longer wear (a membership that lapsed, was refunded or cancelled) and goes
     /// back to black-gold; true when it did.
-    @discardableResult func takeOffLocked(level: Int, member: Bool) -> Bool {
-        guard !Skins.isUnlocked(skin, level: level, member: member, achievements: []) else { return false }
+    /// A skin the player earned with an achievement (`achievements`: the ids unlocked) stays on without membership.
+    @discardableResult func takeOffLocked(level: Int, member: Bool, achievements: Set<String>) -> Bool {
+        guard !Skins.isUnlocked(skin, level: level, member: member, achievements: achievements) else { return false }
         select("blackgold")
         return true
     }
