@@ -133,8 +133,9 @@ jobs:
   simulator:
     needs: core
     runs-on: macos-26
-    # 55 + the Release compile and the App Store screens below (up to about 15 more: two of them wait for real
-    # data, a first 回測 download alone takes about four minutes).
+    # The UI tests and the per-skin launches (five skins, 收成 included; 100 is the old 90 plus its launches), then
+    # the Release compile and the App Store screens below (up to about 15 more: two of them wait for real data, a
+    # first 回測 download alone takes about four minutes).
     timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4
@@ -298,7 +299,7 @@ jobs:
             xcrun simctl io "$DEVICE" screenshot "build/screens/widget-$SKIN.png"
           done
       # 圖鑑卡翻面: the reveal in every 外觀主題. Its own step (a launch can take over a minute on a busy runner), and the
-      # check after the tests fails the job when one of the four is missing or blank.
+      # check after the tests fails the job when one of the five is missing or blank.
       - name: Capture the card reveal in every skin
         timeout-minutes: 15
         continue-on-error: true
@@ -480,7 +481,7 @@ jobs:
         # The capture step is continue-on-error; a cut-off one leaves pictures missing, which fails the job here.
         run: |
           set -euo pipefail
-          build/venv/bin/python Scripts/screens.py check build/screens/screen-dex-reveal.png build/screens/dex-reveal-{blackgold,voxel,stitch,sketch}.png
+          build/venv/bin/python Scripts/screens.py check build/screens/screen-dex-reveal.png build/screens/dex-reveal-{blackgold,voxel,stitch,sketch,harvest}.png
       - name: Check the ten App Store screens that need no network
         # store-backtest and store-overlap are left out: they depend on other people's sites.
         run: |
@@ -491,7 +492,19 @@ jobs:
         run: |
           if [ -d build/Tests.xcresult ]; then
             xcrun xcresulttool export attachments --path build/Tests.xcresult --output-path build/test-attachments
+            # The locked 收成 page (and its largest-text twin) are test attachments, not simctl shots: put them with the
+            # other screens and publish them on their own, since the screens artifact above was uploaded before the tests.
+            build/venv/bin/python Scripts/screens.py collect build/test-attachments build/screens-locked skins-harvest-locked || true
+            mkdir -p build/screens && cp build/screens-locked/*.png build/screens/ 2>/dev/null || true
           fi
+      - name: Publish the locked 收成 page pictures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ETFToGo-screens-locked
+          path: build/screens-locked/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Save verifiable build artifacts
         if: always()
         uses: actions/upload-artifact@v4

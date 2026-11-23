@@ -5,9 +5,10 @@
         Exit 1 when a picture is missing or is a blank frame: one flat colour below the status bar, which is the
         launch screen or a page that had not drawn yet. Each such picture gets a GitHub `::error::` line. Needs Pillow.
 
-    python Scripts/screens.py collect <attachments-dir> <out-dir>
-        Copy the `store-*` attachments of a UI test run (as `xcresulttool export attachments` writes them, with its
-        manifest.json) into <out-dir> under their own names, leaving alone any picture that is already there.
+    python Scripts/screens.py collect <attachments-dir> <out-dir> [prefix...]
+        Copy the attachments of a UI test run (as `xcresulttool export attachments` writes them, with its
+        manifest.json) whose name starts with one of the prefixes (default `store-`) into <out-dir> under their own
+        names, leaving alone any picture that is already there.
 """
 from __future__ import annotations
 
@@ -41,7 +42,7 @@ def check(pictures: list[str]) -> int:
     return 1 if bad else 0
 
 
-def collect(attachments: Path, out: Path) -> int:
+def collect(attachments: Path, out: Path, prefixes: tuple[str, ...] = ("store-",)) -> int:
     manifest = attachments / "manifest.json"
     if not manifest.is_file():
         print(f"no manifest in {attachments}")
@@ -53,7 +54,7 @@ def collect(attachments: Path, out: Path) -> int:
             # "store-backtest_0_<uuid>.png": the name the test gave, then what Xcode adds to it.
             given = item.get("suggestedHumanReadableName", "").split("_")[0]
             source = attachments / exported
-            if not given.startswith("store-") or not exported or not source.is_file():
+            if not given.startswith(prefixes) or not exported or not source.is_file():
                 continue
             target = out / f"{given}.png"
             if target.exists():
@@ -66,8 +67,8 @@ def collect(attachments: Path, out: Path) -> int:
 def main(arguments: list[str]) -> int:
     if len(arguments) >= 2 and arguments[0] == "check":
         return check(arguments[1:])
-    if len(arguments) == 3 and arguments[0] == "collect":
-        return collect(Path(arguments[1]), Path(arguments[2]))
+    if len(arguments) >= 3 and arguments[0] == "collect":
+        return collect(Path(arguments[1]), Path(arguments[2]), tuple(arguments[3:]) or ("store-",))
     print(__doc__)
     return 2
 
