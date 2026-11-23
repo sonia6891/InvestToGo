@@ -20,6 +20,7 @@ enum SkinStatus: Equatable {
             case .free: return "預設外觀主題 · 已解鎖"
             case .level(let needed): return member && level < needed ? "會員 · 已解鎖" : "LV.\(needed) 已解鎖 · 你是 LV.\(level)"
             case .member: return "會員 · 已解鎖"
+            case .achievement: return member ? "會員 · 已解鎖" : "已解鎖"
             }
         case .needsLevel(let needed): return "LV.\(needed) 解鎖 · 你是 LV.\(level)"
         case .needsMember: return "會員專屬"
