@@ -373,8 +373,18 @@ Expected:
 
 ## After the last task (owner's go-ahead only)
 
-The signed path can only be proven by a TestFlight run, which uploads a build. Ask the owner in chat before `gh workflow run testflight.yml`. When the owner says yes:
-- The run's archive check shows the widget id `<ID>.widget` and the group in both sets of entitlements.
+The signed path can only be proven by a TestFlight run, which uploads a build. Ask the owner in chat before `gh workflow run testflight.yml`. When the owner says yes, `prepare` takes one of two paths, and its log says which.
+
+**Temporary certificate** (`prepare` ends with "Prepared signing for …"):
+- The archive step logs the widget id `<ID>.widget` and `Verified group.<ID> in the archived ETFToGo.app` and `… ETFToGoWidget.appex`.
+- The step 「Check the App Group in the exported IPA」 logs `Verified group.<ID> in the exported ETFToGo.app` and `… ETFToGoWidget.appex`, and the run summary says "Verified the exported IPA".
 - `cleanup` logs the removal of two profiles and one certificate.
+
+**Cloud signing** (the 409 path; `prepare` logs "signing in the cloud instead" and "Prepared cloud signing for …"). This is the path the account is expected to take, since the team already holds two distribution certificates:
+- The archive step logs "Removed the vendor signature from Sentry", then "Signed the widget and the app ad hoc with group.<ID> for the export to carry", then the widget id and `Verified group.<ID> in the archived …` for both bundles.
+- The step 「Check the App Group in the exported IPA」 logs `Verified group.<ID> in the exported ETFToGo.app` and `… ETFToGoWidget.appex`. It finds no ad hoc signature left in the app, the widget or the frameworks, `codesign --verify --deep` passes, and the run summary says "Verified the exported IPA".
+- Only then does 「Upload archive to App Store Connect」 run. `cleanup` removes nothing, since no certificate or profile was created.
+
+On either path, a missing group or a leftover ad hoc signature fails the job with `::error::` before anything is uploaded. After the build reaches TestFlight, check on a tester's phone that the widget shows the real streak, not 「今天開始」: once after a save, and again after a restart and unlock.
 
 If `prepare` stops with one of the Task 1 messages, a portal step from Task 1 Step 2 is missing.

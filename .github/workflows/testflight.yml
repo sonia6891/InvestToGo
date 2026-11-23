@@ -1,7 +1,9 @@
 name: Sign and upload native ETF app
 # Needs only an App Store Connect API key with the Admin role (secrets APPLE_ASC_KEY_ID, APPLE_ASC_ISSUER_ID,
 # APPLE_ASC_KEY_P8) and the variable ETF_BUNDLE_ID. Each run creates a temporary distribution certificate and
-# App Store profile through the API (Scripts/asc_signing.py) and removes both at the end.
+# App Store profiles through the API (Scripts/asc_signing.py) and removes them at the end, or, when the account's
+# certificate limit is reached, signs in the cloud. Either way the App Group is checked in an exported IPA before the
+# upload.
 on:
   workflow_dispatch:
     inputs:
@@ -98,7 +100,7 @@ jobs:
           set -euo pipefail
           mkdir -p build
           # Build numbers start at 3.x: builds uploaded before used 2.x for the same version.
-          # Signed with the temporary certificate, or (cloud signing) left unsigned for the export to sign.
+          # Signed with the temporary certificate, or (cloud signing) built unsigned, signed ad hoc below, for the export to sign.
           if [[ "${SIGNING:-}" == "cloud" ]]; then
             SIGN=(CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO)
           else
@@ -108,21 +110,34 @@ jobs:
             -destination 'generic/platform=iOS' -archivePath build/ETFToGo.xcarchive \
             "${SIGN[@]}" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" ETF_APP_BUNDLE_ID="$ETF_BUNDLE_ID" \
             CURRENT_PROJECT_VERSION="3.$GITHUB_RUN_NUMBER" 2>&1 | tee build/archive.log
+          APP_DIR=build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app
+          APPEX_DIR="$APP_DIR/PlugIns/ETFToGoWidget.appex"
           if [[ "${SIGNING:-}" == "cloud" ]]; then
             # An unsigned archive still carries each prebuilt framework's vendor signature (Sentry's), already broken
             # by the copy step's strip; the export would keep it and App Store Connect rejects it (error 90035).
             # Stripped of it, the frameworks are unsigned like the app, and the export signs them all.
             shopt -s nullglob
-            for framework in build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Frameworks/*.framework; do
+            for framework in "$APP_DIR"/Frameworks/*.framework; do
               codesign --remove-signature "$framework/$(basename "$framework" .framework)"
               rm -rf "$framework/_CodeSignature"
               echo "Removed the vendor signature from $(basename "$framework")"
             done
+            # Unsigned binaries carry no entitlements, so the export would have no App Group to carry over and the
+            # widget would never see the app's file. Ad hoc signatures hold it (the same keys as the generated
+            # Support/*.entitlements); the export replaces every signature with the distribution one and keeps the
+            # entitlements. Inside out: the frameworks (codesign seals nested code only when it is signed), then the
+            # widget, then the app.
+            "$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_signing.py entitlements
+            ENTITLEMENTS="$RUNNER_TEMP/etf-signing/app-group.entitlements"
+            for framework in "$APP_DIR"/Frameworks/*.framework; do
+              codesign -f -s - "$framework"
+            done
+            codesign -f -s - --entitlements "$ENTITLEMENTS" "$APPEX_DIR"
+            codesign -f -s - --entitlements "$ENTITLEMENTS" "$APP_DIR"
+            echo "Signed the widget and the app ad hoc with group.$ETF_BUNDLE_ID for the export to carry"
           fi
           python3 -c "import plistlib; from pathlib import Path; p=plistlib.loads(Path('build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app/Info.plist').read_bytes()); assert p['UIDeviceFamily']==[1], p['UIDeviceFamily']; print('Verified iPhone-only archive', p['CFBundleShortVersionString'], p['CFBundleVersion'])"
-          # The 連續定投 widget rides in the app: <id>.widget, the app's build number, and (signed) the App Group in both.
-          APP_DIR=build/ETFToGo.xcarchive/Products/Applications/ETFToGo.app
-          APPEX_DIR="$APP_DIR/PlugIns/ETFToGoWidget.appex"
+          # The 連續定投 widget rides in the app: <id>.widget, the app's build number, and the App Group in both.
           python3 - "$APP_DIR/Info.plist" "$APPEX_DIR/Info.plist" "$ETF_BUNDLE_ID" <<'PY'
           import plistlib, sys
           from pathlib import Path
@@ -131,12 +146,45 @@ jobs:
           assert ext['CFBundleVersion'] == app['CFBundleVersion'], (ext['CFBundleVersion'], app['CFBundleVersion'])
           print('Verified the widget extension', ext['CFBundleIdentifier'], ext['CFBundleVersion'])
           PY
-          if [[ "${SIGNING:-}" != "cloud" ]]; then
-            for bundle in "$APP_DIR" "$APPEX_DIR"; do
-              codesign -d --entitlements - --xml "$bundle" 2>/dev/null | grep -q "group.$ETF_BUNDLE_ID" || { echo "::error::$bundle lacks the App Group group.$ETF_BUNDLE_ID"; exit 1; }
-              echo "Verified group.$ETF_BUNDLE_ID in $(basename "$bundle")"
-            done
-          fi
+          # Signed with the temporary certificate, or ad hoc above on the cloud path: either way both carry the group.
+          for bundle in "$APP_DIR" "$APPEX_DIR"; do
+            # Read whole first: with pipefail, grep -q closing the pipe early could fail a match.
+            ENT=$(codesign -d --entitlements - --xml "$bundle" 2>/dev/null || true)
+            grep -qF "group.$ETF_BUNDLE_ID" <<<"$ENT" || { echo "::error::$bundle lacks the App Group group.$ETF_BUNDLE_ID"; exit 1; }
+            echo "Verified group.$ETF_BUNDLE_ID in the archived $(basename "$bundle")"
+          done
+      # What the upload would send, exported to a folder first: the App Group must be in the app and the widget as the
+      # export signed them (in both signing modes), or the job stops here, before anything is uploaded.
+      - name: Check the App Group in the exported IPA
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/asc-venv/bin/python" Scripts/asc_signing.py check-options
+          xcodebuild -exportArchive -archivePath build/ETFToGo.xcarchive \
+            -exportPath build/ipa-check -exportOptionsPlist "$RUNNER_TEMP/etf-signing/ExportOptions-check.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/etf-signing/AuthKey.p8" \
+            -authenticationKeyID "$APPLE_ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$APPLE_ASC_ISSUER_ID" 2>&1 | tee build/ipa-check.log
+          shopt -s nullglob
+          IPAS=(build/ipa-check/*.ipa)
+          [[ ${#IPAS[@]} == 1 ]] || { echo "::error::The local export made ${#IPAS[@]} IPAs, not one"; exit 1; }
+          rm -rf build/ipa-check/unzipped
+          unzip -q "${IPAS[0]}" -d build/ipa-check/unzipped
+          APP=build/ipa-check/unzipped/Payload/ETFToGo.app
+          APPEX="$APP/PlugIns/ETFToGoWidget.appex"
+          for bundle in "$APP" "$APPEX"; do
+            test -d "$bundle" || { echo "::error::The IPA has no $(basename "$bundle")"; exit 1; }
+            ENT=$(codesign -d --entitlements - --xml "$bundle" 2>/dev/null || true)
+            grep -qF "group.$ETF_BUNDLE_ID" <<<"$ENT" || { echo "::error::The exported $(basename "$bundle") lacks the App Group group.$ETF_BUNDLE_ID"; exit 1; }
+            echo "Verified group.$ETF_BUNDLE_ID in the exported $(basename "$bundle")"
+          done
+          # No ad hoc signature may survive the export (the cloud path signs ad hoc before it), and the whole app verifies.
+          for code in "$APP" "$APPEX" "$APP"/Frameworks/*.framework; do
+            INFO=$(codesign -dv "$code" 2>&1 || true)
+            if grep -qF "Signature=adhoc" <<<"$INFO"; then echo "::error::The exported $(basename "$code") is still signed ad hoc"; exit 1; fi
+          done
+          codesign --verify --deep "$APP" || { echo "::error::The exported app does not verify"; exit 1; }
+          echo "Verified the exported IPA: the App Group in the app and the widget, and no ad hoc signature" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Upload archive to App Store Connect
         run: |
           set -euo pipefail

@@ -6,6 +6,10 @@ bundle, and leaves them for the keychain and the export: certificate.p12 and Exp
 $RUNNER_TEMP/etf-signing, the profiles in the provisioning folders, names and IDs in $GITHUB_ENV.
 cleanup: deletes those profiles and revokes that certificate, so each run starts clean and the account's certificate limit
 is never reached. Builds already uploaded are not affected: Apple re-signs them for TestFlight and the App Store.
+check-options: writes ExportOptions-check.plist, the same export with destination=export, for the local IPA whose App
+Group the workflow checks before the upload.
+entitlements: writes app-group.entitlements, the entitlements the cloud path signs the unsigned archive with (ad hoc), so
+the export has the App Group to carry over. The same keys as the generated Support/*.entitlements (project.yml).
 
 Environment: ASC_KEY_ID, ASC_ISSUER_ID, ETF_BUNDLE_ID, RUNNER_TEMP, GITHUB_ENV; the key in $RUNNER_TEMP/etf-signing/AuthKey.p8.
 Nothing secret is printed. Needs the `cryptography` package.
@@ -119,6 +123,27 @@ def export_options(bundle: str, team: str, app_profile: str, widget_profile: str
                 manageAppVersionAndBuildNumber=False, uploadSymbols=True, stripSwiftSymbols=True)
 
 
+def check_options(options: dict) -> dict:
+    """The upload's export options, exporting an IPA to a local folder instead (nothing is uploaded)."""
+    return {**options, "destination": "export"}
+
+
+def group_entitlements(bundle: str) -> dict:
+    """What project.yml puts in Support/ETFToGo.entitlements and Support/ETFToGoWidget.entitlements, resolved for `bundle`."""
+    return {"com.apple.security.application-groups": [f"group.{bundle}"]}
+
+
+def write_check_options() -> None:
+    options = plistlib.loads((folder / "ExportOptions.plist").read_bytes())
+    (folder / "ExportOptions-check.plist").write_bytes(plistlib.dumps(check_options(options)))
+    print("Wrote the local export options (destination=export).")
+
+
+def write_entitlements() -> None:
+    (folder / "app-group.entitlements").write_bytes(plistlib.dumps(group_entitlements(os.environ["ETF_BUNDLE_ID"])))
+    print(f"Wrote the App Group entitlements (group.{os.environ['ETF_BUNDLE_ID']}).")
+
+
 def prepare() -> None:
     bundle = os.environ["ETF_BUNDLE_ID"]
     widget = bundle + ".widget"
@@ -193,7 +218,8 @@ def cleanup() -> None:
 
 if __name__ == "__main__":
     try:
-        {"prepare": prepare, "cleanup": cleanup}[sys.argv[1]]()
+        {"prepare": prepare, "cleanup": cleanup, "check-options": write_check_options,
+         "entitlements": write_entitlements}[sys.argv[1]]()
     except ApiError as error:
         print(f"::error::{error}")
         sys.exit(1)
