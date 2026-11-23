@@ -494,22 +494,28 @@ struct SkinDecor: View {
         }
     }
 
-    /// Harvest: thin rice stalks with drooping ears rise from the bottom corners of the zone, in rice green and gold at the
-    /// opacity of stitch's seam. The lobby gets three a side, other pages one.
+    /// Harvest: thin rice stalks with drooping ears rise from the bottom corners of the zone: stems in rice green at the
+    /// opacity of stitch's seam, ears in the skin's gold (`accent`) so they read on the paper. The last 20 points of each
+    /// stem fade out instead of ending flat. The lobby gets three a side, packed against the screen's edge so the
+    /// inner ones (and their ears) stay clear of a two-digit numeral's paper slip, which starts near x 70; other pages
+    /// get one.
     private func stalks(_ context: inout GraphicsContext, _ f: Frame) {
-        let green = skin.extra(0, or: \.down).opacity(0.55), gold = skin.extra(1, or: \.accent).opacity(0.55)
+        let green = skin.extra(0, or: \.down).opacity(0.55), gold = skin.color(\.accent).opacity(0.9)
         let base = f.half
         // (x at the foot, height, lean toward the page's middle), in design points
-        let left: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(18, 120, 10)] : [(14, 150, 12), (32, 110, 8), (50, 80, 6)]
-        let right: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(372, 120, -10)] : [(376, 150, -12), (358, 110, -8), (340, 80, -6)]
+        let left: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(18, 120, 10)] : [(10, 150, 12), (24, 115, 8), (38, 85, 4)]
+        let right: [(CGFloat, CGFloat, CGFloat)] = page == .other ? [(372, 120, -10)] : [(380, 150, -12), (366, 115, -8), (352, 85, -4)]
         let stroke = StrokeStyle(lineWidth: 2 * f.scale, lineCap: .round)
+        let fade: CGFloat = 20
         for (x, h, lean) in left + right {
             let top = CGPoint(x: x + lean, y: base - h)
             var stem = Path()
             stem.move(to: f.pt(x, base))
             stem.addQuadCurve(to: f.pt(top.x, top.y), control: f.pt(x - lean * 0.2, base - h * 0.55))
-            context.stroke(stem, with: .color(green), style: stroke)
-            // The ear droops from the tip, away from the lean, as a short curve with a few grains along it.
+            // Clear at the foot, full green 20 points up.
+            let rise = Gradient(stops: [.init(color: green.opacity(0), location: 0), .init(color: green, location: 1)])
+            context.stroke(stem, with: .linearGradient(rise, startPoint: f.pt(x, base), endPoint: f.pt(x, base - fade)), style: stroke)
+            // The ear droops from the tip toward the lean, as a short curve with a few grains along it.
             let droop: CGFloat = lean > 0 ? 1 : -1
             var ear = Path()
             ear.move(to: f.pt(top.x, top.y))

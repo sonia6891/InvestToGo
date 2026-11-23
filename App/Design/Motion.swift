@@ -149,7 +149,8 @@ struct AmbientParticles: View {
 
     var body: some View {
         let motion = SkinMotion.of(skin)
-        let tint = motion.particle == .grain ? skin.extra(1, or: \.accent) : skin.color(\.accent)
+        // Every particle, grains too, takes the skin's accent: 收成's pale straw `extra[1]` was 1.4:1 on its page.
+        let tint = skin.color(\.accent)
         TimelineView(.animation(minimumInterval: motion.frameInterval, paused: !enabled)) { timeline in
             Canvas { context, size in
                 guard enabled, size.width > 0, size.height > 0 else { return }
