@@ -113,7 +113,7 @@ struct SkinsView: View {
         .accessibilityLabel("第 \(index + 1) 套，共 \(order.count) 套")
     }
 
-    /// The four style badges, each in its own skin's drawing on its own page colour; tapping one turns to its card.
+    /// The five style badges, each in its own skin's drawing on its own page colour; tapping one turns to its card.
     private func badges(level: Int, member: Bool, achievements: Set<String>) -> some View {
         HStack(spacing: 18) {
             ForEach(Skins.carouselOrder, id: \.self) { id in

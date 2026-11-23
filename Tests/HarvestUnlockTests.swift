@@ -24,8 +24,22 @@ final class HarvestUnlockTests: XCTestCase {
         XCTAssertNil(store.data.game?.unlocked[id])
         try store.saveDividend(dividend(on: day(2026, 8, 10)), rewardNew: true, now: day(2026, 11, 20))
         XCTAssertNotNil(store.data.game?.unlocked[id], "A payment dated in August counts, whenever it was typed in")
-        XCTAssertEqual(store.pendingReward, 0, "The season itself pays no experience")
         XCTAssertNotNil(PortfolioStore(url: file).data.game?.unlocked[id], "Saved with the record")
+    }
+
+    /// 0056 is held, so a dividend that paid in the current or the previous month would earn experience; this one,
+    /// in August of last year, is outside that window. It still unlocks the season, and the season adds nothing.
+    @MainActor func testTheSeasonPaysNoExperienceOrCoins() throws {
+        let store = PortfolioStore(url: file)
+        try store.save(Holding(symbol: "0056", name: "元大高股息", shares: 1000, unitCost: 30, broker: "", strategy: .income))
+        let before = store.data.game ?? GameState()
+        XCTAssertNil(before.unlocked[id])
+        try store.saveDividend(dividend(on: day(2025, 8, 10)), rewardNew: true, now: day(2026, 11, 20))
+        let after = try XCTUnwrap(store.data.game)
+        XCTAssertNotNil(after.unlocked[id], "The August payment counts")
+        XCTAssertEqual(after.xp, before.xp, "The season itself pays no experience")
+        XCTAssertEqual(after.coins, before.coins, "The season itself pays no coins")
+        XCTAssertEqual(store.pendingReward, 0)
     }
 
     @MainActor func testAnOutOfSeasonDividendDoesNotUnlock() throws {

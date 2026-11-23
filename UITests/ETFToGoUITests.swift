@@ -150,7 +150,7 @@ final class ETFToGoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["券商帳戶"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Test Broker"].exists)
     }
-    /// The skin kit's component sheet in each skin, to compare with the four-skin canvas.
+    /// The skin kit's component sheet in each skin, to compare with the five-skin canvas.
     func testSkinKitSheet() {
         for id in ["blackgold", "voxel", "stitch", "sketch", "harvest"] {
             let app = XCUIApplication(); app.launchArguments = ["--ui-testing", "--reset", "--skip-onboarding", "--skin", id, "--open", "skinKit"]; app.launch()
@@ -632,7 +632,7 @@ final class ETFToGoUITests: XCTestCase {
         return true
     }
 
-    /// A label that is only a figure, such as 「12」 or 「1,280」; 「n / 4」 and 「LV.n」 are allowed.
+    /// A label that is only a figure, such as 「12」 or 「1,280」; 「n / 5」 and 「LV.n」 are allowed.
     private func isBareNumber(_ label: String) -> Bool {
         let text = label.trimmingCharacters(in: .whitespaces)
         if text.isEmpty || text.contains("/") || text.hasPrefix("LV") { return false }
@@ -682,8 +682,19 @@ final class ETFToGoUITests: XCTestCase {
         let promised = app.descendants(matching: .any)
             .matching(NSPredicate(format: "label CONTAINS '即將推出' OR value CONTAINS '即將推出'"))
         XCTAssertEqual(promised.count, 0, "Never 「即將推出」")
+        sleep(1); capture(app, "skins-harvest-locked")
         app.buttons["skin-apply"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["achievement-exDividendSkin"].waitForExistence(timeout: 5), "看成就 opens the wall at 除息季")
+    }
+
+    /// The same locked page at the largest accessibility text: 「7–9 月記一筆配息解鎖」 wraps, nothing is cut off.
+    func testHarvestLockedAtLargestText() {
+        let app = launch(["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL", "--demo-level", "7", "--open", "skins"])
+        XCTAssertTrue(app.buttons["skin-apply"].waitForExistence(timeout: 10), "外觀主題 opens")
+        app.buttons["skin-badge-harvest"].tap()
+        waitForLabel(app.descendants(matching: .any)["skin-status"], "7–9 月記一筆配息解鎖")
+        waitForLabel(app.buttons["skin-apply"], "看成就")
+        sleep(1); capture(app, "skins-harvest-locked-ax")
     }
 
     /// --demo-pocket saves last year's July and August sample dividends, so 收成 is open and can be worn.
@@ -708,7 +719,7 @@ final class ETFToGoUITests: XCTestCase {
             let labels: [String] = app.staticTexts.allElementsBoundByIndex.map { $0.label }
             let bare = labels.filter(isBareNumber)
             XCTAssertEqual(bare, [], "\(id): no bare numbers on the skin page")
-            // Cards and style badges carry no figures at all; only 「LV.n」 and 「n / 4」 may hold digits.
+            // Cards and style badges carry no figures at all; only 「LV.n」 and 「n / 5」 may hold digits.
             let tagged = app.descendants(matching: .any)
                 .matching(NSPredicate(format: "identifier BEGINSWITH 'skin-card-' OR identifier BEGINSWITH 'skin-badge-'"))
                 .allElementsBoundByIndex.map { $0.label }
